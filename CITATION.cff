@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "Please cite the accompanying paper when using this formalization."
+title: "Products of unitaries as continuous evolutions at finite precision"
+authors:
+  - family-names: Jarret
+    given-names: Michael
+license: Apache-2.0
+type: software

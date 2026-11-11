@@ -46,3 +46,6 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.thm_jumps
 #check @UnitaryProducts.PaperProof.thm_unitary_products
 #check @UnitaryProducts.PaperProof.cor_walk_leakage
+#check @UnitaryProducts.PaperProof.ex_gap_adapted
+#check @UnitaryProducts.PaperProof.ex_crossings
+#check @UnitaryProducts.PaperProof.Spin.ex_precessing_spin

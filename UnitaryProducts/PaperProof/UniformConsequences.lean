@@ -54,9 +54,9 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 theorem clock_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {h w : ℝ}
+    {L w : ℝ}
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ h * |t - s|)
+      ‖Hd t - Hd s‖ ≤ L * |t - s|)
     (hw : w < 2 * π)
     (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hj)).eigenvalues p -
@@ -67,7 +67,7 @@ theorem clock_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
     let c₁ := c₀ / 4 + 1 / 64
     let Δ := unitClockJump H Hd T
     ‖V T - U T‖ ≤ (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
-      h / 24 + c₁ * unitSupNorm Hd ^ 2) + ∑ j ∈ Finset.Icc 1 T, ‖Δ j‖ := by
+      L / 24 + c₁ * unitSupNorm Hd ^ 2) + ∑ j ∈ Finset.Icc 1 T, ‖Δ j‖ := by
   have hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ unitSupNorm Hd :=
     fun _ hs ↦ norm_le_unitSupNorm (continuousOn_of_norm_sub_le hlip) hs
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
@@ -88,9 +88,9 @@ entrywise multiplier and closed constants of Definition 4.1. -/
 theorem thm_clocks [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {h w : ℝ}
+    {L w : ℝ}
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ h * |t - s|)
+      ‖Hd t - Hd s‖ ≤ L * |t - s|)
     (hw : w < 2 * π)
     (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hj)).eigenvalues p -
@@ -101,7 +101,7 @@ theorem thm_clocks [NeZero d] {T : ℕ} (hT : 0 < T)
     let c₁ := c₀ / 4 + 1 / 64
     let Δ := paperClockJump H Hd T
     ‖V T - U T‖ ≤ (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
-      h / 24 + c₁ * unitSupNorm Hd ^ 2) + ∑ j ∈ Finset.Icc 1 T, ‖Δ j‖ := by
+      L / 24 + c₁ * unitSupNorm Hd ^ 2) + ∑ j ∈ Finset.Icc 1 T, ‖Δ j‖ := by
   dsimp only
   rw [paperClockJump_sum_eq H Hd hH hw hwidth]
   exact clock_series_bound hT H Hd U V hH hd hlip hw hwidth hU hV
@@ -112,9 +112,9 @@ The derivative uses its compact-interval supremum, and the endpoint norms remain
 theorem endpoint_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {h w : ℝ}
+    {L w : ℝ}
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ h * |t - s|)
+      ‖Hd t - Hd s‖ ≤ L * |t - s|)
     (hw : w < 2 * π)
     (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hj)).eigenvalues p -
@@ -124,7 +124,7 @@ theorem endpoint_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
     let c₀ := frameBound w - frameBound (w / 2) / 2
     let c₁ := c₀ / 4 + 1 / 64
     ‖V T - U T‖ ≤ (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
-      (1 / 24 + frameBound w) * h + (c₁ + (2 * frameLip w)) * unitSupNorm Hd ^ 2) := by
+      (1 / 24 + frameBound w) * L + (c₁ + (2 * frameLip w)) * unitSupNorm Hd ^ 2) := by
   have hclock := thm_clocks hT H Hd U V hH hd hlip hw hwidth hU hV
   have hw0 : 0 ≤ w := by
     simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) (0 : Fin d)
@@ -140,9 +140,9 @@ entrywise multiplier and closed constants of Definition 4.1. -/
 theorem unit_steps_endpoint_bounds [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {h w : ℝ}
+    {L w : ℝ}
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ h * |t - s|)
+      ‖Hd t - Hd s‖ ≤ L * |t - s|)
     (hw : w < 2 * π)
     (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hj)).eigenvalues p -
@@ -152,7 +152,7 @@ theorem unit_steps_endpoint_bounds [NeZero d] {T : ℕ} (hT : 0 < T)
     let c₀ := cellConstant w
     let c₁ := c₀ / 4 + 1 / 64
     ‖V T - U T‖ ≤ (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
-      (1 / 24 + frameMult w) * h + (c₁ + (2 * deriv frameMult w)) * unitSupNorm Hd ^ 2) := by
+      (1 / 24 + frameMult w) * L + (c₁ + (2 * deriv frameMult w)) * unitSupNorm Hd ^ 2) := by
   have hw0 : 0 ≤ w := by
     simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) 0
   rw [cellConstant_eq_frameBound hw0 hw, paperFrameMult_eq_series hw0 hw,
@@ -169,9 +169,9 @@ Duhamel adds precisely the sample truncation sum. -/
 theorem thm_unit_steps_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
     (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hdiff : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))
-    (h w : ℝ)
+    (L w : ℝ)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ h * |t - s|)
+      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ L * |t - s|)
     (hw : w < 2 * π)
     (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hj)).eigenvalues p -
@@ -185,7 +185,7 @@ theorem thm_unit_steps_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 
     let A := fun s ↦ scalarEntryMap F (H s)
     ‖evol (H 1) (1 / 2) * (unitProduct A T).1 * evol (H 0) (-(1 / 2)) - U T‖ ≤
       (∑ j ∈ Finset.range T, ‖H ((j : ℝ) / T) - A ((j : ℝ) / T)‖) +
-      (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * h +
+      (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * L +
         (c₁ + (2 * frameLip w)) * unitSupNorm Hd ^ 2) := by
   intro Nf c₀ c₁ Hd A
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
@@ -200,13 +200,13 @@ theorem thm_unit_steps_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 
     (by linarith [pi_pos] : w / 2 < 2 * π)).1
   have hexact : ‖evol (H 1) (1 / 2) * (unitProduct H T).1 *
       evol (H 0) (-(1 / 2)) - U T‖ ≤
-      (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * h +
+      (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * L +
         (c₁ + (2 * frameLip w)) * unitSupNorm Hd ^ 2) := by
     have hhalf : (T : ℝ) / (2 * T) = 1 / 2 := by field_simp
     simpa only [heV, div_self ht.ne', one_smul, hhalf, c₀, c₁, Nf, hN, hNhalf]
       using hcell
   have htrunc := unitProduct_truncation_comparison
-    (B := (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * h +
+    (B := (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * L +
       (c₁ + (2 * frameLip w)) * unitSupNorm Hd ^ 2)) T hH
     (fun s hs ↦ scalarEntryMap_isHermitian F hF (hH s hs)) (U T)
     (by
@@ -219,9 +219,9 @@ endpoint-norm comparison (4.6) to the two leakage norms. -/
 theorem cor_unit_transfer_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
     (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hdiff : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))
-    (h w : ℝ)
+    (L w : ℝ)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ h * |t - s|)
+      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ L * |t - s|)
     (hw : w < 2 * π)
     (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hj)).eigenvalues p -
@@ -237,7 +237,7 @@ theorem cor_unit_transfer_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT :
     let A := fun s ↦ scalarEntryMap F (H s)
     |‖(1 - Q) * (unitProduct A T).1 * P‖ - ‖(1 - Q) * U T * P‖| ≤
       (∑ j ∈ Finset.range T, ‖H ((j : ℝ) / T) - A ((j : ℝ) / T)‖) +
-      (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * h +
+      (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * L +
         (c₁ + (2 * frameLip w)) * unitSupNorm Hd ^ 2) := by
   intro Nf c₀ c₁ Hd A
   have htransfer := prop_transfer (U := U T) (W := (unitProduct A T).1)
@@ -247,7 +247,7 @@ theorem cor_unit_transfer_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT :
     (commute_evol_right hQc (1 / 2)).symm
     (commute_evol_right hPc (-(1 / 2))).symm
   simp only [sub_self, norm_zero, add_zero, mul_zero] at htransfer
-  exact htransfer.trans (thm_unit_steps_bounds H U T hT hH hdiff h w
+  exact htransfer.trans (thm_unit_steps_bounds H U T hT hH hdiff L w
     hlip hw hwidth hU F hF)
 
 
@@ -827,9 +827,9 @@ theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ)
    (hT1 : 0 < T)
     (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
    (hc : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))
-    (h : ℝ)
+    (L : ℝ)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ h * |t - s|)
+      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ L * |t - s|)
     (hdiff : ∀ j : ℕ, ∀ hjT : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hjT)).eigenvalues p -
         (hH _ (walkCubic_sample hjT)).eigenvalues q| ≤ w)
@@ -847,14 +847,14 @@ theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ)
     let c₁ := c₀ / 4 + 1 / 64
     let Hd := derivWithin H (Icc (0 : ℝ) 1)
     let M := (C : ℝ) + T * ((1 / T) *
-      (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * h +
+      (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * L +
         (c₁ + (2 * deriv frameMult w)) * unitSupNorm Hd ^ 2))
     let σ := ⨆ s : Icc (0 : ℝ) 1, ⨆ i : Fin d,
       (Finset.univ.filter fun j ↦ truncHerm k (H s) i j ≠ H s i j).card
     2 * M / δ ≤ T → Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) →
       ‖(1 - Q) * (unitProduct (fun s ↦ scalarEntryMap (truncBits k) (H s)) T).1 * P‖ ≤ δ := by
   intro Nf c₀ c₁ Hd M σ hbudget hbits
-  have hchain := ex_unit_transfer_chain w hw H U T k hT1 hH hc h hlip hdiff hU
+  have hchain := ex_unit_transfer_chain w hw H U T k hT1 hH hc L hlip hdiff hU
     P Q hP hQ hPc hQc C δ hδ hcont hbudget hbits
   exact (hchain.1.trans (hchain.2.1.trans
     (hchain.2.2.1.trans hchain.2.2.2.1))).trans_eq hchain.2.2.2.2

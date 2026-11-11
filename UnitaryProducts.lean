@@ -4,6 +4,16 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+public import UnitaryProducts.PaperProof.GapAdapted
+public import UnitaryProducts.PaperProof.PrecessingSpin
+public import UnitaryProducts.PaperProof.SpinProse
+public import UnitaryProducts.PaperProof.SpinRemainders
+public import UnitaryProducts.PaperProof.SpinConsequences
+public import UnitaryProducts.PaperProof.BurgarthScaling
+public import UnitaryProducts.PaperProof.LeftHeld
+public import UnitaryProducts.PaperProof.OddResonance
+public import UnitaryProducts.PaperProof.ExamplesProse
+public import UnitaryProducts.PaperProof.Crossings
 public import UnitaryProducts.Prose.Fidelity
 public import UnitaryProducts.PaperProof.CorWalkLeakage
 public import UnitaryProducts.PaperProof.ClosedCellLimit
@@ -137,9 +147,8 @@ The paper's formal development, collected in section order.
 
 ## Main results
 
-See `UnitaryProducts.Sections.Introduction` for the two main scaling results and
-`THEOREMS.md` for the complete statement index. Each section entry file in
-`UnitaryProducts/Sections/` has a reading guide.
+See `UnitaryProducts.PaperProof.IntroTheorems` for Theorem B and
+`THEOREMS.md` for the complete statement index, including the three examples.
 
 ## References
 

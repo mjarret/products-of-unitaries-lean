@@ -20,7 +20,6 @@ public import UnitaryProducts.PaperProof.ExTruncationBits
 - `exists_rounded_evolution`
 - `uniform_bit_sample_error`
 - `uniform_bit_sample_error_sigma`
-- `uniform_identity_entry_error`
 -/
 
 @[expose] public section
@@ -104,14 +103,6 @@ theorem all_sample_width_eventually (H : ℝ → 𝕄)
   have he (i : Fin d) :=
     (spectrum.norm_le_norm_of_mem ((hH s hs).eigenvalues_mem_spectrum_real i)).trans (hB s hs)
   simpa only [Real.norm_eq_abs, two_mul] using norm_sub_le_of_le (he p) (he q)
-
-/-- The identity entry map recovers exact samples and zero error on the whole grid. -/
-theorem uniform_identity_entry_error (H : ℝ → 𝕄) (N : ℕ) :
-    (∀ s, scalarEntryMap id (H s) = H s) ∧
-      (⨆ j : Fin (N + 1),
-        ‖H ((j : ℝ) / N) - scalarEntryMap id (H ((j : ℝ) / N))‖) = 0 := by
-  exact ⟨fun _ ↦ rfl, by simp only [show ∀ A : 𝕄, scalarEntryMap id A = A from fun _ ↦ rfl,
-    sub_self, norm_zero, ciSup_const]⟩
 
 /-- Example 3.2 with the paper's literal changed-entry sparsity `σ_k`: the
 supremum over all path times and all rows, rather than a supplied sparsity bound.

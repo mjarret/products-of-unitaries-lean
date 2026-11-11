@@ -15,31 +15,6 @@ open scoped Topology
 open UnitaryProducts.Corrector UnitaryProducts.Paper UnitaryProducts.Prose
 namespace UnitaryProducts.PaperProof
 
-/-- The strict decimal bounds after equation (4.6), for `a = 2c₀ + 1/24 + N(π)` and
-`b = c₁ + 2N'(π)`. -/
-theorem intro_constants_strict :
-    1 / π - 1 / π ^ 2 + 1 / 24 < (26 / 100 : ℝ) ∧
-    5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 < (61 / 1000 : ℝ) := by
-  have hlo : (10000 / 31416 : ℝ) ≤ 1 / π := by
-    apply (le_div_iff₀ pi_pos).mpr
-    linarith [Real.pi_lt_d4]
-  have hhi : 1 / π ≤ (10000 / 31415 : ℝ) := by
-    apply (div_le_iff₀ pi_pos).mpr
-    linarith [Real.pi_gt_d4]
-  have hsqlo := pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 10000 / 31416) hlo 2
-  have hcubelo := pow_le_pow_left₀ (by norm_num : (0 : ℝ) ≤ 10000 / 31416) hlo 3
-  have hA : 1 / π - 1 / π ^ 2 + 1 / 24 = 1 / π - (1 / π) ^ 2 + 1 / 24 := by ring
-  have hB : 5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 =
-      5 / 8 * (1 / π) - 1 / 4 * (1 / π) ^ 2 - 4 * (1 / π) ^ 3 + 1 / 64 := by ring
-  rw [hA, hB]
-  constructor <;> linarith
-
-/-- Theorem B's stated weak bounds follow from the strict evaluation after (4.6). -/
-theorem intro_constants :
-    1 / π - 1 / π ^ 2 + 1 / 24 ≤ (26 / 100 : ℝ) ∧
-    5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 ≤ (61 / 1000 : ℝ) :=
-  ⟨intro_constants_strict.1.le, intro_constants_strict.2.le⟩
-
 /-- The squared unitary-derivative coefficient in Theorem 4.5. -/
 def walk_square (w : ℝ) : ℝ :=
   (1 / 24 + frameBound w) / Real.cos (w / 4) ^ 2 +

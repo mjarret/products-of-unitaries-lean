@@ -5,7 +5,9 @@ Lean proofs accompanying Michael Jarret's *Products of unitaries as continuous e
 The library compares finite products of unitary matrices with continuous Schrödinger evolutions.
 It proves fine-step error bounds for truncated midpoint samples, a unit-step comparison for
 Hamiltonians with Lipschitz derivative, the corresponding walk comparison through a logarithm,
-and transfer bounds for leakage between spectral subspaces. All matrix norms are operator norms.
+and transfer bounds for leakage between spectral subspaces. The examples cover gap-adapted
+schedules, a precessing spin (including endpoint-coefficient optimality), and eigenvalue
+crossings. All matrix norms are operator norms.
 
 The Jansen–Ruskai–Seiler continuous adiabatic bound is an input hypothesis. Its continuous theorem
 is not formalized here. The formalized results transfer that bound to the products under the
@@ -50,10 +52,9 @@ Every indexed statement depends only on `propext`, `Classical.choice`, and `Quot
 ## Conventions
 
 - **Statements.** Every numbered statement of the paper, Theorems A and B, and each unnumbered claim
-  the paper relies on has a row in [THEOREMS.md](THEOREMS.md). Each indexed declaration's docstring
-  gives the paper's number, then the correspondence between the Lean statement and the paper's
-  (for example `sSup` as a maximum, or an explicit constant where the paper writes an absolute
-  one), then an outline of the proof.
+  the paper relies on has a row in [THEOREMS.md](THEOREMS.md). Each numbered head's docstring
+  gives the paper's number and explains the correspondence between the Lean statement and
+  the paper's formulation. Supporting docstrings describe the corresponding calculation.
 - **Hypotheses.** Where a proof does not use one of the paper's standing hypotheses (for example
   `d ≥ 1`), the Lean statement omits it and the docstring says so.
 - **Inputs.** Continuous adiabatic theorems are not formalized. The two Jansen–Ruskai–Seiler

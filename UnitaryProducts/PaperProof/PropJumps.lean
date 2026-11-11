@@ -243,13 +243,13 @@ entrywise multiplier and the closed scalar function and its derivative. -/
 theorem thm_jumps [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ K, (H s).IsHermitian)
     (hd : ∀ s ∈ K, HasDerivWithinAt H (Hd s) K s)
-    {h w : ℝ} (hlip : ∀ s ∈ K, ∀ t ∈ K, ‖Hd t - Hd s‖ ≤ h * |t - s|)
+    {L w : ℝ} (hlip : ∀ s ∈ K, ∀ t ∈ K, ‖Hd t - Hd s‖ ≤ L * |t - s|)
     (hw : w < 2 * π)
     (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hj)).eigenvalues p -
         (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ w) :
     ((∑ j ∈ Finset.Icc 1 T, ‖paperClockJump H Hd T j‖) ≤
-      (1 / T : ℝ) * (frameMult w * h + (2 * deriv frameMult w) * unitSupNorm Hd ^ 2)) ∧
+      (1 / T : ℝ) * (frameMult w * L + (2 * deriv frameMult w) * unitSupNorm Hd ^ 2)) ∧
     (ContDiffOn ℝ 2 H K →
       (∀ s (hs : s ∈ K) p q,
         |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) →

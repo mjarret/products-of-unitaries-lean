@@ -88,7 +88,6 @@ public import UnitaryProducts.Corrector.PeriodicCharacterization
 public import UnitaryProducts.PaperProof.LemWalkLog
 public import UnitaryProducts.PaperProof.ThmComparison
 public import UnitaryProducts.PaperProof.ThmTransfer
-public import UnitaryProducts.PaperProof.CorJrs
 public import UnitaryProducts.PaperProof.RemTruncatedEndpoints
 public import UnitaryProducts.PaperProof.UniformConsequences
 public import UnitaryProducts.Prose.SyncSteps

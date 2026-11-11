@@ -98,6 +98,27 @@ theorem walk_band_gap_eq (W : ℝ → 𝕄) (α β : ℝ → ℝ)
   have hb := hband.2.2 s hs
   exact spectralWindowGap_eq_circularGap (hu s hs) hb.1 hb.2.1 hb.2.2.1 hb.2.2.2.1
 
+/-- Definition 2.5(i): a nonempty proper spectral arc with excluded endpoints
+necessarily has ordered endpoints less than one full turn apart. -/
+theorem spectralWindowBand_endpoint_order {U : 𝕄} {a b : ℝ}
+    (hband : spectralWindowBand true U a b) : a < b ∧ b < a + 2 * π := by
+  obtain ⟨z, _, x, hx, _⟩ := hband.2.1
+  have hab : a < b := hx.1.trans hx.2
+  obtain ⟨z, hzs, hzout⟩ := hband.2.2.1
+  obtain ⟨y, hy, hey⟩ := phase_of_unit (norm_of_mem_spectrum hband.1 hzs) a
+  have hys : Complex.exp (-I * (y : ℂ)) ∈ spectrum ℂ U := by
+    rw [← hey]
+    exact hzs
+  have hay : a < y := by
+    apply lt_of_le_of_ne hy.1
+    intro he
+    exact hband.2.2.2.1 (he ▸ hys)
+  have hby : b ≤ y := by
+    apply le_of_not_gt
+    intro hyb
+    exact hzout ⟨y, ⟨hay, hyb⟩, hey.symm⟩
+  exact ⟨hab, hby.trans_lt hy.2⟩
+
 /-- On arcs shorter than one turn, the moving-band predicate is precisely the
 family-band predicate of Definition 2.5. Unitarity places all complementary
 spectral points on that same turn, and excluded endpoints make both arcs open. -/

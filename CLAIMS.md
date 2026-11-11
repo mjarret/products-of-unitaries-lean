@@ -122,13 +122,13 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
 21. **EXTERNAL** — Section 1.1
 
-    In its choice of $Y$, \Cref{thm:comparison} generalizes the lemma of Burgarth et al.\ \cite{burgarth2022}, which takes $Y$ to be the integral of the Hamiltonian difference and allows locally integrable bounded generators on a separable Hilbert space.
+    In its choice of $Y$, \Cref{thm:comparison} generalizes the lemma of Burgarth et al., which takes $Y$ to be the integral of the Hamiltonian difference and allows locally integrable bounded generators on a separable Hilbert space.
 
     burgarth2022, Lemma 1 and Proposition 1
 
 22. **EXTERNAL** — Section 1.1
 
-    generalizes the lemma of Burgarth et al.\ \cite{burgarth2022}, which takes $Y$ to be the integral of the Hamiltonian difference
+    generalizes the lemma of Burgarth et al., which takes $Y$ to be the integral of the Hamiltonian difference
 
     Cited leaf: Burgarth et al. (burgarth2022), integration-by-parts lemma and its scope
 
@@ -236,395 +236,377 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
 39. **LEAN** — Section 1
 
-    That value is $1/T$ times a Lipschitz function of the sample and its derivative, which change by $O(1/T)$ between samples
+    That value is $1/T$ times a function of the sample and its derivative that is Lipschitz over samples of width at most $\width$. As the sample and its derivative change by $O(1/T)$ between samples
 
     UnitaryProducts.Paper.adjacent_corrector_jump_le; UnitaryProducts.PaperProof.thm_unit_steps_bounds; UnitaryProducts.PaperProof.unified_affine_variation_of_derivWithin; UnitaryProducts.PaperProof.uniform_residual_step; UnitaryProducts.PaperProof.uniform_residual_integral
 
-40. **EXTERNAL** — Section 1.1
-
-    They play the role of the symplectic corrector that Wisdom, Holman, and Touma \cite{wisdom1996} built for splitting methods.
-
-    wisdom1996
-
-41. **LEAN** — Section 1
+40. **LEAN** — Section 1
 
     with the same value at $j-\frac12$ and $j+\frac12$.
 
     UnitaryProducts.PaperProof.lem_cell
 
-42. **LEAN** — Section 1.1
+41. **LEAN** — Section 1.1
 
     We summarize the comparisons informally, writing $\sparsity_\bits$ for the largest number of entries that truncation at the $\bits$th binary place changes in one row of $\sched(s)$, over all rows and all $s\in[0,1]$.
 
     UnitaryProducts.Prose.truncation_error_sparsity_le_dim; UnitaryProducts.PaperProof.uniform_bit_sample_error_sigma; UnitaryProducts.Prose.truncation_path_rowSparse
 
-43. **LEAN** — Section 1.1
+42. **LEAN** — Section 1.1
 
     Let $\sched(s)$ for $s\in[0,1]$ be a regulated Hamiltonian with evolution $\evol$ over time $T>0$, and let $\varepsilon>0$. Take checkpoints such that, inside each interval between them, $\sched(s)$ is within $\varepsilon$ of the sample at the interval's midpoint, which every regulated Hamiltonian admits. Inside each interval, replace $\sched$ by that sample with every entry's real and imaginary parts truncated toward zero at the $\bits$th binary place. The resulting product is within $T(\varepsilon+\sqrt2\,\sparsity_\bits\,2^{-\bits})$ of $\evol(T)$.
 
     UnitaryProducts.PaperProof.introthm_fine_oscillation; UnitaryProducts.Paper.truncation_bits; UnitaryProducts.PaperProof.ex_truncation_bits; UnitaryProducts.Prose.truncation_path_rowSparse
 
-44. **LEAN** — Section 1.1
+43. **LEAN** — Section 1.1
 
     every entry's real and imaginary parts truncated toward zero at the $\bits$th binary place
 
     UnitaryProducts.Paper.truncation_bits
 
-45. **LEAN** — Section 1.1
+44. **LEAN** — Section 1.1
 
     In \Cref{introthm:fine-count}, the checkpoints control the error in time and the precision controls the error in the entries, even for Hamiltonians that jump. For a Hamiltonian with Lipschitz constant $L$, any number $N\ge L/(2\varepsilon)$ of equal intervals has midpoint error at most $\varepsilon$ (\Cref{rem:oscillation-counts}).
 
     UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.rem_oscillation_count_lipschitz
 
-46. **LEAN** — Section 1.1
+45. **LEAN** — Section 1.1
 
     a bound on the eigenvalue differences of the samples $\sched(j/T)$.
 
     UnitaryProducts.PaperProof.AllSampleWidth
 
-47. **LEAN** — Section 1.1
+46. **LEAN** — Section 1.1
 
     There are absolute constants $a$ and $b$ such that the following holds. Let $T\ge2$ be an integer, let $\sched(s)$ for $s\in[0,1]$ be a Hamiltonian with $\|\sched'(s)\|\le h$ and $\|\sched'(s_1)-\sched'(s_2)\|\le h|s_1-s_2|$ for $s,s_1,s_2\in[0,1]$, and let $\evol$ be its evolution over time $T$. If every sample $\sched(j/T)$ with $0\le j\le T$ has eigenvalue differences of modulus at most $\pi$, then
 
     UnitaryProducts.PaperProof.introthm_unit
 
-48. **LEAN** — Section 1.1
+47. **LEAN** — Section 1.1
 
     \bigl\|e^{-i\sched(1)/2}\devprod_Te^{i\sched(0)/2}-\evol(T)\bigr\|\le\frac{ah+bh^2}T.
 
     UnitaryProducts.PaperProof.introthm_unit
 
-49. **LEAN** — Section 1.1
+48. **LEAN** — Section 1.1
 
     A simulation guarantee $\|\evol(T)-X\|\le\varepsilon$ gives $\|e^{-i\sched(1)/2}\devprod_Te^{i\sched(0)/2}-X\|\le\varepsilon$ plus the error of \Cref{introthm:unit}.
 
     UnitaryProducts.PaperProof.introthm_unit; norm_sub_le_norm_sub_add_norm_sub
 
-50. **LEAN** — Section 1.1
+49. **LEAN** — Section 1.1
 
-    Its formal version holds at any width below $2\pi$, with the largest $\|\sched'(s)\|$ and the Lipschitz constant of $\sched'$ in place of $h$, and with $\|\sched'\|$ entering the term linear in $h$ only through $\|\sched'(0)\|$ and $\|\sched'(1)\|$.
+    Its formal version holds for every integer $T\ge1$ and at every width below $2\pi$, with the largest $\|\sched'(s)\|$ and the Lipschitz constant of $\sched'$ in place of $h$, and with $\|\sched'\|$ entering the term linear in $h$ only through $\|\sched'(0)\|$ and $\|\sched'(1)\|$.
 
     UnitaryProducts.PaperProof.unit_steps_endpoint_bounds
 
-51. **LEAN** — Section 1.1
+50. **LEAN** — Section 1.1
 
     \Cref{introthm:unit} gives $O(1/T)$
 
     UnitaryProducts.PaperProof.introthm_unit
 
-52. **LEAN** — Section 1.1
+51. **LEAN** — Section 1.1
 
-    whereas \Cref{introthm:fine-count} needs $\varepsilon$ of order $1/T^2$, and so about $LT^2$ factors for a Hamiltonian with Lipschitz constant $L$, to reach $O(1/T)$.
+    whereas \Cref{introthm:fine-count} reaches $O(1/T)$ only with $\varepsilon$ of order $1/T^2$, so the sufficient count it certifies for a Hamiltonian with Lipschitz constant $L$ is about $LT^2$ factors.
 
     UnitaryProducts.PaperProof.oscillation_inverse_time_tolerance; UnitaryProducts.PaperProof.oscillation_inverse_time_count; UnitaryProducts.PaperProof.oscillation_inverse_time_count_rounding; UnitaryProducts.PaperProof.oscillation_inverse_time_budget; UnitaryProducts.PaperProof.oscillation_inverse_time_product
 
-53. **LEAN** — Section 1.1
+52. **LEAN** — Section 1.1
 
     At unit steps, a continuous bound decaying faster than $O(1/T)$ transfers only up to the comparison's $O(1/T)$.
 
     UnitaryProducts.PaperProof.cor_unit_transfer; UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.PaperProof.ex_unit_sharp; UnitaryProducts.PaperProof.sharp_corrected_error_asymptotic
 
-54. **LEAN** — Section 1.1
+53. **LEAN** — Section 1.1
 
-    A leakage bound, on the largest norm of the evolved vector's component outside a spectral subspace of $\sched(1)$ over unit vectors in one of $\sched(0)$,
+    A leakage bound, a bound on $\|(1-Q)\evol(T)P\|$ for spectral projectors $P$ of $\sched(0)$ and $Q$ of $\sched(1)$,
 
     UnitaryProducts.Prose.matrix_norm_eq_operator_norm; ContinuousLinearMap.sSup_sphere_eq_norm; UnitaryProducts.Prose.norm_orthogonal_projector_le; UnitaryProducts.PaperProof.prop_transfer
 
-55. **EXTERNAL** — Section 1.1
+54. **EXTERNAL** — Section 1.1
 
     An adiabatic theorem is such a leakage bound. When a Hamiltonian varies slowly and a gap isolates part of its spectrum, the evolution maps the corresponding spectral subspace of the initial Hamiltonian close to that of the final one.
 
     jansen2007, Theorem 3 (continuous adiabatic theorem); background summary
 
-56. **LEAN** — Section 1.1
+55. **LEAN** — Section 1.1
 
     Neither \Cref{introthm:fine-count} nor \Cref{introthm:unit} uses adiabaticity
 
     UnitaryProducts.PaperProof.introthm_fine_oscillation; UnitaryProducts.PaperProof.introthm_unit
 
-57. **EXTERNAL** — Section 1.1
+56. **EXTERNAL** — Section 1.1
 
-    Tanaka \cite{tanaka2011} notes that the proof of the adiabatic theorem for slowly modulated Hamiltonians does not apply to quantum maps in general
+    Tanaka \cite{tanaka2011} notes that the proof of the adiabatic theorem for slowly modulated Hamiltonians, through eigenvectors of a Floquet Hamiltonian, does not apply to quantum maps in general
 
     tanaka2011
 
-58. **LEAN** — Section 1.1
+57. **LEAN** — Section 1.1
 
     continuous adiabatic theorems transfer to the products of \Cref{introthm:fine-count,introthm:unit} through their comparisons.
 
     UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.PaperProof.introthm_unit; UnitaryProducts.half_step_leakage_comparison; UnitaryProducts.commute_evol_right; UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.cor_jrs_oscillation
 
-59. **LEAN** — Section 1.1
+58. **LEAN** — Section 1.1
 
     Both comparisons are in operator norm and assume no spectral gap of $\sched$, so they cover every initial state.
 
     UnitaryProducts.PaperProof.cor_unit_transfer; UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.Prose.matrix_norm_eq_operator_norm; ContinuousLinearMap.le_opNorm
 
-60. **LEAN** — Section 1.1
+59. **LEAN** — Section 1.1
 
     A continuous leakage bound $C/T$ with $C>0$, such as the Jansen--Ruskai--Seiler bound \cite{jansen2007}, gives leakage at most $\delta$ from $O(1/\delta)$ unit steps (\Cref{ex:unit-transfer}), and from the fine-step product over time $T=2C/\delta$ with midpoint and truncation errors at most $\delta^2/(8C)$ (\Cref{cor:jrs}).
 
     UnitaryProducts.PaperProof.cor_jrs_oscillation; UnitaryProducts.PaperProof.exists_oscillation_partition; UnitaryProducts.Prose.bounded_truncation_error_tendsto; UnitaryProducts.PaperProof.ex_unit_transfer_bounds; UnitaryProducts.Prose.truncation_path_rowSparse
 
-61. **LEAN** — Section 1.1
+60. **LEAN** — Section 1.1
 
     A continuous leakage bound $C/T$ with $C>0$, such as the Jansen--Ruskai--Seiler bound \cite{jansen2007}, gives leakage at most $\delta$ from $O(1/\delta)$ unit steps (\Cref{ex:unit-transfer}), and from the fine-step product over time $T=2C/\delta$ with midpoint and truncation errors at most $\delta^2/(8C)$ (\Cref{cor:jrs}).
 
     UnitaryProducts.PaperProof.ex_unit_transfer_bounds; UnitaryProducts.PaperProof.cor_jrs_oscillation; UnitaryProducts.Prose.truncation_path_rowSparse
 
-62. **LEAN** — Section 1.1
+61. **LEAN** — Section 1.1
 
-    A leakage bound, on the largest norm of the evolved vector's component outside a spectral subspace of $\sched(1)$ over unit vectors in one of $\sched(0)$, transfers through \Cref{prop:transfer}, and the half-step phases preserve these subspaces, so the bound holds for the product itself (\Cref{sec:unit-transfer}).
+    A leakage bound, a bound on $\|(1-Q)\evol(T)P\|$ for spectral projectors $P$ of $\sched(0)$ and $Q$ of $\sched(1)$, transfers through \Cref{prop:transfer}, and the half-step phases commute with $P$ and $Q$, so the bound holds for the product itself (\Cref{sec:unit-transfer}).
 
     UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.PaperProof.introthm_unit; UnitaryProducts.half_step_leakage_comparison; UnitaryProducts.commute_evol_right; UnitaryProducts.Prose.matrix_norm_eq_operator_norm; ContinuousLinearMap.sSup_sphere_eq_norm
 
-63. **LEAN** — Section 1.1
+62. **LEAN** — Section 1.1
 
     A continuous leakage bound $C/T$ with $C>0$, such as the Jansen--Ruskai--Seiler bound \cite{jansen2007}, gives leakage at most $\delta$ from $O(1/\delta)$ unit steps (\Cref{ex:unit-transfer}), and from the fine-step product over time $T=2C/\delta$ with midpoint and truncation errors at most $\delta^2/(8C)$ (\Cref{cor:jrs}).
 
     UnitaryProducts.PaperProof.cor_jrs_oscillation; UnitaryProducts.PaperProof.ex_unit_transfer_bounds; UnitaryProducts.Prose.truncation_path_rowSparse
 
-64. **LEAN** — Section 1.1
+63. **LEAN** — Section 1.1
 
-    the half-step phases preserve these subspaces, so the bound holds for the product itself (\Cref{sec:unit-transfer}).
+    the half-step phases commute with $P$ and $Q$, so the bound holds for the product itself (\Cref{sec:unit-transfer}).
 
     UnitaryProducts.half_step_leakage_comparison; UnitaryProducts.commute_evol_right; UnitaryProducts.PaperProof.prop_transfer
 
-65. **LEAN** — Section 1.1
+64. **LEAN** — Section 1.1
 
     $e^{-i\sched(s)}=\devprod(s)$
 
     UnitaryProducts.PaperProof.lem_walk_log
 
-66. **LEAN** — Section 1.1
+65. **LEAN** — Section 1.1
 
-    A leakage bound, on the largest norm of the evolved vector's component outside a spectral subspace of $\sched(1)$ over unit vectors in one of $\sched(0)$, transfers through \Cref{prop:transfer}, and the half-step phases preserve these subspaces, so the bound holds for the product itself (\Cref{sec:unit-transfer}).
+    A leakage bound, a bound on $\|(1-Q)\evol(T)P\|$ for spectral projectors $P$ of $\sched(0)$ and $Q$ of $\sched(1)$, transfers through \Cref{prop:transfer}, and the half-step phases commute with $P$ and $Q$, so the bound holds for the product itself (\Cref{sec:unit-transfer}).
 
     UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.half_step_leakage_comparison
 
-67. **LEAN** — Section 1.1
+66. **LEAN** — Section 1.1
 
     gives the phase-corrected $O(1/T)$ comparison with coefficients $O(\freearc^{-3})$
 
     UnitaryProducts.PaperProof.thm_unitary_products; UnitaryProducts.PaperProof.walk_coefficient_equivalents; Asymptotics.IsEquivalent.isBigO; Asymptotics.IsBigO.trans; Asymptotics.IsBigO.of_bound; Asymptotics.IsBigO.const_mul_left; one_div_le_one_div_of_le; UnitaryProducts.PaperProof.lem_walk_log
 
-68. **LEAN** — Section 1.1
+67. **LEAN** — Section 1.1
 
     A product of unitaries $\devprod(j/T)$ from a $C^2$ unitary family $\devprod(s)$, such as the walks of discrete adiabatic theorems, is the $T$-step product of any Hermitian logarithm $\sched(s)$ of $\devprod(s)$, a Hermitian matrix with $e^{-i\sched(s)}=\devprod(s)$.
 
     UnitaryProducts.stepProduct_eq_pieceProduct
 
-69. **EXTERNAL** — Section 1.1
+68. **EXTERNAL** — Section 1.1
 
     Blanes, Casas, and Murua \cite{blanes2008}, Hochbruck and Lubich \cite{hochbruck2003}, and Blanes et al.\ \cite{blanes2009} analyze the splitting, exponential, and Magnus integrators that do the same in numerical analysis
 
     blanes2008; hochbruck2003; blanes2009
 
-70. **EXTERNAL** — Section 1.1
+69. **EXTERNAL** — Section 1.1
 
     Kato \cite{kato1950}, Avron, Seiler, and Yaffe \cite{avron1987}, and Jansen, Ruskai, and Seiler \cite{jansen2007} prove adiabatic theorems in continuous time
 
     kato1950; avron1987; jansen2007
 
-71. **EXTERNAL** — Section 1.1
+70. **EXTERNAL** — Section 1.1
 
     Discrete adiabatic theorems \cite{dranov1998,tanaka2011,costa2022,an2025} take a product as given and bound its distance from adiabatic transport by separate arguments, under an eigenphase (eigenvalue-argument) gap for a tracked band.
 
-    tanaka2011; costa2022; an2025; tanaka2011; an2025; dranov1998; tanaka2011; costa2022; an2025
+    tanaka2011; costa2022; an2025
 
-72. **EXTERNAL** — Section 1.1
+71. **EXTERNAL** — Section 1.1
 
     Wiebe et al.\ \cite{wiebe2011} and Poulin et al.\ \cite{poulin2011} simulate continuous evolutions on a quantum computer by products of unitaries
 
     wiebe2011; poulin2011
 
-73. **EXTERNAL** — Section 1.1
+72. **EXTERNAL** — Section 1.1
 
     Discrete adiabatic theorems \cite{dranov1998,tanaka2011,costa2022,an2025} take a product as given and bound its distance from adiabatic transport by separate arguments, under an eigenphase (eigenvalue-argument) gap for a tracked band.
 
-    tanaka2011; costa2022; an2025; tanaka2011; an2025; dranov1998; tanaka2011; costa2022; an2025
+    tanaka2011; an2025
 
-74. **LEAN** — Section 1.1
+73. **LEAN** — Section 1.1
 
-    First, it compares the product with the Hamiltonian's own evolution rather than with ideal adiabatic transport, so it needs no band gap and allows eigenvalue crossings.
+    First, it compares the product with the Hamiltonian's own evolution rather than with ideal adiabatic transport, so it needs no band gap, no gap enters its constants, and it allows eigenvalue crossings.
 
     UnitaryProducts.PaperProof.thm_unit_steps_endpoint_max
 
-75. **EXTERNAL** — Section 1.1
+74. **EXTERNAL** — Section 1.1
 
     For one initial state and sufficiently short fixed steps, Yi \cite{yi2021} obtains $O(1/T)$ leakage for an eigenstate of a nondegenerate spectrum, Kovalsky et al.\ \cite{kovalsky2023} for a gapped ground state, and Lu et al.\ \cite{lu2026} asymptotically for the ground state.
 
-    yi2021, discrete leakage analysis; kovalsky2023, Theorem 1; lu2026, Theorem 1
+    yi2021, discrete leakage analysis (source main.tex:144–210); kovalsky2023, Theorem 1; lu2026, Theorem 1
 
-76. **EXTERNAL** — Section 1.1
+75. **EXTERNAL** — Section 1.1
 
     For walks, Costa et al.\ \cite{costa2022} and An, Costa, and Berry \cite{an2025} prove $O(1/T)$ leakage under eigenphase gaps across neighboring samples.
 
     costa2022, discrete adiabatic theorem; an2025, §III.A, discrete adiabatic theorem
 
-77. **LEAN** — Section 1.1
+76. **LEAN** — Section 1.1
 
     Third, continuous adiabatic theorems transfer with their own hypotheses, up to $O(1/T)$
 
     UnitaryProducts.PaperProof.cor_unit_transfer
 
-78. **LEAN** — Section 1.1
+77. **LEAN** — Section 1.1
 
     a width hypothesis on $\sched$ that by itself neither implies nor follows from eigenphase gaps of a band of its sampled exponentials
 
     UnitaryProducts.Paper.width_band_gap_incomparable
 
-79. **LEAN** — Section 1.1
+78. **LEAN** — Section 1.1
 
-    it needs no band gap and allows eigenvalue crossings
+    it needs no band gap, no gap enters its constants, and it allows eigenvalue crossings
 
     UnitaryProducts.PaperProof.thm_unit_steps_endpoint_max
 
-80. **LEAN** — Section 1.1
-
-    its $O(1/T)$ error, with explicit constants, decreases with $T$ at a fixed step length
-
-    UnitaryProducts.PaperProof.introthm_unit
-
-81. **LEAN** — Section 1.1
-
-    its $O(1/T)$ error, with explicit constants, decreases with $T$ at a fixed step length.
-
-    UnitaryProducts.PaperProof.introthm_unit
-
-82. **EXTERNAL** — Section 1.1
+79. **EXTERNAL** — Section 1.1
 
     Yi and Crosson \cite[Proposition~1]{yicrosson2021v1} apply continuous theory to logarithms of Trotter steps
 
     yicrosson2021v1, Proposition~1
 
-83. **EXTERNAL** — Section 1.1
+80. **EXTERNAL** — Section 1.1
 
     treating the change from time discretization as negligible without a rigorous bound on that change
 
     yicrosson2021v1, Proposition 1
 
-84. **EXTERNAL** — Section 1.1
+81. **EXTERNAL** — Section 1.1
 
     Discrete adiabatic theorems \cite{dranov1998,tanaka2011,costa2022,an2025} take a product as given and bound its distance from adiabatic transport by separate arguments, under an eigenphase (eigenvalue-argument) gap for a tracked band.
 
-    tanaka2011; costa2022; an2025; tanaka2011; an2025; dranov1998; tanaka2011; costa2022; an2025
+    dranov1998; tanaka2011; costa2022; an2025
 
-85. **LEAN** — Section 1.1
+82. **LEAN** — Section 1.1
 
-    When $\sched(s)$ has eigenvalue differences of modulus at most $\width<2\pi$, the eigenvalues of $e^{-i\sched(s)}$ are $e^{-i\theta}$ for $\theta\in\operatorname{spec}\sched(s)+2\pi\mathbb Z$, so the image of a band of $\sched(s)$ has eigenphase gap at least the smaller of $2\pi-\width$ and the band's spectral gap.
+    When $\sched(s)$ has eigenvalue differences of modulus at most $\width<2\pi$, the eigenvalues of $e^{-i\sched(s)}$ are $e^{-i\theta}$ for $\theta\in\operatorname{spec}\sched(s)+2\pi\mathbb Z$, so the image of a band of $\sched(s)$ is a band of $e^{-i\sched(s)}$, with eigenphase gap at least the smaller of $2\pi-\width$ and the band's spectral gap.
 
-    UnitaryProducts.PaperProof.periodic_phase_spectrum; UnitaryProducts.PaperProof.internal_phase_gap; UnitaryProducts.PaperProof.between_periods_phase_gap; UnitaryProducts.PaperProof.finite_band_phase_gap_lower; UnitaryProducts.spectrum_evol_image
+    UnitaryProducts.PaperProof.periodic_phase_spectrum; UnitaryProducts.PaperProof.internal_phase_gap; UnitaryProducts.PaperProof.between_periods_phase_gap; UnitaryProducts.PaperProof.finite_band_phase_gap_lower; UnitaryProducts.spectrum_evol_image; UnitaryProducts.PaperProof.spectralWindowProjector_evol; UnitaryProducts.Paper.phase_inj; UnitaryProducts.PaperProof.hermitian_band_exponential_image
 
-86. **LEAN** — Section 1.1
+83. **LEAN** — Section 1.1
 
     The Jansen--Ruskai--Seiler bound, transferred to unit-step products of $\sched$ by \Cref{ex:unit-transfer} with $C=J_m(\sched)$, recovers the known first-order rate, with the gap entering only through the continuous theorem.
 
     UnitaryProducts.PaperProof.cor_unit_transfer_bounds; UnitaryProducts.PaperProof.ex_unit_transfer_bounds; UnitaryProducts.Prose.unit_step_leakage_isBigO
 
-87. **LEAN** — Section 1.1
+84. **LEAN** — Section 1.1
 
     A gap of $\sched$ does not ensure the width hypothesis, whereas rescaling energy and time together does
 
     UnitaryProducts.Paper.band_gap_does_not_ensure_width; UnitaryProducts.Paper.bounded_path_rescale_width; QuotientAddGroup.norm_mk_le_norm; Finset.inf'_le; Real.norm_eq_abs
 
-88. **EXTERNAL** — Section 1.1
+85. **EXTERNAL** — Section 1.1
 
-    For $\sched(t/T)$ at unit steps, their error estimate is $O(1/T)$ when the values of $\sched$ commute, but otherwise has an $O(1/T)$ commutator term from each step, and over $T$ steps these terms sum to an $O(1)$ bound.
+    Specialized to $\sched(t/T)$ at unit steps, their bound on the local error of each step is $O(1/T^2)$ when the values of $\sched$ commute. Otherwise the bound has a commutator term of order $1/T$, and over $T$ steps these commutator terms sum to an $O(1)$ bound.
 
-    hochbruck2003, Theorem 3.1; unit-step substitution H(t/T) in the cited estimate
+    hochbruck2003, Theorem 3.1 (specialization to the slow-time family at unit steps)
 
-89. **EXTERNAL** — Section 1.1
+86. **EXTERNAL** — Section 1.1
 
-    Hochbruck and Lubich \cite[Theorem~3.1]{hochbruck2003} analyze exponential midpoint steps with no bound on step length times Hamiltonian norm.
+    Hochbruck and Lubich \cite[Theorem~3.1]{hochbruck2003} analyze exponential midpoint steps with no bound on step length times Hamiltonian norm, and they bound the error by summing local errors over the steps.
 
     hochbruck2003, Theorem~3.1
 
-90. **LEAN** — Section 1.1
+87. **LEAN** — Section 1.1
 
     It keeps every eigenvalue difference of every sample within a fixed $\width<2\pi$ in modulus, and so away from the nonzero multiples of $2\pi$, where the correction is singular.
 
     UnitaryProducts.PaperProof.closedCellMultiplier; UnitaryProducts.PaperProof.periodicCorrector_eq_closedCell; UnitaryProducts.Prose.width_resonance_distance; UnitaryProducts.Prose.scalar_corrector_resonant_obstruction; UnitaryProducts.Prose.scalar_corrector_resonant_forcing_zero
 
-91. **LEAN** — Section 1.1
+88. **LEAN** — Section 1.1
 
     My corrections take equal values at both ends of the intervals $|t-j|\le\frac12$
 
     UnitaryProducts.PaperProof.allSampleCorrectorFamily_end_values
 
-92. **EXTERNAL** — Section 1.1
+89. **EXTERNAL** — Section 1.1
 
     The integrators of Jahnke and Lubich \cite[Theorem~1]{jahnke2003} use adiabatic variables with a smooth eigendecomposition and separated eigenvalues
 
     jahnke2003, Theorem~1
 
-93. **LEAN** — Section 1.1
+90. **LEAN** — Section 1.1
 
     my only spectral condition is the width hypothesis
 
     UnitaryProducts.PaperProof.introthm_unit
 
-94. **LEAN** — Section 1.1
+91. **LEAN** — Section 1.1
 
-    differ by $O(1/T^2)$ between neighboring samples, and my estimate is $O(1/T)$ for the whole product
+    differ by $O(1/T^2)$ between neighboring samples. My estimate is $O(1/T)$ in operator norm for the whole product
 
     UnitaryProducts.Paper.adjacent_corrector_jump_le; UnitaryProducts.PaperProof.thm_unit_steps_bounds; UnitaryProducts.Prose.adjacent_corrector_jump_le_inclusive
 
-95. **LEAN** — Section 2
+92. **LEAN** — Section 2
 
     $\|\cdot\|$ is the operator norm
 
     UnitaryProducts.Prose.matrix_norm_eq_operator_norm
 
-96. **LEAN** — Section 2
+93. **LEAN** — Section 2
 
     is \emph{piecewise constant} if there are times $a=t_0<t_1<\cdots<t_n=b$
 
     UnitaryProducts.Paper.piecewiseData
 
-97. **LEAN** — Section 2
+94. **LEAN** — Section 2
 
     with $\comp(t)=\comp_j$ for $t\in(t_j,t_{j+1})$.
 
     UnitaryProducts.Paper.piecewiseData
 
-98. **LEAN** — Section 2, Definition 2.1
+95. **LEAN** — Section 2, Definition 2.1
 
     A matrix-valued function $\sched(t)$ with $t\in[a,b]$ is \emph{regulated} if $\sched$ has a right limit at every $t\in[a,b)$ and a left limit at every $t\in(a,b]$.
 
     UnitaryProducts.Paper.IsRegulated
 
-99. **LEAN** — Section 2
+96. **LEAN** — Section 2
 
     A regulated function $\sched(t)$ with $t\in[a,b]$ is a uniform limit of piecewise-constant functions
 
     UnitaryProducts.Prose.exists_uniform_step_approximation; UnitaryProducts.Prose.exists_uniform_hermitian_step_approximation
 
-100. **LEAN** — Section 2
+97. **LEAN** — Section 2
 
     Lipschitz functions are regulated
 
     UnitaryProducts.Prose.regulated_of_continuousOn; UnitaryProducts.eVariationOn_le_lipschitz; UnitaryProducts.regulated_of_boundedVariation
 
-101. **LEAN** — Section 2
+98. **LEAN** — Section 2
 
     but regulated functions may additionally jump.
 
     UnitaryProducts.Paper.piecewise_regulated; UnitaryProducts.Regulated; UnitaryProducts.Prose.regulated_family_with_jump
 
-102. **LEAN** — Section 2
+99. **LEAN** — Section 2
 
     continuous outside a countable set.
 
     UnitaryProducts.Regulated.countable_not_continuousWithinAt; UnitaryProducts.Regulated.translate_to_zero
 
-103. **LEAN** — Section 2
+100. **LEAN** — Section 2
 
     so it is bounded
 
     UnitaryProducts.Regulated.exists_norm_le; UnitaryProducts.Regulated.translate_to_zero
 
-104. **LEAN** — Section 2
+101. **LEAN** — Section 2
 
     A Hermitian family $\comp(t)$ with $t\in[a,b]$ \emph{generates} a continuous, unitary-valued \emph{evolution} $\compevol(t)$ for $t\in[a,b]$ if
     \begin{equation}\label{eq:evolution}
@@ -636,7 +618,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.IsEvolution
 
-105. **LEAN** — Section 2
+102. **LEAN** — Section 2
 
     \begin{cases}
       i\compevol'(t)=\comp(t)\compevol(t) & \text{for all but countably many } t,\\
@@ -645,80 +627,80 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.IsEvolution
 
-106. **LEAN** — Section 2
+103. **LEAN** — Section 2
 
     With $s=t/T$, $\evol(Ts)$ for $s\in[0,1]$ is generated by $T\sched(s)$
 
     UnitaryProducts.Paper.evolution_over_time
 
-107. **LEAN** — Section 2
+104. **LEAN** — Section 2
 
     so $\evol(T)$ depends only on $T\sched$.
 
     UnitaryProducts.Paper.evolution_over_time; UnitaryProducts.evolution_eq_of_solves_off_countable
 
-108. **LEAN** — Section 2.1
+105. **LEAN** — Section 2.1
 
     $(U^\dagger)'=iU^\dagger K$, as $K$ is Hermitian
 
     UnitaryProducts.Paper.hasDerivAt_evolution_adjoint
 
-109. **LEAN** — Section 2.1
+106. **LEAN** — Section 2.1
 
     $V'=-iGV$
 
     UnitaryProducts.Paper.IsEvolution
 
-110. **LEAN** — Section 2.1
+107. **LEAN** — Section 2.1
 
     \frac d{dt}\bigl(U^\dagger V\bigr)&=iU^\dagger(K-G)V\notag\\
 
     UnitaryProducts.Paper.hasDerivAt_corrected_product; UnitaryProducts.Paper.comparison_with_jumps
 
-111. **LEAN** — Section 2.1
+108. **LEAN** — Section 2.1
 
     &=iU^\dagger(K-G)V-i\frac d{dt}\bigl(U^\dagger YV\bigr)+i\frac d{dt}\bigl(U^\dagger YV\bigr)\notag\\
      &=iU^\dagger(K-G)V-i\bigl(iU^\dagger KYV+U^\dagger Y'V-iU^\dagger YGV\bigr)+i\frac d{dt}\bigl(U^\dagger YV\bigr)\notag\\
 
     UnitaryProducts.Paper.residual_display_chain; UnitaryProducts.Paper.hasDerivAt_corrected_product
 
-112. **LEAN** — Section 2.1
+109. **LEAN** — Section 2.1
 
     &=iU^\dagger\underbrace{\bigl(K-G-Y'-i(KY-YG)\bigr)}_{R}V+i\frac d{dt}\bigl(U^\dagger YV\bigr),\label{eq:residual}
 
     UnitaryProducts.Paper.residual_display_chain; UnitaryProducts.Paper.hasDerivAt_corrected_product
 
-113. **LEAN** — Section 2.1
+110. **LEAN** — Section 2.1
 
     \underbrace{\bigl(K-G-Y'-i(KY-YG)\bigr)}_{R}
 
     UnitaryProducts.Paper.residual_display_chain; UnitaryProducts.Paper.hasDerivAt_corrected_product
 
-114. **EXTERNAL** — Section 2.1
+111. **EXTERNAL** — Section 2.1
 
     For continuous $K$ and $G$, taking $m=0$ and $Y_0(t)=\int_a^t(K-G)\,ds$ in \Cref{thm:comparison} gives the integration-by-parts lemma of Burgarth et al.
 
     Cited leaf: Burgarth et al. (burgarth2022), integration-by-parts lemma with correction equal to the primitive of the Hamiltonian difference.
 
-115. **EXPOSITION** — Section 2.1
+112. **EXPOSITION** — Section 2.1
 
     We write $[f]_a^b=f(b)-f(a)$.
 
-116. **LEAN** — Section 2.1
+113. **LEAN** — Section 2.1
 
     which defines the \emph{residual} $R$. Integrating \eqref{eq:residual} gives the error $U^\dagger V-1$ as the integral of the residual plus boundary terms (\Cref{thm:comparison}).
 
     UnitaryProducts.Paper.comparison_with_jumps; UnitaryProducts.Paper.hasDerivAt_corrected_product
 
-117. **LEAN** — Section 2.1, Theorem 2.2
+114. **LEAN** — Section 2.1, Theorem 2.2
 
-    Let regulated Hermitian families $K(t)$ and $G(t)$ with $t\in[a,b]$ generate $U$ and $V$, respectively, let $m\ge0$ be an integer, and let $a=p_0\le p_1\le\cdots\le p_{m+1}=b$. For $0\le j\le m$, let the pieces $Y_j(t)$ for $t\in[p_j,p_{j+1}]$ be continuous and matrix-valued, with a derivative that, for all but countably many $t$, exists and agrees with a regulated function. Let $R(t)$ be the residual \eqref{eq:residual} of $Y_j$ wherever $p_j<t<p_{j+1}$ and $Y_j'(t)$ exists, with arbitrary values at the remaining countably many $t$, which do not change its integral, and let $\Delta_j=Y_j(p_j)-Y_{j-1}(p_j)$ for $1\le j\le m$.
+    Let regulated Hermitian families $K(t)$ and $G(t)$ with $t\in[a,b]$ generate $U$ and $V$, respectively, let $m\ge0$ be an integer, and let $a=p_0\le p_1\le\cdots\le p_{m+1}=b$. For $0\le j\le m$, let the pieces $Y_j(t)$ for $t\in[p_j,p_{j+1}]$ be continuous and matrix-valued, with a derivative that, for all but countably many $t$, exists and agrees with a regulated function. Let $R(t)$ be the residual \eqref{eq:residual} of $Y_j$ wherever $p_j<t<p_{j+1}$ and $Y_j'(t)$ exists, with arbitrary values at the remaining countably many $t$, and let $\Delta_j=Y_j(p_j)-Y_{j-1}(p_j)$ for $1\le j\le m$.
 
     UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.Paper.regulated_corrected_product_derivative
 
-118. **LEAN** — Section 2.1, Theorem 2.2
+115. **LEAN** — Section 2.1, Theorem 2.2
 
-    Let regulated Hermitian families $K(t)$ and $G(t)$ with $t\in[a,b]$ generate $U$ and $V$, respectively, let $m\ge0$ be an integer, and let $a=p_0\le p_1\le\cdots\le p_{m+1}=b$. For $0\le j\le m$, let the pieces $Y_j(t)$ for $t\in[p_j,p_{j+1}]$ be continuous and matrix-valued, with a derivative that, for all but countably many $t$, exists and agrees with a regulated function. Let $R(t)$ be the residual \eqref{eq:residual} of $Y_j$ wherever $p_j<t<p_{j+1}$ and $Y_j'(t)$ exists, with arbitrary values at the remaining countably many $t$, which do not change its integral, and let $\Delta_j=Y_j(p_j)-Y_{j-1}(p_j)$ for $1\le j\le m$.
+    Let regulated Hermitian families $K(t)$ and $G(t)$ with $t\in[a,b]$ generate $U$ and $V$, respectively, let $m\ge0$ be an integer, and let $a=p_0\le p_1\le\cdots\le p_{m+1}=b$. For $0\le j\le m$, let the pieces $Y_j(t)$ for $t\in[p_j,p_{j+1}]$ be continuous and matrix-valued, with a derivative that, for all but countably many $t$, exists and agrees with a regulated function. Let $R(t)$ be the residual \eqref{eq:residual} of $Y_j$ wherever $p_j<t<p_{j+1}$ and $Y_j'(t)$ exists, with arbitrary values at the remaining countably many $t$, and let $\Delta_j=Y_j(p_j)-Y_{j-1}(p_j)$ for $1\le j\le m$.
     Then
     \[
      U(b)^\dagger V(b)-1=\int_a^biU^\dagger RV\,dt+iU(b)^\dagger Y_m(b)V(b)-iY_0(a)-i\sum_{j=1}^mU(p_j)^\dagger\Delta_jV(p_j).
@@ -726,37 +708,37 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.thm_comparison
 
-119. **LEAN** — Section 2.1, Theorem 2.2
+116. **LEAN** — Section 2.1, Theorem 2.2
 
     U(b)^\dagger V(b)-1=\int_a^biU^\dagger RV\,dt+iU(b)^\dagger Y_m(b)V(b)-iY_0(a)-i\sum_{j=1}^mU(p_j)^\dagger\Delta_jV(p_j).
 
     UnitaryProducts.PaperProof.thm_comparison
 
-120. **LEAN** — Section 2.1, Theorem 2.2
+117. **LEAN** — Section 2.1, Theorem 2.2
 
     For $p_j<t<p_{j+1}$, outside a countable set, \eqref{eq:residual} holds with $Y_j$ in place of $Y$.
 
     UnitaryProducts.Paper.comparison_with_jumps; UnitaryProducts.Paper.hasDerivAt_corrected_product; UnitaryProducts.Paper.residual_display_chain
 
-121. **LEAN** — Section 2.1, Theorem 2.2
+118. **LEAN** — Section 2.1, Theorem 2.2
 
     Integrating \eqref{eq:residual} over each $[p_j,p_{j+1}]$ and summing over $j$ gives
 
     UnitaryProducts.Paper.integral_eq_piecewise_sub
 
-122. **LEAN** — Section 2.1, Theorem 2.2
+119. **LEAN** — Section 2.1, Theorem 2.2
 
     The functions $U^\dagger V$ and $U^\dagger Y_jV$ are continuous
 
     UnitaryProducts.Paper.comparison_with_jumps; ContinuousOn.star; ContinuousOn.mul
 
-123. **LEAN** — Section 2.1, Theorem 2.2
+120. **LEAN** — Section 2.1, Theorem 2.2
 
     their derivatives agree with regulated functions outside a countable set
 
     UnitaryProducts.Paper.regulated_corrected_product_derivative; UnitaryProducts.Paper.hasDerivAt_corrected_product; UnitaryProducts.Paper.hasDerivAt_evolution_adjoint
 
-124. **LEAN** — Section 2.1, Theorem 2.2
+121. **LEAN** — Section 2.1, Theorem 2.2
 
     U(b)^\dagger V(b)-1&=\sum_{j=0}^m\int_{p_j}^{p_{j+1}}\frac d{dt}\bigl(U^\dagger V\bigr)\,dt\\
      &=\sum_{j=0}^m\int_{p_j}^{p_{j+1}}\Bigl(iU^\dagger RV+i\frac d{dt}\bigl(U^\dagger Y_jV\bigr)\Bigr)\,dt\\
@@ -764,25 +746,25 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.comparison_with_jumps; UnitaryProducts.Paper.integral_eq_piecewise_sub; UnitaryProducts.Paper.hasDerivAt_corrected_product; UnitaryProducts.Paper.residual_display_chain
 
-125. **LEAN** — Section 2.1, Theorem 2.2
+122. **LEAN** — Section 2.1, Theorem 2.2
 
     &=\int_a^biU^\dagger RV\,dt+iU(b)^\dagger Y_m(b)V(b)-iY_0(a)-i\sum_{j=1}^mU(p_j)^\dagger\Delta_jV(p_j).
 
     UnitaryProducts.Paper.sum_piece_sub; UnitaryProducts.Paper.comparison_with_jumps
 
-126. **LEAN** — Section 2.1, Theorem 2.2
+123. **LEAN** — Section 2.1, Theorem 2.2
 
     The first equality holds as $U(a)=V(a)=1$, the second is \eqref{eq:residual}, the third integrates the derivatives of $U^\dagger Y_jV$, and the last regroups the sum at each $p_j$, again using $U(a)=V(a)=1$.
 
     UnitaryProducts.Paper.sum_piece_sub; UnitaryProducts.Paper.comparison_with_jumps; UnitaryProducts.Paper.hasDerivAt_corrected_product; UnitaryProducts.Paper.residual_display_chain
 
-127. **LEAN** — Section 2.1
+124. **LEAN** — Section 2.1
 
     With no correction, $m=0$ and $Y_0=0$, the residual is $R=K-G$, and as $U$ and $V$ are unitary, \Cref{thm:comparison} gives \emph{Duhamel's bound}
 
     UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.duhamel_integral_identity; UnitaryProducts.PaperProof.duhamel_display_chain
 
-128. **LEAN** — Section 2.1
+125. **LEAN** — Section 2.1
 
     With no correction, $m=0$ and $Y_0=0$, the residual is $R=K-G$, and as $U$ and $V$ are unitary, \Cref{thm:comparison} gives \emph{Duhamel's bound}
     \begin{align}
@@ -793,13 +775,13 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.duhamel_integral_identity; UnitaryProducts.PaperProof.duhamel_display_chain
 
-129. **LEAN** — Section 2.1
+126. **LEAN** — Section 2.1
 
     \|V(b)-U(b)\|&=\|U(b)^\dagger V(b)-1\|\notag\\
 
     UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.duhamel_display_chain; UnitaryProducts.PaperProof.duhamel_integral_identity
 
-130. **LEAN** — Section 2.1
+127. **LEAN** — Section 2.1
 
     \|V(b)-U(b)\|&=\|U(b)^\dagger V(b)-1\|\notag\\
      &=\Bigl\|\int_a^biU^\dagger(K-G)V\,dt\Bigr\|\notag\\
@@ -808,77 +790,77 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.duhamel_display_chain; UnitaryProducts.PaperProof.duhamel_integral_identity
 
-131. **LEAN** — Section 2.1
+128. **LEAN** — Section 2.1
 
     &=\Bigl\|\int_a^biU^\dagger(K-G)V\,dt\Bigr\|\notag\\
 
     UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.duhamel_display_chain; UnitaryProducts.PaperProof.duhamel_integral_identity
 
-132. **LEAN** — Section 2.1
+129. **LEAN** — Section 2.1
 
     &\le\int_a^b\|K-G\|\,dt,\label{eq:duhamel}
 
     UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.duhamel_display_chain; UnitaryProducts.PaperProof.duhamel_integral_identity
 
-133. **EXPOSITION** — Section 2.1
+130. **EXPOSITION** — Section 2.1
 
     used in \Cref{sec:results,sec:coarse}.
 
-134. **LEAN** — Section 2.1
+131. **LEAN** — Section 2
 
-    It is unitary as $\comp$ is Hermitian
+    The solution $\compevol$ is unitary as $\comp$ is Hermitian
 
     UnitaryProducts.Paper.star_mul_self_of_solves_off_countable_interval
 
-135. **LEAN** — Section 2.1
+132. **LEAN** — Section 2
 
     so $\comp$ generates exactly one evolution.
 
     UnitaryProducts.Paper.exists_unique_evolution_interval
 
-136. **LEAN** — Section 2.1
+133. **LEAN** — Section 2
 
     the real-linear maps $X\mapsto-i\comp(t)X$ are regulated in $t$
 
     UnitaryProducts.Prose.regulated_real_coefficient; UnitaryProducts.Prose.real_coefficient_apply
 
-137. **LEAN** — Section 2.1
+134. **LEAN** — Section 2
 
     there is exactly one continuous matrix-valued $\compevol$ with $\compevol(a)=1$ and $i\compevol'=\comp\compevol$ for all but countably many $t$
 
     UnitaryProducts.Paper.exists_unique_continuous_evolution_interval
 
-138. **LEAN** — Section 2.1
+135. **LEAN** — Section 2.1
 
     A product of unitaries enters the comparison theorem as the evolution generated by a piecewise-constant Hermitian family.
 
     UnitaryProducts.Prose.pieceProduct_eq_evolution_of_pieces; UnitaryProducts.Prose.exists_piecewise_recursive_evolution; UnitaryProducts.Paper.unitary_product_evolution
 
-139. **LEAN** — Section 2.1
+136. **LEAN** — Section 2.1
 
     If $\comp$ is piecewise constant, the recursion $\compevol(a)=1$, $\compevol(t)=e^{-i(t-t_j)\comp_j}\compevol(t_j)$ for $t\in[t_j,t_{j+1}]$ defines a continuous, unitary $\compevol$
 
     UnitaryProducts.Prose.exists_piecewise_recursive_evolution; UnitaryProducts.Prose.exists_piecewise_recursive_evolution_from
 
-140. **LEAN** — Section 2.1
+137. **LEAN** — Section 2.1
 
     defines a continuous, unitary $\compevol$
 
     UnitaryProducts.Prose.exists_piecewise_recursive_evolution; UnitaryProducts.Prose.exists_piecewise_recursive_evolution_from
 
-141. **LEAN** — Section 2.1
+138. **LEAN** — Section 2.1
 
     satisfies $i\compevol'(t)=\comp(t)\compevol(t)$ for every $t\notin\{t_0,\ldots,t_n\}$
 
     UnitaryProducts.Prose.exists_piecewise_recursive_evolution; UnitaryProducts.Prose.exists_piecewise_recursive_evolution_from
 
-142. **LEAN** — Section 2.1
+139. **LEAN** — Section 2.1
 
     \compevol(b)=e^{-i(t_n-t_{n-1})\comp_{n-1}}\cdots e^{-i(t_2-t_1)\comp_1}e^{-i(t_1-t_0)\comp_0}.
 
     UnitaryProducts.Paper.piecewiseData; UnitaryProducts.pieceProduct; UnitaryProducts.evol; UnitaryProducts.exists_piecewise_evolution; UnitaryProducts.Paper.regulated_evolution; UnitaryProducts.Prose.exists_piecewise_recursive_evolution_from
 
-143. **LEAN** — Section 2.1, Definition 2.3
+140. **LEAN** — Section 2.1, Definition 2.3
 
     For a Hamiltonian $\sched(s)$ with $s\in[0,1]$ and an integer $T\ge1$, the \emph{$T$-step product} of $\sched$ is
     \[
@@ -887,79 +869,79 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.unitProduct
 
-144. **LEAN** — Section 2.1, Definition 2.3
+141. **LEAN** — Section 2.1, Definition 2.3
 
     \devprod_T=e^{-i\sched((T-1)/T)}\cdots e^{-i\sched(0)}.
 
     UnitaryProducts.Paper.unitProduct; UnitaryProducts.Paper.step_products_unit; UnitaryProducts.Paper.step_products_factors
 
-145. **LEAN** — Section 2.1
+142. **LEAN** — Section 2.1
 
     In \Cref{sec:coarse}, it rounds $t$ to the nearest integer $\lfloor t+1/2\rfloor$, and its two end intervals of length $1/2$ give the half-step phases of \eqref{eq:rounded}.
 
     UnitaryProducts.Prose.rounded_clock_nearest; UnitaryProducts.Prose.rounded_clock_tie; UnitaryProducts.Prose.rounded_clock_half_distance; UnitaryProducts.Paper.regulated_evolution_rounded
 
-146. **LEAN** — Section 2.1
+143. **LEAN** — Section 2.1
 
     For a Hamiltonian $\sched(s)$ with $s\in[0,1]$, $\sched(\lfloor t+1/2\rfloor/T)$ for $t\in[0,T]$ is piecewise constant, equal to $\sched(j/T)$ for $|t-j|<1/2$ and $0\le j\le T$.
 
     UnitaryProducts.Paper.UnitStepsProse.path_sample_eq; UnitaryProducts.Paper.rounded_clock_partition
 
-147. **LEAN** — Section 2.1
+144. **LEAN** — Section 2.1
 
-     \compevol(T)&=e^{-i\sched(1)/2}e^{-i\sched((T-1)/T)}\cdots e^{-i\sched(1/T)}e^{-i\sched(0)/2}\notag\\
+    \compevol(T)&=e^{-i\sched(1)/2}e^{-i\sched((T-1)/T)}\cdots e^{-i\sched(1/T)}e^{-i\sched(0)/2}\notag\\
 
     UnitaryProducts.Paper.rounded_clock_piecewise_endpoint
 
-148. **LEAN** — Section 2.1
+145. **LEAN** — Section 2.1
 
     &=e^{-i\sched(1)/2}\,\devprod_T\,e^{i\sched(0)/2}.
 
     UnitaryProducts.PaperProof.unit_rounded_clock_endpoint; UnitaryProducts.Paper.rounded_clock_product_eq_unitProduct
 
-149. **LEAN** — Section 2.1
+146. **LEAN** — Section 2.1
 
     $e^{-i\sched(0)/2}=e^{-i\sched(0)}e^{i\sched(0)/2}$
 
     UnitaryProducts.Paper.rounded_clock_half_step_split
 
-150. **LEAN** — Section 2.1
+147. **LEAN** — Section 2.1
 
     The first equality is \eqref{eq:piecewise-product} for $\sched(\lfloor t+1/2\rfloor/T)$
 
     UnitaryProducts.Paper.rounded_clock_piecewise_endpoint
 
-151. **LEAN** — Section 2.1
+148. **LEAN** — Section 2.1
 
     The second writes $e^{-i\sched(0)/2}=e^{-i\sched(0)}e^{i\sched(0)/2}$ and uses \Cref{def:unit-product}.
 
     UnitaryProducts.Paper.regulated_evolution_rounded; UnitaryProducts.evol_add
 
-152. **LEAN** — Section 2.1
+149. **LEAN** — Section 2.1
 
     which equals $\sched(j/T)$ for $t$ in an interval of length $1$ when $0<j<T$ and of length $1/2$ when $j\in\{0,T\}$.
 
     UnitaryProducts.Paper.rounded_clock_partition; UnitaryProducts.Paper.rounded_clock_cell_lengths
 
-153. **LEAN** — Section 3
+150. **LEAN** — Section 3
 
     Checkpoints and truncation can be chosen to make the resulting product's distance from the Hamiltonian's evolution arbitrarily small, even when the Hamiltonian jumps.
 
     UnitaryProducts.Prose.exists_midpointProductOver_truncation_close
 
-154. **LEAN** — Section 3.1
+151. **LEAN** — Section 3.1
 
     Precision is set by a function $F$ applied to the entries, such as bit truncation (\Cref{ex:truncation-bits}).
 
     UnitaryProducts.Paper.levelFunctionData; UnitaryProducts.PaperProof.ex_truncation_bits
 
-155. **LEAN** — Section 3.1, Definition 3.1
+152. **LEAN** — Section 3.1, Definition 3.1
 
     For a function $F\colon\mathbb R\to\mathbb R$ and a matrix $\sched$, $\sched^{(F)}$ is the matrix with entries
 
     UnitaryProducts.Paper.levelFunctionData
 
-156. **LEAN** — Section 3.1, Definition 3.1
+153. **LEAN** — Section 3.1, Definition 3.1
 
     For a function $F\colon\mathbb R\to\mathbb R$ and a matrix $\sched$, $\sched^{(F)}$ is the matrix with entries
     \[
@@ -969,7 +951,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.levelFunctionData
 
-157. **LEAN** — Section 3.1, Definition 3.1
+154. **LEAN** — Section 3.1, Definition 3.1
 
     \[
       \sched^{(F)}_{pq}=F(\operatorname{Re}\sched_{pq})+iF(\operatorname{Im}\sched_{pq}),
@@ -977,49 +959,49 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.levelFunctionData; UnitaryProducts.scalarEntryMap
 
-158. **LEAN** — Section 3.1, Definition 3.1
+155. **LEAN** — Section 3.1, Definition 3.1
 
     and for a matrix-valued function $\sched(s)$, $\sched^{(F)}(s)=\sched(s)^{(F)}$.
 
     UnitaryProducts.Paper.levelFunctionData
 
-159. **LEAN** — Section 3.1
+156. **LEAN** — Section 3.1
 
     For $d\ge2$, oddness is exactly the condition: if $\sched^{(F)}$ is Hermitian for every Hermitian $\sched$, the entries $x+iy$ and $x-iy$ of $\sched$ at $(p,q)$ and $(q,p)$ give $F(-y)=-F(y)$ for every real $y$.
 
     UnitaryProducts.PaperProof.odd_of_scalarEntryMap_preserves_hermitian; UnitaryProducts.PaperProof.scalarEntryMap_preserves_hermitian_iff
 
-160. **LEAN** — Section 3.1
+157. **LEAN** — Section 3.1
 
     Products need Hermitian samples, so we require $F$ to be odd. Then $(A^{(F)})^\dagger=(A^\dagger)^{(F)}$ for every matrix $A$, as conjugating an entry negates its imaginary part and $F(-y)=-F(y)$, so for Hermitian $\sched(s)$ each $\sched^{(F)}(s)$ and each error $\sched(s)-\sched^{(F)}(s)$ is Hermitian.
 
     UnitaryProducts.PaperProof.scalarEntryMap_adjoint; UnitaryProducts.PaperProof.scalarEntryMap_and_error_isHermitian
 
-161. **LEAN** — Section 3.1
+158. **LEAN** — Section 3.1
 
     Then $(A^{(F)})^\dagger=(A^\dagger)^{(F)}$ for every matrix $A$
 
     UnitaryProducts.PaperProof.scalarEntryMap_adjoint
 
-162. **LEAN** — Section 3.1
+159. **LEAN** — Section 3.1
 
     for Hermitian $\sched(s)$ each $\sched^{(F)}(s)$ and each error $\sched(s)-\sched^{(F)}(s)$ is Hermitian.
 
     UnitaryProducts.PaperProof.scalarEntryMap_and_error_isHermitian
 
-163. **LEAN** — Section 3.1, Example 3.2
+160. **LEAN** — Section 3.1, Example 3.2
 
     $[x]_\bits=\operatorname{sgn}(x)\,2^{-\bits}\lfloor2^\bits|x|\rfloor$
 
     UnitaryProducts.PaperProof.truncBits_eq_sign_floor
 
-164. **LEAN** — Section 3.1, Example 3.2
+161. **LEAN** — Section 3.1, Example 3.2
 
     $\sparsity_\bits=\max_p\max_{s\in[0,1]}\#\{q:\sched^{(\bits)}_{pq}(s)\ne\sched_{pq}(s)\}$
 
     UnitaryProducts.Prose.truncation_path_rowSparse
 
-165. **LEAN** — Section 3.1, Example 3.2
+162. **LEAN** — Section 3.1, Example 3.2
 
     Fix an integer $\bits\ge0$ and a Hermitian family $\sched(s)$ with $s\in[0,1]$. Let bit truncation be $[x]_\bits=\operatorname{sgn}(x)\,2^{-\bits}\lfloor2^\bits|x|\rfloor$, let $\sched^{(\bits)}=\sched^{([\cdot]_\bits)}$, and let $\sparsity_\bits=\max_p\max_{s\in[0,1]}\#\{q:\sched^{(\bits)}_{pq}(s)\ne\sched_{pq}(s)\}$ be the largest number of entries that truncation changes in a row of $\sched(s)$.
     \begin{enumerate}
@@ -1029,7 +1011,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.ex_truncation_bits; UnitaryProducts.Prose.truncation_path_rowSparse
 
-166. **LEAN** — Section 3.1, Example 3.2
+163. **LEAN** — Section 3.1, Example 3.2
 
     \begin{enumerate}
     \item Bit truncation is odd.
@@ -1038,37 +1020,37 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.ex_truncation_bits; UnitaryProducts.Prose.truncation_path_rowSparse
 
-167. **LEAN** — Section 3.1, Example 3.2
+164. **LEAN** — Section 3.1, Example 3.2
 
     $2^\bits|x|-\lfloor2^\bits|x|\rfloor<1$
 
     UnitaryProducts.Prose.bit_fraction_lt_one
 
-168. **LEAN** — Section 3.1, Example 3.2
+165. **LEAN** — Section 3.1, Example 3.2
 
     For real $x$, as $[x]_\bits$ lies between $0$ and $x$
 
     UnitaryProducts.Prose.truncBits_mem_uIcc
 
-169. **LEAN** — Section 3.1, Example 3.2
+166. **LEAN** — Section 3.1, Example 3.2
 
     In $[x]_\bits$, only the factor $\operatorname{sgn}(x)$ depends on the sign of $x$, and it is odd, so $[-x]_\bits=-[x]_\bits$, which is (i).
 
     UnitaryProducts.PaperProof.truncBits_odd_from_sign
 
-170. **LEAN** — Section 3.1, Example 3.2
+167. **LEAN** — Section 3.1, Example 3.2
 
     |x-[x]_\bits|=|x|-|[x]_\bits|<2^{-\bits}.
 
     UnitaryProducts.PaperProof.truncBits_error_chain
 
-171. **LEAN** — Section 3.1, Example 3.2
+168. **LEAN** — Section 3.1, Example 3.2
 
     So an entry $z$ of $\sched(s)-\sched^{(\bits)}(s)$ has real and imaginary parts of modulus below $2^{-\bits}$
 
     UnitaryProducts.PaperProof.truncBits_error_chain
 
-172. **LEAN** — Section 3.1, Example 3.2
+169. **LEAN** — Section 3.1, Example 3.2
 
     So an entry $z$ of $\sched(s)-\sched^{(\bits)}(s)$ has real and imaginary parts of modulus below $2^{-\bits}$, and
     \[
@@ -1077,91 +1059,91 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.truncBits_entry_sqrt_chain
 
-173. **LEAN** — Section 3.1, Example 3.2
+170. **LEAN** — Section 3.1, Example 3.2
 
     As the error is Hermitian by (i), the Schur test gives
 
     UnitaryProducts.norm_le_maxRowSum
 
-174. **LEAN** — Section 3.1, Example 3.2
+171. **LEAN** — Section 3.1, Example 3.2
 
     \max_p\sum_q\bigl|\sched_{pq}(s)-\sched^{(\bits)}_{pq}(s)\bigr|\le\sqrt2\,\sparsity_\bits\,2^{-\bits}
 
     UnitaryProducts.maxRowSum_le_sparsity_mul; UnitaryProducts.Prose.truncation_path_rowSparse
 
-175. **LEAN** — Section 3.1, Example 3.2
+172. **LEAN** — Section 3.1, Example 3.2
 
     \|\sched(s)-\sched^{(\bits)}(s)\|\le\max_p\sum_q\bigl|\sched_{pq}(s)-\sched^{(\bits)}_{pq}(s)\bigr|
 
     UnitaryProducts.norm_le_maxRowSum
 
-176. **LEAN** — Section 3.1, Example 3.2
+173. **LEAN** — Section 3.1, Example 3.2
 
-    the second inequality by this bound on $|z|$ and the definition of $\sparsity_\bits$. This is (ii).
+    the second inequality by this bound on $|z|$ and the definition of $\sparsity_\bits$. The resulting bound is (ii).
 
     UnitaryProducts.PaperProof.ex_truncation_bits; UnitaryProducts.norm_le_sparsity_mul_maxEntryNorm; UnitaryProducts.Prose.truncation_path_rowSparse
 
-177. **LEAN** — Section 3.1
+174. **LEAN** — Section 3.1
 
     $\sparsity_\bits$ is at most the largest number of nonzero entries in a row of $\sched(s)$
 
     UnitaryProducts.Prose.truncation_error_sparsity_le_nonzero; UnitaryProducts.Prose.truncation_changed_count_le
 
-178. **LEAN** — Section 3.1
+175. **LEAN** — Section 3.1
 
     As $[0]_\bits=0$, truncation keeps zero entries zero
 
     UnitaryProducts.Prose.truncHerm_entry_zero
 
-179. **LEAN** — Section 3.1
+176. **LEAN** — Section 3.1
 
-    it is $0$ for every $\sched$, however dense, with $\sched^{(\bits)}=\sched$
+    it is $0$ whenever $\sched^{(\bits)}=\sched$, however dense $\sched$ is.
 
     UnitaryProducts.Prose.truncation_error_sparsity_eq_zero
 
-180. **LEAN** — Section 3.2
+177. **LEAN** — Section 3.2
 
     To build a product, we round the clock to the midpoint between consecutive checkpoints and truncate the sample there. We choose checkpoints between which the Hamiltonian stays close to that sample.
 
     UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces; UnitaryProducts.PaperProof.exists_oscillation_partition
 
-181. **LEAN** — Section 3.2, Definition 3.3
+178. **LEAN** — Section 3.2, Definition 3.3
 
     Checkpoints $0=s_0\le\cdots\le s_N=1$ have \emph{midpoint error at most $\varepsilon$} for a Hamiltonian $\sched$ if $\|\sched(s)-\sched(s_{j+1/2})\|\le\varepsilon$ for every $j$ and every $s$ with $s_j<s<s_{j+1}$, where $s_{j+1/2}=(s_j+s_{j+1})/2$.
 
     UnitaryProducts.PaperProof.IsCheckpointPartition; UnitaryProducts.PaperProof.HasMidpointOscillation; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-182. **LEAN** — Section 3.2
+179. **LEAN** — Section 3.2
 
     Every regulated Hamiltonian admits such checkpoints for every $\varepsilon>0$.
 
     UnitaryProducts.PaperProof.exists_oscillation_partition
 
-183. **LEAN** — Section 3.2, Lemma 3.4
+180. **LEAN** — Section 3.2, Lemma 3.4
 
     Let $\sched$ be a regulated Hamiltonian, and let $\varepsilon>0$. There are checkpoints $0=s_0<\cdots<s_N=1$ with $\|\sched(x)-\sched(y)\|\le\varepsilon$ whenever $s_j<x,y<s_{j+1}$ for some $j$. In particular, their midpoint error is at most $\varepsilon$.
 
     UnitaryProducts.PaperProof.exists_oscillation_partition
 
-184. **LEAN** — Section 3.2, Lemma 3.4
+181. **LEAN** — Section 3.2, Lemma 3.4
 
     By \cite[(7.6.1)]{dieudonne1960}, there are checkpoints $0=s_0<\cdots<s_N=1$ and matrices $A_j$ with $\|\sched(s)-A_j\|\le\varepsilon/2$ for $s_j<s<s_{j+1}$.
 
     UnitaryProducts.exists_pieces_of_regulated
 
-185. **LEAN** — Section 3.2, Lemma 3.4
+182. **LEAN** — Section 3.2, Lemma 3.4
 
     Then $\|\sched(x)-\sched(y)\|\le\varepsilon$ for $s_j<x,y<s_{j+1}$, and $s_{j+1/2}$ is such a $y$.
 
     UnitaryProducts.PaperProof.exists_oscillation_partition
 
-186. **LEAN** — Section 3.2
+183. **LEAN** — Section 3.2
 
     Each interval between checkpoints contributes the evolution under the sample at its midpoint for $T$ times the interval's length.
 
     UnitaryProducts.Paper.midpointProductOver_eq; UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces
 
-187. **LEAN** — Section 3.2, Definition 3.5
+184. **LEAN** — Section 3.2, Definition 3.5
 
     The \emph{midpoint product} of a Hermitian family $A$ over time $T$ on checkpoints $s_0,\ldots,s_N$ is
     \[
@@ -1171,42 +1153,39 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.midpointProductOver; UnitaryProducts.Paper.midpointProductOver_eq; UnitaryProducts.Paper.midpointProduct_succ
 
-188. **LEAN** — Section 3.2
+185. **LEAN** — Section 3.2
 
     For an odd $F$, Duhamel's bound \eqref{eq:duhamel} bounds the distance of the midpoint product of $\sched^{(F)}$ from $\evol(T)$ by the largest distance of $\sched$ from its truncated midpoint sample within an interval, which splits into the change of $\sched$ within the interval, controlled by the checkpoints, and the truncation error of the sample, controlled by $F$.
-    
 
     UnitaryProducts.PaperProof.thm_fine_steps_sup; norm_sub_le_norm_sub_add_norm_sub
 
-189. **LEAN** — Section 3.2, Theorem 3.6
+186. **LEAN** — Section 3.2, Theorem 3.6
 
     Let $F\colon\mathbb R\to\mathbb R$ be odd, and let $\sched$ be a regulated Hamiltonian with evolution $\evol$ over time $T>0$. The midpoint product $W$ of $\sched^{(F)}$ over time $T$ on any checkpoints $0=s_0\le\cdots\le s_N=1$ satisfies
     \[
      \|W-\evol(T)\|\le T\max_j\sup_{s_j<s<s_{j+1}}\bigl\|\sched(s)-\sched^{(F)}(s_{j+1/2})\bigr\|.
     \]
     A repeated checkpoint contributes the factor $1$ to $W$ and an empty supremum, taken to be $0$.
-    
 
     UnitaryProducts.PaperProof.thm_fine_steps_sup; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-190. **LEAN** — Section 3.2, Theorem 3.6
+187. **LEAN** — Section 3.2, Theorem 3.6
 
     Let $F\colon\mathbb R\to\mathbb R$ be odd, and let $\sched$ be a regulated Hamiltonian with evolution $\evol$ over time $T>0$. The midpoint product $W$ of $\sched^{(F)}$ over time $T$ on any checkpoints $0=s_0\le\cdots\le s_N=1$ satisfies
     \[
      \|W-\evol(T)\|\le T\max_j\sup_{s_j<s<s_{j+1}}\bigl\|\sched(s)-\sched^{(F)}(s_{j+1/2})\bigr\|.
     \]
     A repeated checkpoint contributes the factor $1$ to $W$ and an empty supremum, taken to be $0$.
-    
 
     UnitaryProducts.PaperProof.thm_fine_steps_sup; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-191. **LEAN** — Section 3.2, Theorem 3.6
+188. **LEAN** — Section 3.2, Theorem 3.6
 
     A repeated checkpoint contributes the factor $1$ to $W$ and an empty supremum, taken to be $0$.
 
     UnitaryProducts.PaperProof.maxCellError; UnitaryProducts.evol_zero
 
-192. **LEAN** — Section 3.2
+189. **LEAN** — Section 3.2
 
     Duhamel's bound \eqref{eq:duhamel} bounds the distance of the midpoint product of $\sched^{(F)}$ from $\evol(T)$ by the largest distance of $\sched$ from its truncated midpoint sample within an interval, which splits into the change of $\sched$ within the interval, controlled by the checkpoints, and the truncation error of the sample, controlled by $F$.
     \begin{theorem}[]\label{thm:fine-steps}
@@ -1222,13 +1201,13 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.midpoint_duhamel_integral; UnitaryProducts.PaperProof.thm_fine_steps_sup; norm_sub_le_norm_sub_add_norm_sub
 
-193. **LEAN** — Section 3.2, Theorem 3.6
+190. **LEAN** — Section 3.2, Theorem 3.6
 
     The piecewise-constant family $\comp(s)=\sched^{(F)}(s_{j+1/2})$ for $s_j<s<s_{j+1}$ is Hermitian, as $F$ is odd, and its evolution over time $T$ ends at $W$ by \eqref{eq:piecewise-product}.
 
     UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces; UnitaryProducts.PaperProof.scalarEntryMap_and_error_isHermitian
 
-194. **LEAN** — Section 3.2
+191. **LEAN** — Section 3.2
 
     \bigl\|\sched(s)-\sched^{(\bits)}(s_{j+1/2})\bigr\|\le\|\sched(s)-\sched(s_{j+1/2})\|+\bigl\|\sched(s_{j+1/2})-\sched^{(\bits)}(s_{j+1/2})\bigr\|\le\varepsilon+\sqrt2\,\sparsity_\bits\,2^{-\bits}
     \]
@@ -1239,18 +1218,17 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.maxCellError_le; norm_sub_le_norm_sub_add_norm_sub; UnitaryProducts.Prose.truncation_path_rowSparse; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-195. **LEAN** — Section 3.2
+192. **LEAN** — Section 3.2
 
     For $\varepsilon>0$, let $W$ be the midpoint product of $\sched^{(\bits)}$ on checkpoints with midpoint error at most $\varepsilon$, which exist by \Cref{lem:oscillation-partition}. Bit truncation is odd by \Cref{ex:truncation-bits}(i), and for $s_j<s<s_{j+1}$,
     \[
      \bigl\|\sched(s)-\sched^{(\bits)}(s_{j+1/2})\bigr\|\le\|\sched(s)-\sched(s_{j+1/2})\|+\bigl\|\sched(s_{j+1/2})-\sched^{(\bits)}(s_{j+1/2})\bigr\|\le\varepsilon+\sqrt2\,\sparsity_\bits\,2^{-\bits}
     \]
     by \Cref{ex:truncation-bits}(ii), so \Cref{thm:fine-steps} gives
-    
 
     UnitaryProducts.PaperProof.exists_oscillation_partition; UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.exists_fine_bits_oscillation; UnitaryProducts.Prose.truncation_path_rowSparse; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-196. **LEAN** — Section 3.2
+193. **LEAN** — Section 3.2
 
     \begin{equation}\label{eq:fine-bits}
      \|W-\evol(T)\|\le T\bigl(\varepsilon+\sqrt2\,\sparsity_\bits\,2^{-\bits}\bigr).
@@ -1258,61 +1236,61 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.Prose.truncation_path_rowSparse; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-197. **LEAN** — Section 3.2
+194. **LEAN** — Section 3.2
 
     Since $\sparsity_\bits\le d$, increasing the precision and decreasing $\varepsilon$ make the error arbitrarily small.
 
     UnitaryProducts.Prose.truncation_error_sparsity_le_dim; UnitaryProducts.Prose.bounded_truncation_error_tendsto; UnitaryProducts.Prose.exists_midpointProductOver_truncation_close
 
-198. **LEAN** — Section 3.2
+195. **LEAN** — Section 3.2
 
-    When $\sparsity_\bits>0$, choosing $\varepsilon=\sqrt2\,\sparsity_\bits\,2^{-\bits}$ makes this at most $2\sqrt2\,\sparsity_\bits\,2^{-\bits}T$.
+    When $\sparsity_\bits>0$, choosing $\varepsilon=\sqrt2\,\sparsity_\bits\,2^{-\bits}$ makes the right side of \eqref{eq:fine-bits} at most $2\sqrt2\,\sparsity_\bits\,2^{-\bits}T$.
 
     UnitaryProducts.PaperProof.exists_fine_bits_balanced; UnitaryProducts.Prose.truncation_path_rowSparse; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-199. **LEAN** — Section 3.2, Remark 3.7
+196. **LEAN** — Section 3.2, Remark 3.7
 
     For $\varepsilon>0$, an explicit factor count follows from a Lipschitz condition. If $\sched$ is Lipschitz with constant $L\ge0$, then $N$ equal intervals have midpoint error at most $\varepsilon$ for every integer $N\ge\max\{1,L/(2\varepsilon)\}$, as every point is within $1/(2N)$ of its interval's midpoint, so the midpoint error is at most $L/(2N)\le\varepsilon$.
 
     UnitaryProducts.PaperProof.rem_oscillation_count_lipschitz; UnitaryProducts.PaperProof.uniform_cell_midpoint_distance; UnitaryProducts.PaperProof.rem_oscillation_counts
 
-200. **LEAN** — Section 3.3
+197. **LEAN** — Section 3.3
 
     By \Cref{prop:transfer} with $\tilde P=P$, $\tilde Q=Q$, and $A=B=1$, the leakages $\|(1-Q)WP\|$ and $\|(1-Q)\evol(T)P\|$ of any product $W$ and of $\evol(T)$ differ by at most $\|W-\evol(T)\|$, so leakage bounds transfer both ways.
 
     UnitaryProducts.PaperProof.transfer_same_projectors
 
-201. **LEAN** — Section 3.3
+198. **LEAN** — Section 3.3
 
     (their $m$ counts distinct eigenvalues, at most ours)
 
     UnitaryProducts.Prose.jrs_bound_of_distinct_band_count; UnitaryProducts.Paper.jrsCoefficient
 
-202. **LEAN** — Section 3.3
+199. **LEAN** — Section 3.3
 
     (their $m$ counts distinct eigenvalues, at most ours), where
 
     UnitaryProducts.Prose.jrs_bound_of_distinct_band_count; UnitaryProducts.Prose.distinct_band_card_le; UnitaryProducts.Prose.jrsFunctional_mono_band_size
 
-203. **EXTERNAL** — Section 3.3
+200. **EXTERNAL** — Section 3.3
 
     For the evolution $\evol$ of $\sched$ over time $T$, they prove $\|(1-Q)\evol(T)P\|\le J_m(\sched)/T$
 
     jansen2007, Theorem 3
 
-204. **EXTERNAL** — Section 3.3
+201. **EXTERNAL** — Section 3.3
 
     Jansen, Ruskai, and Seiler \cite[Theorem~3]{jansen2007}, for instance, bound the leakage for a $C^2$ Hamiltonian $\sched(s)$ with $s\in[0,1]$, a band of $m$ eigenvalues with spectral gap $\gap{\sched(s)}$ continuous in $s$, and endpoint projectors $P$ at $s=0$ and $Q$ at $s=1$ (\Cref{def:spectral-window}).
 
     jansen2007, Theorem 3
 
-205. **LEAN** — Section 3.3
+202. **LEAN** — Section 3.3
 
     The next example assumes a bound $\|(1-Q)\evol(T)P\|\le C/T$ on the leakage of the evolution, which an adiabatic theorem supplies under its own hypotheses, and converts it into a bound on the leakage of the product.
 
     UnitaryProducts.PaperProof.cor_jrs_oscillation; UnitaryProducts.Prose.truncation_path_rowSparse
 
-206. **LEAN** — Section 3.3
+203. **LEAN** — Section 3.3
 
     \begin{equation}\label{eq:jrs-coefficient}
       J_m(\sched)=\sum_{s\in\{0,1\}}\frac{m\|\sched'(s)\|}{\gap{\sched(s)}^2}+\int_0^1\Bigl(\frac{m\|\sched''(s)\|}{\gap{\sched(s)}^2}+7m\sqrt m\,\frac{\|\sched'(s)\|^2}{\gap{\sched(s)}^3}\Bigr)\,ds.
@@ -1320,25 +1298,25 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.jrsFunctional; UnitaryProducts.Paper.jrsCoefficient; UnitaryProducts.Paper.jrs_coefficient_tracked_exactGap
 
-207. **LEAN** — Section 3.3
+204. **LEAN** — Section 3.3
 
     We choose the checkpoints and the precision for a target leakage.
 
     UnitaryProducts.PaperProof.exists_oscillation_partition; UnitaryProducts.Prose.bounded_truncation_error_tendsto
 
-208. **LEAN** — Section 3.3, Example 3.8
+205. **LEAN** — Section 3.3, Example 3.8
 
     Let $\sched$ be a regulated Hamiltonian, let $P$ and $Q$ be orthogonal projectors, and let $C>0$. For a target leakage $\delta>0$, let $T=2C/\delta$, and assume that the evolution $\evol$ of $\sched$ over time $T$ satisfies $\|(1-Q)\evol(T)P\|\le C/T$. Choose checkpoints with midpoint error at most $\delta^2/(8C)$ and an integer $\bits\ge0$ with $\sqrt2\,\sparsity_\bits\,2^{-\bits}\le\delta^2/(8C)$. The midpoint product $W$ of $\sched^{(\bits)}$ on these checkpoints over time $T$ satisfies $\|(1-Q)WP\|\le\delta$.
 
     UnitaryProducts.PaperProof.cor_jrs_oscillation; UnitaryProducts.Prose.truncation_path_rowSparse; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-209. **LEAN** — Section 3.3, Example 3.8
+206. **LEAN** — Section 3.3, Example 3.8
 
     \Cref{prop:transfer}, the assumed bound, and \eqref{eq:fine-bits} give
 
     UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.Prose.truncation_path_rowSparse; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-210. **LEAN** — Section 3.3, Example 3.8
+207. **LEAN** — Section 3.3, Example 3.8
 
     \[
      \|(1-Q)WP\|\le C/T+T\bigl(\delta^2/(8C)+\sqrt2\,\sparsity_\bits\,2^{-\bits}\bigr)
@@ -1347,74 +1325,68 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.cor_jrs_oscillation; UnitaryProducts.PaperProof.oscillation_jrs_allocations; UnitaryProducts.Prose.truncation_path_rowSparse; UnitaryProducts.PaperProof.checkpointPartition_constant_extension
 
-211. **LEAN** — Section 3.3
+208. **EXTERNAL** — Section 3.3
 
-    For a $C^2$ Hamiltonian
-
-    UnitaryProducts.PaperProof.regulated_of_contDiffOn_two
-
-212. **EXTERNAL** — Section 3.3
-
-    For a $C^2$ Hamiltonian with a band of $m$ eigenvalues as above, the Jansen--Ruskai--Seiler bound gives the hypothesis with $C=J_m(\sched)$ when $J_m(\sched)>0$.
+    When $\sched$ satisfies the hypotheses of Jansen, Ruskai, and Seiler, their bound gives the hypothesis with $C=J_m(\sched)$ when $J_m(\sched)>0$.
 
     jansen2007, Theorem 3
 
-213. **LEAN** — Section 3.3, Remark 3.9
+209. **LEAN** — Section 3.3, Remark 3.9
 
     A device that knows $\sched$ only to the $\bits$th binary place uses the spectral projectors of $\sched^{(\bits)}(0)$ and $\sched^{(\bits)}(1)$ rather than those of $\sched(0)$ and $\sched(1)$. For $s\in\{0,1\}$, let $P_s$ be the spectral projector of a band $S_s$ of $\sched(s)$ with spectral gap $\gap{\sched(s)}$ (\Cref{def:spectral-window}), suppose $\varepsilon_s=\|\sched(s)-\sched^{(\bits)}(s)\|<\gap{\sched(s)}/2$, and let $\tilde P_s$ project onto the span of the eigenvectors of $\sched^{(\bits)}(s)$ with eigenvalues within $\varepsilon_s$ of $I_s=[\min S_s,\max S_s]$.
 
     UnitaryProducts.Prose.endpoint_projector_eq_directed_and_le; UnitaryProducts.endpoint_projector_bound; UnitaryProducts.PaperProof.rem_truncated_endpoints; UnitaryProducts.PaperProof.truncated_endpoint_equal_rank; UnitaryProducts.PaperProof.truncated_endpoint_weyl_separation; UnitaryProducts.PaperProof.truncated_endpoint_norm_identity
 
-214. **LEAN** — Section 3.3, Remark 3.9
+210. **LEAN** — Section 3.3, Remark 3.9
 
     \Cref{prop:transfer} with $A=B=1$ and $\|\evol(T)\|=1$ shows that the leakage of $W$ from $\tilde P_0$ to $\tilde P_1$ differs from that of $\evol(T)$ from $P_0$ to $P_1$ by at most $\|W-\evol(T)\|+\sum_{s\in\{0,1\}}\varepsilon_s/(\gap{\sched(s)}-\varepsilon_s)$.
     \end{remark}
 
     UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.PaperProof.rem_truncated_endpoints
 
-215. **EXTERNAL** — Section 3.3, Remark 3.9
+211. **EXTERNAL** — Section 3.3, Remark 3.9
 
     At equal rank $\|P_s-\tilde P_s\|=\|(1-\tilde P_s)P_s\|$ \cite[Exercise~VII.1.11]{bhatia1997}
 
     Cited leaf: Bhatia (bhatia1997), Exercise VII.1.11, equality of projector difference and directed difference at equal rank
 
-216. **LEAN** — Section 3.3, Remark 3.9
+212. **LEAN** — Section 3.3, Remark 3.9
 
     The eigenvalues of $\sched(s)$ outside $S_s$ lie at distance at least $\gap{\sched(s)}$ from $I_s$.
 
     UnitaryProducts.PaperProof.truncated_endpoint_weyl_separation
 
-217. **EXTERNAL** — Section 3.3, Remark 3.9
+213. **EXTERNAL** — Section 3.3, Remark 3.9
 
     Weyl's perturbation theorem \cite[Corollary~III.2.6]{bhatia1997} moves each ordered eigenvalue by at most $\varepsilon_s$
 
     Cited leaf: Bhatia (bhatia1997), Corollary III.2.6, Weyl eigenvalue perturbation inequality
 
-218. **LEAN** — Section 3.3, Remark 3.9
+214. **LEAN** — Section 3.3, Remark 3.9
 
     so $\tilde P_s$ and $P_s$ have equal rank
 
     UnitaryProducts.PaperProof.truncated_endpoint_equal_rank
 
-219. **EXTERNAL** — Section 3.3, Remark 3.9
+215. **EXTERNAL** — Section 3.3, Remark 3.9
 
-    the Davis--Kahan $\sin\Theta$ theorem \cite{daviskahan1970}, \cite[Theorem~VII.3.1]{bhatia1997}, bounds this by $\varepsilon_s/(\gap{\sched(s)}-\varepsilon_s)$
+    the Davis--Kahan $\sin\Theta$ theorem \cite{daviskahan1970}, \cite[Theorem~VII.3.1]{bhatia1997}, bounds $\|(1-\tilde P_s)P_s\|$ by $\varepsilon_s/(\gap{\sched(s)}-\varepsilon_s)$
 
     Cited leaf: Davis–Kahan (daviskahan1970) and Bhatia (bhatia1997), Theorem VII.3.1, sin Θ bound; endpoint specialization is covered by rem_truncated_endpoints and truncated_endpoint_norm_identity
 
-220. **LEAN** — Section 3.3, Remark 3.9
+216. **LEAN** — Section 3.3, Remark 3.9
 
     the other eigenvalues of $\sched^{(\bits)}(s)$ lie at distance at least $\gap{\sched(s)}-\varepsilon_s>\varepsilon_s$ from $I_s$.
 
     UnitaryProducts.PaperProof.truncated_endpoint_weyl_separation
 
-221. **LEAN** — Section 3.3, Remark 3.9
+217. **LEAN** — Section 3.3, Remark 3.9
 
     shows that the leakage of $W$ from $\tilde P_0$ to $\tilde P_1$ differs from that of $\evol(T)$ from $P_0$ to $P_1$ by at most $\|W-\evol(T)\|+\sum_{s\in\{0,1\}}\varepsilon_s/(\gap{\sched(s)}-\varepsilon_s)$.
 
     UnitaryProducts.PaperProof.rem_truncated_endpoints
 
-222. **LEAN** — Section 4
+218. **LEAN** — Section 4
 
     Let $\sched(s)$ for $s\in[0,1]$ be a differentiable Hamiltonian with one-sided derivatives at $s=0$ and $s=1$ and with Lipschitz derivative, and let $T\ge1$ be an integer. Recall that at unit steps the rounded clock is $\lfloor t+1/2\rfloor$, so that $|t-\lfloor t+1/2\rfloor|\le1/2$. By the rounded-clock identity \eqref{eq:rounded}, the $T$-step product $\devprod_T$ of \Cref{def:unit-product}, with half-step phases at its ends, is itself an evolution,
     \[
@@ -1424,25 +1396,25 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.regulated_evolution_rounded; UnitaryProducts.Prose.rounded_clock_nearest; UnitaryProducts.Prose.rounded_clock_tie; UnitaryProducts.Prose.rounded_clock_half_distance
 
-223. **LEAN** — Section 4
+219. **LEAN** — Section 4
 
     We compare it with the evolution $\evol$ generated by $K(t)=\sched(t/T)$.
 
     UnitaryProducts.Paper.evolution_over_time
 
-224. **LEAN** — Section 4.1, Example 4.3
+220. **LEAN** — Section 4.1, Example 4.3
 
     For an integer $T\ge2$, the Hamiltonian $\sched(s)=s^2Z$ with $Z=\operatorname{diag}(1,-1)$ satisfies the hypotheses of \Cref{thm:clocks} with $h=2$ and $\width=2$, and its evolutions $\evol$ and $\compevol$ satisfy the following.
 
     UnitaryProducts.PaperProof.ex_unit_sharp; UnitaryProducts.Paper.sharpFamily_derivative_supNorm
 
-225. **LEAN** — Section 4.1, Example 4.3
+221. **LEAN** — Section 4.1, Example 4.3
 
     \item $\|\compevol(T)-\evol(T)\|=2\sin\bigl(1/(12T)\bigr)$, asymptotic to $1/(6T)$.
 
     UnitaryProducts.PaperProof.ex_unit_sharp
 
-226. **LEAN** — Section 4.1, Example 4.3
+222. **LEAN** — Section 4.1, Example 4.3
 
     \begin{enumerate}
     \item $\|\compevol(T)-\evol(T)\|=2\sin\bigl(1/(12T)\bigr)$, asymptotic to $1/(6T)$.
@@ -1451,60 +1423,60 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.ex_unit_sharp; UnitaryProducts.PaperProof.sharp_corrected_error_asymptotic; UnitaryProducts.PaperProof.sharp_uncorrected_error_limit
 
-227. **LEAN** — Section 4.1, Example 4.3
+223. **LEAN** — Section 4.1, Example 4.3
 
-    $\sum_{j<T}j^2=(T-1)T(2T-1)/6$
+    $\sum_{j=0}^{T-1}\sched(j/T)=(T-1)(2T-1)Z/(6T)$
 
-    UnitaryProducts.Prose.sum_sample_squares
+    UnitaryProducts.Prose.sum_sample_squares; Finset.sum_smul; UnitaryProducts.PaperProof.sharp_example_computation
 
-228. **LEAN** — Section 4.2
+224. **LEAN** — Section 4.2
 
     no eigenvalue, length $\freearc$
 
     UnitaryProducts.Paper.spectrumAvoidsOpenArc_iff_closedArc
 
-229. **LEAN** — Section 4.2
+225. **LEAN** — Section 4.2
 
     \node at (90:1.7) {spectrum, in an arc of length $\width=2\pi-\freearc$};
 
     UnitaryProducts.Paper.spectrumAvoidsOpenArc_iff_closedArc
 
-230. **LEAN** — Section 4.2
+226. **LEAN** — Section 4.2
 
     \caption{The width $\width$ of $\sched(s)$ on the circle, with its spectrum in $[a,a+\width]$: the eigenvalues of $e^{-i\sched(s)}$ (dots) lie in the closed gray arc, and the open dashed arc contains none.}\label{fig:free-arc}
 
     UnitaryProducts.Paper.spectrumAvoidsOpenArc_iff_closedArc; UnitaryProducts.spectrum_evol_image
 
-231. **LEAN** — Section 4.1, Theorem 4.2
+227. **LEAN** — Section 4.1, Theorem 4.2
 
     \|\compevol(T)-\evol(T)\|\le\frac1T\Bigl(c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)+\frac{h}{24}+c_1\|\sched'\|_\infty^2\Bigr)+\sum_{j=1}^T\|\Delta_j\|,
     \]
 
     UnitaryProducts.PaperProof.thm_clocks
 
-232. **LEAN** — Section 4.2
+228. **LEAN** — Section 4.2
 
     \operatorname{spec}\devprod(s)\subset\{e^{-i\theta}:a(s)\le\theta\le a(s)+\width\}\quad\text{for every $s\in[0,1]$},
 
     UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.PaperProof.hamiltonian_window_arc
 
-233. **LEAN** — Section 4.3, Example 4.6
+229. **LEAN** — Section 4.3, Example 4.6
 
-    Let $\sched$, $T$, $h$, and $\width$ satisfy the hypotheses of \Cref{thm:clocks}, let $P$ and $Q$ be orthogonal projectors commuting with $\sched(0)$ and $\sched(1)$, respectively, let $C\ge0$, and let
+    Let $\sched$, $T$, $h$, and $\width$ satisfy the hypotheses of \Cref{thm:clocks}, let $P$ and $Q$ be orthogonal projectors commuting with $\sched(0)$ and $\sched(1)$, respectively, let $C\ge0$, and, with the $c_0$ and $c_1$ of \Cref{thm:clocks}, let
     \[
-     M=C+T\,(\text{right side of \eqref{eq:products}}).
+     M=C+c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)+\Bigl(\frac1{24}+\cormult(\width)\Bigr)h+(c_1+2\cormult'(\width))\|\sched'\|_\infty^2.
     \]
     For a target leakage $\delta>0$, assume that $\|(1-Q)\evol(T)P\|\le C/T$ and $T\ge2M/\delta$, and choose an integer $\bits\ge0$ with $\sqrt2\,\sparsity_\bits\,2^{-\bits}\le\delta/(2T)$. The $T$-step product $\devprod^{(\bits)}_T$ of the truncation $\sched^{(\bits)}$ of \Cref{ex:truncation-bits} satisfies $\|(1-Q)\devprod^{(\bits)}_TP\|\le\delta$.
 
     UnitaryProducts.PaperProof.ex_unit_transfer_bounds
 
-234. **LEAN** — Section 4.3, Example 4.6
+230. **LEAN** — Section 4.3, Example 4.6
 
     and choose an integer $\bits\ge0$ with $\sqrt2\,\sparsity_\bits\,2^{-\bits}\le\delta/(2T)$.
 
     UnitaryProducts.PaperProof.ex_unit_transfer_bounds
 
-235. **LEAN** — Section 4.3, Example 4.6
+231. **LEAN** — Section 4.3, Example 4.6
 
     \Cref{prop:transfer} with $A=e^{-i\sched(1)/2}$ and $B=e^{i\sched(0)/2}$, which commute with $Q$ and $P$, with $\tilde P=P$ and $\tilde Q=Q$, and with $\|(1-Q)\evol(T)P\|\le C/T$ gives the first line of
     \begin{align*}
@@ -1517,59 +1489,58 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.ex_unit_transfer_bounds; UnitaryProducts.PaperProof.uniform_bit_sample_error_sigma; UnitaryProducts.PaperProof.ex_unit_transfer_chain
 
-236. **LEAN** — Section 4.3, Example 4.6
+232. **LEAN** — Section 4.3, Example 4.6
 
-     \|(1-Q)\devprod^{(\bits)}_TP\|
+    \|(1-Q)\devprod^{(\bits)}_TP\|
      &\le\frac CT+\bigl\|e^{-i\sched(1)/2}\devprod^{(\bits)}_Te^{i\sched(0)/2}-\evol(T)\bigr\|\\
      &\le\frac CT+\|\devprod^{(\bits)}_T-\devprod_T\|+\|\compevol(T)-\evol(T)\|\\
      &\le\frac MT+T\sqrt2\,\sparsity_\bits\,2^{-\bits}\\
      &\le\frac\delta2+\frac\delta2=\delta.
-    
 
     UnitaryProducts.PaperProof.ex_unit_transfer_bounds; UnitaryProducts.PaperProof.ex_unit_transfer_chain
 
-237. **LEAN** — Section 1
+233. **LEAN** — Section 1
 
     neighboring antiderivatives differ by $O(1/T^2)$ at their common end. The $T$ common ends therefore contribute $O(1/T)$, and $\|\compevol(T)-\evol(T)\|=O(1/T)$ with explicit constants (\Cref{thm:clocks} and \eqref{eq:products}).
 
     UnitaryProducts.Paper.adjacent_corrector_jump_le; UnitaryProducts.PaperProof.thm_unit_steps_bounds; UnitaryProducts.PaperProof.unified_affine_variation_of_derivWithin; UnitaryProducts.PaperProof.uniform_residual_step; UnitaryProducts.PaperProof.uniform_residual_integral; UnitaryProducts.PaperProof.unit_steps_uncentred; UnitaryProducts.PaperProof.unit_steps_endpoint_bounds
 
-238. **LEAN** — Section 4.1, Example 4.3
+234. **LEAN** — Section 4.1, Example 4.3
 
-    The values commute, so with $\int_0^Tt^2/T^2\,dt=T/3$ and $\sum_{j<T}j^2=(T-1)T(2T-1)/6$ the sums above give
+    The values commute, so the integral $\int_0^T\sched(t/T)\,dt=TZ/3$, the left-endpoint sum $\sum_{j=0}^{T-1}\sched(j/T)=(T-1)(2T-1)Z/(6T)$, and the trapezoidal sum, which adds $(\sched(1)-\sched(0))/2=Z/2$ to the left-endpoint sum, give
     \begin{align*}
      \evol(T)&=e^{-iTZ/3},\\
      \devprod_T&=e^{-i(T/3-1/2+1/(6T))Z},\\
      \compevol(T)&=e^{-i(T/3+1/(6T))Z}.
     \end{align*}
 
-    UnitaryProducts.Prose.integral_quadratic_clock; UnitaryProducts.Prose.sharp_evolution_endpoint_via_integral; UnitaryProducts.Prose.sharp_unit_step_expanded; UnitaryProducts.Prose.quadratic_endpoints; UnitaryProducts.Prose.sum_sample_squares; UnitaryProducts.PaperProof.sharp_example_computation
+    UnitaryProducts.Prose.integral_quadratic_clock; UnitaryProducts.Prose.sharp_evolution_endpoint_via_integral; UnitaryProducts.Prose.sharp_unit_step_expanded; UnitaryProducts.Prose.quadratic_endpoints; UnitaryProducts.Prose.sum_sample_squares; UnitaryProducts.PaperProof.sharp_example_computation; intervalIntegral.integral_smul_const; Finset.sum_smul
 
-239. **LEAN** — Section 2.1
+235. **LEAN** — Section 2.1
 
-    which defines the \emph{residual} $R$. Integrating \eqref{eq:residual} gives the error $U^\dagger V-1$ as the integral of the residual plus boundary terms (\Cref{thm:comparison}). The a priori unit-step bound in \Cref{sec:coarse} uses one correction for each sample (\Cref{sec:comparison}), and neighboring ones can disagree where they meet, so the comparison theorem lets the correction jump. We write $[f]_a^b=f(b)-f(a)$.\footnote{For continuous $K$ and $G$, taking $m=0$ and $Y_0(t)=\int_a^t(K-G)\,ds$ in \Cref{thm:comparison} gives the integration-by-parts lemma of Burgarth et al.\ \cite{burgarth2022}.}
+    which defines the \emph{residual} $R$. Integrating \eqref{eq:residual} gives the error $U^\dagger V-1$ as the integral of the residual plus boundary terms (\Cref{thm:comparison}). The unit-step bound in \Cref{sec:coarse} uses one correction for each sample (\Cref{sec:comparison}), and neighboring ones can disagree where they meet, so the comparison theorem lets the correction jump. We write $[f]_a^b=f(b)-f(a)$.\footnote{For continuous $K$ and $G$, taking $m=0$ and $Y_0(t)=\int_a^t(K-G)\,ds$ in \Cref{thm:comparison} gives the integration-by-parts lemma of Burgarth et al.\ \cite{burgarth2022}.}
 
     UnitaryProducts.PaperProof.canonical_cell_comparison_assembly; UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.Paper.comparison_integrated_difference; UnitaryProducts.PaperProof.lem_cell
 
-240. **LEAN** — Section 1.1
+236. **LEAN** — Section 1.1
 
     Finally, \Cref{app:spectral} proves the three lemmas behind \Cref{sec:coarse}, on the correction, the Hermitian logarithm of a unitary family and its derivatives, and the derivative of the correction's end value.
 
     UnitaryProducts.PaperProof.lem_cell; UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.PaperProof.canonical_cell_curve
 
-241. **LEAN** — Section 4.1
+237. **LEAN** — Section 4.1
 
     As the factor depends only on the eigenvalues, $\cormult([\Omega,\cdot])E$ is independent of the eigenbasis.
 
     UnitaryProducts.PaperProof.frameOp_arbitrary_eigenbasis_entry
 
-242. **LEAN** — Section 4.1
+238. **LEAN** — Section 4.1
 
     We therefore require every sample to have eigenvalue differences of modulus at most a width $\width<2\pi$, the \emph{width hypothesis}.
 
     UnitaryProducts.Paper.ne_two_pi_mul_of_abs_lt; UnitaryProducts.Separation.zero_or_sin_half_ne_zero
 
-243. **LEAN** — Section 4.1, Theorem 4.2
+239. **LEAN** — Section 4.1, Theorem 4.2
 
     \evol(T)^\dagger\compevol(T)-1=\int_0^Ti\evol^\dagger R\compevol\,dt+i\evol(T)^\dagger Y(T)\compevol(T)-iY(0)-i\sum_{j=1}^T\evol(p_j)^\dagger\Delta_j\compevol(p_j),
     \]
@@ -1580,73 +1551,73 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.canonical_cell_comparison_assembly; UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.PaperProof.unit_steps_uncentred; UnitaryProducts.PaperProof.uniform_boundary_endpoints; UnitaryProducts.PaperProof.unitClockJump_norm_sum; UnitaryProducts.PaperProof.cor_residual
 
-244. **LEAN** — Section 4.1, Theorem 4.2
+240. **LEAN** — Section 4.1, Theorem 4.2
 
     the fourth uses $\int_{-1/2}^{1/2}(\tau^2,|\tau|,|\tau|^3)\,d\tau=(1/12,1/4,1/32)$.
 
     UnitaryProducts.PaperProof.uniform_residual_moments; UnitaryProducts.PaperProof.uniform_even_integral; UnitaryProducts.PaperProof.uniform_residual_profile_integral
 
-245. **LEAN** — Section 4.3, Example 4.6
+241. **LEAN** — Section 4.3, Example 4.6
 
-    In the third, the bit truncation $[\cdot]_\bits$ is odd by \Cref{ex:truncation-bits}, so $\sched^{(\bits)}(\lfloor t\rfloor/T)$ is Hermitian and generates $\devprod^{(\bits)}_T$ by \eqref{eq:piecewise-product}, and Duhamel's bound \eqref{eq:duhamel} with \Cref{ex:truncation-bits} bounds $\|\devprod^{(\bits)}_T-\devprod_T\|$ by $T\sqrt2\,\sparsity_\bits\,2^{-\bits}$, while \eqref{eq:products} bounds $\|\compevol(T)-\evol(T)\|$.
+    In the third, the bit truncation $[\cdot]_\bits$ is odd by \Cref{ex:truncation-bits}, so $\sched^{(\bits)}(\lfloor t\rfloor/T)$ is Hermitian and generates $\devprod^{(\bits)}_T$ by \eqref{eq:piecewise-product}, and Duhamel's bound \eqref{eq:duhamel} with \Cref{ex:truncation-bits} bounds $\|\devprod^{(\bits)}_T-\devprod_T\|$ by $T\sqrt2\,\sparsity_\bits\,2^{-\bits}$, while \eqref{eq:products} bounds $\|\compevol(T)-\evol(T)\|$ by $(M-C)/T$.
 
     UnitaryProducts.PaperProof.unitProduct_sample_error; UnitaryProducts.PaperProof.uniform_phase_error_norm; UnitaryProducts.Prose.pieceProduct_eq_evolution_of_pieces; UnitaryProducts.scalarEntryMap_isHermitian; UnitaryProducts.PaperProof.unitProduct_sample_error_chain; norm_sub_le_norm_sub_add_norm_sub; UnitaryProducts.PaperProof.uniform_bit_sample_error_sigma; UnitaryProducts.PaperProof.unit_steps_endpoint_bounds
 
-246. **LEAN** — Section 4.1, Example 4.3
+242. **LEAN** — Section 4.1, Example 4.3
 
     For unitaries $A$ and $B$, $\|A-B\|=\|AB^\dagger-1\|$, and $\|e^{i\theta Z}-1\|=2|\sin(\theta/2)|$, as $Z$ has eigenvalues $\pm1$. Hence $\|\compevol(T)-\evol(T)\|=\|e^{-iZ/(6T)}-1\|$ and $\|\devprod_T-\evol(T)\|=\|e^{i(1/2-1/(6T))Z}-1\|$, which are (i) and (ii).
 
     UnitaryProducts.PaperProof.sharp_phase_error; UnitaryProducts.PaperProof.sharp_example_computation; UnitaryProducts.PaperProof.ex_unit_sharp; CStarRing.norm_mul_mem_unitary; Unitary.mul_star_self; sub_mul
 
-247. **LEAN** — Section 4.1
+243. **LEAN** — Section 4.1
 
     Replacing $\sched$ by $\sched/n$ and $T$ by $nT$, so that the factors are $e^{-i\sched(j/(nT))/n}$, preserves $\evol(T)$ and divides every eigenvalue difference by $n$, so large $n$ gives the width hypothesis.
 
     UnitaryProducts.Paper.rescaled_evolution_steps; UnitaryProducts.Paper.scaled_eigenvalue; UnitaryProducts.PaperProof.all_sample_width_eventually; UnitaryProducts.Paper.walk
 
-248. **LEAN** — Section 4.2
+244. **LEAN** — Section 4.2
 
     and an open arc of length $\freearc=2\pi-\width$ contains no eigenvalue (\Cref{fig:free-arc})
 
     UnitaryProducts.Paper.spectrumAvoidsOpenArc_iff_closedArc; UnitaryProducts.PaperProof.lem_walk_log
 
-249. **LEAN** — Section 4.3
+245. **LEAN** — Section 4.3
 
     If orthogonal projectors $P$ and $Q$ commute with $\sched(0)$ and $\sched(1)$, respectively, they commute with the half-step phases, so \Cref{prop:transfer} transfers leakage bounds between $\devprod_T$ and $\evol(T)$, adding the comparison error \eqref{eq:products} and, for truncated samples, their truncation error (\Cref{ex:unit-transfer}).
 
     UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.commute_evol_right; UnitaryProducts.PaperProof.cor_unit_transfer_bounds; UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.PaperProof.unitProduct_sample_error
 
-250. **LEAN** — Section 4.3
+246. **LEAN** — Section 4.3
 
     If orthogonal projectors $P$ and $Q$ commute with $\sched(0)$ and $\sched(1)$, respectively, they commute with the half-step phases, so \Cref{prop:transfer} transfers leakage bounds between $\devprod_T$ and $\evol(T)$, adding the comparison error \eqref{eq:products}
 
     UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.PaperProof.unified_products_walk; UnitaryProducts.Prose.walk_uniform_leakage_transfer_bounds
 
-251. **LEAN** — Section 1
+247. **LEAN** — Section 1
 
-    Setting $Y=0$ gives the bounds for evolutions as products (\Cref{sec:results}). For products as evolutions, we integrate the Hamiltonian difference in the frame of the rounded-clock evolution before taking norms, and the a priori bound builds $Y$ from one correction for each sample (\Cref{sec:coarse}).
+    Setting $Y=0$ gives the bounds for evolutions as products (\Cref{sec:results}). For products as evolutions, we integrate the Hamiltonian difference in the frame of the rounded-clock evolution before taking norms, and the unit-step bound builds $Y$ from one correction for each sample (\Cref{sec:coarse}).
 
     UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.frame_comparison_identity; UnitaryProducts.PaperProof.canonical_cell_comparison_assembly
 
-252. **EXTERNAL** — Section 1.1
+248. **EXTERNAL** — Section 1.1
 
     In \Cref{sec:prelim}, we prove the comparison theorem, introduce the rounded clock and its unit-step identity, prove leakage transfer, and define bands. In \Cref{sec:results}, we compare an evolution with its truncated midpoint product, transfer continuous bounds, and use bits as an example. In \Cref{sec:coarse}, the unit-step comparison bounds the distance between the phase-corrected product and the Hamiltonian's evolution with explicit $O(1/T)$ constants. Rescaling reduces shorter steps to unit steps, and Hermitian logarithms reduce products of given unitaries to Hamiltonians, to which continuous bounds transfer. In \Cref{sec:outlook}, we discuss higher-order transfer and other open questions. Finally, \Cref{app:spectral} proves the three lemmas behind \Cref{sec:coarse}, on the correction, the Hermitian logarithm of a unitary family and its derivatives, and the derivative of the correction's end value. They are the most computational parts of the paper, because I keep their constants explicit. Every numbered statement, and each of \Cref{introthm:fine-count,introthm:unit}, links from its header to its Lean~4 declaration in the repository \cite{jarret2026lean}, whose file \texttt{THEOREMS.md} lists them.
 
     Paper outline and repository-link documentation (jarret2026lean)
 
-253. **LEAN** — Section 4.1
+249. **LEAN** — Section 4.1
 
     For $|t-j|<1/2$, $G$ is the constant $\Omega=\sched(j/T)$ and $(t-\lfloor t+1/2\rfloor)K'(\lfloor t+1/2\rfloor)=\tau D$ for $\tau=t-j$ and $D=\sched'(j/T)/T$, so the bracket vanishes when $Y$, as a function of $\tau$, solves
 
     UnitaryProducts.Paper.UnitStepsProse.clock_eq_of_abs_sub_lt; UnitaryProducts.Paper.UnitStepsProse.path_sample_eq; UnitaryProducts.Paper.UnitStepsProse.local_taylor_integral; UnitaryProducts.PaperProof.cell_taylor_remainder; UnitaryProducts.Paper.UnitStepsProse.local_taylor_chain; UnitaryProducts.Paper.UnitStepsProse.hasDerivWithinAt_local_hamiltonian
 
-254. **LEAN** — Section 4.1
+250. **LEAN** — Section 4.1
 
     The second line writes $KY-YG=[G,Y]+(K-G)Y$, and the third separates $K'(\lfloor t+1/2\rfloor)$ from the integrand.
 
     UnitaryProducts.Prose.local_commutator_split; UnitaryProducts.Paper.UnitStepsProse.local_taylor_integral
 
-255. **LEAN** — Section 4.1
+251. **LEAN** — Section 4.1
 
     \begin{equation}\label{eq:corrector}
      \begin{cases}
@@ -1657,7 +1628,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.allSampleCorrectorFamily_ode; UnitaryProducts.PaperProof.allSampleCorrectorFamily_end_values; UnitaryProducts.PaperProof.uniformCorrectionPiece_jump_frame
 
-256. **LEAN** — Section 4.1
+252. **LEAN** — Section 4.1
 
     For a correction $Y(t)$ that is continuously differentiable for $|t-j|<1/2$ for each $j$, with one-sided limits at the points $p_j=j-1/2$, \Cref{thm:comparison} writes $\evol(T)^\dagger\compevol(T)-1$ through three kinds of terms: the residual
     \[
@@ -1667,163 +1638,163 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.Paper.residual_display_chain
 
-257. **LEAN** — Section 2.2
+253. **LEAN** — Section 2.2
 
     Eigenvalues may cross.
 
     UnitaryProducts.Prose.crossing_diagonal_spectrum
 
-258. **EXTERNAL** — Section 5
+254. **EXTERNAL** — Section 5
 
     some continuous theorems decay faster than $1/T$.
 
     elgart2012; ge2016; joye1991; nenciu1993 (following two sentences)
 
-259. **EXTERNAL** — Section 5
+255. **EXTERNAL** — Section 5
 
-    Joye and Pfister \cite{joye1991} and Nenciu \cite{nenciu1993} prove leakage exponentially small in $T$, between the spectral subspaces of the two limits, for uniformly gapped Hamiltonians that depend analytically on $s\in\mathbb R$ and approach limits as $s\to\pm\infty$ sufficiently fast.
+    Joye and Pfister \cite{joye1991} and Nenciu prove leakage exponentially small in $T$, between the spectral subspaces of the two limits, for uniformly gapped Hamiltonians that depend analytically on $s\in\mathbb R$ and approach limits as $s\to\pm\infty$ sufficiently fast.
 
-    joye1991, exponential scattering estimate; nenciu1993, exponential estimates
+    joye1991, exponential scattering estimate; nenciu1993, exponential adiabatic estimates
 
-260. **PROSPECTIVE** — Section 5
+256. **PROSPECTIVE** — Section 5
 
     the question is whether polynomially many factors can retain that decay.
 
-261. **LEAN** — Section 5
+257. **LEAN** — Section 5
 
     At unit steps, the correction covers only the part of $\sched(t/T)-\sched(\lfloor t+1/2\rfloor/T)$ linear in $t-\lfloor t+1/2\rfloor$.
 
     UnitaryProducts.PaperProof.uniformCorrectionPiece_derivative
 
-262. **LEAN** — Section 5
+258. **LEAN** — Section 5
 
     What remains is of order $1/T^2$ on each interval $|t-j|\le\frac12$
 
     UnitaryProducts.PaperProof.unitPhysicalResidual_profile_bound; UnitaryProducts.Paper.UnitStepsProse.abs_clock_sub_le
 
-263. **PROSPECTIVE** — Section 5
+259. **PROSPECTIVE** — Section 5
 
     Closing that step would prove leakage $O(T^{-p})$ for every $p$ for walks whose derivatives all vanish at both ends, under an eigenphase gap.
 
-264. **EXTERNAL** — Section 5
+260. **EXTERNAL** — Section 5
 
     Working with products directly, An, Costa, and Berry \cite{an2025} prove bounds that use cancellation at the two ends but assume a conjectured higher-order theorem, as they report a missing step in the proof of Dranov, Kellendonk, and Seiler \cite{dranov1998}.
 
-    An, Costa, and Berry (an2025), Section III.A: higher-order conjecture and the reported missing step in Dranov, Kellendonk, and Seiler (dranov1998).
+    an2025; dranov1998
 
-265. **PROSPECTIVE** — Section 5
+261. **PROSPECTIVE** — Section 5
 
     Such a bound would show that finite-precision entries, like finite-precision time, need not accumulate error over long evolutions.
 
-266. **LEAN** — Section 5
+262. **LEAN** — Section 5
 
     After rescaling energy and time, \eqref{eq:products} therefore bounds the time-discretization error by a quantity tending to zero with the step length, uniformly in $T$.
 
     UnitaryProducts.Prose.unit_rhs_le_step_polynomial; UnitaryProducts.Prose.unit_rhs_uniform_step_limit; UnitaryProducts.PaperProof.thm_unit_steps_bounds; UnitaryProducts.Paper.rescaled_evolution_steps
 
-267. **LEAN** — Section 5
+263. **LEAN** — Section 5
 
     Rounding to the nearest multiple of $2^{-\bits}$ cannot by itself give a bound uniform in $T$.
 
     UnitaryProducts.Paper.entry_rounding_obstruction_two
 
-268. **LEAN** — Section 5
+264. **LEAN** — Section 5
 
     The evolutions generated by the constant Hamiltonians $\operatorname{diag}(x,-x)$ and $\operatorname{diag}(y,-y)$, for any rounding $y\ne x$ of $x$, differ at time $T$ by $2|\sin(T(x-y)/2)|$ in norm, which is $2$ at $T=\pi/|x-y|$.
 
     UnitaryProducts.Paper.entry_rounding_obstruction
 
-269. **EXTERNAL** — Section 5
+265. **EXTERNAL** — Section 5
 
     The discretization term of the ground-state infidelity bounds of Kovalsky et al.\ \cite{kovalsky2023} and Lu et al.\ \cite{lu2026} also tends to zero with the step length, uniformly in $T$.
 
     kovalsky2023; lu2026
 
-270. **LEAN** — Section 5
+266. **LEAN** — Section 5
 
     which is $2$ at $T=\pi/|x-y|$.
 
     UnitaryProducts.Paper.entry_rounding_obstruction_two
 
-271. **EXTERNAL** — Section 5
+267. **EXTERNAL** — Section 5
 
     Avron et al.\ \cite{avron2012} prove adiabatic theorems for generators of contracting evolutions.
 
     avron2012
 
-272. **EXTERNAL** — Section 5
+268. **EXTERNAL** — Section 5
 
-    Elgart and Hagedorn \cite{elgart2012} and Ge, Moln\'ar, and Cirac \cite{ge2016} bound the leakage of gapped Gevrey families whose derivatives all vanish at the two ends by $O(\exp(-\gamma T^{\rho}))$, with $\gamma>0$ and $0<\rho<1$.
+    Elgart and Hagedorn \cite{elgart2012}, Ge, Moln\'ar, and Cirac \cite{ge2016}, and Nenciu \cite{nenciu1993} bound the leakage of gapped Gevrey families whose derivatives all vanish at the two ends by $O(\exp(-\gamma T^{\rho}))$, with $\gamma>0$ and $0<\rho<1$.
 
-    elgart2012, switching theorem and optimized estimate; ge2016, Gevrey adiabatic theorem
+    elgart2012, switching adiabatic theorem; ge2016, Gevrey adiabatic theorem; nenciu1993, Gevrey exponential-order estimates
 
-273. **LEAN** — Section 5
+269. **LEAN** — Section 5
 
     At fine steps, the term $T\varepsilon$ of \eqref{eq:fine-bits} is at most $\exp(-\gamma T^\rho)$ exactly when $\varepsilon\le\exp(-\gamma T^\rho)/T$
 
     UnitaryProducts.PaperProof.oscillation_exponential_tolerance
 
-274. **PROSPECTIVE** — Section 5
+270. **PROSPECTIVE** — Section 5
 
     Does the unit-step comparison extend to contracting evolutions, so that those theorems transfer to products of quantum channels, or is the cancellation in the frame of the rounded-clock evolution special to unitary dynamics?
 
-275. **LEAN** — Section 5
+271. **LEAN** — Section 5
 
     A product of the exponentials of samples of $\sched$ is the evolution of $\sched$ run on a rounded clock, and both directions of this paper come from taking that statement literally. The product and the evolution it approximates are then two evolutions, and Duhamel's formula integrated by parts against a correction $Y$ that may jump (\Cref{thm:comparison}) compares them in either direction.
 
     UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces; UnitaryProducts.PaperProof.unit_rounded_clock_endpoint; UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.thm_unit_steps_endpoint_max; UnitaryProducts.PaperProof.thm_comparison
 
-276. **LEAN** — Section 5
+272. **LEAN** — Section 5
 
     A continuous theorem, a simulation guarantee or an adiabatic theorem, then holds for the product with its own hypotheses, up to the comparison error.
 
     UnitaryProducts.PaperProof.cor_unit_transfer_bounds; UnitaryProducts.PaperProof.cor_jrs_oscillation; UnitaryProducts.PaperProof.cor_unit_transfer_min; UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; norm_sub_le_norm_sub_add_norm_sub; UnitaryProducts.PaperProof.prop_transfer
 
-277. **LEAN** — Section 5
+273. **LEAN** — Section 5
 
     and at each of the $T$ jumps
 
     UnitaryProducts.PaperProof.uniformCorrectionPiece_jump_frame; UnitaryProducts.PaperProof.unified_affine_variation_of_derivWithin; UnitaryProducts.Paper.adjacent_corrector_jump_le
 
-278. **LEAN** — Section 5
+274. **LEAN** — Section 5
 
     and of order $1/T$ at the two ends.
 
     UnitaryProducts.PaperProof.allSampleCorrectorFamily_center_norm_le; UnitaryProducts.PaperProof.lem_boundary_uniform
 
-279. **LEAN** — Section 5
+275. **LEAN** — Section 5
 
     In \Cref{sec:comparison}, we therefore choose $Y$ to solve $Y'+i[\sched(j/T),Y]=(t-j)\sched'(j/T)/T$ with equal values at $j\pm\frac12$ \eqref{eq:corrector}.
 
     UnitaryProducts.PaperProof.lem_cell; UnitaryProducts.PaperProof.allSampleCorrectorFamily_end_values; UnitaryProducts.PaperProof.uniformCorrectionPiece_derivative
 
-280. **LEAN** — Section 5
+276. **LEAN** — Section 5
 
     Truncation moves every entry toward zero, so its error need not change sign over time, and Duhamel's bound accumulates it into the term $\sqrt2\,\sparsity_\bits\,2^{-\bits}T$ of \eqref{eq:fine-bits}.
 
     UnitaryProducts.Prose.truncBits_mem_uIcc; UnitaryProducts.Prose.constant_truncation_error_positive; UnitaryProducts.PaperProof.ex_truncation_bits; UnitaryProducts.PaperProof.fine_bits_oscillation
 
-281. **LEAN** — Section 5
+277. **LEAN** — Section 5
 
     Alternating the direction of rounding over time would give the entry error the sign changes of the clock error.
 
     UnitaryProducts.Prose.alternating_rounding_error_signs; UnitaryProducts.Prose.alternating_rounding_in_time
 
-282. **LEAN** — Section 5
+278. **LEAN** — Section 5
 
     \Cref{thm:comparison} assumes Hermitian generators, and every bound drawn from it takes norms by unitary invariance, beginning with $\|V(b)-U(b)\|=\|U(b)^\dagger V(b)-1\|$.
 
     UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.Paper.IsEvolution; UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.uniform_phase_error_norm
 
-283. **LEAN** — Section 5
+279. **LEAN** — Section 5
 
     The clock error changes sign within every interval $|t-j|\le\frac12$, and the correction turns the sign change into cancellation.
 
     UnitaryProducts.Prose.full_cell_opposite_signs; UnitaryProducts.PaperProof.lem_cell; UnitaryProducts.PaperProof.allSampleCorrectorFamily_end_values; UnitaryProducts.PaperProof.uniformCorrectionPiece_derivative
 
-284. **LEAN** — Section 4.1
+280. **LEAN** — Section 4.1
 
-    As $G(t)=K(\lfloor t+1/2\rfloor)$, $K(t)-G(t)=\int_{\lfloor t+1/2\rfloor}^tK'(\sigma)\,d\sigma$, and the residual is
+    As $G(t)=K(\lfloor t+1/2\rfloor)$, the difference $K(t)-G(t)$ equals $\int_{\lfloor t+1/2\rfloor}^tK'(\sigma)\,d\sigma$, and the residual is
     \begin{equation}\label{eq:corrected-residual}
     \begin{aligned}
      R&=K-G-Y'-i(KY-YG)\\
@@ -1835,147 +1806,146 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.cell_residual_split; UnitaryProducts.PaperProof.cell_taylor_remainder; UnitaryProducts.Prose.local_commutator_split; UnitaryProducts.Paper.residual_display_chain; UnitaryProducts.PaperProof.global_residual_split; UnitaryProducts.continuousOn_of_norm_sub_le; UnitaryProducts.Paper.UnitStepsProse.local_taylor_integral
 
-285. **LEAN** — Section 2.1
+281. **LEAN** — Section 2.1
 
     For orthogonal projectors $P$ and $Q$, the \emph{leakage} of a matrix $\devprod$ from $P$ to $Q$ is $\|(1-Q)\devprod P\|$. The next proposition transfers leakage bounds between an evolution and a product in either direction, allowing unitary end phases and perturbed projectors.
 
     UnitaryProducts.PaperProof.prop_transfer
 
-286. **LEAN** — Section 2.1, Proposition 2.4
+282. **LEAN** — Section 2.1, Proposition 2.4
 
     Let $P$, $Q$, $\tilde{P}$, and $\tilde{Q}$ be orthogonal projectors, let $\evol$ and $\devprod$ be matrices, and let $A$ and $B$ be unitary matrices that commute with $\tilde{Q}$ and $\tilde{P}$, respectively. Then
 
     UnitaryProducts.PaperProof.prop_transfer
 
-287. **LEAN** — Section 2.1, Proposition 2.4
+283. **LEAN** — Section 2.1, Proposition 2.4
 
     \Bigl|\|(1-\tilde{Q})\devprod\tilde{P}\|-\|(1-Q)\evol P\|\Bigr|\le\|A\devprod B-\evol\|+\|\evol\|\bigl(\|\tilde{P}-P\|+\|\tilde{Q}-Q\|\bigr).
 
     UnitaryProducts.PaperProof.prop_transfer
 
-288. **LEAN** — Section 2.1, Proposition 2.4
+284. **LEAN** — Section 2.1, Proposition 2.4
 
     (1-\tilde{Q})A\devprod B\tilde{P}-(1-Q)\evol P=(1-\tilde{Q})(A\devprod B-\evol)\tilde{P}+(Q-\tilde{Q})\evol P+(1-\tilde{Q})\evol(\tilde{P}-P)
 
     UnitaryProducts.PaperProof.transfer_identity
 
-289. **LEAN** — Section 2.1
+285. **LEAN** — Section 2.1
 
     Thus a leakage bound for either matrix, such as an adiabatic theorem for an evolution, holds for the other up to the right side.
 
     UnitaryProducts.PaperProof.prop_transfer
 
-290. **LEAN** — Section 2.1, Proposition 2.4
+286. **LEAN** — Section 2.1, Proposition 2.4
 
     The commutation gives $\|(1-\tilde{Q})A\devprod B\tilde{P}\|=\|(1-\tilde{Q})\devprod\tilde{P}\|$
 
     UnitaryProducts.PaperProof.transfer_phase_norm
 
-291. **LEAN** — Section 2.1, Proposition 2.4
+287. **LEAN** — Section 2.1, Proposition 2.4
 
     projectors are contractions
 
     UnitaryProducts.norm_le_one_of_isStarProjection
 
-292. **EXPOSITION** — Section 2.1, Proposition 2.4
+288. **EXPOSITION** — Section 2.1, Proposition 2.4
 
     the reverse triangle inequality prove the proposition.
 
-293. **LEAN** — Section 4
+289. **LEAN** — Section 4
 
     For $t\in[0,T]$ with $|t-j|<1/2$, where $G(t)=\sched(j/T)$
 
     UnitaryProducts.PaperProof.rounded_cell_iff; UnitaryProducts.PaperProof.rounded_cell_description; UnitaryProducts.PaperProof.rounded_endpoint_cells
 
-294. **LEAN** — Section 4.1, Theorem 4.2
+290. **LEAN** — Section 4.1, Theorem 4.2
 
     The first line is \eqref{eq:corrected-residual}, whose bracket vanishes as $Y$ solves \eqref{eq:corrector}.
 
     UnitaryProducts.PaperProof.canonical_cell_residual; UnitaryProducts.PaperProof.global_residual_split
 
-295. **LEAN** — Section 4.1
+291. **LEAN** — Section 4.1
 
     At $x=2\pi m\ne0$, it vanishes and the right side is $-i(-1)^mD_{pq}/x$, so equal end values force $D_{pq}=0$.
 
     UnitaryProducts.Prose.scalar_corrector_resonant_moment; UnitaryProducts.Prose.scalar_corrector_resonant_obstruction; UnitaryProducts.Prose.scalar_corrector_boundary; UnitaryProducts.Prose.scalar_corrector_resonant_forcing_zero
 
-296. **LEAN** — Section 4.1
+292. **LEAN** — Section 4.1
 
     At $x=0$, every solution of $Y_{pq}'=\tau D_{pq}$ has equal end values, and we take the limit as $x\to0$ of the solutions for $0<|x|<2\pi$, whose end values are $\cormult(0)D_{pq}=D_{pq}/12$.
 
     UnitaryProducts.Paper.periodic_corrector_zero_limit; UnitaryProducts.Paper.corrector_entry_solutions; UnitaryProducts.PaperProof.closedCellMultiplier; UnitaryProducts.Paper.corrector_entry_solutions_zero; UnitaryProducts.PaperProof.closedCellMultiplier_endpoints; UnitaryProducts.PaperProof.closedCellMultiplier_zero_limit
 
-297. **EXTERNAL** — Section 4.2
+293. **EXTERNAL** — Section 4.2
 
     Discrete adiabatic theorems take the factors instead from a unitary family $\devprod(s)$ for $s\in[0,1]$, the walks of \cite{costa2022,an2025}, often $C^2$ with bounds on $\devprod'$ and $\devprod''$, under eigenphase gaps.
 
-    costa2022 and an2025, discrete adiabatic theorem hypotheses for prescribed unitary walks
+    costa2022 and an2025; cited unitary-family setup
 
-298. **LEAN** — Section 2.1
+294. **LEAN** — Section 2.1
 
     Every product of $T$ unitaries is a $T$-step product, since every unitary is $e^{-iA}$ for a Hermitian $A$.
 
     UnitaryProducts.Prose.exists_unitProduct_of_unitaries; UnitaryProducts.Paper.exists_isHermitian_evol_eq_of_unitary
 
-299. **LEAN** — Section 1.1
+295. **LEAN** — Section 1.1
 
     A product of unitaries $\devprod(j/T)$ from a $C^2$ unitary family $\devprod(s)$, such as the walks of discrete adiabatic theorems, is the $T$-step product of any Hermitian logarithm $\sched(s)$ of $\devprod(s)$, a Hermitian matrix with $e^{-i\sched(s)}=\devprod(s)$. If the spectrum of every $\devprod(s)$ avoids an arc of fixed length $\freearc$ that moves continuously, the logarithm with its branch cut in the arc gives the phase-corrected $O(1/T)$ comparison with coefficients $O(\freearc^{-3})$ (\Cref{cor:walks}).
 
     UnitaryProducts.stepProduct_eq_pieceProduct; UnitaryProducts.Paper.spectrumAvoidsOpenArc_iff_closedArc; UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.PaperProof.unitary_products_of_arc; UnitaryProducts.PaperProof.thm_unitary_products; UnitaryProducts.PaperProof.walk_coefficient_equivalents; Asymptotics.IsEquivalent.isBigO; Asymptotics.IsBigO.trans; Asymptotics.IsBigO.of_bound; Asymptotics.IsBigO.const_mul_left; one_div_le_one_div_of_le
 
-300. **LEAN** — Section 4.1, Theorem 4.2
+296. **LEAN** — Section 4.1, Theorem 4.2
 
     \Cref{lem:cell}(ii) at $\tau=0$ bounds $\|Y(0)\|$ and $\|Y(T)\|$ by $c_0\|\sched'(0)\|/T$ and $c_0\|\sched'(1)\|/T$, respectively.
 
     UnitaryProducts.PaperProof.uniform_boundary_endpoints; UnitaryProducts.PaperProof.allSampleCorrectorFamily_center_norm_le
 
-301. **LEAN** — Section 4.1
+297. **LEAN** — Section 4.1
 
     The residual is integrated over time $T$ and there are $T$ jumps, so a correction with residual and jumps $O(T^{-2})$ and boundary values $O(1/T)$ gives an error $O(1/T)$.
 
     UnitaryProducts.PaperProof.correction_rate_bound
 
-302. **LEAN** — Section 4.1
+298. **LEAN** — Section 4.1
 
     R=K-G-Y'-i(KY-YG)
 
     UnitaryProducts.Paper.residual_display_chain
 
-303. **LEAN** — Section 4.1, Theorem 4.2
+299. **LEAN** — Section 4.1, Theorem 4.2
 
     \Cref{thm:comparison} with endpoints $0$ and $T$ gives
 
     UnitaryProducts.PaperProof.thm_comparison
 
-304. **LEAN** — Section 4
+300. **LEAN** — Section 4
 
     $K(t)-G(t)$ is $(t-j)\sched'(j/T)/T$ to first order
 
     UnitaryProducts.PaperProof.cell_taylor_remainder; UnitaryProducts.PaperProof.uniform_local_bounds
 
-305. **LEAN** — Section 4
+301. **LEAN** — Section 4
 
     which is odd about $t=j$ and integrates to zero over $|t-j|\le1/2$.
 
     UnitaryProducts.PaperProof.unframed_linear_integral; neg_smul
 
-306. **LEAN** — Section 4.1
+302. **LEAN** — Section 4.1
 
     For $0<|x|\le\width<2\pi$, $\sin(x/2)\ne0$, and dividing by $2i\sin(x/2)$ gives $Y_{pq}(\pm\frac12)=\cormult(x)D_{pq}$ with $\cormult$ as follows.
 
     UnitaryProducts.Prose.scalar_corrector_boundary; UnitaryProducts.Paper.corrector_entry_solutions; UnitaryProducts.PaperProof.closedCellMultiplier; UnitaryProducts.Separation.zero_or_sin_half_ne_zero; UnitaryProducts.Paper.ne_two_pi_mul_of_abs_lt
 
-307. **LEAN** — Section 4
+303. **LEAN** — Section 4
 
     The two generators differ by
     \[
      \|K(t)-G(t)\|=\|\sched(t/T)-\sched(\lfloor t+1/2\rfloor/T)\|\le\frac{\|\sched'\|_\infty}T|t-\lfloor t+1/2\rfloor|\le\frac{\|\sched'\|_\infty}{2T}.
     \]
-    
 
     UnitaryProducts.Paper.rounded_hamiltonian_error_chain; UnitaryProducts.continuousOn_of_norm_sub_le; UnitaryProducts.Paper.norm_le_unitSupNorm
 
-308. **LEAN** — Section 4
+304. **LEAN** — Section 4
 
     This difference is small at every time, but the evolutions run for time $T$, so Duhamel's bound \eqref{eq:duhamel} gives only
     \begin{align*}
@@ -1987,13 +1957,13 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.rounded_duhamel_display_chain; UnitaryProducts.Paper.rounded_duhamel_quarter; UnitaryProducts.Prose.rounded_clock_mean_quarter; UnitaryProducts.continuousOn_of_norm_sub_le; UnitaryProducts.Paper.norm_le_unitSupNorm
 
-309. **LEAN** — Section 4
+305. **LEAN** — Section 4
 
     Yet, under the width hypothesis of \Cref{thm:clocks}, the error is of order $1/T$ \eqref{eq:products}.
 
     UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.PaperProof.ex_unit_sharp; UnitaryProducts.Paper.unit_step_comparison_sharp_in_T
 
-310. **LEAN** — Section 4.1, Theorem 4.2
+306. **LEAN** — Section 4.1, Theorem 4.2
 
     Let $T\ge1$ be an integer, and let $\sched(s)$ for $s\in[0,1]$ be a differentiable Hamiltonian with one-sided derivatives at $s=0$ and $s=1$, with
     \[
@@ -2010,37 +1980,37 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.thm_clocks
 
-311. **LEAN** — Section 4.1
+307. **LEAN** — Section 4.1
 
     The last two terms are $O(T^{-2})$ when $Y$ is $O(1/T)$, as $K'(\sigma)-K'(\lfloor t+1/2\rfloor)$ is $O(T^{-2})$ and $K-G$ is $O(1/T)$.
 
     UnitaryProducts.PaperProof.uniformResidual_norm_le; UnitaryProducts.PaperProof.uniformResidual_profile_bound; UnitaryProducts.PaperProof.uniform_local_bounds; UnitaryProducts.PaperProof.cell_taylor_remainder
 
-312. **LEAN** — Section 4.1
+308. **LEAN** — Section 4.1
 
     The second condition, equal end values, makes the jump at $p_j$ the change of end value from $j-1$ to $j$.
 
     UnitaryProducts.PaperProof.allSampleCorrectorFamily_end_values; UnitaryProducts.PaperProof.uniformCorrectionPiece_jump_frame
 
-313. **LEAN** — Section 4.3, Example 4.6
+309. **LEAN** — Section 4.3, Example 4.6
 
     The second line is \eqref{eq:rounded}.
 
     UnitaryProducts.Paper.regulated_evolution_rounded; norm_sub_le_norm_sub_add_norm_sub; UnitaryProducts.PaperProof.uniform_phase_error_norm; UnitaryProducts.PaperProof.unitProduct_truncation_split; UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.PaperProof.unit_rounded_clock_endpoint
 
-314. **LEAN** — Section 4
+310. **LEAN** — Section 4
 
     The comparison identity of \Cref{thm:comparison} keeps this cancellation through a correction that may jump at $j-1/2$.
 
     UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.PaperProof.canonical_cell_comparison_assembly
 
-315. **LEAN** — Section 4
+311. **LEAN** — Section 4
 
     Duhamel's bound loses this order by taking the norm of $K-G$ at each time before integrating.
 
     UnitaryProducts.PaperProof.rounded_duhamel_display_chain; UnitaryProducts.PaperProof.thm_clocks
 
-316. **LEAN** — Section 4.1, Theorem 4.2
+312. **LEAN** — Section 4.1, Theorem 4.2
 
     \int_0^T\|R(t)\|\,dt
      &=\int_0^T\Bigl\|\int_{\lfloor t+1/2\rfloor}^t\bigl(K'(\sigma)-K'(\lfloor t+1/2\rfloor)\bigr)\,d\sigma-i(K-G)Y\Bigr\|\,dt\\
@@ -2051,25 +2021,25 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.unitPhysicalResidual_integral_formula; UnitaryProducts.PaperProof.unitPhysicalResidual_integral_product_bound; UnitaryProducts.PaperProof.unitPhysicalResidual_profile_bound; UnitaryProducts.PaperProof.clock_profile_cell_split; UnitaryProducts.PaperProof.clock_profile_subcell; UnitaryProducts.PaperProof.clock_profile_unit_interval; UnitaryProducts.PaperProof.uniform_clock_profile_integral; UnitaryProducts.PaperProof.unit_residual_integral; UnitaryProducts.PaperProof.uniform_residual_integral_of_profile; UnitaryProducts.PaperProof.unitPhysicalResidual_integral; UnitaryProducts.PaperProof.cor_residual
 
-317. **LEAN** — Section 4.1
+313. **LEAN** — Section 4.1
 
     Under the width hypothesis, \Cref{lem:cell} gives, for $\Omega=\sched(j/T)$ and $D=\sched'(j/T)/T$, a solution $Y$ of \eqref{eq:corrector} with end values $\cormult([\Omega,\cdot])D$. We take this $Y$ for every $j$.
 
     UnitaryProducts.PaperProof.lem_cell; UnitaryProducts.PaperProof.allSampleCorrectorFamily_end_values; UnitaryProducts.PaperProof.uniformCorrectionPiece_jump_frame; UnitaryProducts.PaperProof.integralCell_spec; UnitaryProducts.PaperProof.unitClockJump
 
-318. **LEAN** — Section 4
+314. **LEAN** — Section 4
 
     so that $|t-\lfloor t+1/2\rfloor|\le1/2$
 
     UnitaryProducts.Paper.rounded_clock_error_and_tie
 
-319. **LEAN** — Section 4.1, Theorem 4.2
+315. **LEAN** — Section 4.1, Theorem 4.2
 
     The second uses $\|K'(\sigma)-K'(\lfloor t+1/2\rfloor)\|\le h|\sigma-\lfloor t+1/2\rfloor|/T^2$ for the integral term, and $\|K(t)-G(t)\|\le\|\sched'\|_\infty|\tau|/T$ with \Cref{lem:cell}(ii) and $\|D\|\le\|\sched'\|_\infty/T$ for the other. In the third line, $\tau$ runs over $[-1/2,1/2)$ as $t$ runs over each $[k,k+1)$ with $0\le k<T$, and the fourth uses $\int_{-1/2}^{1/2}(\tau^2,|\tau|,|\tau|^3)\,d\tau=(1/12,1/4,1/32)$.
 
     UnitaryProducts.PaperProof.clock_profile_subcell; UnitaryProducts.PaperProof.clock_profile_cell_split; UnitaryProducts.PaperProof.clock_profile_unit_interval; UnitaryProducts.PaperProof.unitPhysicalResidual_profile_bound; UnitaryProducts.PaperProof.uniform_local_bounds; UnitaryProducts.PaperProof.uniform_corrector_norm_LM; UnitaryProducts.PaperProof.uniform_residual_moments
 
-320. **LEAN** — Section 2
+316. **LEAN** — Section 2
 
     $\|f\|_\infty=\sup_{s\in[0,1]}\|f(s)\|$ for a matrix-valued function $f(s)$ with $s\in[0,1]$
 
@@ -2077,7 +2047,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     The supremum is applied to bounded functions, as in the estimates that use this notation.
 
-321. **LEAN** — Section 4.1, Theorem 4.2
+317. **LEAN** — Section 4.1, Theorem 4.2
 
     \int_0^T\|R(t)\|\,dt
      &=\int_0^T\Bigl\|\int_{\lfloor t+1/2\rfloor}^t\bigl(K'(\sigma)-K'(\lfloor t+1/2\rfloor)\bigr)\,d\sigma-i(K-G)Y\Bigr\|\,dt\\
@@ -2088,356 +2058,356 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.cor_residual; UnitaryProducts.PaperProof.unitPhysicalResidual_integral_formula; UnitaryProducts.PaperProof.unitPhysicalResidual_integral_product_bound; UnitaryProducts.PaperProof.unitPhysicalResidual_profile_bound; UnitaryProducts.PaperProof.clock_profile_cell_split; UnitaryProducts.PaperProof.clock_profile_subcell; UnitaryProducts.PaperProof.clock_profile_unit_interval; UnitaryProducts.PaperProof.uniform_clock_profile_integral; UnitaryProducts.PaperProof.unit_residual_integral; UnitaryProducts.PaperProof.uniform_residual_integral_of_profile; UnitaryProducts.PaperProof.unitPhysicalResidual_integral
 
-322. **LEAN** — Section 4.3, Example 4.6
+318. **LEAN** — Section 4.3, Example 4.6
 
     The last uses the choices of $T$ and $\bits$.
 
     UnitaryProducts.PaperProof.ex_unit_transfer_bounds
 
-323. **LEAN** — Section 4.1
+319. **LEAN** — Section 4.1
 
     If the values $\sched(s)$ commute, the comparison is quadrature. Then $\evol(T)=\exp(-i\int_0^T\sched(t/T)\,dt)$
 
     UnitaryProducts.Prose.commuting_rescaled_evolution
 
-324. **LEAN** — Section 4.1
+320. **LEAN** — Section 4.1
 
     the product $\devprod_T$ is the exponential of $-i$ times the left-endpoint sum $\sum_{j=0}^{T-1}\sched(j/T)$
 
     UnitaryProducts.Prose.commuting_unitProduct
 
-325. **LEAN** — Section 4.1
+321. **LEAN** — Section 4.1
 
-     \compevol(T)=e^{-i\sched(1)/2}\devprod_Te^{i\sched(0)/2}=\exp\Bigl(-i\Bigl(\frac12\sched(0)+\sum_{j=1}^{T-1}\sched(j/T)+\frac12\sched(1)\Bigr)\Bigr)
+    \compevol(T)=e^{-i\sched(1)/2}\devprod_Te^{i\sched(0)/2}=\exp\Bigl(-i\Bigl(\frac12\sched(0)+\sum_{j=1}^{T-1}\sched(j/T)+\frac12\sched(1)\Bigr)\Bigr)
     \]
 
     UnitaryProducts.Prose.commuting_trapezoidal_product; UnitaryProducts.Paper.regulated_evolution_rounded
 
-326. **LEAN** — Section 4.1
+322. **LEAN** — Section 4.1
 
     The half-step phases turn a first-order rule, whose errors of order $1/T$ on each of $T$ steps add up to order $1$, into a second-order rule with total error of order $1/T$.
 
     UnitaryProducts.Prose.quadrature_local_orders; UnitaryProducts.Prose.quadrature_integral_partition; UnitaryProducts.Prose.quadrature_accumulated_orders
 
-327. **LEAN** — Section 4.1, Example 4.3
+323. **LEAN** — Section 4.1, Example 4.3
 
     \item $\|\devprod_T-\evol(T)\|=2\sin\bigl(1/4-1/(12T)\bigr)$, with limit $2\sin(1/4)$.
 
     UnitaryProducts.PaperProof.ex_unit_sharp
 
-328. **LEAN** — Section 4.1, Example 4.3
+324. **LEAN** — Section 4.1, Example 4.3
 
-    $\int_0^Tt^2/T^2\,dt=T/3$
+    $\int_0^T\sched(t/T)\,dt=TZ/3$
 
-    UnitaryProducts.Prose.integral_quadratic_clock
+    UnitaryProducts.Prose.integral_quadratic_clock; intervalIntegral.integral_smul_const; UnitaryProducts.Paper.sharpFamily
 
-329. **LEAN** — Section 4.1
+325. **LEAN** — Section 4.1
 
     That value is $1/T$ times a smooth function of $\Omega$ and $\sched'(j/T)$, which change by $O(1/T)$ between samples, so each jump is $O(T^{-2})$.
 
     UnitaryProducts.PaperProof.contDiffOn_frameOp; UnitaryProducts.PaperProof.unitClockJump; UnitaryProducts.PaperProof.affine_hamiltonian_cell_bound; UnitaryProducts.PaperProof.hamiltonian_jump_sum_integral
 
-330. **LEAN** — Section 4.1, Theorem 4.2
+326. **LEAN** — Section 4.1, Theorem 4.2
 
-    Let $Y$ be the correction above, and let $\tau=t-\lfloor t+1/2\rfloor$, so that, for $|t-j|<1/2$, $Y$ as a function of $\tau$ solves \eqref{eq:corrector} with $\Omega=\sched(j/T)$ and $D=\sched'(j/T)/T$, and its jump at $p_j$ is $\Delta_j$.
+    Let $Y$ be the correction that \Cref{lem:cell} gives for every $j$, and let $\tau=t-\lfloor t+1/2\rfloor$, so that, for $|t-j|<1/2$, $Y$ as a function of $\tau$ solves \eqref{eq:corrector} with $\Omega=\sched(j/T)$ and $D=\sched'(j/T)/T$, and its jump at $p_j$ is $\Delta_j$.
 
     UnitaryProducts.PaperProof.contDiff_uniformCorrectionPiece; UnitaryProducts.PaperProof.canonical_cell_comparison_assembly; UnitaryProducts.PaperProof.allSampleCorrectorFamily_ode; UnitaryProducts.PaperProof.uniformCorrectionPiece_derivative; UnitaryProducts.PaperProof.uniformCorrectionPiece_jump_frame; UnitaryProducts.Prose.unit_sample_corrector_ode
 
-331. **LEAN** — Section 4
+327. **LEAN** — Section 4
 
     as $\int_k^{k+1}|t-\lfloor t+1/2\rfloor|\,dt=1/4$ for integers $k$.
 
     UnitaryProducts.Prose.rounded_clock_cell_quarter
 
-332. **LEAN** — Section 4.1
+328. **LEAN** — Section 4.1
 
     If the end values agree, the left side is $2i\sin(x/2)Y_{pq}(\frac12)$.
 
     UnitaryProducts.Paper.UnitStepsProse.corrector_eigenbasis_derivative; UnitaryProducts.Prose.scalar_corrector_boundary; UnitaryProducts.PaperProof.cell_eigenbasis_entry; UnitaryProducts.Prose.scalar_corrector_trig_moment; UnitaryProducts.Prose.scalar_corrector_integrating_factor
 
-333. **LEAN** — Abstract
+329. **LEAN** — Abstract
 
-    a product of exponentials of samples is exactly the Hamiltonian's evolution on a rounded clock, a step function assigning each time a sample time in its interval.
+    a product of exponentials of samples is exactly the Hamiltonian's evolution on a rounded clock. The rounded clock, a step function assigning each time a sample time in its interval, is time at finite precision.
 
     UnitaryProducts.Prose.pieceProduct_eq_evolution_of_pieces; UnitaryProducts.Prose.exists_piecewise_recursive_evolution
 
-334. **LEAN** — Section 1
+330. **LEAN** — Section 1
 
     I compare products and continuous evolutions in both directions through piecewise-constant Hamiltonians at finite precision, by one mechanism: a product of exponentials of samples of a Hamiltonian is exactly the evolution of the Hamiltonian run on a rounded clock, a step function from times to sample times (\Cref{sec:prelim}).
 
     UnitaryProducts.Prose.pieceProduct_eq_evolution_of_pieces; UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces; UnitaryProducts.Paper.regulated_evolution_rounded
 
-335. **LEAN** — Section 1
+331. **LEAN** — Section 1
 
     In one direction, I approximate a continuous evolution by a product built from it, which needs short steps, and Duhamel's bound measures how much rounding the clock changes the evolution (\Cref{introthm:fine-count}).
 
     UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.Paper.duhamel
 
-336. **LEAN** — Section 1
+332. **LEAN** — Section 1
 
     In the other, I identify a product with a continuous evolution, which works even at steps of length one (unit steps), and a corrected comparison bounds the change by $O(1/T)$ (\Cref{introthm:unit}).
 
     UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.Paper.regulated_evolution_rounded
 
-337. **LEAN** — Section 1
+333. **LEAN** — Section 1
 
     A simulation bound or an adiabatic theorem for the continuous evolution therefore holds for the product, between two half-step phases at unit steps, up to the comparison error and under its own hypotheses.
 
     UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.PaperProof.prop_transfer; norm_sub_le_norm_sub_add_norm_sub
 
-338. **LEAN** — Section 1
+334. **LEAN** — Section 1
 
     To approximate $\evol(T)$ by a product, we run $\sched$ on the clock rounded to the midpoints between consecutive checkpoints, with truncated samples, and Duhamel's formula bounds the distance by the integrated Hamiltonian error.
 
     UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces; UnitaryProducts.Paper.duhamel
 
-339. **LEAN** — Section 2.1
+335. **LEAN** — Section 2.1
 
-    In this paper, the piecewise-constant family is a Hamiltonian $\sched$ on a \emph{rounded clock}, a step function that assigns to each time a sample time in its interval, so by \eqref{eq:piecewise-product} the product of the exponentials of the samples is exactly the evolution of $\sched$ run on the rounded clock.
+    In this paper, the piecewise-constant family is a Hamiltonian $\sched$ on a \emph{rounded clock}, a step function that assigns to each time in an interval $(t_j,t_{j+1})$ a sample time in $[t_j,t_{j+1}]$, so by \eqref{eq:piecewise-product} the product of the exponentials of the samples is exactly the evolution of $\sched$ run on the rounded clock.
 
     UnitaryProducts.Prose.pieceProduct_eq_evolution_of_pieces; UnitaryProducts.Prose.exists_piecewise_recursive_evolution
 
-340. **LEAN** — Section 2.1
+336. **LEAN** — Section 2.1
 
     In \Cref{sec:results}, the clock rounds $s$ between checkpoints $s_j<s<s_{j+1}$ to their midpoint $(s_j+s_{j+1})/2$, and the entries of the samples are truncated too.
 
     UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces; UnitaryProducts.Paper.midpointProductOver; UnitaryProducts.Paper.midpoint_bit_truncation_finite_precision
 
-341. **LEAN** — Section 3
+337. **LEAN** — Section 3
 
     In this section, we run a regulated Hamiltonian on the clock rounded to the midpoints between consecutive checkpoints and truncate the entries of its samples. Checkpoints and truncation can be chosen to make the resulting product's distance from the Hamiltonian's evolution arbitrarily small, even when the Hamiltonian jumps. We then transfer continuous leakage bounds to these products.
 
     UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces; UnitaryProducts.Prose.exists_midpointProductOver_truncation_close; UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.prop_transfer
 
-342. **LEAN** — Section 4.2
+338. **LEAN** — Section 4.2
 
-    For a continuous Hermitian $\sched(s)$ with spectrum in $[a(s),a(s)+\width]$ for a continuous $a$, such as its least eigenvalue, continuous by \cite[Corollary~III.2.6]{bhatia1997}, $\devprod=e^{-i\sched}$ has the eigenvalues of $\sched$ read modulo $2\pi$, so it satisfies
+    For a continuous Hermitian $\sched(s)$ with spectrum in $[a(s),a(s)+\width]$ for a continuous function $a$, the unitary $\devprod=e^{-i\sched}$ has the eigenvalues of $\sched$ read modulo $2\pi$, so it satisfies
 
     UnitaryProducts.PaperProof.hamiltonian_window_arc; UnitaryProducts.spectrum_evol_image
 
-343. **EXTERNAL** — Section 4.2
+339. **EXTERNAL** — Section 4.2
 
-    continuous by \cite[Corollary~III.2.6]{bhatia1997}
+    The least eigenvalue of $\sched(s)$ is then one such $a$, as it is continuous \cite[Corollary~III.2.6]{bhatia1997}.
 
-    Bhatia (1997), Matrix Analysis, Corollary III.2.6 (Weyl eigenvalue perturbation inequality).
+    bhatia1997, Corollary III.2.6 (continuity of ordered eigenvalues)
 
-344. **LEAN** — Section 4.2
+340. **LEAN** — Section 4.2
 
     and conversely \eqref{eq:arc} for a $C^2$ unitary family and a continuous $a$ supplies such a $C^2$ $\sched$ (\Cref{lem:walk-log}).
 
     UnitaryProducts.PaperProof.lem_walk_log
 
-345. **LEAN** — Section 4.2
+341. **LEAN** — Section 4.2
 
     A fixed arc about $-1$ is the case $\|\sched(s)\|\le\width/2$ with $\sched=i\operatorname{Log}\devprod$
 
     UnitaryProducts.PaperProof.centered_log_principal; UnitaryProducts.PaperProof.centered_window_log_principal; UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.Paper.spectrumAvoidsOpenArc_iff_closedArc
 
-346. **LEAN** — Section 4.2
+342. **LEAN** — Section 4.2
 
     the gaps between consecutive eigenphases of $\devprod(s)$ are those of $\operatorname{spec}\sched(s)+2\pi\mathbb Z$.
 
     UnitaryProducts.PaperProof.periodic_phase_spectrum
 
-347. **EXPOSITION** — Section 4
+343. **EXPOSITION** — Section 4
 
     \Cref{sec:comparison} chooses the correction and proves the main unit-step theorem, \Cref{thm:clocks}, and \Cref{ex:unit-sharp} shows the order $1/T$ attained. \Cref{sec:walks} bounds the correction's jumps (\Cref{thm:jumps}), which gives the comparison for Hamiltonians \eqref{eq:products} and unitary families (\Cref{cor:walks}), and \Cref{sec:unit-transfer} transfers continuous bounds to the product.
 
-348. **LEAN** — Section 4.2
+344. **LEAN** — Section 4.2
 
     The condition that $\sched(s)$ has spectrum in $[a(s),a(s)+\width]$ and \eqref{eq:arc} differ only in the branch of the logarithm, the interval $[a(s),a(s)+\width]$, and conversely \eqref{eq:arc} for a $C^2$ unitary family and a continuous $a$ supplies such a $C^2$ $\sched$ (\Cref{lem:walk-log}).
 
     UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.spectrum_evol_image
 
-349. **LEAN** — Section 4.2, Theorem 4.4
+345. **LEAN** — Section 4.2, Theorem 4.4
 
     Let $\Omega(s)$ for $s\in[0,1]$ be a continuous Hermitian family with $\Omega(j/T)=\sched(j/T)$ and eigenvalue differences of modulus at most $\width$, twice continuously differentiable for $s$ in each $[(j-1)/T,j/T]$. For $1\le j\le T$ with $l=(j-1)/T$ and $r=j/T$, $T\Delta_j=\cormult([\Omega(r),\cdot])\sched'(r)-\cormult([\Omega(l),\cdot])\sched'(l)$ is the change of $\cormult([\Omega,\cdot])\Omega'$ over $[l,r]$ up to the terms in $\sched'-\Omega'$ at its ends, and
 
     UnitaryProducts.PaperProof.unitClockJump; UnitaryProducts.PaperProof.affine_jump_three_terms; UnitaryProducts.PaperProof.jump_sample_slope
 
-350. **LEAN** — Section 4.2, Theorem 4.4
+346. **LEAN** — Section 4.2, Theorem 4.4
 
-     T\|\Delta_j\|&\le\bigl\|\cormult([\Omega(r),\cdot])\bigl(\sched'(r)-\Omega'(r^-)\bigr)\bigr\|+\bigl\|\cormult([\Omega(r),\cdot])\Omega'(r^-)-\cormult([\Omega(l),\cdot])\Omega'(l^+)\bigr\|\\
+    T\|\Delta_j\|&\le\bigl\|\cormult([\Omega(r),\cdot])\bigl(\sched'(r)-\Omega'(r^-)\bigr)\bigr\|+\bigl\|\cormult([\Omega(r),\cdot])\Omega'(r^-)-\cormult([\Omega(l),\cdot])\Omega'(l^+)\bigr\|\\
      &\quad+\bigl\|\cormult([\Omega(l),\cdot])\bigl(\Omega'(l^+)-\sched'(l)\bigr)\bigr\|\\
 
     UnitaryProducts.PaperProof.affine_jump_three_terms; UnitaryProducts.PaperProof.affine_jump_three_norms; UnitaryProducts.PaperProof.unitClockJump
 
-351. **LEAN** — Section 4.2, Theorem 4.4
+347. **LEAN** — Section 4.2, Theorem 4.4
 
-     &\le\cormult(\width)\bigl(\|\sched'(r)-\Omega'(r^-)\|+\|\Omega'(l^+)-\sched'(l)\|\bigr)+\bigl\|\cormult([\Omega(r),\cdot])\Omega'(r^-)-\cormult([\Omega(l),\cdot])\Omega'(l^+)\bigr\|\\
+    &\le\cormult(\width)\bigl(\|\sched'(r)-\Omega'(r^-)\|+\|\Omega'(l^+)-\sched'(l)\|\bigr)+\bigl\|\cormult([\Omega(r),\cdot])\Omega'(r^-)-\cormult([\Omega(l),\cdot])\Omega'(l^+)\bigr\|\\
 
     UnitaryProducts.PaperProof.affine_jump_outer_bounds
 
-352. **LEAN** — Section 4.2, Theorem 4.4
+348. **LEAN** — Section 4.2, Theorem 4.4
 
     The first two lines add and subtract $\cormult([\Omega(r),\cdot])\Omega'(r^-)$ and $\cormult([\Omega(l),\cdot])\Omega'(l^+)$
 
     UnitaryProducts.PaperProof.affine_jump_three_terms
 
-353. **LEAN** — Section 4.2, Theorem 4.4
+349. **LEAN** — Section 4.2, Theorem 4.4
 
     the third bounds the outer terms by \eqref{eq:series-bound}.
 
     UnitaryProducts.PaperProof.affine_jump_outer_bounds; UnitaryProducts.norm_frameOp_le
 
-354. **LEAN** — Section 4.2, Theorem 4.4
+350. **LEAN** — Section 4.2, Theorem 4.4
 
     For (i), let $\Omega$ be affine for $s$ in each $[l,r]$, so $\Omega''=0$ and $\Omega'=T\int_l^r\sched'(\sigma)\,d\sigma$. Every $\Omega(s)$ has eigenvalue differences of modulus at most $\width$, as the largest eigenvalue is convex in the matrix and the least concave.
 
     UnitaryProducts.PaperProof.jumpSegment; UnitaryProducts.PaperProof.affine_spectral_extrema; UnitaryProducts.PaperProof.width_jumpSegment; UnitaryProducts.PaperProof.jumpSegment_second_derivWithin; UnitaryProducts.PaperProof.jump_increment_eq_integral; UnitaryProducts.PaperProof.jump_sample_slope; UnitaryProducts.PaperProof.jumpSegment_sample_derivative
 
-355. **LEAN** — Section 4.2, Theorem 4.4
+351. **LEAN** — Section 4.2, Theorem 4.4
 
     $\|\sched'(r)-\Omega'(r^-)\|\le hT\int_l^r(r-\sigma)\,d\sigma=h/(2T)$
 
     UnitaryProducts.PaperProof.jump_average_endpoint_errors; integral_id; intervalIntegral.integral_const; intervalIntegral.integral_sub; UnitaryProducts.PaperProof.jump_sample_slope
 
-356. **LEAN** — Section 4.2, Theorem 4.5
+352. **LEAN** — Section 4.2, Theorem 4.5
 
     By \eqref{eq:rounded}, $\compevol(T)$ is the evolution of $\sched(\lfloor t+1/2\rfloor/T)$ at $T$. As $\devprod$ is $C^2$ and satisfies \eqref{eq:arc} with $a$ the least eigenvalue of $\sched$, $\sched$ is the logarithm of \Cref{lem:walk-log}, so $\|\sched'\|\le\kappa\|\devprod'\|$ and $\|\sched''\|\le\kappa\|\devprod''\|+\|\devprod'\|^2/\cos^2(\width/4)$. Hence
 
     UnitaryProducts.PaperProof.exists_rounded_evolution; UnitaryProducts.PaperProof.thm_clocks; UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.PaperProof.hamiltonian_window_arc
 
-357. **LEAN** — Section 4.2, Theorem 4.5
+353. **LEAN** — Section 4.2, Theorem 4.5
 
-     T\|\compevol(T)-\evol(T)\|
+    T\|\compevol(T)-\evol(T)\|
      &\le c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)+\frac{\|\sched''\|_\infty}{24}+c_1\|\sched'\|_\infty^2+T\sum_{j=1}^T\|\Delta_j\|\\
 
     UnitaryProducts.PaperProof.thm_clocks
 
-358. **LEAN** — Section 4.2, Theorem 4.5
+354. **LEAN** — Section 4.2, Theorem 4.5
 
-     &\le c_0\kappa\bigl(\|\devprod'(0)\|+\|\devprod'(1)\|\bigr)+\Bigl(\frac1{24}+\cormult(\width)\Bigr)\kappa\|\devprod''\|_\infty+c_2\|\devprod'\|_\infty^2.
+    &\le c_0\kappa\bigl(\|\devprod'(0)\|+\|\devprod'(1)\|\bigr)+\Bigl(\frac1{24}+\cormult(\width)\Bigr)\kappa\|\devprod''\|_\infty+c_2\|\devprod'\|_\infty^2.
 
     UnitaryProducts.PaperProof.thm_unitary_products; UnitaryProducts.PaperProof.walk_square
 
-359. **LEAN** — Section 4.2, Theorem 4.4
+355. **LEAN** — Section 4.2, Theorem 4.4
 
     Then $\|\Omega'\|\le\|\sched'\|_\infty$
 
     UnitaryProducts.PaperProof.jump_average_norm_le; UnitaryProducts.PaperProof.jump_sample_slope
 
-360. **LEAN** — Appendix A, Lemma A.3
+356. **LEAN** — Appendix A, Lemma A.3
 
     $\cormult(x)=\sum_{n\ge0}\nu_nx^n$
 
     UnitaryProducts.Corrector.frameMult_eq_frameCoeff_series
 
-361. **LEAN** — Appendix A, Lemma A.1
+357. **LEAN** — Appendix A, Lemma A.1
 
     Let $0\le\width<2\pi$, let $\Omega$ be a Hermitian matrix with eigenvalue differences of modulus at most $\width$, and let $D$ be a matrix. There is a continuously differentiable matrix-valued $Y(\tau)$ for $|\tau|\le\frac12$ such that the following hold.
 
     UnitaryProducts.PaperProof.lem_cell
 
-362. **LEAN** — Appendix A, Lemma A.1
+358. **LEAN** — Appendix A, Lemma A.1
 
     \item $Y$ solves \eqref{eq:corrector}, with end values $\cormult([\Omega,\cdot])D$.
 
     UnitaryProducts.PaperProof.lem_cell
 
-363. **LEAN** — Appendix A, Lemma A.1
+359. **LEAN** — Appendix A, Lemma A.1
 
     \item $\|Y(0)\|\le c_0\|D\|$ for the $c_0$ of \Cref{thm:clocks}, and $\|Y(\tau)\|\le\|Y(0)\|+\tau^2\|D\|/2$ for $|\tau|\le\frac12$.
 
     UnitaryProducts.PaperProof.lem_cell
 
-364. **LEAN** — Appendix A, Lemma A.1
+360. **LEAN** — Appendix A, Lemma A.1
 
     \dfrac{1-ix\tau}{x^2}-\dfrac{e^{-ix\tau}}{2x\sin(x/2)}, & x\ne0,\\[2ex]
 
     UnitaryProducts.PaperProof.closedCellMultiplier
 
-365. **LEAN** — Appendix A, Lemma A.1
+361. **LEAN** — Appendix A, Lemma A.1
 
     \dfrac{\tau^2}2-\dfrac1{24}, & x=0.
 
     UnitaryProducts.PaperProof.closedCellMultiplier
 
-366. **LEAN** — Appendix A, Lemma A.1
+362. **LEAN** — Appendix A, Lemma A.1
 
     Differentiating gives $\partial_\tau\cormult_\tau(x)+ix\cormult_\tau(x)=\tau$, so $Y'+i[\Omega,Y]=\tau D$, and $\cormult_{\pm1/2}(x)=\cormult(x)$, so $Y(\pm\frac12)=\cormult([\Omega,\cdot])D$. The two identities verify the guess and prove (i).
 
     UnitaryProducts.PaperProof.closedCellMultiplier_derivative; UnitaryProducts.PaperProof.closedCellMultiplier_endpoints; UnitaryProducts.PaperProof.cell_entry_ansatz_verified; UnitaryProducts.PaperProof.closedCell_eq_integralCell; UnitaryProducts.PaperProof.integralCell_hasDerivAt; UnitaryProducts.PaperProof.closedCell_endpoints
 
-367. **LEAN** — Appendix A, Lemma A.1
+363. **LEAN** — Appendix A, Lemma A.1
 
     whose coefficient of each $x^{2k}$ is an alternating sum with decreasing terms and so positive.
 
     UnitaryProducts.Corrector.centerCoeff_even; UnitaryProducts.Corrector.centerEvenCoeff_pos; UnitaryProducts.Corrector.centerCoeff_nonneg; UnitaryProducts.Corrector.summable_centerCoeff_power
 
-368. **LEAN** — Appendix A, Lemma A.1
+364. **LEAN** — Appendix A, Lemma A.1
 
     \|Y(\tau)\|&=\Bigl\|Y(0)+\int_0^\tau\sigma e^{i\sigma\Omega}De^{-i\sigma\Omega}\,d\sigma\Bigr\|\\
 
     UnitaryProducts.PaperProof.integralCell_norm_eq_integral; UnitaryProducts.PaperProof.closedCell_eq_integralCell
 
-369. **LEAN** — Appendix A, Lemma A.1
+365. **LEAN** — Appendix A, Lemma A.1
 
     &\le\|Y(0)\|+\frac{\tau^2}2\|D\|.
 
     UnitaryProducts.PaperProof.integralCell_norm; UnitaryProducts.Paper.UnitStepsProse.abs_integral_abs_zero
 
-370. **LEAN** — Appendix A, Lemma A.2
+366. **LEAN** — Appendix A, Lemma A.2
 
     Let $0\le\width<2\pi$, let $a\colon[0,1]\to\mathbb R$ be continuous, let $\devprod(s)$ for $s\in[0,1]$ be a $C^2$ unitary family with $\operatorname{spec}\devprod(s)\subset\{e^{-i\theta}:\theta\in[a(s),a(s)+\width]\}$, and let $\kappa=(\width/2)/\sin(\width/2)$, with $\kappa=1$ if $\width=0$. Then $\devprod=e^{-i\sched}$ for exactly one Hermitian $\sched(s)$ with spectrum in $[a(s),a(s)+\width]$, $\sched$ is twice continuously differentiable in $s\in[0,1]$, and for every $s\in[0,1]$,
 
     UnitaryProducts.PaperProof.lem_walk_log
 
-371. **LEAN** — Appendix A, Lemma A.2
+367. **LEAN** — Appendix A, Lemma A.2
 
     \item $\|\sched'(s)\|\le\kappa\|\devprod'(s)\|$, and
 
     UnitaryProducts.PaperProof.lem_walk_log
 
-372. **LEAN** — Appendix A, Lemma A.2
+368. **LEAN** — Appendix A, Lemma A.2
 
     \item $\|\sched''(s)\|\le\kappa\|\devprod''(s)\|+\|\devprod'(s)\|^2/\cos^2(\width/4)$.
 
     UnitaryProducts.PaperProof.lem_walk_log
 
-373. **LEAN** — Appendix A, Lemma A.2
+369. **LEAN** — Appendix A, Lemma A.2
 
     &=\kappa\|\devprod'\|
 
     UnitaryProducts.PaperProof.chord_quadratures
 
-374. **LEAN** — Appendix A
+370. **LEAN** — Appendix A
 
     The third lemma bounds the derivative of $\cormult([\Omega,\cdot])\Omega'$ along a curve $\Omega$.
 
     UnitaryProducts.PaperProof.canonical_cell_curve
 
-375. **LEAN** — Appendix A
+371. **LEAN** — Appendix A
 
     For the least eigenvalue $\mu$ of $\Omega$, $\|\Omega-\mu-\width/2\|\le\width/2$, so $\|[\Omega,A]\|=\|[\Omega-\mu-\width/2,A]\|\le\width\|A\|$ for every matrix $A$.
 
     UnitaryProducts.norm_sub_smul_one_le_of_eigenvalues; UnitaryProducts.Paper.UnitStepsProse.ad_power_norm_le; UnitaryProducts.norm_adL_apply_le
 
-376. **LEAN** — Section 1
+372. **LEAN** — Section 1
 
-    Conjugating the difference $\sched(t/T)-\sched(\lfloor t+1/2\rfloor/T)$ by $\compevol$ and integrating it before taking any norm bounds $\|\compevol(T)-\evol(T)\|$ from above.
+    We do better by integrating the difference $\sched(t/T)-\sched(\lfloor t+1/2\rfloor/T)$ by parts, in the frame of $\compevol$, before taking any norm (\Cref{thm:comparison}).
 
     UnitaryProducts.PaperProof.rotating_frame_bound; UnitaryProducts.PaperProof.frame_unit
 
-377. **LEAN** — Section 2.2, Definition 2.5
+373. **LEAN** — Section 2.2, Definition 2.5
 
-    \item A \emph{band} of a Hermitian matrix $A$ is a nonempty proper subset of its eigenvalues of the form $\{\lambda:a<\lambda<b\}$, where $a$ and $b$ are not eigenvalues of $A$. A band of a unitary matrix $A$ is one of the form $\{e^{-i\theta}:a<\theta<b\}$, where $e^{-ia}$ and $e^{-ib}$ are not eigenvalues of $A$. Its \emph{spectral projector} projects orthogonally onto the span of the eigenvectors with eigenvalues in the band.
+    \item A \emph{band} of a Hermitian matrix $A$ is a nonempty proper subset of its eigenvalues of the form $\{\lambda:a<\lambda<b\}$, where $a$ and $b$ are not eigenvalues of $A$. A band of a unitary matrix $A$ is one of the form $\{e^{-i\theta}:a<\theta<b\}$ with $a<b<a+2\pi$, where $e^{-ia}$ and $e^{-ib}$ are not eigenvalues of $A$. Its \emph{spectral projector} projects orthogonally onto the span of the eigenvectors with eigenvalues in the band.
 
-    UnitaryProducts.Paper.spectralWindowData; UnitaryProducts.Paper.spectralWindowBand; UnitaryProducts.Paper.spectralWindowProjector
+    UnitaryProducts.Paper.spectralWindowData; UnitaryProducts.Paper.spectralWindowBand; UnitaryProducts.Paper.spectralWindowProjector; UnitaryProducts.PaperProof.spectralWindowBand_endpoint_order
 
-378. **LEAN** — Section 2.2, Definition 2.5
+374. **LEAN** — Section 2.2, Definition 2.5
 
     \item For Hermitian $A$, its \emph{spectral gap} $\gap A$ is the least distance $|\lambda-\mu|$ from an eigenvalue $\lambda$ in the band to an eigenvalue $\mu$ outside it. For unitary $A$, its \emph{eigenphase gap} $\gap A$ is the least distance along the circle, $\min_{k\in\mathbb Z}|\theta-\phi+2\pi k|$, from an eigenvalue $e^{-i\theta}$ in the band to an eigenvalue $e^{-i\phi}$ outside it.
 
     UnitaryProducts.Paper.spectralWindowGap; UnitaryProducts.Paper.angularDistance_isLeast
 
-379. **LEAN** — Section 2.2, Definition 2.5
+375. **LEAN** — Section 2.2, Definition 2.5
 
     \item A \emph{band} of a Hermitian or unitary family $A(s)$ with $s\in[0,1]$ is a band of each $A(s)$ with endpoints $a(s)$ and $b(s)$ continuous in $s$. It is a \emph{band of $m$ eigenvalues} if each $A(s)$ has $m$ eigenvalues in it, counted with multiplicity, and its spectral projectors at $s=0$ and $s=1$ are its \emph{endpoint projectors}.
 
     UnitaryProducts.Paper.spectralWindowFamily; UnitaryProducts.Paper.spectralWindowCount; UnitaryProducts.Paper.spectralWindowData
 
-380. **LEAN** — Section 4.1, Definition 4.1
+376. **LEAN** — Section 4.1, Definition 4.1
 
     For complex $x\notin2\pi\mathbb Z\setminus\{0\}$, let
     \begin{equation}\label{eq:N-def}
@@ -2450,7 +2420,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.unitComparisonObjects; UnitaryProducts.Corrector.frameMult; UnitaryProducts.Paper.frameOp_eq_paper_value; UnitaryProducts.PaperProof.frameOp_arbitrary_eigenbasis_entry; UnitaryProducts.WalkCut.complexFrameMult; UnitaryProducts.WalkCut.complexFrameMult_ofReal; UnitaryProducts.Paper.UnitStepsProse.complexSpectralMultiplier
 
-381. **LEAN** — Section 4.1
+377. **LEAN** — Section 4.1
 
     Let $\psi_p$ be an orthonormal basis of eigenvectors of $\Omega$, with $\Omega\psi_p=\lambda_p\psi_p$, and write $A_{pq}=\psi_p^\dagger A\psi_q$ for a matrix $A$. As $\Omega$ is Hermitian, $[\Omega,A]_{pq}=\psi_p^\dagger(\Omega A-A\Omega)\psi_q=(\lambda_p-\lambda_q)A_{pq}$, so, with $x=\lambda_p-\lambda_q$, applying $\psi_p^\dagger\cdot\psi_q$ to \eqref{eq:corrector} gives $Y_{pq}'+ixY_{pq}=\tau D_{pq}$. Integrating $(e^{ix\tau}Y_{pq})'=\tau e^{ix\tau}D_{pq}$ over $|\tau|\le1/2$ gives
     \begin{equation}\label{eq:cell-integral}
@@ -2463,7 +2433,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.Paper.UnitStepsProse.corrector_eigenbasis_derivative; UnitaryProducts.Prose.scalar_corrector_boundary; UnitaryProducts.PaperProof.cell_eigenbasis_entry; UnitaryProducts.Prose.scalar_corrector_trig_moment; UnitaryProducts.Prose.scalar_corrector_integrating_factor; UnitaryProducts.PaperProof.ad_power_arbitrary_eigenbasis_entry
 
-382. **LEAN** — Appendix A, Lemma A.1
+378. **LEAN** — Appendix A, Lemma A.1
 
     With $A_{pq}=\psi_p^\dagger A\psi_q$ and $x=\lambda_p-\lambda_q$ as in \Cref{sec:coarse}, every matrix $A$ satisfies $[\Omega,A]_{pq}=xA_{pq}$ and, as in \Cref{def:unit-objects}, $(\phi([\Omega,\cdot])A)_{pq}=\phi(x)A_{pq}$ for a function $\phi$. We guess that $Y(\tau)=\cormult_\tau([\Omega,\cdot])D$ solves \eqref{eq:corrector}, where
     \[
@@ -2471,73 +2441,73 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.closedCell; UnitaryProducts.PaperProof.closedCellMultiplier; UnitaryProducts.Paper.UnitStepsProse.complexSpectralMultiplier; UnitaryProducts.Paper.UnitStepsProse.ad_power_eigenbasis_entry; UnitaryProducts.Paper.spectralMultiplier_eigenbasis_entry
 
-383. **LEAN** — Appendix A, Lemma A.2
+379. **LEAN** — Appendix A, Lemma A.2
 
     For each $s\in[0,1]$, the spectral theorem and the hypothesis on $\operatorname{spec}\devprod(s)$ give $\devprod(s)=\sum_je^{-i\theta_j}P_j$ with spectral projectors $P_j$ and $\theta_j\in[a(s),a(s)+\width]$, so $\sched(s)=\sum_j\theta_jP_j$ is Hermitian with spectrum in $[a(s),a(s)+\width]$ and $e^{-i\sched(s)}=\devprod(s)$. As $\theta\mapsto e^{-i\theta}$ is injective for $\theta\in[a(s),a(s)+\width]$, $\sched(s)$ is the only Hermitian matrix with spectrum in $[a(s),a(s)+\width]$ and $e^{-i\sched(s)}=\devprod(s)$. Fix $s_0\in[0,1]$. Multiplying $\devprod$ by the constant phase $e^{i(a(s_0)+\width/2)}$ shifts $\sched$ by a constant and changes none of the norms in (i) and (ii), so we may take $a(s_0)=-\width/2$. Then every eigenvalue $\varphi$ of $\sched(s_0)$ satisfies $|\varphi|\le\width/2$, and, as $a$ is continuous and $\width<2\pi$, every eigenvalue $\varphi$ of $\sched(s)$ for $s$ near $s_0$ satisfies $|\varphi|<\pi$, so $\sched(s)=i\operatorname{Log}\devprod(s)$ for $s$ near $s_0$, with $\operatorname{Log}$ the principal logarithm.
 
     UnitaryProducts.PaperProof.walk_log_pointwise; UnitaryProducts.eq_of_evol_eq; UnitaryProducts.Prose.eventually_window_in_principal_turn; UnitaryProducts.PaperProof.moving_window_center_bound; UnitaryProducts.Prose.evol_sub_scalar_one; UnitaryProducts.Prose.chord_mem_slitPlane; UnitaryProducts.Prose.exp_neg_I_mem_slitPlane; UnitaryProducts.PaperProof.walk_log_interior_bounds; UnitaryProducts.PaperProof.finiteSpectralProjector; UnitaryProducts.PaperProof.finite_spectral_expansion; UnitaryProducts.PaperProof.finiteSpectralProjector_properties
 
-384. **LEAN** — Appendix A, Lemma A.2
+380. **LEAN** — Appendix A, Lemma A.2
 
     For complex $z\notin(-\infty,0]$, $\operatorname{Log}z=\int_0^1(z-1)(1+u(z-1))^{-1}\,du$. Applying this integral formula to $\devprod(s)$, with $S_u=(1+u(\devprod-1))^{-1}$, and differentiating twice,
 
     UnitaryProducts.Prose.integral_log_chord; UnitaryProducts.walkLogIntegral_eq_cfc; UnitaryProducts.PaperProof.walk_log_integral_eigenvalue; UnitaryProducts.PaperProof.walk_log_centered_integral; UnitaryProducts.PaperProof.walk_log_integral
 
-385. **LEAN** — Appendix A, Lemma A.2
+381. **LEAN** — Appendix A, Lemma A.2
 
     \sched'&=i\int_0^1S_u\devprod'S_u\,du,\\
 
     UnitaryProducts.PaperProof.centered_log_derivatives
 
-386. **LEAN** — Appendix A, Lemma A.2
+382. **LEAN** — Appendix A, Lemma A.2
 
     \sched''&=i\int_0^1\bigl(S_u\devprod''S_u-2uS_u\devprod'S_u\devprod'S_u\bigr)\,du,
 
     UnitaryProducts.PaperProof.centered_log_derivatives
 
-387. **LEAN** — Appendix A, Lemma A.2
+383. **LEAN** — Appendix A, Lemma A.2
 
     where the second and third lines follow from the first and second by $u(\devprod-1)S_u=1-S_u$ and $\partial_sS_u=-uS_u\devprod'S_u$
 
     UnitaryProducts.walkLogResolvent_mul_sub; UnitaryProducts.hasDerivWithinAt_walkLogResolvent; UnitaryProducts.Prose.log_product_rule_eq_sandwich
 
-388. **LEAN** — Appendix A
+384. **LEAN** — Appendix A
 
     let $[\Omega,\cdot]^n$ be the $n$-fold commutator with $\Omega$.
 
     UnitaryProducts.adL; UnitaryProducts.adL_apply; ContinuousLinearMap.mul_apply
 
-389. **LEAN** — Appendix A
+385. **LEAN** — Appendix A
 
     \|g([\Omega,\cdot])A\|\le g(\width)\|A\|,
 
     UnitaryProducts.PaperProof.general_series_bound
 
-390. **LEAN** — Appendix A
+386. **LEAN** — Appendix A
 
     $([\Omega,\cdot]^nA)_{pq}=(\lambda_p-\lambda_q)^nA_{pq}$ for $A_{pq}=\psi_p^\dagger A\psi_q$ as in \Cref{sec:coarse}
 
     UnitaryProducts.PaperProof.ad_power_arbitrary_eigenbasis_entry
 
-391. **EXTERNAL** — Appendix A
+387. **EXTERNAL** — Appendix A
 
     By the partial fractions of the cotangent \cite[4.22.3]{dlmf}
 
     DLMF §4.22, equation (4.22.3), cotangent partial fractions (https://dlmf.nist.gov/4.22.E3).
 
-392. **LEAN** — Appendix A
+388. **LEAN** — Appendix A
 
     $\cormult(x)=\sum_{m\ge1}2/(4\pi^2m^2-x^2)$ is such a series
 
     UnitaryProducts.Corrector.frameCoeff_nonneg; UnitaryProducts.Corrector.summable_frameCoeff_power; UnitaryProducts.Corrector.frameCoeff_power_eq_partialFractions; UnitaryProducts.Corrector.frameMult_eq_frameCoeff_series
 
-393. **LEAN** — Appendix A
+389. **LEAN** — Appendix A
 
     the two meanings of $\cormult([\Omega,\cdot])A$ agree.
 
     UnitaryProducts.Prose.frameOp_eq_positive_series; UnitaryProducts.PaperProof.frameOp_arbitrary_eigenbasis_entry
 
-394. **LEAN** — Section 1.1
+390. **LEAN** — Section 1.1
 
     There are absolute constants $a$ and $b$ such that the following holds. Let $T\ge2$ be an integer, let $\sched(s)$ for $s\in[0,1]$ be a Hamiltonian with $\|\sched'(s)\|\le h$ and $\|\sched'(s_1)-\sched'(s_2)\|\le h|s_1-s_2|$ for $s,s_1,s_2\in[0,1]$, and let $\evol$ be its evolution over time $T$. If every sample $\sched(j/T)$ with $0\le j\le T$ has eigenvalue differences of modulus at most $\pi$, then
     \[
@@ -2547,19 +2517,19 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.introthm_unit
 
-395. **LEAN** — Section 1.1
+391. **LEAN** — Section 1.1
 
     Furthermore, $a\le0.26$ and $b\le0.061$.
 
     UnitaryProducts.PaperProof.introthm_unit; UnitaryProducts.PaperProof.intro_constants
 
-396. **LEAN** — Section 4.2
+392. **LEAN** — Section 4.2
 
     \Cref{thm:clocks} leaves the jumps $\Delta_j$, the changes of $\cormult([\sched(s),\cdot])\sched'(s)/T$ between adjacent samples, which the next theorem bounds by \Cref{lem:end-value}, for Hamiltonians in (i) and unitary families in (ii).
 
     UnitaryProducts.PaperProof.unitClockJump; UnitaryProducts.PaperProof.thm_clocks; UnitaryProducts.PaperProof.thm_jumps
 
-397. **LEAN** — Section 4.2, Theorem 4.4
+393. **LEAN** — Section 4.2, Theorem 4.4
 
     Let $T$, $\sched$, $h$, and $\width$ satisfy the hypotheses of \Cref{thm:clocks}, with its jumps $\Delta_j$.
     \begin{enumerate}
@@ -2575,13 +2545,13 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.thm_jumps
 
-398. **LEAN** — Section 4.2, Theorem 4.4
+394. **LEAN** — Section 4.2, Theorem 4.4
 
-     \sum_{j=1}^T\|\Delta_j\|\le\frac1T\bigl(\cormult(\width)h+2\cormult'(\width)\|\sched'\|_\infty^2\bigr).
+    \sum_{j=1}^T\|\Delta_j\|\le\frac1T\bigl(\cormult(\width)h+2\cormult'(\width)\|\sched'\|_\infty^2\bigr).
 
     UnitaryProducts.PaperProof.thm_jumps; UnitaryProducts.PaperProof.affine_hamiltonian_sum_bound
 
-399. **LEAN** — Section 4.2, Theorem 4.4
+395. **LEAN** — Section 4.2, Theorem 4.4
 
     \item If $\sched$ is $C^2$ and every $\sched(s)$ has eigenvalue differences of modulus at most $\width$, then, with $\devprod=e^{-i\sched}$,
     \[
@@ -2590,31 +2560,36 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.thm_jumps
 
-400. **LEAN** — Section 4.2, Theorem 4.4
+396. **LEAN** — Section 4.2, Theorem 4.4
 
-     &\le\cormult(\width)\bigl(\|\sched'(r)-\Omega'(r^-)\|+\|\Omega'(l^+)-\sched'(l)\|\bigr)+\int_l^r\|(\cormult([\Omega,\cdot])\Omega')'\|\,ds.
+    &\le\cormult(\width)\bigl(\|\sched'(r)-\Omega'(r^-)\|+\|\Omega'(l^+)-\sched'(l)\|\bigr)+\int_l^r\|(\cormult([\Omega,\cdot])\Omega')'\|\,ds.
 
     UnitaryProducts.PaperProof.affine_jump_integral_chain; UnitaryProducts.PaperProof.unified_increment_norm_integral_chain
 
-401. **LEAN** — Section 4.2, Theorem 4.4
+397. **LEAN** — Section 4.2, Theorem 4.4
 
     $\|\Omega'(l^+)-\sched'(l)\|\le hT\int_l^r(\sigma-l)\,d\sigma=h/(2T)$
 
     UnitaryProducts.PaperProof.jump_average_endpoint_errors; UnitaryProducts.PaperProof.jump_sample_slope; integral_id; intervalIntegral.integral_const; intervalIntegral.integral_sub
 
-402. **LEAN** — Section 4.2, Theorem 4.4
+398. **LEAN** — Section 4.2, Theorem 4.4
 
-    \Cref{lem:end-value}(i) gives $T\|\Delta_j\|\le(\cormult(\width)h+2\cormult'(\width)\|\sched'\|_\infty^2)/T$, and summing over $j$ proves (i).
+    The first line inserts these two end bounds, and \Cref{lem:end-value}(i) with $\Omega''=0$, into the last line of the first display, and the second uses $\|\Omega'\|\le\|\sched'\|_\infty$ and $r-l=1/T$. Dividing by $T$ and summing over $1\le j\le T$ proves (i).
 
     UnitaryProducts.PaperProof.canonical_cell_curve; UnitaryProducts.PaperProof.affine_hamiltonian_cell_bound; UnitaryProducts.PaperProof.affine_hamiltonian_sum_bound; UnitaryProducts.PaperProof.thm_jumps
 
-403. **LEAN** — Section 4.2, Theorem 4.4
+399. **LEAN** — Section 4.2, Theorem 4.4
 
-    For (ii), let $\Omega=\sched$, so the outer terms vanish and $e^{-i\Omega}=\devprod$, apply \Cref{lem:end-value}(ii), and sum over $j$.
+    For (ii), let $\Omega=\sched$, which the hypotheses of (ii) allow, so the outer terms vanish and $e^{-i\Omega}=\devprod$. Then
+    \begin{align*}
+     T\|\Delta_j\|&\le\int_l^r\bigl(\cormult(\width)\|\sched''\|+2\cormult'(\width)\|\devprod'\|\,\|\sched'\|+(\cormult(\width)-\cormult(0))\|\sched'\|^2\bigr)\,ds\\
+     &\le\frac1T\bigl(\cormult(\width)\|\sched''\|_\infty+2\cormult'(\width)\|\devprod'\|_\infty\|\sched'\|_\infty+(\cormult(\width)-\cormult(0))\|\sched'\|_\infty^2\bigr).
+    \end{align*}
+    The first line bounds the integrand in the last line of the first display by \Cref{lem:end-value}(ii), and the second bounds each norm by its supremum and uses $r-l=1/T$. Dividing by $T$ and summing over $1\le j\le T$ proves (ii).
 
-    UnitaryProducts.PaperProof.thm_jumps; UnitaryProducts.PaperProof.unified_jump_sum_bound; UnitaryProducts.PaperProof.canonical_cell_curve
+    UnitaryProducts.PaperProof.thm_jumps; UnitaryProducts.PaperProof.unified_jump_sum_bound; UnitaryProducts.PaperProof.canonical_cell_curve; UnitaryProducts.PaperProof.unified_increment_norm_integral_chain; UnitaryProducts.PaperProof.canonical_cell_series_bounds
 
-404. **LEAN** — Section 4.2
+400. **LEAN** — Section 4.2
 
     Inserting (i) into \Cref{thm:clocks} gives
     \begin{equation}\label{eq:products}
@@ -2623,7 +2598,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.PaperProof.thm_clocks; UnitaryProducts.PaperProof.thm_jumps
 
-405. **LEAN** — Section 4.2, Theorem 4.5
+401. **LEAN** — Section 4.2, Theorem 4.5
 
     Under the hypotheses of \Cref{thm:jumps}(ii), with its $\devprod$ and the $c_0$ of \Cref{thm:clocks}, and with $\kappa=(\width/2)/\sin(\width/2)$, or $\kappa=1$ if $\width=0$, the evolution $\evol$ of $\sched(t/T)$ and $\compevol(T)=e^{-i\sched(1)/2}\devprod((T-1)/T)\cdots\devprod(0)e^{i\sched(0)/2}$ satisfy
     \begin{equation}\label{eq:walks}
@@ -2633,32 +2608,32 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.thm_unitary_products; UnitaryProducts.PaperProof.walk_square; UnitaryProducts.PaperProof.walk_coefficient_equivalents
 
-406. **LEAN** — Section 4.2, Theorem 4.5
+402. **LEAN** — Section 4.2, Theorem 4.5
 
     where $c_2=(1/24+\cormult(\width))/\cos^2(\width/4)+(c_0/4+1/64)\kappa^2+2\cormult'(\width)\kappa+(\cormult(\width)-\cormult(0))\kappa^2$.
 
     UnitaryProducts.PaperProof.walk_square; UnitaryProducts.PaperProof.walk_square_eq_paper; UnitaryProducts.PaperProof.uniform_c1
 
-407. **LEAN** — Section 4.2, Theorem 4.5
+403. **LEAN** — Section 4.2, Theorem 4.5
 
     As $\width\to2\pi$, $c_0\kappa$ and $(1/24+\cormult(\width))\kappa$ are asymptotic to $(2\pi-\width)^{-2}$, and $c_2$ to $(8/\pi+5\pi/2+2)(2\pi-\width)^{-3}$.
 
     UnitaryProducts.PaperProof.walk_coefficient_equivalents
 
-408. **LEAN** — Section 4.2, Theorem 4.5
+404. **LEAN** — Section 4.2, Theorem 4.5
 
-     &\le c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)+\Bigl(\frac1{24}+\cormult(\width)\Bigr)\|\sched''\|_\infty\\
+    &\le c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)+\Bigl(\frac1{24}+\cormult(\width)\Bigr)\|\sched''\|_\infty\\
      &\quad+\bigl(c_1+\cormult(\width)-\cormult(0)\bigr)\|\sched'\|_\infty^2+2\cormult'(\width)\|\devprod'\|_\infty\|\sched'\|_\infty\\
 
     UnitaryProducts.PaperProof.thm_jumps; UnitaryProducts.PaperProof.thm_unitary_products
 
-409. **LEAN** — Section 4.2, Theorem 4.5
+405. **LEAN** — Section 4.2, Theorem 4.5
 
-    The first line is \Cref{thm:clocks} with $h=\|\sched''\|_\infty$ and its $c_1=c_0/4+1/64$, the next two are \Cref{thm:jumps}(ii), and the last inserts the two bounds above and collects $c_2$.
+    The first line is \Cref{thm:clocks} with $h=\|\sched''\|_\infty$ and its $c_1=c_0/4+1/64$, the next two are \Cref{thm:jumps}(ii), and the last inserts the two bounds of \Cref{lem:walk-log} and collects $c_2$.
 
     UnitaryProducts.PaperProof.thm_clocks; UnitaryProducts.PaperProof.thm_jumps; UnitaryProducts.PaperProof.thm_unitary_products; UnitaryProducts.PaperProof.walk_collect
 
-410. **LEAN** — Section 4.2, Theorem 4.5
+406. **LEAN** — Section 4.2, Theorem 4.5
 
     As $\width\to2\pi$, $c_0\kappa$ and $(1/24+\cormult(\width))\kappa$ are asymptotic to $(2\pi-\width)^{-2}$, and $c_2$ to $(8/\pi+5\pi/2+2)(2\pi-\width)^{-3}$.
     \end{theorem}
@@ -2672,277 +2647,277 @@ The entries pair the paper’s equations and mathematical prose with their suppo
      &\quad+\bigl(c_1+\cormult(\width)-\cormult(0)\bigr)\|\sched'\|_\infty^2+2\cormult'(\width)\|\devprod'\|_\infty\|\sched'\|_\infty\\
      &\le c_0\kappa\bigl(\|\devprod'(0)\|+\|\devprod'(1)\|\bigr)+\Bigl(\frac1{24}+\cormult(\width)\Bigr)\kappa\|\devprod''\|_\infty+c_2\|\devprod'\|_\infty^2.
     \end{align*}
-    The first line is \Cref{thm:clocks} with $h=\|\sched''\|_\infty$ and its $c_1=c_0/4+1/64$, the next two are \Cref{thm:jumps}(ii), and the last inserts the two bounds above and collects $c_2$.
+    The first line is \Cref{thm:clocks} with $h=\|\sched''\|_\infty$ and its $c_1=c_0/4+1/64$, the next two are \Cref{thm:jumps}(ii), and the last inserts the two bounds of \Cref{lem:walk-log} and collects $c_2$.
     
     As $\width\to2\pi$, with $\freearc=2\pi-\width$, $\kappa\sim2\pi/\freearc$, $\cormult(\width)\sim1/(2\pi\freearc)$ and $\cormult'(\width)\sim1/(2\pi\freearc^2)$ by \eqref{eq:N-def}, and $\cos(\width/4)=\sin(\freearc/4)\sim\freearc/4$, while $\sin(\width/2)=\sin(\freearc/2)\sim\freearc/2$, so $c_0\sim\cormult(\width)$ and $c_1\sim\cormult(\width)/4$. Hence $c_0\kappa\sim(1/24+\cormult(\width))\kappa\sim\freearc^{-2}$,
 
     UnitaryProducts.PaperProof.scalar_edge_limits; UnitaryProducts.PaperProof.cos_gap_identity; UnitaryProducts.PaperProof.tendsto_gap_div_cos; UnitaryProducts.Prose.free_arc_reflections; UnitaryProducts.PaperProof.uniform_c0_c1_div_frame_limits; UnitaryProducts.PaperProof.walk_coefficient_equivalents; UnitaryProducts.PaperProof.free_arc_sine_equivalent; UnitaryProducts.PaperProof.cellConstant_walk_endpoint_equivalent; UnitaryProducts.PaperProof.cellConstant_eq_frameBound
 
-411. **LEAN** — Section 4.2, Theorem 4.5
+407. **LEAN** — Section 4.2, Theorem 4.5
 
-     c_2\sim\frac{\cormult(\width)}{\cos^2(\width/4)}+\frac{\cormult(\width)}4\kappa^2+2\cormult'(\width)\kappa+\cormult(\width)\kappa^2\sim\frac{8/\pi+5\pi/2+2}{\freearc^3}.
+    c_2\sim\frac{\cormult(\width)}{\cos^2(\width/4)}+\frac{\cormult(\width)}4\kappa^2+2\cormult'(\width)\kappa+\cormult(\width)\kappa^2\sim\frac{8/\pi+5\pi/2+2}{\freearc^3}.
 
     UnitaryProducts.PaperProof.walk_leading; UnitaryProducts.PaperProof.walk_leading_equivalents; UnitaryProducts.PaperProof.walk_square_leading_terms
 
-412. **LEAN** — Appendix A, Lemma A.2
+408. **LEAN** — Appendix A, Lemma A.2
 
     Then every eigenvalue $\varphi$ of $\sched(s_0)$ satisfies $|\varphi|\le\width/2$
 
     UnitaryProducts.PaperProof.moving_window_center_bound; UnitaryProducts.PaperProof.centered_resolvent_le
 
-413. **LEAN** — Appendix A, Lemma A.2
+409. **LEAN** — Appendix A, Lemma A.2
 
     For $0\le u\le1$, let $v=2u-1$ and $r(v)=\cos^2(\width/4)+v^2\sin^2(\width/4)$.
 
     UnitaryProducts.PaperProof.radius; UnitaryProducts.PaperProof.radius_substitution; UnitaryProducts.PaperProof.quadrature_substitution
 
-414. **LEAN** — Appendix A, Lemma A.2
+410. **LEAN** — Appendix A, Lemma A.2
 
     $1+u(e^{-i\varphi}-1)=e^{-i\varphi/2}(\cos(\varphi/2)-iv\sin(\varphi/2))$
 
     UnitaryProducts.PaperProof.chord_factorization
 
-415. **LEAN** — Appendix A, Lemma A.2
+411. **LEAN** — Appendix A, Lemma A.2
 
     has squared modulus $1-(1-v^2)\sin^2(\varphi/2)\ge r(v)$
 
     UnitaryProducts.PaperProof.chord_norm_sq; UnitaryProducts.PaperProof.chord_radius_lower
 
-416. **LEAN** — Appendix A, Lemma A.2
+412. **LEAN** — Appendix A, Lemma A.2
 
     $\|S_u\|^2\le1/r(v)$
 
     UnitaryProducts.PaperProof.centered_resolvent_le; UnitaryProducts.PaperProof.radius_substitution; UnitaryProducts.PaperProof.radius_pos; pow_le_pow_left₀; Real.sq_sqrt
 
-417. **LEAN** — Appendix A, Lemma A.2
+413. **LEAN** — Appendix A, Lemma A.2
 
     \|\sched'\|&\le\frac{\|\devprod'\|}2\int_{-1}^1\frac{dv}{r(v)}\\
 
     UnitaryProducts.PaperProof.centered_log_derivatives; UnitaryProducts.PaperProof.norm_sandwich_integral_le; UnitaryProducts.PaperProof.radius_substitution; UnitaryProducts.PaperProof.quadrature_substitution; UnitaryProducts.PaperProof.radius_pos; Real.sq_sqrt; UnitaryProducts.PaperProof.lem_walk_log
 
-418. **LEAN** — Appendix A, Lemma A.2
+414. **LEAN** — Appendix A, Lemma A.2
 
     \|\sched''\|&\le\frac{\|\devprod''\|}2\int_{-1}^1\frac{dv}{r(v)}+\frac{\|\devprod'\|^2}2\int_{-1}^1\frac{1+v}{r(v)^{3/2}}\,dv\\
 
     UnitaryProducts.PaperProof.centered_log_derivatives; UnitaryProducts.norm_walkLogHessian_integral_le; UnitaryProducts.PaperProof.radius_substitution; UnitaryProducts.PaperProof.quadrature_substitution; UnitaryProducts.PaperProof.radius_three_halves; UnitaryProducts.PaperProof.lem_walk_log
 
-419. **LEAN** — Appendix A, Lemma A.2
+415. **LEAN** — Appendix A, Lemma A.2
 
     &=\kappa\|\devprod''\|+\frac{\|\devprod'\|^2}2\int_{-1}^1\frac{dv}{r(v)^{3/2}}\\
 
     UnitaryProducts.PaperProof.square_quadrature; UnitaryProducts.PaperProof.cube_weighted_integral; UnitaryProducts.PaperProof.radius_three_halves
 
-420. **LEAN** — Appendix A, Lemma A.2
+416. **LEAN** — Appendix A, Lemma A.2
 
     &=\kappa\|\devprod''\|+\frac{\|\devprod'\|^2}{\cos^2(\width/4)}.
 
     UnitaryProducts.PaperProof.cube_quadrature; UnitaryProducts.PaperProof.cube_rpow_weighted_quadrature; UnitaryProducts.PaperProof.radius_three_halves
 
-421. **LEAN** — Appendix A, Lemma A.2
+417. **LEAN** — Appendix A, Lemma A.2
 
     with $u=(1+v)/2$
 
     UnitaryProducts.PaperProof.quadrature_substitution
 
-422. **LEAN** — Appendix A, Lemma A.2
+418. **LEAN** — Appendix A, Lemma A.2
 
     The fourth line drops the odd part $v\,r(v)^{-3/2}$ of $(1+v)r(v)^{-3/2}$.
 
     UnitaryProducts.PaperProof.cube_odd; UnitaryProducts.PaperProof.cube_odd_integral; UnitaryProducts.PaperProof.radius_three_halves; Real.rpow_neg
 
-423. **LEAN** — Appendix A
+419. **LEAN** — Appendix A
 
     Hence a power series $g(x)=\sum_{n\ge0}g_nx^n$ with every $g_n\ge0$ and radius of convergence at least $2\pi$ defines $g([\Omega,\cdot])A=\sum_{n\ge0}g_n[\Omega,\cdot]^nA$, with
 
     UnitaryProducts.PaperProof.NonnegativeSeries; UnitaryProducts.PaperProof.scalarSeries; UnitaryProducts.PaperProof.commutatorSeries; UnitaryProducts.PaperProof.general_series_bound
 
-424. **LEAN** — Appendix A, Lemma A.3
+420. **LEAN** — Appendix A, Lemma A.3
 
     Let $0\le\width<2\pi$, and let $\Omega(s)$ be twice continuously differentiable for $s\in[0,1]$, with every $\Omega(s)$ Hermitian with eigenvalue differences of modulus at most $\width$. Then $\cormult([\Omega,\cdot])\Omega'$ is continuously differentiable in $s\in[0,1]$, and for every $s\in[0,1]$ the following hold.
 
     UnitaryProducts.PaperProof.canonical_cell_curve
 
-425. **LEAN** — Appendix A, Lemma A.3
+421. **LEAN** — Appendix A, Lemma A.3
 
     \item $\|(\cormult([\Omega,\cdot])\Omega')'\|\le\cormult(\width)\|\Omega''\|+2\cormult'(\width)\|\Omega'\|^2$.
 
     UnitaryProducts.PaperProof.canonical_cell_curve
 
-426. **LEAN** — Appendix A, Lemma A.3
+422. **LEAN** — Appendix A, Lemma A.3
 
     \item $\|(\cormult([\Omega,\cdot])\Omega')'\|\le\cormult(\width)\|\Omega''\|+2\cormult'(\width)\|(e^{-i\Omega})'\|\,\|\Omega'\|+\bigl(\cormult(\width)-\cormult(0)\bigr)\|\Omega'\|^2$.
 
     UnitaryProducts.PaperProof.canonical_cell_curve
 
-427. **LEAN** — Appendix A, Lemma A.3
+423. **LEAN** — Appendix A, Lemma A.3
 
     \mathcal F(A)=\sum_{n\ge1}\nu_n\sum_{k=0}^{n-1}[\Omega,\cdot]^k[A,[\Omega,\cdot]^{n-1-k}\Omega']
 
     UnitaryProducts.PaperProof.unifiedFrameError_full_series; UnitaryProducts.PaperProof.summable_frameError_positive
 
-428. **LEAN** — Appendix A
+424. **LEAN** — Appendix A
 
     (g([\Omega,\cdot])A)'&=g([\Omega,\cdot])A'+\sum_{n\ge1}g_n\sum_{k=0}^{n-1}[\Omega,\cdot]^k[\Omega',[\Omega,\cdot]^{n-1-k}A],\\
 
     UnitaryProducts.PaperProof.general_series_derivative
 
-429. **LEAN** — Appendix A
+425. **LEAN** — Appendix A
 
     as each of the $n$ terms with coefficient $g_n$ has norm at most $2g_n\width^{n-1}\|\Omega'\|\,\|A\|$.
 
     UnitaryProducts.PaperProof.norm_ad_insertion_le; UnitaryProducts.PaperProof.general_series_derivative_bound
 
-430. **LEAN** — Appendix A
+426. **LEAN** — Appendix A
 
-    For $\Omega(s)$ and $A(s)$ continuously differentiable in $s\in[0,1]$, with every $\Omega(s)$ as above, termwise differentiation
+    For $\Omega(s)$ and $A(s)$ continuously differentiable in $s\in[0,1]$, with every $\Omega(s)$ Hermitian with eigenvalue differences of modulus at most $\width$, termwise differentiation
 
     UnitaryProducts.PaperProof.general_series_contDiffOn; UnitaryProducts.PaperProof.general_series_derivative
 
-431. **EXTERNAL** — Appendix A
+427. **EXTERNAL** — Appendix A
 
     termwise differentiation \cite[(8.6.4)]{dieudonne1960}
 
     Dieudonné (1960), Foundations of Modern Analysis, (8.6.4), termwise differentiation.
 
-432. **LEAN** — Appendix A, Lemma A.3
+428. **LEAN** — Appendix A, Lemma A.3
 
     X&=\int_{-1/2}^{1/2}\Omega'_\tau\,d\tau,\\
 
     UnitaryProducts.PaperProof.centeredDuhamel; UnitaryProducts.PaperProof.centeredDuhamel_decomposition
 
-433. **LEAN** — Appendix A, Lemma A.3
+429. **LEAN** — Appendix A, Lemma A.3
 
     \Lambda&=-i\int_{-1/2}^{1/2}\int_0^\tau\Omega'_\sigma\,d\sigma\,d\tau.
 
     UnitaryProducts.PaperProof.centeredRemainder; UnitaryProducts.PaperProof.centeredPrimitive; UnitaryProducts.PaperProof.centeredDuhamel_decomposition
 
-434. **LEAN** — Appendix A, Lemma A.3
+430. **LEAN** — Appendix A, Lemma A.3
 
     &=\Omega'-X.
 
     UnitaryProducts.PaperProof.centeredDuhamel_decomposition
 
-435. **LEAN** — Appendix A, Lemma A.3
+431. **LEAN** — Appendix A, Lemma A.3
 
     $\|X\|=\|(e^{-i\Omega})'\|$
 
     UnitaryProducts.PaperProof.norm_centeredDuhamel; UnitaryProducts.hasFDerivAt_evol_one
 
-436. **LEAN** — Appendix A, Lemma A.3
+432. **LEAN** — Appendix A, Lemma A.3
 
     $\|\Lambda\|\le\int_{-1/2}^{1/2}|\tau|\,d\tau\,\|\Omega'\|=\|\Omega'\|/4$
 
     UnitaryProducts.PaperProof.norm_centeredRemainder_le; UnitaryProducts.PaperProof.integral_abs_centered_half
 
-437. **LEAN** — Appendix A, Lemma A.3
+433. **LEAN** — Appendix A, Lemma A.3
 
     &=\sum_{n\ge1}\nu_n\bigl([\Omega,\cdot]^n[\Lambda,\Omega']-[\Lambda,[\Omega,\cdot]^n\Omega']\bigr),\notag\\
 
     UnitaryProducts.PaperProof.unifiedFrameError_full_series; UnitaryProducts.PaperProof.cubicPowDerivative_commutator_telescope; UnitaryProducts.PaperProof.unifiedFrameError_commutator_closed
 
-438. **LEAN** — Appendix A, Lemma A.3
+434. **LEAN** — Appendix A, Lemma A.3
 
     &\le\cormult(\width)\|\Omega''\|+2\cormult'(\width)\|X\|\,\|\Omega'\|+4\bigl(\cormult(\width)-\cormult(0)\bigr)\|\Lambda\|\,\|\Omega'\|.\label{eq:F-split}
 
     UnitaryProducts.PaperProof.general_series_bound; UnitaryProducts.PaperProof.norm_unifiedFrameError_split_le
 
-439. **LEAN** — Appendix A, Lemma A.3
+435. **LEAN** — Appendix A, Lemma A.3
 
     \|(\cormult([\Omega,\cdot])\Omega')'\|&\le\cormult(\width)\|\Omega''\|+\|\mathcal F(X)\|+\|\mathcal F([\Omega,\Lambda])\|\notag\\
 
     UnitaryProducts.PaperProof.general_series_derivative; UnitaryProducts.PaperProof.unifiedFrameError_add_direction; UnitaryProducts.PaperProof.general_series_bound; UnitaryProducts.PaperProof.norm_unifiedFrameError_split_le
 
-440. **LEAN** — Appendix A, Lemma A.3
+436. **LEAN** — Appendix A, Lemma A.3
 
     To choose $X$ and $\Lambda$, let $\Omega'_\sigma=e^{i\sigma\Omega}\Omega'e^{-i\sigma\Omega}$, so $[\Omega,\Omega'_\sigma]=-i\partial_\sigma\Omega'_\sigma$, and let
 
     UnitaryProducts.PaperProof.centered_conjugation_commutator_eq_deriv
 
-441. **LEAN** — Appendix A, Lemma A.3
+437. **LEAN** — Appendix A, Lemma A.3
 
     Moreover, $\|X\|=\|(e^{-i\Omega})'\|$, as $(e^{-i\Omega})'=-i\int_0^1e^{-i\sigma\Omega}\Omega'e^{-i(1-\sigma)\Omega}\,d\sigma=-ie^{-i\Omega/2}Xe^{-i\Omega/2}$ with $\sigma=1/2-\tau$
 
     UnitaryProducts.PaperProof.norm_centeredDuhamel; UnitaryProducts.hasFDerivAt_evol_one; UnitaryProducts.PaperProof.centeredDuhamel_eq_centeredSymmetrize; UnitaryProducts.PaperProof.centeredSymmetrize; UnitaryProducts.PaperProof.centered_evolDeriv_duhamel
 
-442. **LEAN** — Appendix A, Lemma A.3
+438. **LEAN** — Appendix A, Lemma A.3
 
     $(e^{-i\Omega})'=-i\int_0^1e^{-i\sigma\Omega}\Omega'e^{-i(1-\sigma)\Omega}\,d\sigma=-ie^{-i\Omega/2}Xe^{-i\Omega/2}$
 
     UnitaryProducts.PaperProof.centered_evolDeriv_duhamel; UnitaryProducts.hasFDerivAt_evol_one; UnitaryProducts.PaperProof.centeredDuhamel_eq_centeredSymmetrize; UnitaryProducts.PaperProof.centeredSymmetrize
 
-443. **LEAN** — Appendix A, Lemma A.3
+439. **LEAN** — Appendix A, Lemma A.3
 
     with $\sigma=1/2-\tau$
 
     UnitaryProducts.PaperProof.centeredDuhamel_eq_centeredSymmetrize
 
-444. **LEAN** — Appendix A, Lemma A.3
+440. **LEAN** — Appendix A, Lemma A.3
 
     $\|\Lambda\|\le\int_{-1/2}^{1/2}|\tau|\,d\tau\,\|\Omega'\|=\|\Omega'\|/4$
 
     UnitaryProducts.PaperProof.integral_abs_centered_half; UnitaryProducts.PaperProof.norm_centeredRemainder_le
 
-445. **LEAN** — Appendix A, Lemma A.3
+441. **LEAN** — Appendix A, Lemma A.3
 
     The first line applies Jacobi's identity $[[\Omega,\Lambda],B]=[\Omega,[\Lambda,B]]-[\Lambda,[\Omega,B]]$ to $B=[\Omega,\cdot]^{n-1-k}\Omega'$ in the $k$-th term of $\mathcal F([\Omega,\Lambda])$
 
     UnitaryProducts.PaperProof.adL_commutator; UnitaryProducts.PaperProof.cubicPowDerivative_commutator_telescope; UnitaryProducts.PaperProof.unifiedFrameError_commutator_closed
 
-446. **LEAN** — Appendix A, Lemma A.3
+442. **LEAN** — Appendix A, Lemma A.3
 
     so \eqref{eq:F-split} is (ii).
 
     UnitaryProducts.PaperProof.norm_centeredRemainder_le; UnitaryProducts.PaperProof.norm_unifiedFrameError_split_le; UnitaryProducts.PaperProof.canonical_cell_curve
 
-447. **LEAN** — Section 4.2, Theorem 4.4
+443. **LEAN** — Section 4.2, Theorem 4.4
 
-    By \Cref{lem:end-value} for $u\mapsto\Omega(l+u/T)$, whose bounds scale by $T^{-2}$ on both sides and so hold in $s$, $\cormult([\Omega,\cdot])\Omega'$ is continuously differentiable for $s\in[l,r]$, so the fourth line integrates its derivative.
+    For $u\in[0,1]$, let $\tilde\Omega(u)=\Omega(l+u/T)$. Then $\tilde\Omega'(u)=\Omega'(l+u/T)/T$, $\tilde\Omega''(u)=\Omega''(l+u/T)/T^2$, $(e^{-i\tilde\Omega})'(u)=(e^{-i\Omega})'(l+u/T)/T$, and $\cormult([\tilde\Omega(u),\cdot])\tilde\Omega'(u)=\cormult([\Omega(l+u/T),\cdot])\Omega'(l+u/T)/T$, so each side of each bound of \Cref{lem:end-value} for $\tilde\Omega$ at $u$ is $T^{-2}$ times that side for $\Omega$ at $l+u/T$. Hence \Cref{lem:end-value} for $\tilde\Omega$ shows that $\cormult([\Omega,\cdot])\Omega'$ is continuously differentiable for $s\in[l,r]$, as the fourth line needs to integrate its derivative, and that the bounds of \Cref{lem:end-value} hold for $\Omega$ with derivatives in $s$.
 
     UnitaryProducts.PaperProof.affineCell_mapsTo; UnitaryProducts.PaperProof.hasDerivWithinAt_affineCell; UnitaryProducts.PaperProof.hasDerivWithinAt_affineCell_scaled; UnitaryProducts.PaperProof.derivWithin_affineCell; UnitaryProducts.PaperProof.second_derivWithin_affineCell; UnitaryProducts.PaperProof.norm_affineCell_scaled; UnitaryProducts.PaperProof.affineCell_rhs_scaling; UnitaryProducts.PaperProof.hasDerivWithinAt_affineCell_frame; UnitaryProducts.PaperProof.affineCell_quadratic_bound_iff; UnitaryProducts.PaperProof.canonical_cell_curve
 
-448. **LEAN** — Section 4.3
+444. **LEAN** — Section 4.3
 
     The eigenvalues of $\sched(s)$ in $(\alpha(s),\beta(s))$ form a band of $m$ eigenvalues with the spectral projectors of the band of $\devprod$ and spectral gap at least the eigenphase gap $\gap{\devprod(s)}$ by \Cref{def:spectral-window}(ii), continuous in $s$ as the eigenvalues of $\sched$, $\alpha$, and $\beta$ are.
 
     UnitaryProducts.PaperProof.cut_log_band; UnitaryProducts.PaperProof.continuous_exactGap_intervals; UnitaryProducts.Prose.log_band_projector; UnitaryProducts.Paper.walk_band_jrs_count
 
-449. **EXTERNAL** — Section 4.3
+445. **EXTERNAL** — Section 4.3
 
     The Jansen--Ruskai--Seiler bound of \Cref{sec:dat} therefore gives \Cref{cor:walk-leakage} with $C=J_m(\sched)$, a discrete adiabatic theorem for walks, with the gap entering through $J_m(\sched)$ and through $\width=2\pi-\freearc$.
 
-    jansen2007, Theorem 3; the explicit statement and formula in sec:dat
+    UnitaryProducts/PaperProof/LemWalkBands.lean:209; UnitaryProducts/PaperProof/LemWalkBands.lean:247; UnitaryProducts/Prose/UnitTransfer.lean:80; UnitaryProducts/Prose/UnitTransfer.lean:101; UnitaryProducts/Walks/TrackedBandMultiplicity.lean:102; UnitaryProducts/PaperProof/LemWalkLog.lean:479; UnitaryProducts/PaperProof/CorProducts.lean:102
 
-450. **LEAN** — Appendix A
+446. **LEAN** — Appendix A
 
     Its bound (ii) replaces one factor $\|\Omega'\|$ by $\|(e^{-i\Omega})'\|$, which a unitary family $\devprod=e^{-i\Omega}$ supplies directly, at the cost of the term $(\cormult(\width)-\cormult(0))\|\Omega'\|^2$. Using (i) instead in the proof of \Cref{cor:walks}, with $\|\sched'\|\le\kappa\|\devprod'\|$ of \Cref{lem:walk-log}, would replace the terms $2\cormult'(\width)\kappa+(\cormult(\width)-\cormult(0))\kappa^2$ of $c_2$ by $2\cormult'(\width)\kappa^2\sim4\pi(2\pi-\width)^{-4}$.
 
     UnitaryProducts.PaperProof.canonical_cell_curve; UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.PaperProof.walk_collect; UnitaryProducts.PaperProof.first_bound_collect; UnitaryProducts.PaperProof.first_bound_equivalent
 
-451. **LEAN** — Section 2.2
+447. **LEAN** — Section 2.2
 
     a band (gray arc) of a unitary matrix, and their gaps $\Gamma$.
 
     UnitaryProducts.Paper.spectralWindowBand; UnitaryProducts.Paper.spectralWindowGap; UnitaryProducts.Paper.angularDistance_isLeast
 
-452. **LEAN** — Appendix A, Lemma A.3
+448. **LEAN** — Appendix A, Lemma A.3
 
     As $\mathcal F$ is linear, and on a commutator $A=[\Omega,\Lambda]$ the sum over $k$ telescopes, with $\cormult(\width)-\cormult(0)$ in place of $\cormult'(\width)$, we write $\Omega'=X+[\Omega,\Lambda]$ for matrices $X$ and $\Lambda$, chosen below with $\|X\|=\|(e^{-i\Omega})'\|$ and $\|\Lambda\|\le\|\Omega'\|/4$.
 
     UnitaryProducts.PaperProof.norm_unifiedFrameError_split_le; UnitaryProducts.PaperProof.centeredDuhamel; UnitaryProducts.PaperProof.centeredDuhamel_decomposition; UnitaryProducts.PaperProof.centeredRemainder; UnitaryProducts.PaperProof.centeredPrimitive; UnitaryProducts.PaperProof.norm_centeredDuhamel; UnitaryProducts.hasFDerivAt_evol_one; UnitaryProducts.PaperProof.norm_centeredRemainder_le; UnitaryProducts.PaperProof.integral_abs_centered_half; UnitaryProducts.PaperProof.unifiedFrameError_add_direction; UnitaryProducts.PaperProof.adL_commutator; UnitaryProducts.PaperProof.cubicPowDerivative_commutator_telescope; UnitaryProducts.PaperProof.unifiedFrameError_commutator_closed; UnitaryProducts.PaperProof.unifiedFrameError_smul_direction
 
-453. **LEAN** — Appendix A, Lemma A.3
+449. **LEAN** — Appendix A, Lemma A.3
 
     $(\cormult([\Omega,\cdot])\Omega')'=\cormult([\Omega,\cdot])\Omega''+\mathcal F(\Omega')$
 
     UnitaryProducts.PaperProof.general_series_derivative; UnitaryProducts.PaperProof.hasDerivWithinAt_frameOp; UnitaryProducts.PaperProof.unifiedFrameError_full_series
 
-454. **LEAN** — Appendix A, Lemma A.3
+450. **LEAN** — Appendix A, Lemma A.3
 
     With $g=\cormult$ and $A=\Omega'$, \eqref{eq:series-derivative} gives the continuous differentiability of $\cormult([\Omega,\cdot])\Omega'$ and (i).
 
     UnitaryProducts.PaperProof.general_series_contDiffOn; UnitaryProducts.PaperProof.general_series_derivative_bound; UnitaryProducts.PaperProof.canonical_cell_curve
 
-455. **LEAN** — Section 4.3, Corollary 4.7
+451. **LEAN** — Section 4.3, Corollary 4.7
 
     Let $T\ge1$ be an integer, let a $C^2$ unitary family $\devprod$ have a band of $m$ eigenvalues $\{e^{-i\theta}:\alpha(s)<\theta<\beta(s)\}$ with $\alpha<\beta<\alpha+2\pi$, eigenphase gap $\gap{\devprod(s)}$ continuous in $s$, and endpoint projectors $P$ and $Q$, and let $\freearc$ be the least $\gap{\devprod(s)}$ over $s\in[0,1]$. Let $\evol$ be the evolution of $\sched(t/T)$ for the Hermitian $\sched(s)$ with $e^{-i\sched(s)}=\devprod(s)$ and spectrum in $(\alpha(s),\alpha(s)+2\pi)$, and let $C\ge0$ satisfy $\|(1-Q)\evol(T)P\|\le C/T$. Then, with $\width=2\pi-\freearc$,
     \[
@@ -2951,382 +2926,492 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     UnitaryProducts.PaperProof.cor_walk_leakage
 
-456. **LEAN** — Section 4.3, Corollary 4.7
+452. **LEAN** — Section 4.3, Corollary 4.7
 
     So \Cref{cor:walks} applies, and $\devprod((T-1)/T)\cdots\devprod(0)=\devprod_T$.
 
     UnitaryProducts.PaperProof.walk_comparison_of_log; UnitaryProducts.PaperProof.thm_unitary_products
 
-457. **LEAN** — Section 4.3, Corollary 4.7
+453. **LEAN** — Section 4.3, Corollary 4.7
 
-    As $\sched(s)$ has spectrum in $(\alpha(s),\alpha(s)+2\pi)$, an eigenvalue $\theta$ of $\sched(s)$ lies in $(\alpha(s),\beta(s))$ exactly when $e^{-i\theta}$ lies in the band, and $\devprod(s)=e^{-i\sched(s)}$, so $P$ and $Q$ are spectral projectors of $\sched(0)$ and $\sched(1)$ and commute with $e^{i\sched(0)/2}$ and $e^{-i\sched(1)/2}$.
+    As $\devprod(s)=e^{-i\sched(s)}$, $P$ and $Q$ are the spectral projectors of $\sched(0)$ and $\sched(1)$ for their eigenvalues in $(\alpha(0),\beta(0))$ and $(\alpha(1),\beta(1))$, and they commute with $e^{i\sched(0)/2}$ and $e^{-i\sched(1)/2}$.
 
     UnitaryProducts.PaperProof.open_turn_band_projector; UnitaryProducts.commute_evol_right; UnitaryProducts.PaperProof.spectralWindowProjector_evol
 
-458. **LEAN** — Section 4.3, Corollary 4.7
+454. **LEAN** — Section 4.3, Corollary 4.7
 
     \Cref{prop:transfer} with these phases as $B$ and $A$, with $\tilde P=P$ and $\tilde Q=Q$, gives $\|(1-Q)\devprod_TP\|\le C/T+\|\compevol(T)-\evol(T)\|$ by \eqref{eq:rounded}, and \eqref{eq:walks} bounds the last term.
 
     UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.Paper.regulated_evolution_rounded; UnitaryProducts.PaperProof.thm_unitary_products
 
-459. **LEAN** — Section 4.3
+455. **LEAN** — Section 4.3
 
     For a unitary family with a gapped band, the logarithm with its branch cut at the band's lower endpoint turns \Cref{cor:walks} into a leakage bound for the product of the given unitaries.
 
     UnitaryProducts.PaperProof.cor_walk_leakage
 
-460. **LEAN** — Section 1.1
+456. **LEAN** — Section 1.1
 
     A gapped band of $\devprod$ supplies such an arc, and a continuous leakage bound for the logarithm then holds for the product of the $\devprod(j/T)$, up to that comparison (\Cref{cor:walk-leakage}).
 
     UnitaryProducts.PaperProof.cor_walk_leakage
 
-461. **LEAN** — Appendix A, Lemma A.1
+457. **LEAN** — Appendix A, Lemma A.1
 
     &\le-\cormult_0(\width)\|D\|\\
 
     UnitaryProducts.PaperProof.cell_center_multiplier_bound
 
-462. **LEAN** — Appendix A, Lemma A.1
+458. **LEAN** — Appendix A, Lemma A.1
 
-    As $Y'+i[\Omega,Y]=\tau D$, $(e^{i\tau\Omega}Ye^{-i\tau\Omega})'=\tau e^{i\tau\Omega}De^{-i\tau\Omega}$, and integrating from $0$ to $\tau$ gives $Y(\tau)=e^{-i\tau\Omega}\bigl(Y(0)+\int_0^\tau\sigma e^{i\sigma\Omega}De^{-i\sigma\Omega}\,d\sigma\bigr)e^{i\tau\Omega}$.
+    As $Y'+i[\Omega,Y]=\tau D$, the conjugate $e^{i\tau\Omega}Ye^{-i\tau\Omega}$ has derivative $\tau e^{i\tau\Omega}De^{-i\tau\Omega}$, and integrating from $0$ to $\tau$ gives $Y(\tau)=e^{-i\tau\Omega}\bigl(Y(0)+\int_0^\tau\sigma e^{i\sigma\Omega}De^{-i\sigma\Omega}\,d\sigma\bigr)e^{i\tau\Omega}$.
 
     UnitaryProducts.PaperProof.cell_conjugated_hasDerivAt; UnitaryProducts.PaperProof.cell_integrating_factor; UnitaryProducts.PaperProof.closedCell_eq_integralCell
 
-463. **EXTERNAL** — Appendix A, Lemma A.1
+459. **EXTERNAL** — Appendix A, Lemma A.1
 
     The partial fractions of the cosecant \cite[4.22.5]{dlmf}
 
     DLMF §4.22, equation (4.22.5), cosecant partial fractions (https://dlmf.nist.gov/4.22.E5).
 
-464. **LEAN** — Appendix A, Lemma A.1
+460. **LEAN** — Appendix A, Lemma A.1
 
     \|Y(0)\|&=\|\cormult_0([\Omega,\cdot])D\|\\
 
     UnitaryProducts.PaperProof.cell_center_multiplier_bound
 
-465. **LEAN** — Appendix A, Lemma A.1
+461. **LEAN** — Appendix A, Lemma A.1
 
     &=c_0\|D\|.
 
     UnitaryProducts.PaperProof.cell_center_multiplier_bound; UnitaryProducts.PaperProof.cellConstant
 
-466. **LEAN** — Appendix A, Lemma A.2
+462. **LEAN** — Appendix A, Lemma A.2
 
     \sched&=i\int_0^1(\devprod-1)S_u\,du,\\
 
     UnitaryProducts.PaperProof.walk_log_centered_integral
 
-467. **LEAN** — Appendix A, Lemma A.2
+463. **LEAN** — Appendix A, Lemma A.2
 
     so $\sched$ is $C^2$ for $s$ near $s_0$.
 
     UnitaryProducts.Prose.exists_local_walkLogIntegral_contDiffOn; UnitaryProducts.PaperProof.lem_walk_log
 
-468. **LEAN** — Appendix A, Lemma A.3
+464. **LEAN** — Appendix A, Lemma A.3
 
     [\Omega,\Lambda]&=-i\int_{-1/2}^{1/2}\int_0^\tau[\Omega,\Omega'_\sigma]\,d\sigma\,d\tau\\
 
     UnitaryProducts.PaperProof.centeredRemainder_commutator_integral
 
-469. **LEAN** — Appendix A, Lemma A.3
+465. **LEAN** — Appendix A, Lemma A.3
 
     &=-\int_{-1/2}^{1/2}\int_0^\tau\partial_\sigma\Omega'_\sigma\,d\sigma\,d\tau\\
 
     UnitaryProducts.PaperProof.centeredRemainder_commutator_deriv
 
-470. **LEAN** — Appendix A, Lemma A.3
+466. **LEAN** — Appendix A, Lemma A.3
 
     &=-\int_{-1/2}^{1/2}(\Omega'_\tau-\Omega')\,d\tau\\
 
     UnitaryProducts.PaperProof.centeredRemainder_commutator_boundary
 
-471. **LEAN** — Appendix A, Lemma A.3
+467. **LEAN** — Appendix A, Lemma A.3
 
     Then $\Omega'=X+[\Omega,\Lambda]$, as
 
     UnitaryProducts.PaperProof.centeredDuhamel_add_commutator; UnitaryProducts.PaperProof.centeredDuhamel_decomposition
 
-472. **LEAN** — Section 4.3, Corollary 4.7
+468. **LEAN** — Section 4.3, Corollary 4.7
 
     As $\alpha$ and $\devprod$ are continuous, $\sched=\alpha+\pi+i\operatorname{Log}(e^{i(\alpha+\pi)}\devprod)$ is continuous, for the principal logarithm $\operatorname{Log}$,
 
     UnitaryProducts.PaperProof.walk_bands_principal_logarithm; UnitaryProducts.PaperProof.cut_log_eq_principal; UnitaryProducts.PaperProof.cut_log_continuous_principal
 
-473. **EXTERNAL** — Section 4.3, Corollary 4.7
+469. **EXTERNAL** — Section 4.3, Corollary 4.7
 
     and therefore so is its least eigenvalue $\ell$~\cite[Corollary~III.2.6]{bhatia1997}.
 
     Bhatia (1997), Matrix Analysis, Corollary III.2.6
 
-474. **LEAN** — Section 4.3, Corollary 4.7
+470. **LEAN** — Section 4.3, Corollary 4.7
 
-    The band is nonempty and proper, so $\sched(s)$ has eigenvalues on both sides of $\beta(s)$, and for such eigenvalues $\theta<\varphi$, \Cref{def:spectral-window}(ii) gives $\freearc\le2\pi-(\varphi-\theta)$.
+    The band is nonempty and proper, so $\ell(s)$ lies in $(\alpha(s),\beta(s))$ and the greatest eigenvalue $\varphi$ of $\sched(s)$ in $(\beta(s),\alpha(s)+2\pi)$, and \Cref{def:spectral-window}(ii) gives $\freearc\le2\pi-(\varphi-\ell(s))$.
 
-    UnitaryProducts.Prose.spectral_extrema_straddle_cut; UnitaryProducts.Prose.extreme_pair_width
+    UnitaryProducts.Prose.spectral_extrema_straddle_cut; UnitaryProducts.Prose.extreme_pair_width; UnitaryProducts.Prose.eigenvalues_mem_open_turn_of_norm; UnitaryProducts.PaperProof.walk_band_arc
 
-475. **LEAN** — Section 4.3, Corollary 4.7
+471. **LEAN** — Section 4.3, Corollary 4.7
 
     Hence $\sched(s)$ has spectrum in $[\ell(s),\ell(s)+\width]$, and $\sched$ is $C^2$ by \Cref{lem:walk-log}.
 
     UnitaryProducts.PaperProof.walk_band_arc; UnitaryProducts.PaperProof.lem_walk_log
 
-476. **LEAN** — Section 5
+472. **LEAN** — Section 5
 
     With $Y=0$ it is Duhamel's bound, which integrates the norm of the generator difference over time.
 
     UnitaryProducts.PaperProof.duhamel_bound
 
-477. **LEAN** — Section 5
+473. **LEAN** — Section 5
 
     I chose to compare two evolutions, rather than an evolution with adiabatic transport, because that choice keeps the spectral gap of $\sched$ out of the comparison.
 
     UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.PaperProof.thm_unit_steps_endpoint_max; UnitaryProducts.PaperProof.fine_bits_oscillation
 
-478. **LEAN** — Section 5
+474. **LEAN** — Section 5
 
     Nothing in the comparisons assumes that $\sched$ varies slowly, so adiabatic theorems are one application, and the discrete adiabatic theorems of \Cref{sec:unit-transfer} are continuous ones carried over by the comparison.
 
     UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.PaperProof.thm_unit_steps_endpoint_max; UnitaryProducts.PaperProof.fine_bits_oscillation; UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.PaperProof.cor_unit_transfer_bounds
 
-479. **PROSPECTIVE** — Section 5
+475. **PROSPECTIVE** — Section 5
 
     I anticipate that the comparison will be useful in settings beyond the scope of this paper, including other forms of Hamiltonian simulation and near-term algorithms.
 
-480. **LEAN** — Section 5
+476. **LEAN** — Section 5
 
     Within the identity, the decisions are in the choice of $Y$.
 
     UnitaryProducts.PaperProof.thm_comparison
 
-481. **LEAN** — Section 5
+477. **LEAN** — Section 5
 
     It asks only for one-sided limits of $\sched$, so it covers Hamiltonians that jump, and it splits the error into a part the checkpoints control and a part the precision controls \eqref{eq:fine-bits}.
 
     UnitaryProducts.PaperProof.duhamel_bound; UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.PaperProof.fine_bits_oscillation
 
-482. **LEAN** — Section 5
+478. **LEAN** — Section 5
 
     The difference $\sched(t/T)-\sched(\lfloor t+1/2\rfloor/T)$ is of order $1/T$ for a time $T$, so Duhamel's bound returns $\|\sched'\|_\infty/4$ however large $T$ is.
 
     UnitaryProducts.PaperProof.uniform_local_bounds; UnitaryProducts.Paper.UnitStepsProse.abs_clock_sub_le; UnitaryProducts.Paper.UnitStepsProse.rounded_evolution_bound; UnitaryProducts.Paper.UnitStepsProse.unit_steps_coefficient
 
-483. **LEAN** — Section 5
+479. **LEAN** — Section 5
 
     Yet the clock error $t-\lfloor t+1/2\rfloor$ is $t-j$, odd about $j$, for $|t-j|<\frac12$
 
     UnitaryProducts.Prose.full_cell_clock_error
 
-484. **LEAN** — Section 5
+480. **LEAN** — Section 5
 
     Solving \eqref{eq:corrector} is the one place the width hypothesis enters.
 
     UnitaryProducts.PaperProof.lem_cell
 
-485. **LEAN** — Section 5
+481. **LEAN** — Section 5
 
     They commute with the spectral projectors of $\sched(0)$ and $\sched(1)$, so a leakage bound for the phase-corrected product is one for the product itself (\Cref{prop:transfer}).
 
     UnitaryProducts.PaperProof.unit_rounded_clock_endpoint; UnitaryProducts.PaperProof.open_turn_band_projector; UnitaryProducts.half_step_leakage_comparison; UnitaryProducts.PaperProof.prop_transfer
 
-486. **LEAN** — Section 5
+482. **LEAN** — Section 5
 
     It excludes no Hamiltonian, since replacing $\sched$ by $\sched/n$ and $T$ by $nT$ preserves the evolution and divides every eigenvalue difference by $n$, so it sets only how many factors a given evolution needs.
 
     UnitaryProducts.Prose.subdivided_evolution; UnitaryProducts.Prose.subdivided_eigenvalue_difference; UnitaryProducts.Paper.bounded_path_rescale_width
 
-487. **LEAN** — Section 5
+483. **LEAN** — Section 5
 
     A product of given unitaries, such as the walk of a discrete adiabatic theorem, is the $T$-step product of any Hermitian logarithm of the family, and a band with eigenphase gap $\freearc$ supplies a logarithm of width $2\pi-\freearc$ (\Cref{cor:walk-leakage}).
 
     UnitaryProducts.PaperProof.cor_walk_leakage; UnitaryProducts.PaperProof.walk_band_gap_minimum; UnitaryProducts.PaperProof.walk_band_log_support; UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.Paper.unitary_product_evolution
 
-488. **EXTERNAL** — Section 5
+484. **EXTERNAL** — Section 5
 
     The large steps of An, Costa, and Berry \cite{an2025}
 
     An, Costa, and Berry (an2025), Section III.A: supplied slowly varying unitary operators and their discrete adiabatic comparison.
 
-489. **EXPOSITION** — Section 5
+485. **EXPOSITION** — Section 5
 
     are thus the unit steps of \Cref{sec:coarse}
 
-490. **PROSPECTIVE** — Section 5
+486. **PROSPECTIVE** — Section 5
 
     Without commutation, do corrections built from the higher Taylor terms of $\sched(t/T)$ about the samples give a unit-step comparison error $O(T^{-p})$ for every $p$ for such $\sched$?
 
-491. **PROSPECTIVE** — Section 5
+487. **PROSPECTIVE** — Section 5
 
     Does such a rounding, a phase correction, or a weaker error measure such as leakage bound the entry error uniformly in $T$ by a quantity that tends to zero with the precision?
 
-492. **EXPOSITION** — Section 2
+488. **EXPOSITION** — Section 2
 
     A \emph{Hamiltonian} is a Hermitian family $\sched(s)$ with $s\in[0,1]$.
 
-493. **EXPOSITION** — Section 2
+489. **EXPOSITION** — Section 2
 
     Throughout, $d\ge1$, matrices are $d\times d$
 
-494. **EXPOSITION** — Section 2
+490. **EXPOSITION** — Section 2
 
     Primes denote derivatives of a function in its own variable, as in $\compevol'(t)$ for $t\in[a,b]$, $\sched'(s)$ for $s\in[0,1]$, and $f'(x)$ for a scalar function $f$.
 
-495. **LEAN** — Section 5
+491. **LEAN** — Section 5
 
     The residual is then of order $1/T^2$.
 
     UnitaryProducts.PaperProof.unitPhysicalResidual_profile_bound; UnitaryProducts.Paper.UnitStepsProse.abs_clock_sub_le
 
-496. **LEAN** — Section 5
+492. **LEAN** — Section 5
 
     Each jump of $Y$ is the change of $\cormult([\sched(s),\cdot])\sched'(s)/T$ between neighboring samples, which is of order $1/T^2$ because the end value is $1/T$ times a smooth function of the sample and its derivative (\Cref{thm:jumps}).
 
     UnitaryProducts.PaperProof.uniformCorrectionPiece_jump_frame; UnitaryProducts.PaperProof.unified_affine_variation_of_derivWithin; UnitaryProducts.Paper.adjacent_corrector_jump_le
 
-497. **LEAN** — Section 5
+493. **LEAN** — Section 5
 
     The two half-step phases are what centering the clock on the samples requires.
 
     UnitaryProducts.PaperProof.unit_rounded_clock_endpoint
 
-498. **LEAN** — Section 5
+494. **LEAN** — Section 5
 
     Where the values of $\sched$ commute, they turn the left-endpoint sum into the trapezoidal sum, and in \Cref{ex:unit-sharp} the distance from the evolution is $2\sin(1/(12T))$ with them and tends to $2\sin(1/4)$ without them.
 
     UnitaryProducts.Prose.commuting_trapezoidal_product; UnitaryProducts.PaperProof.ex_unit_sharp
 
-499. **LEAN** — Section 5
+495. **LEAN** — Section 5
 
     When two eigenvalues of a sample differ by a nonzero multiple of $2\pi$, equal end values in \eqref{eq:cell-integral} force the corresponding entry of $\sched'(j/T)$ to vanish.
 
     UnitaryProducts.Prose.scalar_corrector_resonant_forcing_zero; UnitaryProducts.Prose.scalar_corrector_resonant_obstruction
 
-500. **LEAN** — Section 5
+496. **LEAN** — Section 5
 
-    The hypothesis keeps every eigenvalue difference of every sample at least $2\pi-\width$ away from those values.
+    The hypothesis keeps every eigenvalue difference of every sample at least $2\pi-\width$ away from the nonzero multiples of $2\pi$.
 
     UnitaryProducts.Prose.width_resonance_distance
 
-501. **LEAN** — Section 5
+497. **LEAN** — Section 5
 
-    \Cref{cor:walk-leakage} recovers their $O(1/T)$ rate from the continuous theorem.
+    \Cref{cor:walk-leakage} recovers their $O(1/T)$ rate in $T$ from the continuous theorem, through a comparison that holds for every initial state and whose constants involve no gap.
 
-    UnitaryProducts.PaperProof.cor_walk_leakage
+    UnitaryProducts.PaperProof.cor_walk_leakage; UnitaryProducts.PaperProof.thm_unit_steps_endpoint_max; UnitaryProducts.Prose.matrix_norm_eq_operator_norm; ContinuousLinearMap.le_opNorm
 
-502. **EXPOSITION** — Section 5
+498. **EXPOSITION** — Section 5
 
     The comparison error caps the decay a product inherits
 
-503. **LEAN** — Section 5
+499. **LEAN** — Section 5
 
     Where the values of $\sched$ commute, the comparison is the trapezoidal rule.
 
     UnitaryProducts.Prose.commuting_trapezoidal_product
 
-504. **EXTERNAL** — Section 5
+500. **EXTERNAL** — Section 5
 
     The Euler--Maclaurin formula writes its error as boundary terms in the odd derivatives of $\sched$ at $s=0$ and $s=1$ plus a remainder of any chosen order.
 
     DLMF §2.10(i), equation (2.10.1), Euler–Maclaurin formula (https://dlmf.nist.gov/2.10.E1).
 
-505. **EXTERNAL** — Section 5
+501. **EXTERNAL** — Section 5
 
     For a smooth $\sched$ whose derivatives all vanish at the two ends, the error therefore decays faster than every power of $T$.
 
     DLMF §2.10(i), equation (2.10.1), after rescaling the mesh and vanishing of every boundary derivative term; choose the remainder order arbitrarily (https://dlmf.nist.gov/2.10.E1).
 
-506. **PROSPECTIVE** — Section 5
+502. **PROSPECTIVE** — Section 5
 
     A higher-order comparison would give the same conclusion from the continuous theorems, under their hypotheses on the logarithm of the walk.
 
-507. **EXPOSITION** — Section 5
+503. **EXPOSITION** — Section 5
 
     Read as an evolution on a rounded clock, a product of unitaries is not a separate object with a theory of its own. It is the continuous evolution at finite resolution in time, and the comparison bounds the distance between the two.
 
-508. **EXTERNAL** — Section 5
+504. **EXTERNAL** — Section 5
 
     Yi and Crosson \cite{yicrosson2021v1} apply continuous adiabatic theory to logarithms of Trotter steps
 
     Yi and Crosson (yicrosson2021v1), effective Hamiltonian and continuous adiabatic analysis of the Trotter steps.
 
-509. **LEAN** — Section 5
+505. **LEAN** — Section 5
 
-    \Cref{cor:walks} is the bound on the change from time discretization that their argument lacked.
+    When the Trotter steps form a $C^2$ unitary family whose spectrum avoids an arc of fixed length that moves continuously, \Cref{cor:walks} is the bound on the change from time discretization that their argument lacked.
 
     UnitaryProducts.PaperProof.thm_unitary_products
 
-510. **PROSPECTIVE** — Section 5
+506. **PROSPECTIVE** — Section 5
 
     The same route is open wherever a product of unitaries is read as the unit-step product of a Hamiltonian.
 
-511. **LEAN** — Appendix A
+507. **LEAN** — Appendix A
 
     $g([\Omega,\cdot])A$ has $(p,q)$ entry $g(\lambda_p-\lambda_q)A_{pq}$.
 
     UnitaryProducts.PaperProof.general_series_eigenbasis_entry
 
-512. **LEAN** — Appendix A
+508. **LEAN** — Appendix A
 
     \|(g([\Omega,\cdot])A)'\|&\le g(\width)\|A'\|+2g'(\width)\|\Omega'\|\,\|A\|,
 
     UnitaryProducts.PaperProof.general_series_derivative_bound
 
-513. **LEAN** — Appendix A, Lemma A.1
+509. **LEAN** — Appendix A, Lemma A.1
 
     $-\cormult_0(x)=\sum_{m\ge1}(-1)^{m+1}2/(4\pi^2m^2-x^2)$
 
     UnitaryProducts.PaperProof.neg_closedCellMultiplier_center_partialFractions; UnitaryProducts.PaperProof.cellConstant_eq_partialFractions; UnitaryProducts.Corrector.centerCoeff_power_eq_partialFractions
 
-514. **LEAN** — Appendix A, Lemma A.3
+510. **LEAN** — Appendix A, Lemma A.3
 
     $\|\mathcal F(A)\|\le2\cormult'(\width)\|A\|\,\|\Omega'\|$.
 
     UnitaryProducts.PaperProof.norm_unifiedFrameError_le
 
-515. **LEAN** — Appendix A, Lemma A.3
+511. **LEAN** — Appendix A, Lemma A.3
 
     \mathcal F([\Omega,\Lambda])&=\sum_{n\ge1}\nu_n\sum_{k=0}^{n-1}\bigl([\Omega,\cdot]^{k+1}[\Lambda,[\Omega,\cdot]^{n-1-k}\Omega']-[\Omega,\cdot]^k[\Lambda,[\Omega,\cdot]^{n-k}\Omega']\bigr)\notag\\
 
     UnitaryProducts.PaperProof.unifiedFrameError_full_series; UnitaryProducts.PaperProof.adL_commutator; UnitaryProducts.PaperProof.cubicPowDerivative_outer_sum
 
-516. **LEAN** — Appendix A, Lemma A.3
+512. **LEAN** — Appendix A, Lemma A.3
 
-    the second telescopes the sum over $k$, the third splits $\mathcal F(\Omega')=\mathcal F(X)+\mathcal F([\Omega,\Lambda])$ and bounds $\cormult([\Omega,\cdot])\Omega''$ by \eqref{eq:series-bound}, and the fourth bounds $\mathcal F(X)$ as above and each of the two terms in the second line by $2(\cormult(\width)-\cormult(0))\|\Lambda\|\,\|\Omega'\|$, by \eqref{eq:series-bound} for $\cormult(x)-\cormult(0)=\sum_{n\ge1}\nu_nx^n$.
+    the second telescopes the sum over $k$, the third splits $\mathcal F(\Omega')=\mathcal F(X)+\mathcal F([\Omega,\Lambda])$ and bounds $\cormult([\Omega,\cdot])\Omega''$ by \eqref{eq:series-bound}, and the fourth applies the bound on $\|\mathcal F(A)\|$ with $A=X$ and bounds each of the two terms in the second line by $2(\cormult(\width)-\cormult(0))\|\Lambda\|\,\|\Omega'\|$, by \eqref{eq:series-bound} for $\cormult(x)-\cormult(0)=\sum_{n\ge1}\nu_nx^n$.
 
     UnitaryProducts.PaperProof.cubicPowDerivative_commutator_telescope; UnitaryProducts.PaperProof.unifiedFrameError_add_direction; UnitaryProducts.PaperProof.general_series_bound; UnitaryProducts.PaperProof.norm_unifiedFrameError_commutator_le; UnitaryProducts.PaperProof.norm_unifiedFrameError_le
 
-517. **LEAN** — Appendix A
+513. **LEAN** — Appendix A
 
     For $0\le\width<2\pi$, let $\Omega$ be a Hermitian matrix with eigenvalue differences of modulus at most $\width$
 
     UnitaryProducts.PaperProof.general_series_bound
 
-518. **LEAN** — Appendix A, Lemma A.2
+514. **LEAN** — Appendix A, Lemma A.2
 
     For every eigenvalue $\varphi$ of $\sched(s_0)$
 
     UnitaryProducts.PaperProof.moving_window_center_bound; UnitaryProducts.PaperProof.centered_resolvent_le
 
-519. **LEAN** — Appendix A, Lemma A.2
+515. **LEAN** — Appendix A, Lemma A.2
 
     as $|\varphi|\le\width/2$, so $\|S_u\|^2\le1/r(v)$ at $s_0$.
 
     UnitaryProducts.PaperProof.centered_resolvent_le; UnitaryProducts.PaperProof.chord_radius_lower; UnitaryProducts.PaperProof.radius_substitution
 
-520. **LEAN** — Appendix A, Lemma A.2
+516. **LEAN** — Appendix A, Lemma A.2
 
     By \eqref{eq:log-integral} at $s_0$, with $u=(1+v)/2$
 
     UnitaryProducts.PaperProof.centered_log_derivatives; UnitaryProducts.PaperProof.quadrature_substitution
 
-521. **LEAN** — Appendix A, Lemma A.3
+517. **LEAN** — Appendix A, Lemma A.3
 
     for matrices $A$, so that
 
     UnitaryProducts.PaperProof.unifiedFrameError_full_series
 
-522. **LEAN** — Section 5
+518. **LEAN** — Section 5
 
     so the first-order part of the difference integrates to zero there for each $0<j<T$.
 
     UnitaryProducts.Prose.full_cell_first_order_integral
+
+519. **LEAN** — Section 1.1
+
+    A gap enters only through the continuous theorem being transferred, with the dependence that theorem has.
+
+    UnitaryProducts.PaperProof.prop_transfer; UnitaryProducts.PaperProof.ex_unit_transfer_bounds; UnitaryProducts.PaperProof.thm_unit_steps_endpoint_max
+
+520. **LEAN** — Section 1.1
+
+    Second, it holds in operator norm, and so for every initial state.
+
+    UnitaryProducts.PaperProof.thm_unit_steps_endpoint_max; UnitaryProducts.Prose.matrix_norm_eq_operator_norm; ContinuousLinearMap.le_opNorm
+
+521. **LEAN** — Section 1.1
+
+    It is one integration by parts and, at each sample, one linear equation solved entry by entry
+
+    UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.PaperProof.canonical_cell_comparison_assembly; UnitaryProducts.PaperProof.lem_cell; UnitaryProducts.PaperProof.periodicCorrector_eq_closedCell
+
+522. **EXTERNAL** — Section 1.1
+
+    where each discrete adiabatic theorem needs its own analysis of the product.
+
+    dranov1998, discrete adiabatic theorem; tanaka2011, proof of the discrete adiabatic theorem; costa2022, discrete adiabatic theorem; an2025, Section III.A
+
+523. **EXTERNAL** — Section 1.1
+
+    An, Costa, and Berry also deduce $O(1/T)$ error at a fixed step from a spectral gap of the Hamiltonian, for preparing one eigenstate.
+
+    an2025, Section III (complexity estimates from the discrete adiabatic theorem)
+
+524. **EXTERNAL** — Section 1.1
+
+    Conjugating the steps of a method by one map is processing, which Blanes, Casas, and Murua survey \cite[Section~4.2]{blanes2008}, and conjugation by a half step turns the first-order symplectic Euler method into the second-order St\"ormer--Verlet method.
+
+    blanes2008, Section 4.2 (processing)
+
+525. **EXTERNAL** — Section 1.1
+
+    Layden \cite{layden2022} bounds first-order Trotter errors for a time-independent Hamiltonian through the same conjugation
+
+    layden2022, first-order Trotter bound via half-step conjugation
+
+526. **LEAN** — Section 1.1
+
+    the half-step phases process $\devprod_T$ in the same way, with $\sched(0)$ at the start and $\sched(1)$ at the end.
+
+    UnitaryProducts.PaperProof.unit_rounded_clock_endpoint
+
+527. **EXTERNAL** — Section 1.1
+
+    Wisdom, Holman, and Touma \cite{wisdom1996} read a splitting map as the evolution of a Hamiltonian with periodic delta kicks
+
+    wisdom1996, pp. 219–220, equations (2.1)–(2.2)
+
+528. **EXTERNAL** — Section 1.1
+
+    They correct the map by a formal series whose divisors vanish at step-size resonances.
+
+    wisdom1996, p. 221, periodic-corrector Fourier series and divisors
+
+529. **LEAN** — Section 1.1
+
+    as exact solutions of $Y_j'+i[\sched(j/T),Y_j]=(t-j)\sched'(j/T)/T$ with equal end values, and the width hypothesis is a nonresonance condition that makes these solutions exist.
+
+    UnitaryProducts.PaperProof.lem_cell; UnitaryProducts.Prose.unit_sample_corrector_ode; UnitaryProducts.Prose.width_resonance_distance
+
+530. **LEAN** — Section 1.1
+
+    It keeps every eigenvalue difference of every sample within a fixed $\width<2\pi$ in modulus, and so away from the nonzero multiples of $2\pi$, where the correction is singular.
+
+    UnitaryProducts.Prose.width_resonance_distance; UnitaryProducts.Prose.scalar_corrector_resonant_obstruction; UnitaryProducts.Prose.scalar_corrector_resonant_forcing_zero
+
+531. **LEAN** — Section 2.1, Theorem 2.2
+
+    Likewise, $U^\dagger RV$ agrees with a regulated function outside a countable set, and its integral is that function's integral, whatever the values of $R$ at the remaining countably many $t$.
+
+    UnitaryProducts.PaperProof.thm_comparison; UnitaryProducts.Paper.regulated_corrected_product_derivative; Set.Countable.ae_notMem; intervalIntegral.integral_congr_ae
+
+532. **LEAN** — Section 4.1, Example 4.3
+
+    $(\sched(1)-\sched(0))/2=Z/2$
+
+    UnitaryProducts.Prose.quadratic_endpoints
+
+533. **LEAN** — Section 4.2, Theorem 4.4
+
+    T\|\Delta_j\|&\le\cormult(\width)\Bigl(\frac h{2T}+\frac h{2T}\Bigr)+\int_l^r2\cormult'(\width)\|\Omega'\|^2\,ds\\
+     &\le\frac1T\bigl(\cormult(\width)h+2\cormult'(\width)\|\sched'\|_\infty^2\bigr).
+    \end{align*}
+
+    UnitaryProducts.PaperProof.affine_hamiltonian_cell_bound; UnitaryProducts.PaperProof.affine_self_variation; UnitaryProducts.PaperProof.affine_jump_integral_chain; UnitaryProducts.PaperProof.jump_average_endpoint_errors; UnitaryProducts.PaperProof.canonical_cell_series_bounds
+
+534. **LEAN** — Section 4.2
+
+    Substituting $\pi$ for $\width$, the quantities in \eqref{eq:products} are $c_0=1/(2\pi)-1/\pi^2$, $\cormult(\pi)=1/\pi^2$, and $\cormult'(\pi)=1/(4\pi)-2/\pi^3$.
+
+    UnitaryProducts.Corrector.frameBound_center_pi; UnitaryProducts.Corrector.frameBound_frameLip_pi; UnitaryProducts.PaperProof.uniform_pi_coefficients
+
+535. **LEAN** — Section 4.2
+
+    So if also $\|\sched'\|_\infty\le h$, the right side of \eqref{eq:products} is at most $(ah+bh^2)/T$ with $a=2c_0+1/24+\cormult(\pi)<0.26$ and $b=c_1+2\cormult'(\pi)<0.061$, which gives \Cref{introthm:unit}.
+
+    UnitaryProducts.PaperProof.introthm_unit; UnitaryProducts.PaperProof.uniform_pi_coefficients; UnitaryProducts.PaperProof.intro_constants_strict
+
+536. **LEAN** — Section 4.3, Corollary 4.7
+
+    As $\sched(s)$ has spectrum in $(\alpha(s),\alpha(s)+2\pi)$, an eigenvalue $\theta$ of $\sched(s)$ lies in $(\alpha(s),\beta(s))$ exactly when $e^{-i\theta}$ lies in the band, and otherwise in $(\beta(s),\alpha(s)+2\pi)$.
+
+    UnitaryProducts.Paper.phase_inj; UnitaryProducts.PaperProof.open_turn_band_projector; UnitaryProducts.Prose.spectral_extrema_straddle_cut; UnitaryProducts.Prose.eigenvalues_mem_open_turn_of_norm

@@ -23,8 +23,8 @@ def spectralWindowSet (circular : Bool) (a b : ℝ) : Set ℂ :=
   (fun θ : ℝ ↦ if circular then Complex.exp (-I * (θ : ℂ)) else (θ : ℂ)) '' Ioo a b
 
 /-- Definition 2.5(i): the selected eigenvalues form a nonempty proper subset,
-and neither endpoint is an eigenvalue. No unnecessary restriction on a choice
-of angular representatives is imposed. -/
+and neither endpoint is an eigenvalue. In the unitary case these conditions
+force `a < b < a + 2π`, as `spectralWindowBand_endpoint_order` proves. -/
 def spectralWindowBand (circular : Bool) (A : 𝕄) (a b : ℝ) : Prop :=
   (if circular then star A * A = 1 else A.IsHermitian) ∧
   (spectrum ℂ A ∩ spectralWindowSet circular a b).Nonempty ∧

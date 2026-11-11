@@ -6,6 +6,7 @@ Authors: Michael Jarret
 module
 
 public import UnitaryProducts.PaperProof.PrincipalLog
+public import UnitaryProducts.Paper.SpectralWindow
 
 /-! # Principal logarithms and periodic spectral gaps
 
@@ -190,5 +191,119 @@ theorem finite_band_phase_gap_lower {ι : Type*} [Fintype ι] [DecidableEq ι]
   apply Finset.le_inf'
   intro j hj
   exact band_phase_gap_lower (hwidth i j) (hgap i hi j hj)
+
+/-- Section 1.2: the image of a Hermitian band under exponentiation is a band
+of the unitary matrix. The original real interval may extend beyond the spectral
+span; cropping its endpoints inside one open turn preserves exactly the selected
+eigenvalues. The resulting arc has nonempty selected and complementary spectra,
+and neither endpoint is a unitary eigenvalue. -/
+theorem hermitian_band_exponential_image {H : 𝕄} (hH : H.IsHermitian)
+    {w a b : ℝ} (hw : w < 2 * π)
+    (hwidth : ∀ i j, |hH.eigenvalues i - hH.eigenvalues j| ≤ w)
+    (hin : (spectrum ℝ H ∩ Ioo a b).Nonempty)
+    (hout : (spectrum ℝ H \ Ioo a b).Nonempty)
+    (ha : a ∉ spectrum ℝ H) (hb : b ∉ spectrum ℝ H) :
+    ∃ α β : ℝ, spectralWindowBand true (evol H 1) α β ∧
+      spectrum ℂ (evol H 1) ∩ spectralWindowSet true α β =
+        (fun x : ℝ ↦ Complex.exp (-I * (x : ℂ))) '' (spectrum ℝ H ∩ Ioo a b) := by
+  let L := spectralBottom H
+  let q := (2 * π - w) / 4
+  let c := L - q
+  let α := max a (L - q / 2)
+  let β := min b (L + w + q / 2)
+  have hq : 0 < q := by dsimp [q]; linarith
+  have hbounds (x : ℝ) (hx : x ∈ spectrum ℝ H) : L ≤ x ∧ x ≤ L + w := by
+    have hlo := (isLeast_spectralBottom hH).2 hx
+    have hhi := (UnitaryProducts.Prose.isGreatest_spectralTop hH).2 hx
+    have hspan := spectral_span_le hH hwidth
+    exact ⟨hlo, by dsimp [L]; linarith⟩
+  have hturn (x : ℝ) (hx : x ∈ spectrum ℝ H) : x ∈ Ioo c (c + 2 * π) := by
+    have hx' := hbounds x hx
+    dsimp [c, q]
+    constructor <;> linarith [hx'.1, hx'.2]
+  obtain ⟨x₀, hx₀, hx₀ab⟩ := hin
+  have hαx : α < x₀ := by
+    apply max_lt hx₀ab.1
+    linarith [(hbounds x₀ hx₀).1]
+  have hxβ : x₀ < β := by
+    apply lt_min hx₀ab.2
+    linarith [(hbounds x₀ hx₀).2]
+  have hαturn : α ∈ Ioo c (c + 2 * π) := by
+    refine ⟨?_, hαx.trans (hturn x₀ hx₀).2⟩
+    have hlo : L - q / 2 ≤ α := le_max_right _ _
+    dsimp [c]
+    linarith
+  have hβturn : β ∈ Ioo c (c + 2 * π) := by
+    refine ⟨(hturn x₀ hx₀).1.trans hxβ, ?_⟩
+    have hhi : β ≤ L + w + q / 2 := min_le_right _ _
+    dsimp [c, q] at *
+    linarith
+  have hcrop (x : ℝ) (hx : x ∈ spectrum ℝ H) :
+      x ∈ Ioo α β ↔ x ∈ Ioo a b := by
+    constructor
+    · intro h
+      exact ⟨(le_max_left _ _).trans_lt h.1, h.2.trans_le (min_le_left _ _)⟩
+    · intro h
+      have hbd := hbounds x hx
+      exact ⟨max_lt h.1 (by linarith [hbd.1]),
+        lt_min h.2 (by linarith [hbd.2])⟩
+  have hαnot : α ∉ spectrum ℝ H := by
+    intro hs
+    by_cases h : a ≤ L - q / 2
+    · have he : α = L - q / 2 := max_eq_right h
+      have hbd := (hbounds α hs).1
+      rw [he] at hbd
+      linarith
+    · have he : α = a := max_eq_left (le_of_not_ge h)
+      exact ha (he ▸ hs)
+  have hβnot : β ∉ spectrum ℝ H := by
+    intro hs
+    by_cases h : b ≤ L + w + q / 2
+    · have he : β = b := min_eq_left h
+      exact hb (he ▸ hs)
+    · have he : β = L + w + q / 2 := min_eq_right (le_of_not_ge h)
+      have hbd := (hbounds β hs).2
+      rw [he] at hbd
+      linarith
+  have hphase (x : ℝ) (hx : x ∈ spectrum ℝ H) :
+      Complex.exp (-I * (x : ℂ)) ∈ spectralWindowSet true α β ↔ x ∈ Ioo a b := by
+    constructor
+    · rintro ⟨y, hy, he⟩
+      change Complex.exp (-I * (y : ℂ)) = Complex.exp (-I * (x : ℂ)) at he
+      have hyturn : y ∈ Ioo c (c + 2 * π) :=
+        ⟨hαturn.1.trans hy.1, hy.2.trans hβturn.2⟩
+      have hyx := phase_inj hyturn (hturn x hx) he
+      exact (hcrop x hx).mp (hyx ▸ hy)
+    · intro hi
+      exact ⟨x, (hcrop x hx).mpr hi, rfl⟩
+  have hendpoint (t : ℝ) (ht : t ∈ Ioo c (c + 2 * π))
+      (htnot : t ∉ spectrum ℝ H) :
+      Complex.exp (-I * (t : ℂ)) ∉ spectrum ℂ (evol H 1) := by
+    rw [spectrum_evol_image hH]
+    rintro ⟨x, hx, he⟩
+    have hxt := phase_inj (hturn x hx) ht he
+    exact htnot (hxt ▸ hx)
+  refine ⟨α, β, ?_, ?_⟩
+  · refine ⟨?_, ?_, ?_, hendpoint α hαturn hαnot, hendpoint β hβturn hβnot⟩
+    · exact star_evol_mul_self hH 1
+    · refine ⟨Complex.exp (-I * (x₀ : ℂ)), ?_, (hphase x₀ hx₀).mpr hx₀ab⟩
+      rw [spectrum_evol_image hH]
+      exact ⟨x₀, hx₀, rfl⟩
+    · obtain ⟨x, hx, hxnot⟩ := hout
+      refine ⟨Complex.exp (-I * (x : ℂ)), ?_, ?_⟩
+      · rw [spectrum_evol_image hH]
+        exact ⟨x, hx, rfl⟩
+      · intro hi
+        exact hxnot ((hphase x hx).mp hi)
+  · ext z
+    constructor
+    · rintro ⟨hz, hzband⟩
+      rw [spectrum_evol_image hH] at hz
+      obtain ⟨x, hx, rfl⟩ := hz
+      exact ⟨x, ⟨hx, (hphase x hx).mp hzband⟩, rfl⟩
+    · rintro ⟨x, ⟨hx, hxab⟩, rfl⟩
+      refine ⟨?_, (hphase x hx).mpr hxab⟩
+      rw [spectrum_evol_image hH]
+      exact ⟨x, hx, rfl⟩
 
 end UnitaryProducts.PaperProof

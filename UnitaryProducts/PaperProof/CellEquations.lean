@@ -7,8 +7,11 @@ module
 public import UnitaryProducts.PaperProof.ThmComparison
 public import UnitaryProducts.PaperProof.LocalCell
 public import UnitaryProducts.PaperProof.FactAdjoint
-public import UnitaryProducts.Corrector.SeparatedFrame
-public import UnitaryProducts.Evolution.RoundedClock
+public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
+public import UnitaryProducts.Corrector.FrameMultiplier
+public import UnitaryProducts.Matrix.ExponentialEigenvectors
+public import UnitaryProducts.Walks.LogarithmDerivative
+public import UnitaryProducts.Corrector.FrameOperator
 /-! # The opening cell argument and residual split in Section 4 -/
 @[expose] public section
 open scoped BigOperators Matrix.Norms.L2Operator
@@ -18,7 +21,6 @@ noncomputable section
 namespace UnitaryProducts.PaperProof
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
 
 /-- Entrywise conjugation in an eigenbasis: the phase is the eigenvalue
 difference, multiplied by the local time and the corresponding entry. -/
@@ -42,7 +44,6 @@ theorem cell_eigenbasis_entry (lam : Fin d → ℝ) (D : 𝕄) (τ : ℝ) (p q :
     ← Complex.exp_add]
   congr 2
   ring
-
 
 /-- Section 4 opening: Duhamel first bounds the integral of the generator
 norm difference. The derivative estimate bounds that integral by `h/4`;
@@ -79,13 +80,11 @@ theorem rounded_duhamel_display_chain {H Hd U V : ℝ → 𝕄} {T : ℕ}
           h * ((∫ t in (0 : ℝ)..T, |t - (⌊t + 1 / 2⌋ : ℝ)|) / T) := by ring
       _ = h / 4 := by rw [hmean]; ring
 
-
 /-- The first-order Hamiltonian difference has zero integral on a full cell
 before conjugating into the evolution frame. -/
 theorem unframed_linear_integral (D : 𝕄) :
     (∫ τ in (-1 / 2 : ℝ)..(1 / 2), τ • D) = 0 := by
   rw [intervalIntegral.integral_smul_const, integral_id]
   norm_num
-
 
 end UnitaryProducts.PaperProof

@@ -9,13 +9,56 @@ public import UnitaryProducts.Prose.ResidualAlgebra
 public import UnitaryProducts.Spectral.CircularBands
 public import UnitaryProducts.Corrector.ScalarEntrySolutions
 public import UnitaryProducts.Evolution.RoundedClockEvolution
-public import UnitaryProducts.Comparison.NaturalNorms
-public import UnitaryProducts.Comparison.TransferBounds
-public import UnitaryProducts.Comparison.SharpInT
+public import UnitaryProducts.Comparison.EndpointConstants
+public import Mathlib.MeasureTheory.Integral.Bochner.Set
+public import UnitaryProducts.Approximation.VariationMain
 public import UnitaryProducts.Comparison.EndpointComparison
+public import UnitaryProducts.Corrector.PeriodicFrameDecomposition
+public import Mathlib
+public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Commute
+public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
+public import Mathlib.Analysis.CStarAlgebra.Matrix
+public import Mathlib.Analysis.Calculus.Deriv.Star
+public import Mathlib.Analysis.Complex.Basic
+public import Mathlib.Analysis.Matrix.Order
+public import Mathlib.Analysis.Matrix.PosDef
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
+public import Mathlib.Data.Matrix.Block
+public import Mathlib.Data.Matrix.ColumnRowPartitioned
+public import Mathlib.LinearAlgebra.Eigenspace.Matrix
+public import Mathlib.LinearAlgebra.Matrix.Hermitian
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+public import Mathlib.Tactic.FinCases
+public import UnitaryProducts.Approximation.JRSComparison
+public import UnitaryProducts.Comparison.DiscreteAdiabatic
+public import UnitaryProducts.Corrector.CommutatorRegularity
+public import UnitaryProducts.Corrector.IntegratedComparison
+public import UnitaryProducts.Corrector.PowerSeries
+public import UnitaryProducts.Matrix.ExponentialEigenvectors
+public import UnitaryProducts.Corrector.SineBounds
+public import UnitaryProducts.Evolution.RoundedTransfer
+public import UnitaryProducts.Evolution.Simulation
+public import UnitaryProducts.Spectral.Weyl
+public import UnitaryProducts.Walks.Logarithm
+public import UnitaryProducts.Walks.LogarithmBranch
+public import Mathlib.Data.Matrix.Basis
+public import UnitaryProducts.Corrector.SeparatedFrameBounds
+public import UnitaryProducts.Evolution.PartitionIndependent
+public import UnitaryProducts.Evolution.Pieces
+public import UnitaryProducts.Evolution.PiecewiseDressedComparison
+public import UnitaryProducts.Corrector.FrameOperator
+public import UnitaryProducts.Walks.LogarithmDerivative
+public import UnitaryProducts.Spectral.ProjectorDistance
+public import UnitaryProducts.Comparison.SpectralWidth
+public import UnitaryProducts.Corrector.PowerDerivative
+public import UnitaryProducts.Walks.LogHessian
+public import UnitaryProducts.Walks.LogMoving
 public import UnitaryProducts.Comparison.UnitSteps
+public import UnitaryProducts.Walks.LogarithmDerivativeBounds
+public import UnitaryProducts.Comparison.SharpInT
 public import UnitaryProducts.Corrector.FrameMultiplier
-public import UnitaryProducts.Corrector.BernoulliBounds
+public import UnitaryProducts.Corrector.FrameBounds
 public import Mathlib.Algebra.Order.Round
 public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Periodic
 public import UnitaryProducts.Corrector.PeriodicCharacterization
@@ -63,7 +106,6 @@ public import UnitaryProducts.Corrector.PeriodicCharacterization
 - `sample`
 - `sample_eq_of_abs_sub_lt`
 - `sample_mem`
-- `spectralMultiplier`
 - `sub_sample_eq_coordinate`
 - `taylor_remainder_eq_integral`
 - `trapezoid_square_error`
@@ -107,7 +149,6 @@ theorem clock_eq_of_abs_sub_lt {x : ℝ} {j : ℤ} (h : |x - j| < 1 / 2) :
   have hh := abs_lt.mp h
   constructor <;> linarith
 
-
 /-- Section 4, opening paragraph: the rounded path is constant on each open sample cell. -/
 theorem sample_eq_of_abs_sub_lt {N : ℕ} {s : ℝ} {j : ℤ}
     (hs : |s - (j : ℝ) / N| < 1 / (2 * N)) : sample N s = (j : ℝ) / N := by
@@ -122,7 +163,6 @@ theorem path_sample_eq {E : Type*} (H : ℝ → E) {N : ℕ}
     {s : ℝ} {j : ℤ} (hs : |s - (j : ℝ) / N| < 1 / (2 * N)) :
     H (sample N s) = H ((j : ℝ) / N) := by rw [sample_eq_of_abs_sub_lt hs]
 
-
 /-- Section 4, proof of the comparison theorem: distance from the rounded time is `τ/N`. -/
 theorem sub_sample_eq_coordinate {N : ℕ} (hN : 0 < N) (s : ℝ) :
     s - sample N s = ((N : ℝ) * s - clock (N * s)) / N := by
@@ -135,7 +175,6 @@ theorem unit_steps_coefficient {N : ℕ} (hN : 0 < N) (L : ℝ) :
   have hn : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hN.ne'
   constructor <;> field_simp
 
-
 /-- Local Hamiltonian chain rule on its actual parameter domain, including endpoint half cells. -/
 theorem hasDerivWithinAt_local_hamiltonian {E : Type*} [NormedAddCommGroup E]
     [NormedSpace ℝ E] {H : ℝ → E} {D : E} (T n j τ : ℝ)
@@ -147,7 +186,6 @@ theorem hasDerivWithinAt_local_hamiltonian {E : Type*} [NormedAddCommGroup E]
   simpa only [smul_smul, div_mul_div_comm, mul_one, pow_two] using
     (hd.scomp τ (((hasDerivAt_id τ).const_add j).div_const n).hasDerivWithinAt
       hmap).const_smul (T / n)
-
 
 /-- Section 4, the all-sample construction: the rounded integer lies between zero and `N`. -/
 theorem clock_bounds {N : ℕ} {s : ℝ} (hs : s ∈ Icc (0 : ℝ) 1) :
@@ -274,7 +312,6 @@ theorem norm_pow_le_width {A : Type*} [NormedRing A] [NormOneClass A]
     {a : A} {w : ℝ} (ha : ‖a‖ ≤ w) (n : ℕ) : ‖a ^ n‖ ≤ w ^ n :=
   (norm_pow_le a n).trans (pow_le_pow_left₀ (norm_nonneg a) ha n)
 
-
 /-- Section 4, sharpness example: the composite trapezoid rule for `s²` has error `1/(6N²)`;
 multiplication by the evolution time `N` gives `1/(6N)`. -/
 theorem trapezoid_square_error {N : ℕ} (hN : 0 < N) :
@@ -311,7 +348,6 @@ theorem integral_rounded_discrepancy {E : Type*} [NormedAddCommGroup E]
 
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
 
 /-- Section 4, opening display: the discrepancy is integrable under the stated Lipschitz
 assumption; no global regularity of an extension outside `[0,1]` is needed. -/
@@ -397,7 +433,6 @@ theorem local_taylor_bound {H Hd : ℝ → 𝕄} {T n h j τ : ℝ}
   apply (mul_le_mul_of_nonneg_left hb (by positivity : 0 ≤ T / n)).trans_eq
   rw [← sub_div, add_sub_cancel_left]
   field_simp
-
 
 /-- Section 4, the integral identity in the corrector motivation and rounded-path residual: the
 fundamental theorem
@@ -651,30 +686,6 @@ theorem local_taylor_chain {H Hd : ℝ → 𝕄} {T n h j τ : ℝ}
   refine ⟨congrArg norm (local_taylor_integral hd hc hj ht), ?_, ?_⟩
   · rw [abs_integral_abs_zero]; exact (local_taylor_bound hT hn hd hl hj ht).trans_eq (by ring)
   · rw [abs_integral_abs_zero]; ring
-
-
-/-- Section 4, the spectral-multiplier definition before Lemma A.1: the entrywise spectral
-multiplier as a continuous
-linear operator, with the matrix operator norm on its domain and codomain. -/
-def spectralMultiplier (Ω : 𝕄) (hΩ : Ω.IsHermitian) (f : ℝ → ℝ) : 𝕄 →L[ℂ] 𝕄 :=
-  let U : 𝕄 := hΩ.eigenvectorUnitary
-  LinearMap.toContinuousLinearMap
-    { toFun := fun D ↦ U * Matrix.of (fun p q ↦
-        (f (hΩ.eigenvalues p - hΩ.eigenvalues q) : ℂ) * (star U * D * U) p q) * star U
-      map_add' := fun D E ↦ by
-        simp only [Matrix.mul_add, Matrix.add_mul, Matrix.add_apply]
-        rw [← Matrix.add_mul, ← Matrix.mul_add]
-        congr 2
-        ext p q
-        exact mul_add _ _ _
-      map_smul' := fun z D ↦ by
-        simp only [Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_apply, smul_eq_mul,
-          RingHom.id_apply]
-        rw [← Matrix.smul_mul, ← Matrix.mul_smul]
-        congr 2
-        ext p q
-        exact mul_left_comm _ _ _ }
-
 
 /-- Section 4, the stepwise residual argument: for `j<N` the mesh interval is exactly
 the closed step `[j/N,(j+1)/N]`. -/

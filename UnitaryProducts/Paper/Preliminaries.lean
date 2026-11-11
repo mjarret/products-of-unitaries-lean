@@ -5,7 +5,47 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Comparison.NaturalNormsEnds
+public import UnitaryProducts.Comparison.EndpointConstants
+public import Mathlib.MeasureTheory.Integral.Bochner.Set
+public import UnitaryProducts.Approximation.VariationMain
+public import UnitaryProducts.Comparison.EndpointComparison
+public import UnitaryProducts.Corrector.PeriodicFrameDecomposition
+public import Mathlib
+public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Commute
+public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
+public import Mathlib.Analysis.CStarAlgebra.Matrix
+public import Mathlib.Analysis.Calculus.Deriv.Star
+public import Mathlib.Analysis.Complex.Basic
+public import Mathlib.Analysis.Matrix.Order
+public import Mathlib.Analysis.Matrix.PosDef
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
+public import Mathlib.Data.Matrix.Block
+public import Mathlib.Data.Matrix.ColumnRowPartitioned
+public import Mathlib.LinearAlgebra.Eigenspace.Matrix
+public import Mathlib.LinearAlgebra.Matrix.Hermitian
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+public import Mathlib.Tactic.FinCases
+public import UnitaryProducts.Approximation.JRSComparison
+public import UnitaryProducts.Comparison.DiscreteAdiabatic
+public import UnitaryProducts.Corrector.CommutatorRegularity
+public import UnitaryProducts.Corrector.IntegratedComparison
+public import UnitaryProducts.Corrector.PowerSeries
+public import UnitaryProducts.Matrix.ExponentialEigenvectors
+public import UnitaryProducts.Corrector.SineBounds
+public import UnitaryProducts.Evolution.RoundedTransfer
+public import UnitaryProducts.Evolution.Simulation
+public import UnitaryProducts.Spectral.Weyl
+public import UnitaryProducts.Walks.Logarithm
+public import UnitaryProducts.Walks.LogarithmBranch
+public import Mathlib.Data.Matrix.Basis
+public import UnitaryProducts.Corrector.SeparatedFrameBounds
+public import UnitaryProducts.Evolution.PartitionIndependent
+public import UnitaryProducts.Evolution.Pieces
+public import UnitaryProducts.Evolution.PiecewiseDressedComparison
+public import UnitaryProducts.Corrector.FrameOperator
+public import UnitaryProducts.Walks.LogarithmDerivative
+public import UnitaryProducts.Spectral.ProjectorDistance
 public import UnitaryProducts.Evolution.EnergyRescale
 public import UnitaryProducts.Evolution.UnitaryGenerators
 public import UnitaryProducts.Spectral.SinTheta
@@ -263,7 +303,6 @@ theorem regulated_evolution {H : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
       (fun t ht hn ↦ (hVd t (Ioo_subset_Icc_self ht) hn).hasDerivWithinAt)
       (fun t ht hn ↦ hUd t (Ioo_subset_Icc_self ht) hn)
     exact (h ⟨hT.le, le_rfl⟩).symm.trans hend
-
 
 end
 end UnitaryProducts.Paper

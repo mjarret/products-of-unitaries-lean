@@ -18,7 +18,6 @@ public import UnitaryProducts.Walks.LogarithmDerivative
 - `cfc_argBranch_evol`
 - `conj_argBranch`
 - `continuousOn_argBranch`
-- `continuous_evol_one`
 - `eq_of_evol_eq`
 - `evol_one_eq_cfc_exp`
 - `exists_isHermitian_evol_eq`
@@ -226,10 +225,5 @@ theorem eq_of_evol_eq [NeZero d] {A B : 𝕄} {α r : ℝ} (hr : r < π)
     (hB : B.IsHermitian) (hBn : ‖B - ((-α : ℝ) : ℂ) • 1‖ ≤ r)
     (h : evol A 1 = evol B 1) : A = B := by
   rw [← cfc_argBranch_evol hr hA hAn, ← cfc_argBranch_evol hr hB hBn, h]
-
-/-- `A ↦ e^{-iA}` is continuous. -/
-theorem continuous_evol_one : Continuous (fun A : 𝕄 ↦ evol A 1) := by
-  let +nondep : NormedAlgebra ℚ 𝕄 := .restrictScalars ℚ ℂ 𝕄
-  exact NormedSpace.exp_continuous.comp (by fun_prop)
 
 end UnitaryProducts

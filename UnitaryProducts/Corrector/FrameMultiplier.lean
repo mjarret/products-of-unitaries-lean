@@ -18,11 +18,8 @@ public import UnitaryProducts.Corrector.FrameOperator
 - `frameBound_abs_eq_frameMult`
 - `frameBound_zero`
 - `frameMult`
-- `frameSeries_ofReal_mul_I`
-- `neg_one_pow_mul_bernoulli_two_mul_add_two`
 - `entryCLM`
 - `ad_power_eigenbasis_entry`
-- `complex_smul_pow`
 - `frameOp_eq_eigenbasis`
 -/
 
@@ -35,30 +32,6 @@ noncomputable section
 
 namespace UnitaryProducts.Corrector
 
-/-- The sign of the even Bernoulli numbers: `(-1)^k B_{2k+2} = |B_{2k+2}|`. -/
-theorem neg_one_pow_mul_bernoulli_two_mul_add_two (k : ℕ) :
-    (-1 : ℝ) ^ k * ((bernoulli (2 * k + 2) : ℚ) : ℝ) = |((bernoulli (2 * k + 2) : ℚ) : ℝ)| := by
-  rw [show 2 * k + 2 = 2 * (k + 1) by ring, abs_bernoulli_two_mul (k := k + 1) k.succ_ne_zero]
-  ring
-
-/-- **The frame series at a purely imaginary argument is real**: `frameSeries (x i) = 𝔫(|x|)`,
-term by term (odd Bernoulli numbers vanish, even ones alternate in sign). -/
-theorem frameSeries_ofReal_mul_I (x : ℝ) :
-    frameSeries ((x : ℂ) * Complex.I) = (frameBound |x| : ℂ) := by
-  rw [frameSeries, frameBound, Complex.ofReal_tsum]
-  refine tsum_congr fun n ↦ ?_
-  rcases Nat.even_or_odd n with ⟨k, hk⟩ | ⟨k, hk⟩
-  · subst hk
-    have hsign := neg_one_pow_mul_bernoulli_two_mul_add_two k
-    have hpow : ((x : ℂ) * Complex.I) ^ (k + k) = (((-1 : ℝ) ^ k * x ^ (k + k) : ℝ) : ℂ) := by
-      rw [← two_mul, pow_mul, mul_pow, Complex.I_sq]; push_cast; ring
-    rw [hpow, smul_eq_mul, Even.pow_abs ⟨k, rfl⟩ x, show k + k + 2 = 2 * k + 2 by ring, ← hsign]
-    push_cast; ring
-  · subst hk
-    rw [bernoulli_eq_bernoulli'_of_ne_one (by omega),
-      bernoulli'_eq_zero_of_odd ⟨k + 1, by ring⟩ (by omega)]
-    simp
-
 /-- The paper's definition (eq:N-def, §4.1) of $\mathcal N$:
 $(1 - (x/2)\cot(x/2))/x^2$, with its limit $1/12$ at $x = 0$. It equals
 $\sum_{n \ge 1} 2/(4\pi^2n^2 - x^2)$ off $2\pi\mathbb Z \setminus \{0\}$
@@ -69,12 +42,23 @@ $\mathcal N$ is undefined. -/
 def frameMult (x : ℝ) : ℝ :=
   if x = 0 then 1 / 12 else (1 - (x / 2) * Real.cot (x / 2)) / x ^ 2
 
-/-- $\mathcal N(0) = 1/12$: the constant term of the Bernoulli series, $|B_2|/2!$. -/
+/-- The constant term is the Basel partial-fraction sum. -/
 theorem frameBound_zero : frameBound 0 = 1 / 12 := by
   rw [frameBound, tsum_eq_single 0]
-  · norm_num [bernoulli_eq_bernoulli'_of_ne_one, bernoulli'_two, Nat.factorial]
+  · simpa only [pow_zero, mul_one] using frameCoeff_zero
   · intro n hn
     simp [zero_pow hn]
+
+/-- The positive coefficient series is real on the real axis and even. -/
+theorem positiveFrameSeries_ofReal (x : ℝ) :
+    positiveFrameSeries (x : ℂ) = (frameBound |x| : ℂ) := by
+  rw [positiveFrameSeries, frameBound, Complex.ofReal_tsum]
+  apply tsum_congr
+  intro n
+  rcases Nat.even_or_odd' n with ⟨k, rfl | rfl⟩
+  · rw [(even_two_mul k).pow_abs]
+    simp only [smul_eq_mul, Complex.ofReal_mul, Complex.ofReal_pow]
+  · simp only [frameCoeff_odd, Complex.ofReal_zero, zero_smul, zero_mul]
 
 /-- **The majorant is the multiplier's closed form**: `𝔫(|x|) = θ(x)` for `|x| < 2π`. -/
 theorem frameBound_abs_eq_frameMult {x : ℝ} (hx : |x| < 2 * π) :
@@ -134,10 +118,6 @@ end Paper.UnitStepsProse
 
 namespace Prose
 
-/-- Section 4, the scalar factor of an operator power, in a generic normed algebra. -/
-theorem complex_smul_pow {A : Type*} [NormedRing A] [NormedAlgebra ℂ A]
-    (z : ℂ) (a : A) (n : ℕ) : (z • a) ^ n = z ^ n • a ^ n := smul_pow z a n
-
 end Prose
 
 /-- **The frame operator in an eigenbasis.**  For `h` Hermitian with eigenvalues in an interval
@@ -160,42 +140,41 @@ theorem frameOp_eq_eigenbasis {h : 𝕄} (hh : h.IsHermitian) {m w : ℝ}
   have hw0 : 0 ≤ w := by linarith [(hev 0).1, (hev 0).2]
   have hwidth : ‖h - (((m + w / 2 : ℝ)) : ℂ) • 1‖ ≤ w / 2 :=
     norm_sub_smul_one_le_of_eigenvalues hh hw0 hev
-  have hA : ‖I • adL h‖ < 2 * π :=
-    lt_of_le_of_lt ((norm_I_smul_adL_le h _).trans (by linarith)) hw
-  have hsum : Summable (fun n : ℕ ↦
-      (((bernoulli (n + 2) : ℚ) : ℂ) / (Nat.factorial (n + 2) : ℂ)) • (I • adL h) ^ n) :=
-    (summable_norm_frameSeries_terms (I • adL h) hA).of_norm
+  have had : ‖adL h‖ < 2 * π := by
+    apply lt_of_le_of_lt _ hw
+    apply ContinuousLinearMap.opNorm_le_bound _ hw0
+    intro E
+    exact (norm_adL_apply_le h E ((m + w / 2 : ℝ) : ℂ)).trans
+      (mul_le_mul_of_nonneg_right (by linarith) (norm_nonneg E))
+  have hsum : Summable (fun n : ℕ ↦ (frameCoeff n : ℂ) • (adL h) ^ n) :=
+    (summable_norm_positiveFrameSeries (adL h) had).of_norm
   set D' : 𝕄 := star U * D * U with hD'
   set x : Fin d → Fin d → ℂ :=
-    fun a b ↦ ((hh.eigenvalues a - hh.eigenvalues b : ℝ) : ℂ) * I with hx
+    fun a b ↦ ((hh.eigenvalues a - hh.eigenvalues b : ℝ) : ℂ) with hx
   have hfin (M : 𝕄) : U * (star U * M * U) * star U = M :=
     (Unitary.conjStarAlgAut ℂ 𝕄 hh.eigenvectorUnitary).apply_symm_apply M
-  -- the frame operator, conjugated back into the eigenbasis, is the scalar series entrywise
   have hkey : star U * frameOp h D * U
-      = Matrix.of (fun a b ↦ frameSeries (x a b) * D' a b) := by
+      = Matrix.of (fun a b ↦ positiveFrameSeries (x a b) * D' a b) := by
     ext a b
-    have hsumD : Summable (fun n : ℕ ↦ (ContinuousLinearMap.apply ℂ 𝕄 D)
-        ((((bernoulli (n + 2) : ℚ) : ℂ) / (Nat.factorial (n + 2) : ℂ)) • (I • adL h) ^ n)) :=
-      (ContinuousLinearMap.apply ℂ 𝕄 D).summable hsum
+    have hsumD := (ContinuousLinearMap.apply ℂ 𝕄 D).summable hsum
     have e := ((entryCLM a b).comp (ContinuousLinearMap.mulLeftRight ℂ 𝕄 (star U) U)).map_tsum hsumD
     simp only [ContinuousLinearMap.comp_apply,
       show ∀ M : 𝕄, entryCLM a b M = M a b from fun _ ↦ rfl,
       ContinuousLinearMap.mulLeftRight_apply,
       ContinuousLinearMap.apply_apply] at e
-    rw [Matrix.of_apply, frameOp, frameSeries, frameSeries, tsum_apply_of_summable hsum, e,
-      ← tsum_mul_right]
-    refine tsum_congr fun n ↦ ?_
-    rw [ContinuousLinearMap.smul_apply, Prose.complex_smul_pow I (adL h) n,
-      ContinuousLinearMap.smul_apply, Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_apply,
-      Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_apply,
+    rw [Matrix.of_apply, frameOp, positiveFrameSeries, positiveFrameSeries,
+      tsum_apply_of_summable hsum, e, ← tsum_mul_right]
+    apply tsum_congr
+    intro n
+    rw [ContinuousLinearMap.smul_apply, Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_apply,
       Paper.UnitStepsProse.ad_power_eigenbasis_entry]
-    simp only [hx, hD', mul_pow, smul_eq_mul]
+    simp only [hx, hD', smul_eq_mul]
     ring
   rw [← hfin (frameOp h D), hkey]
   congr 2
   ext a b
   have hab : |hh.eigenvalues a - hh.eigenvalues b| < 2 * π :=
     abs_lt.mpr ⟨by linarith [(hev a).1, (hev b).2], by linarith [(hev a).2, (hev b).1]⟩
-  simp only [Matrix.of_apply, hx, frameSeries_ofReal_mul_I, frameBound_abs_eq_frameMult hab]
+  simp only [Matrix.of_apply, hx, positiveFrameSeries_ofReal, frameBound_abs_eq_frameMult hab]
 
 end UnitaryProducts

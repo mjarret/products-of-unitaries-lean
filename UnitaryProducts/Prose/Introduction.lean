@@ -23,7 +23,6 @@ public import UnitaryProducts.Spectral.WidthAndGap
 - `band_gap_does_not_ensure_width`
 - `bounded_path_rescale_width`
 - `comparison_integrated_difference`
-- `introduction_unit_step_error`
 - `midpoint_bit_truncation_finite_precision`
 - `midpoint_error_of_odd`
 - `path_midpoint_error_of_odd`
@@ -224,7 +223,6 @@ theorem path_midpoint_error_of_odd {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
   simp only [hm] at hb
   rwa [mul_add]
 
-
 /-- Section 1, the O(T^-2) neighboring-corrector claim: this bounds each individual interior
 junction, not just their sum. The actual end value is N(ad(H(j/T)))(H'(j/T)/T).
 The bound is uniform in j and T; the endpoint half-cell junctions have zero jump. -/
@@ -270,26 +268,6 @@ theorem adjacent_corrector_jump_le [NeZero d] {H Hd : ℝ → 𝕄} {N : ℕ}
       gcongr
       exact hbd _ hs
     _ = _ := by ring
-
-/-- Section 1, the global O(T^-1) conclusion in the same unit-step convention as the individual
-jump and residual bounds. At width pi an explicit bound is (2h+h^2)/T. -/
-theorem introduction_unit_step_error [NeZero d] {H U : ℝ → 𝕄} {N : ℕ} (hN : 2 ≤ N)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hc : ContDiffOn ℝ 1 H (Icc (0 : ℝ) 1)) (h : ℝ)
-    (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ h)
-    (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ h * |t - s|)
-    (hdiff : ∀ j : ℕ, 0 < j → ∀ hj : j < N, ∀ p q,
-      |(hH _ (unit_sample_mem hj)).eigenvalues p -
-        (hH _ (unit_sample_mem hj)).eigenvalues q| ≤ π)
-    (hU : IsEvolution (fun t ↦ H (t / N)) U 0 N) :
-    ‖evol (H 1) (1 / 2) * (unitProduct H N).1 * evol (H 0) (-(1 / 2)) - U N‖ ≤
-      (2 * h + h ^ 2) / N := by
-  have hNR : (0 : ℝ) < N := Nat.cast_pos.mpr (by omega)
-  have he : (N : ℝ) / (2 * N) = 1 / 2 := by field_simp
-  have hb := (unit_step_comparison_scaling_one_size H U N N hNR hN hH hc h hbd hlip
-    (by simpa only [div_self hNR.ne', one_mul] using hdiff) hU).2 rfl
-  simpa only [he, div_self hNR.ne', one_smul] using hb
 
 /-- Section 1, the comparison lemma specialized to the integrated Hamiltonian difference.
 This is the mathematical specialization described in the comparison with Burgarth et al.;
@@ -367,6 +345,5 @@ theorem band_gap_does_not_ensure_width :
       ∃ (S : Finset (Fin 2)) (hS : S.Nonempty) (hR : Sᶜ.Nonempty),
         0 < finiteEigenphaseGap hh.eigenvalues S hS hR :=
   width_band_gap_incomparable.2
-
 
 end UnitaryProducts.Paper

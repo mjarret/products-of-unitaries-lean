@@ -6,7 +6,7 @@ Authors: Michael Jarret
 module
 
 public import UnitaryProducts.Comparison.EndpointFrame
-public import UnitaryProducts.Corrector.BernoulliBounds
+public import UnitaryProducts.Corrector.FrameBounds
 
 /-!
 # The constants at width `π`

@@ -20,7 +20,6 @@ public import Mathlib.Analysis.Convex.Deriv
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 public import UnitaryProducts.PaperProof.MatrixSeries
-public import UnitaryProducts.Walks.ComplexMultiplierSeries
 public import Mathlib.MeasureTheory.Function.JacobianOneDim
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 public import Mathlib.Analysis.Complex.LocallyUniformLimit
@@ -44,14 +43,19 @@ public import UnitaryProducts.PaperProof.ClosedCellCorrector
 public import UnitaryProducts.PaperProof.CanonicalCell
 public import UnitaryProducts.PaperProof.CenteredUnitSteps
 public import UnitaryProducts.Paper.EvolutionAndFineSteps
-public import UnitaryProducts.Comparison.LipschitzScaling
+public import UnitaryProducts.Comparison.SpectralWidth
+public import UnitaryProducts.Corrector.PowerDerivative
+public import UnitaryProducts.Comparison.EndpointConstants
+public import UnitaryProducts.Corrector.FrameOperator
+public import UnitaryProducts.Walks.LogMoving
+public import UnitaryProducts.Comparison.UnitSteps
+public import UnitaryProducts.Walks.LogarithmDerivativeBounds
+public import UnitaryProducts.Evolution.RoundedClockEvolution
 public import UnitaryProducts.Paper.OneVariable
 public import UnitaryProducts.Comparison.OneSize
 public import UnitaryProducts.Paper.Preliminaries
-public import UnitaryProducts.Evolution.RoundedClockEvolution
 public import UnitaryProducts.Evolution.RegulatedComparison
 public import UnitaryProducts.Spectral.CircularBands
-public import UnitaryProducts.Comparison.UnitSteps
 public import UnitaryProducts.Spectral.SinTheta
 public import UnitaryProducts.Evolution.RegulatedExistence
 public import UnitaryProducts.Paper.FineStepBounds
@@ -59,15 +63,10 @@ public import UnitaryProducts.Approximation.MidpointError
 public import UnitaryProducts.Spectral.BandTransfer
 public import UnitaryProducts.Spectral.TrackedBandGap
 public import UnitaryProducts.Comparison.EndpointComparison
-public import UnitaryProducts.Corrector.BernoulliBounds
-public import UnitaryProducts.Comparison.TransferBounds
-public import UnitaryProducts.Comparison.EndpointConstants
-public import UnitaryProducts.Comparison.LipschitzDerivative
+public import UnitaryProducts.Corrector.FrameBounds
 public import UnitaryProducts.Spectral.WidthAndGap
-public import UnitaryProducts.Walks.LogarithmBounds
 public import UnitaryProducts.Walks.SharpComparison
 public import UnitaryProducts.Evolution.Simulation
-public import UnitaryProducts.Walks.FrameDerivativeBounds
 public import UnitaryProducts.Corrector.ScalarEntrySolutions
 public import UnitaryProducts.Comparison.SharpInT
 public import UnitaryProducts.Approximation.EntryRounding
@@ -98,7 +97,6 @@ public import UnitaryProducts.PaperProof.ThmUnitStepsMax
 
 public import UnitaryProducts.PaperProof.IntroTheorems
 
-
 public import UnitaryProducts.Prose.UnitTransfer
 
 public import UnitaryProducts.PaperProof.UnitExamples
@@ -119,9 +117,7 @@ public import UnitaryProducts.Prose.ShiftedEvolution
 public import UnitaryProducts.PaperProof.PrincipalLog
 public import UnitaryProducts.PaperProof.PeriodicSpectrum
 
-
 import UnitaryProducts.PaperProof.ExponentialDefinitions
-
 
 public import UnitaryProducts.PaperProof.PropTransfer
 public import UnitaryProducts.Prose.ExactCorrection
@@ -130,10 +126,6 @@ public import UnitaryProducts.PaperProof.CellEquations
 
 public import UnitaryProducts.Prose.UnifiedQuadrature
 public import UnitaryProducts.PaperProof.UnifiedJumpsSupport
-
-
-
-
 
 public import UnitaryProducts.PaperProof.LemWalkBands
 public import UnitaryProducts.Walks.TrackedBandMultiplicity
@@ -154,6 +146,4 @@ See `UnitaryProducts.Sections.Introduction` for the two main scaling results and
 
 Michael Jarret, *Products of unitaries as continuous evolutions at finite precision*.
 -/
-
-
 

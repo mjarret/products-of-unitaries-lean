@@ -6,7 +6,7 @@ Authors: Michael Jarret
 module
 
 public import UnitaryProducts.Walks.Logarithm
-public import UnitaryProducts.Walks.LogarithmSmoothness
+public import UnitaryProducts.Corrector.PowerSeries
 
 /-!
 # The commutator as a continuous bilinear map

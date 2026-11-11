@@ -6,7 +6,8 @@ Authors: Michael Jarret
 module
 
 public import UnitaryProducts.Comparison.UnitStepPathDAT
-public import UnitaryProducts.Evolution.RoundedClock
+public import UnitaryProducts.Corrector.FrameOperator
+public import UnitaryProducts.Walks.LogarithmDerivative
 
 /-!
 # Half-step phases, spectral projectors and norms

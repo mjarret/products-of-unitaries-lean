@@ -23,9 +23,6 @@ public import UnitaryProducts.Spectral.CircularBands
 - `exists_uniform_walkLogResolvent_bound`
 - `exp_neg_I_mem_slitPlane`
 - `frameOp_eq_positive_series`
-- `frame_coefficient_mul_I_pow`
-- `frame_positive_coefficient_nonneg`
-- `frame_term_I_smul`
 - `hasDerivAt_log_denominator`
 - `isGreatest_inv_chord_phase`
 - `isGreatest_inv_chord_phase_radius`
@@ -390,48 +387,15 @@ theorem isGreatest_inv_chord_phase_radius {w u : ℝ} (hw0 : 0 ≤ w) (hw : w < 
   rw [norm_chord_endpoint_eq_sqrt, one_div]
   exact isGreatest_inv_chord_phase hw0 hw hu
 
-/-- Section 4, the positive coefficients in the expansion of `N(ad Λ)`:
-the Bernoulli sign cancels the power of `i`, for every degree including zero. -/
-theorem frame_coefficient_mul_I_pow (n : ℕ) :
-    (((bernoulli (n + 2) : ℚ) : ℂ) / (Nat.factorial (n + 2) : ℂ)) * I ^ n =
-      ((|((bernoulli (n + 2) : ℚ) : ℝ)| /
-        (Nat.factorial (n + 2) : ℝ) : ℝ) : ℂ) := by
-  rcases Nat.even_or_odd n with ⟨k, hk⟩ | ⟨k, hk⟩
-  · subst hk
-    have hs := neg_one_pow_mul_bernoulli_two_mul_add_two k
-    rw [show k + k = 2 * k by omega, pow_mul, Complex.I_sq, ← hs]
-    push_cast
-    ring
-  · subst hk
-    have hz : bernoulli (2 * k + 1 + 2) = 0 := by
-      rw [bernoulli_eq_bernoulli'_of_ne_one (by omega)]
-      exact bernoulli'_eq_zero_of_odd ⟨k + 1, by ring⟩ (by omega)
-    simp [hz]
-
-/-- Section 4, termwise operator identity converting the signed series to positive
-coefficients. Stated in a generic algebra so it also instantiates for operator algebras. -/
-theorem frame_term_I_smul {A : Type*} [NormedRing A] [NormedAlgebra ℂ A] (a : A) (n : ℕ) :
-    (((bernoulli (n + 2) : ℚ) : ℂ) / (Nat.factorial (n + 2) : ℂ)) • (I • a) ^ n =
-      ((|((bernoulli (n + 2) : ℚ) : ℝ)| /
-        (Nat.factorial (n + 2) : ℝ) : ℝ) : ℂ) • a ^ n := by
-  rw [smul_pow, smul_smul, frame_coefficient_mul_I_pow]
-
-/-- Section 4, the operator identity `N(ad Λ)(Λ') = ∑ νₙ ad_Λⁿ(Λ')`,
-where `νₙ = |Bₙ₊₂|/(n+2)! ≥ 0`. -/
+/-- Appendix A, the operator identity `N(ad Ω)(D) = ∑ νₙ ad_Ωⁿ(D)`,
+with coefficients obtained from the cotangent partial fractions. -/
 theorem frameOp_eq_positive_series {d : ℕ} [NeZero d]
-    (H D : Matrix (Fin d) (Fin d) ℂ) (hw : ‖I • adL H‖ < 2 * π) :
-    frameOp H D = ∑' n : ℕ,
-      ((|((bernoulli (n + 2) : ℚ) : ℝ)| /
-        (Nat.factorial (n + 2) : ℝ) : ℝ) : ℂ) • (adL H ^ n) D := by
-  unfold frameOp frameSeries
-  have hs := (summable_norm_frameSeries_terms
-    (A := Matrix (Fin d) (Fin d) ℂ →L[ℂ] Matrix (Fin d) (Fin d) ℂ)
-    (I • adL H) hw).of_norm
+    (H D : Matrix (Fin d) (Fin d) ℂ) (hw : ‖adL H‖ < 2 * π) :
+    frameOp H D = ∑' n : ℕ, (frameCoeff n : ℂ) • (adL H ^ n) D := by
+  unfold frameOp positiveFrameSeries
+  have hs := (summable_norm_positiveFrameSeries (adL H) hw).of_norm
   rw [tsum_apply_of_summable hs]
-  apply tsum_congr
-  intro n
-  exact congrArg (fun T : Matrix (Fin d) (Fin d) ℂ →L[ℂ]
-    Matrix (Fin d) (Fin d) ℂ ↦ T D) (frame_term_I_smul (adL H) n)
+  simp only [ContinuousLinearMap.smul_apply]
 
 
 section LocalOpenTurn

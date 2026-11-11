@@ -5,7 +5,14 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Comparison.LipschitzDerivative
+public import UnitaryProducts.Comparison.SpectralWidth
+public import UnitaryProducts.Corrector.PowerDerivative
+public import UnitaryProducts.Comparison.EndpointConstants
+public import UnitaryProducts.Corrector.FrameOperator
+public import UnitaryProducts.Walks.LogHessian
+public import UnitaryProducts.Walks.LogMoving
+public import UnitaryProducts.Comparison.UnitSteps
+public import UnitaryProducts.Walks.LogarithmDerivativeBounds
 public import UnitaryProducts.Approximation.EntryRounding
 
 /-!

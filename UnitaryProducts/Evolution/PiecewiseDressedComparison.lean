@@ -6,7 +6,8 @@ Authors: Michael Jarret
 module
 
 public import UnitaryProducts.Evolution.DuhamelIntegral
-public import UnitaryProducts.Evolution.RoundedClock
+public import UnitaryProducts.Corrector.FrameOperator
+public import UnitaryProducts.Walks.LogarithmDerivative
 
 /-!
 # Dressed comparison, cell by cell
@@ -19,16 +20,9 @@ public import UnitaryProducts.Evolution.RoundedClock
 - `frameExtension`
 - `hasDerivAt_cellPrimitive`
 - `hasDerivAt_frameExtension`
-- `hasDerivWithinAt_integrated_comparison`
 - `integral_affine`
 - `norm_cellPrimitive_deriv_le`
-- `norm_cellPrimitive_left_le`
-- `norm_cellPrimitive_right_le`
-- `norm_dressed_jump_le`
-- `norm_dressed_steps_le`
-- `norm_piecewise_sub_le`
 - `sum_piece_sub`
-- `norm_sub_le_dressed_add`
 -/
 
 @[expose] public section
@@ -94,41 +88,6 @@ open Complex Set MeasureTheory UnitaryProducts UnitaryProducts.Corrector Real
 noncomputable section
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- The product rule behind Theorem 2.2, at one point and within an arbitrary set:
-$(U^\dagger(1 - iY)V)' = iU^\dagger(K - G - Y' - i(KY - YG))V$, the residual (2.3). Used in
-the Lean proof of Theorem 4.2, cell by cell. -/
-theorem hasDerivWithinAt_integrated_comparison
-    {U V Y : ℝ → 𝕄} {K G Yd : 𝕄} {s : Set ℝ} {t : ℝ}
-    (hK : K.IsHermitian)
-    (hU : HasDerivWithinAt U (-I • (K * U t)) s t)
-    (hV : HasDerivWithinAt V (-I • (G * V t)) s t)
-    (hY : HasDerivWithinAt Y Yd s t) :
-    HasDerivWithinAt (fun t ↦ star (U t) * (1 - I • Y t) * V t)
-      (I • (star (U t) * (K - G - Yd - I • (K * Y t - Y t * G)) * V t)) s t := by
-  convert (hU.star.mul ((hasDerivWithinAt_const t s (1 : 𝕄)).sub
-    (hY.const_smul I))).mul hV using 1
-  simp [show star K = K from hK.eq, mul_add, add_mul,
-    mul_assoc, sub_eq_add_neg, smul_smul, add_comm, add_left_comm, add_assoc]
-
-
-/-- At a switch the dressed curve $U^\dagger(1 - iY)V$ changes by at most the jump of $Y$: this is
-how the Lean proof of Theorem 4.2 pays each corrector jump $\|\Delta_j\|$. -/
-theorem norm_dressed_jump_le {U V Y Z : 𝕄} (hU : ‖U‖ ≤ 1) (hV : ‖V‖ ≤ 1) :
-    ‖star U * (1 - I • Y) * V - star U * (1 - I • Z) * V‖ ≤ ‖Y - Z‖ := by
-  rw [← sub_mul, ← mul_sub, sub_sub_sub_cancel_left, ← smul_sub,
-    mul_smul_comm, smul_mul_assoc, norm_smul, Complex.norm_I, one_mul]
-  simpa only [one_mul, mul_one, norm_sub_rev] using
-    norm_mul_le_of_le (norm_mul_le_of_le ((norm_star U).trans_le hU) (le_refl ‖Z - Y‖)) hV
-
-/-- Telescoping over cells: the total displacement is at most the sum of the cell displacements
-and the jumps between cells. Used in the Lean proof of Theorem 4.2. -/
-theorem norm_piecewise_sub_le {E : Type*} [SeminormedAddCommGroup E]
-    (left right : ℕ → E) (n : ℕ) :
-    ‖right n - left 0‖ ≤ (∑ j ∈ Finset.range (n+1), ‖right j - left j‖)
-      + ∑ j ∈ Finset.range n, ‖left (j+1) - right j‖ := by
-  rw [sub_eq_iff_eq_add.mp (Paper.sum_piece_sub left right n).symm]
-  exact norm_add_le_of_le (norm_sum_le _ _) (norm_sum_le _ _)
 
 /-- $\int_0^t (s - \frac12)e^{ish}De^{-ish}\,ds$, in the cell coordinate $s = \tau + \frac12 \in
 [0,1]$: the integral term of the variation-of-constants formula for the periodic corrector
@@ -200,7 +159,6 @@ theorem norm_cellPrimitive_deriv_le (h D : 𝕄) (hh : h.IsHermitian) (t : ℝ) 
   rw [(hasDerivAt_cellPrimitive h D t).deriv, norm_smul, Real.norm_eq_abs]
   exact mul_le_mul_of_nonneg_left (norm_evol_conj_le hh D t) (abs_nonneg _)
 
-
 /-- Primitive increments on one side of the center are bounded by the trapezoid area. -/
 theorem norm_cellPrimitive_sub_le (h D : 𝕄) (hh : h.IsHermitian) (a b : ℝ)
     (hab : 1 / 2 ≤ min a b ∨ max a b ≤ 1 / 2) :
@@ -218,62 +176,6 @@ theorem norm_cellPrimitive_sub_le (h D : 𝕄) (hh : h.IsHermitian) (a b : ℝ)
     ((by fun_prop : Continuous fun t : ℝ ↦ |t - 1 / 2| * ‖D‖).intervalIntegrable _ _)).trans_eq ?_
   rw [intervalIntegral.integral_mul_const, abs_mul, abs_of_nonneg (norm_nonneg D),
     Paper.UnitStepsProse.abs_integral_distance_of_outside hab]
-
-/-- Left-half primitive estimate, integrating from the left boundary. -/
-theorem norm_cellPrimitive_left_le (h D : 𝕄) (hh : h.IsHermitian)
-    {s : ℝ} (hs : 0 ≤ s) (hs' : s ≤ 1 / 2) :
-    ‖cellPrimitive h D s‖ ≤ (1/8-(s-1/2)^2/2)*‖D‖ := by
-  have hb := norm_cellPrimitive_sub_le h D hh 0 s (Or.inr (max_le (by norm_num) hs'))
-  simp only [cellPrimitive, intervalIntegral.integral_same, sub_zero,
-    zero_sub, abs_neg, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 1/2),
-    abs_of_nonpos (sub_nonpos.mpr hs'), abs_of_nonneg hs] at hb
-  exact hb.trans_eq (by ring)
-
-/-- Right-half primitive estimate, integrating back from the periodic boundary. -/
-theorem norm_cellPrimitive_right_le (h D : 𝕄) (hh : h.IsHermitian)
-    {s : ℝ} (hs : 1 / 2 ≤ s) (hs' : s ≤ 1) :
-    ‖cellPrimitive h D 1 - cellPrimitive h D s‖ ≤ (1/8-(s-1/2)^2/2)*‖D‖ := by
-  have hb := norm_cellPrimitive_sub_le h D hh s 1 (Or.inl (le_min hs (by norm_num)))
-  simp only [abs_of_nonneg (sub_nonneg.mpr hs),
-    abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 1 - 1/2),
-    abs_of_nonneg (sub_nonneg.mpr hs')] at hb
-  exact hb.trans_eq (by ring)
-
-/-- Removing a boundary corrector costs its norm, by unitarity. -/
-theorem norm_sub_le_dressed_add {u v Y : 𝕄}
-    (hu : star u * u = 1) (hv : ‖v‖ ≤ 1) :
-    ‖u-v‖ ≤ ‖star u*(1-I • Y)*v-1‖+‖Y‖ := by
-  have he : u-v = -(u*(star u*(1-I • Y)*v-1))-I • (Y*v) := by
-    simp only [mul_sub, sub_mul, mul_one, mul_smul_comm, smul_mul_assoc,
-      ← mul_assoc, mul_eq_one_comm.mp hu, one_mul]
-    abel
-  rw [he]; refine (norm_sub_le _ _).trans ?_
-  simp only [norm_neg, norm_smul, Complex.norm_I, one_mul]
-  simpa only [one_mul, mul_one] using
-    add_le_add (norm_mul_le_of_le (norm_le_one_of_star_mul_self hu) le_rfl)
-      (norm_mul_le_of_le (le_refl ‖Y‖) hv)
-
-/-- Add the dressed cell displacements and charge every boundary jump once. -/
-theorem norm_dressed_steps_le {u v Y : ℕ → 𝕄} {ε : ℕ → ℝ} (n : ℕ)
-    (hu : ∀ j ≤ n, star (u j) * u j = 1) (hv : ∀ j ≤ n, ‖v j‖ ≤ 1) (hY0 : Y 0 = 0)
-    (hstep : ∀ j < n,
-      ‖star (u (j + 1)) * (1 - I • Y (j + 1)) * v (j + 1) - star (u j) * (1 - I • Y (j + 1)) * v j‖
-        ≤ ε j) :
-    ‖u n-v n‖ ≤ ‖u 0-v 0‖+∑ j ∈ Finset.range n, (ε j+‖Y (j+1)-Y j‖)+‖Y n‖ := by
-  let F : ℕ → 𝕄 := fun j ↦ star (u j) * (1 - I • Y j) * v j
-  have hzero : ‖F 0 - 1‖ ≤ ‖u 0 - v 0‖ := by
-    rw [show F 0 - 1 = star (u 0) * (v 0 - u 0) by simp [F, hY0, mul_sub, hu 0 (Nat.zero_le n)],
-      CStarRing.norm_mem_unitary_mul _ (Unitary.star_mem
-      (Matrix.mem_unitaryGroup_iff'.mpr (hu 0 (Nat.zero_le n)))), norm_sub_rev]
-  have hacc : ‖F n - F 0‖ ≤ ∑ j ∈ Finset.range n, (ε j + ‖Y (j + 1) - Y j‖) := by
-    rw [← Finset.sum_range_sub F]
-    refine norm_sum_le_of_le _ fun j hj ↦ (norm_sub_le_norm_sub_add_norm_sub (F (j + 1))
-      (star (u j) * (1 - I • Y (j + 1)) * v j) (F j)).trans (add_le_add (hstep j ?_)
-      (norm_dressed_jump_le (norm_le_one_of_star_mul_self (hu j ?_)) (hv j ?_))) <;>
-      first | exact Finset.mem_range.mp hj | exact (Finset.mem_range.mp hj).le
-  exact (norm_sub_le_dressed_add (Y := Y n) (hu n le_rfl) (hv n le_rfl)).trans
-    (add_le_add_left ((norm_sub_le_norm_sub_add_norm_sub (F n) (F 0) 1).trans
-      ((add_le_add hacc hzero).trans_eq (add_comm _ _))) _)
 
 end
 end UnitaryProducts.Dressed

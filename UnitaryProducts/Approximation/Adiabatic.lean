@@ -15,7 +15,6 @@ public import UnitaryProducts.Evolution.Simulation
 - `norm_le_one_of_isStarProjection`
 - `norm_leak_le_norm`
 - `norm_leak_sub_le_of_contraction`
-- `star_pieceProduct_mul_self`
 -/
 
 @[expose] public section
@@ -64,16 +63,5 @@ theorem norm_leak_le_norm {P₀ Pₜ : 𝕄} (hP₀ : IsStarProjection P₀) (hP
     (U : 𝕄) : ‖(1 - Pₜ) * U * P₀‖ ≤ ‖U‖ := by
   simpa using norm_mul_le_of_le (norm_mul_le_of_le (norm_le_one_of_isStarProjection hPₜ.one_sub)
     le_rfl) (norm_le_one_of_isStarProjection hP₀)
-
-/-- The simulated evolution is unitary: a product $e^{-i\tau_{n-1}G_{n-1}}\cdots e^{-i\tau_0G_0}$
-of exponentials of Hermitian matrices satisfies $W^\dagger W=1$. -/
-theorem star_pieceProduct_mul_self {τ : ℕ → ℝ} {G : ℕ → 𝕄} {n : ℕ}
-    (hG : ∀ j < n, (G j).IsHermitian) : star (pieceProduct τ G n) * pieceProduct τ G n = 1 := by
-  induction n with
-  | zero => simp [pieceProduct]
-  | succ n ih =>
-    simp only [pieceProduct, star_mul]
-    rw [mul_assoc, ← mul_assoc (star (evol (G n) (τ n))), star_evol_mul_self (hG n (by omega)),
-      one_mul, ih fun j hj ↦ hG j (by omega)]
 
 end UnitaryProducts

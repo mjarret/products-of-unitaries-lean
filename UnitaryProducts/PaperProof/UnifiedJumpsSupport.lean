@@ -5,7 +5,7 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.PaperProof.UnifiedDerivative
+public import UnitaryProducts.PaperProof.CommutatorTelescope
 public import UnitaryProducts.PaperProof.TightFTC
 public import UnitaryProducts.PaperProof.ThmComparison
 public import UnitaryProducts.Comparison.EndpointFrame

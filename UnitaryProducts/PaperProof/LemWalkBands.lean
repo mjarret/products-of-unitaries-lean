@@ -31,9 +31,9 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 local notation "K" => Icc (0 : ℝ) 1
 
 
-/-- Corollary 4.7: the shifted principal-log guess has exactly the Hermitian
+/-- Corollary 4.7: the shifted principal logarithm has exactly the Hermitian
 spectrum in the selected open turn and exponentiates to the given unitary. -/
-theorem walk_bands_principal_ansatz_verified (W : 𝕄) (α : ℝ)
+theorem walk_bands_principal_logarithm (W : 𝕄) (α : ℝ)
     (hu : star W * W = 1)
     (hcut : Complex.exp (-I * (α : ℂ)) ∉ spectrum ℂ W) :
     let G := ((α + π : ℝ) : ℂ) • (1 : 𝕄) +
@@ -152,7 +152,7 @@ theorem walk_band_arc (W : ℝ → 𝕄) (α β : ℝ → ℝ) (ϑ : ℝ)
       (∀ i, hG.eigenvalues i ∈ Ioo (α s) (α s + 2 * π)) ∧ evol G 1 = W s := by
     intro s
     by_cases hs : s ∈ K
-    · obtain ⟨hG, hwin, he⟩ := walk_bands_principal_ansatz_verified
+    · obtain ⟨hG, hwin, he⟩ := walk_bands_principal_logarithm
         (W s) (α s) (hu s hs) (hb s hs).2.2.2.1
       exact ⟨_, hG, fun _ ↦ ⟨hwin, he⟩⟩
     · exact ⟨0, Matrix.isHermitian_zero, fun h ↦ (hs h).elim⟩

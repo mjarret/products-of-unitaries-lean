@@ -6,7 +6,7 @@ Authors: Michael Jarret
 module
 
 public import UnitaryProducts.Spectral.ExactGap
-public import UnitaryProducts.Walks.LogarithmConstruction
+public import UnitaryProducts.Walks.LogarithmBranch
 
 /-!
 # Band eigenphase gaps of sampled exponentials

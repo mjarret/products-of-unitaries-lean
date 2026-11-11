@@ -19,12 +19,22 @@ Alternating strictly below and above the input reverses the error's sign.
 
 namespace UnitaryProducts.Prose
 
-/-- Section 5: the inclusive sample indices `0,...,T` give `T+1` cells.
-The partition and its endpoint half-cells are identified by
-`Paper.rounded_clock_partition` and `PaperProof.uniform_cell_domains`. -/
-theorem sample_cell_count (T : ℕ) :
-    (Finset.range (T + 1)).card = T + 1 :=
-  Finset.card_range (T + 1)
+open Paper.UnitStepsProse in
+/-- Section 5: inside an open centered cell, the clock error is the displacement
+from the integer sample and changes sign under reflection in that sample. -/
+theorem full_cell_clock_error (j : ℤ) {t : ℝ} (ht : |t - (j : ℝ)| < 1 / 2) :
+    t - (clock t : ℝ) = t - (j : ℝ) ∧
+      (2 * (j : ℝ) - t) - (clock (2 * (j : ℝ) - t) : ℝ) =
+        -(t - (clock t : ℝ)) := by
+  have hReflection : |2 * (j : ℝ) - t - j| < 1 / 2 := by
+    have hDisplacement : 2 * (j : ℝ) - t - j = -(t - j) := by ring
+    rwa [hDisplacement, abs_neg]
+  have hClock := clock_eq_of_abs_sub_lt ht
+  have hReflectedClock := clock_eq_of_abs_sub_lt hReflection
+  rw [hClock, hReflectedClock]
+  constructor
+  · rfl
+  · ring
 
 open Paper.UnitStepsProse in
 /-- Section 5: every full centered cell contains both signs of the rounded-clock
@@ -49,6 +59,45 @@ theorem full_cell_opposite_signs (j : ℤ) :
     norm_num
   · rw [hRightClock, add_sub_cancel_left]
     norm_num
+
+open Paper.UnitStepsProse MeasureTheory Set in
+/-- Section 5: the signed clock error has zero integral over every full centered
+cell. The single tie at the right endpoint has measure zero. -/
+theorem full_cell_clock_integral (j : ℤ) :
+    (∫ t in ((j : ℝ) - 1 / 2)..((j : ℝ) + 1 / 2), t - (clock t : ℝ)) = 0 := by
+  have he : (∫ t in ((j : ℝ) - 1 / 2)..((j : ℝ) + 1 / 2), t - (clock t : ℝ)) =
+      ∫ t in ((j : ℝ) - 1 / 2)..((j : ℝ) + 1 / 2), t - (j : ℝ) := by
+    apply intervalIntegral.integral_congr_ae
+    filter_upwards [volume.ae_ne ((j : ℝ) + 1 / 2)] with t ht
+    intro hmem
+    rw [uIoc_of_le (by linarith)] at hmem
+    have habs : |t - (j : ℝ)| < 1 / 2 := abs_lt.mpr
+      ⟨by linarith [hmem.1], by
+        rcases lt_or_eq_of_le hmem.2 with h | h
+        · linarith
+        · exact (ht h).elim⟩
+    rw [clock_eq_of_abs_sub_lt habs]
+  rw [he, intervalIntegral.integral_sub
+    (f := fun t : ℝ ↦ t) (g := fun _ : ℝ ↦ (j : ℝ))
+    (continuous_id.intervalIntegrable _ _) (continuous_const.intervalIntegrable _ _),
+    integral_id, intervalIntegral.integral_const]
+  simp only [smul_eq_mul]
+  ring
+
+open Paper.UnitStepsProse MeasureTheory Set in
+/-- Section 5: the first-order term has zero integral on the open full cell.
+Removing the endpoints does not change the integral, and its matrix coefficient
+is constant on the cell. -/
+theorem full_cell_first_order_integral {E : Type*} [NormedAddCommGroup E]
+    [NormedSpace ℝ E] [CompleteSpace E] (j : ℤ) (D : E) :
+    (∫ t in Ioo ((j : ℝ) - 1 / 2) ((j : ℝ) + 1 / 2),
+      (t - (clock t : ℝ)) • D) = 0 := by
+  have hScalar : (∫ t in Ioo ((j : ℝ) - 1 / 2) ((j : ℝ) + 1 / 2),
+      t - (clock t : ℝ)) = 0 := by
+    rw [← integral_Ioc_eq_integral_Ioo,
+      ← intervalIntegral.integral_of_le (by linarith : (j : ℝ) - 1 / 2 ≤ j + 1 / 2)]
+    exact full_cell_clock_integral j
+  rw [integral_smul_const, hScalar, zero_smul]
 
 /-- Section 5: a constant positive input can have strictly positive truncation error
 at every time. At zero binary places, the constant input `1/2` truncates to zero. -/

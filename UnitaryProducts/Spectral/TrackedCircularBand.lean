@@ -5,7 +5,7 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Walks.LogarithmConstruction
+public import UnitaryProducts.Walks.LogarithmBranch
 
 /-!
 # Continuous spectral minima and exponential spectral mapping
@@ -109,7 +109,6 @@ private theorem phase_unitary (c : ℝ) : Complex.exp (I*(c:ℂ)) ∈ unitary �
     Complex.norm_exp_I_mul_ofReal]
   norm_num
 
-
 private theorem evol_scalar_sub (c : ℝ) (A : 𝕄) :
     evol (((c:ℂ) • 1)-A) 1 = Complex.exp (-I*(c:ℂ)) • NormedSpace.exp (I • A) := by
   have he : -I • (((c:ℂ) • (1:𝕄))-A) = algebraMap ℂ 𝕄 (-I*(c:ℂ))+I • A := by
@@ -118,7 +117,6 @@ private theorem evol_scalar_sub (c : ℝ) (A : 𝕄) :
   rw [evol,one_smul,he,NormedSpace.exp_add_of_commute (Algebra.commutes _ _)]
   rw [← NormedSpace.algebraMap_exp_comm, ← Complex.exp_eq_exp_ℂ,
     Algebra.algebraMap_eq_smul_one,smul_mul_assoc,one_mul]
-
 
 /-- A continuously moving cut outside the spectrum selects the continuous open-interval logarithm:
 if $e^{-i\alpha(s)}$ is never an eigenvalue of $W(s)$, there is a continuous Hermitian $G$ with

@@ -8,7 +8,6 @@ module
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.Commutator
 public import UnitaryProducts.Corrector.SeriesIdentity
-public import UnitaryProducts.Evolution.Propagator
 public import UnitaryProducts.Evolution.Simulation
 
 /-!
@@ -17,7 +16,6 @@ public import UnitaryProducts.Evolution.Simulation
 ## Declarations
 
 - `analyticOnNhd_tsum_coeff`
-- `bernBound`
 - `continuousOn_of_norm_sub_le`
 - `unit_lipschitz_constant_nonneg`
 -/
@@ -60,12 +58,6 @@ open UnitaryProducts.Corrector
 variable {d : ℕ}
 
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- The majorant of the Bernoulli series, `∑ |Bₙ| wⁿ/n! = w/2 + 2 - (w/2) cot(w/2)` for
-$0 < w < 2\pi$ (`tsum_abs_bernoulli_eq`). It is the `tsum` junk value $0$ where the series
-diverges. -/
-noncomputable def bernBound (w : ℝ) : ℝ :=
-  ∑' n : ℕ, |((bernoulli n : ℚ) : ℝ)| * w ^ n / (Nat.factorial n)
 
 /-- A Lipschitz bound on the unit interval has a nonnegative constant. -/
 theorem unit_lipschitz_constant_nonneg {H : ℝ → 𝕄} {L : ℝ}

@@ -16,9 +16,9 @@ namespace UnitaryProducts.PaperProof
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- At zero time the guessed entry is the negative cosecant multiplier,
+/-- At zero time the scalar entry is the negative cosecant multiplier,
 including the removable value `-a/24` at zero frequency. -/
-theorem cell_center_ansatz_verified (x : ℝ) (a : ℂ) :
+theorem cell_center_value (x : ℝ) (a : ℂ) :
     closedCellMultiplier 0 x * a = -(cellConstant x : ℂ) * a := by
   by_cases hx : x = 0
   · subst x
@@ -28,12 +28,22 @@ theorem cell_center_ansatz_verified (x : ℝ) (a : ℂ) :
     simp only [mul_zero, zero_mul, neg_zero, Complex.exp_zero, sub_zero]
     ring
 
+/-- The scalar sign calculation in Lemma A.1 starts from the alternating
+cosecant partial fractions of the negative center multiplier. -/
+theorem neg_closedCellMultiplier_center_partialFractions {x : ℝ} (hx : |x| < 2 * π) :
+    -(closedCellMultiplier 0 x).re = ∑' m : ℕ, (-1 : ℝ) ^ m *
+      (2 / (4 * π ^ 2 * (m + 1 : ℝ) ^ 2 - x ^ 2)) := by
+  have hc := cell_center_value x 1
+  simp only [mul_one] at hc
+  rw [hc]
+  simpa using cellConstant_eq_partialFractions hx
+
 /-- The center of the scalar closed form, identified with the convergent
-frame-series difference by the verified cosecant guess. -/
+frame-series difference by the cosecant identity. -/
 theorem closedCellMultiplier_center {x : ℝ} (hx : |x| < 2 * π) :
     closedCellMultiplier 0 x = -((frameMult x - frameMult (x / 2) / 2 : ℝ) : ℂ) := by
   simpa only [mul_one, cellConstant_eq_frameMult hx] using
-    cell_center_ansatz_verified x 1
+    cell_center_value x 1
 
 /-- The matrix in Appendix A is defined entrywise by the displayed closed form. -/
 def closedCell (Ω : 𝕄) (hΩ : Ω.IsHermitian) (D : 𝕄) (τ : ℝ) : 𝕄 :=
@@ -71,7 +81,7 @@ theorem closedCell_eq_integralCell {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
   rw [hcenter] at hclosed
   exact mul_left_cancel₀ (Complex.exp_ne_zero _) (hclosed.trans hintegral.symm)
 
-/-- Lemma A.1: read the center norm from the guessed multiplier. The
+/-- Lemma A.1: read the center norm from the cosecant multiplier. The
 positive Taylor series gives the middle inequality, and the scalar center
 identity identifies its majorant with the printed cosecant constant. -/
 theorem cell_center_multiplier_bound {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π)
@@ -83,10 +93,9 @@ theorem cell_center_multiplier_bound {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π)
         -(closedCellMultiplier 0 w).re * ‖D‖ ∧
     -(closedCellMultiplier 0 w).re = cellConstant w := by
   have hcenter : -(closedCellMultiplier 0 w).re = cellConstant w := by
-    have he := cell_center_ansatz_verified w 1
-    simp only [mul_one] at he
-    rw [he]
-    simp
+    have hwabs : |w| < 2 * π := by rwa [abs_of_nonneg hw0]
+    exact (neg_closedCellMultiplier_center_partialFractions hwabs).trans
+      (cellConstant_eq_partialFractions hwabs).symm
   refine ⟨rfl, ?_, hcenter⟩
   rw [hcenter, cellConstant_eq_frameBound hw0 hw]
   change ‖closedCell Ω hΩ D 0‖ ≤ _

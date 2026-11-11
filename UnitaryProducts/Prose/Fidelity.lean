@@ -153,7 +153,6 @@ theorem adjacent_corrector_jump_le_inclusive [NeZero d] {H Hd : ℝ → 𝕄} {N
       exact hbd _ hs
     _ = _ := by ring
 
-
 /-- Section 4.2: on the cell centered at the inclusive sample `j`, the
 unit-step correction solves the stated equation with `Ω = H(j/T)` and
 `D = H'(j/T)/T`, in the local variable `τ`. -/
@@ -183,30 +182,6 @@ theorem scalar_corrector_resonant_forcing_zero {m : ℤ} (hm : m ≠ 0)
   have hfactor : -I * (-1 : ℂ)^m ≠ 0 :=
     mul_ne_zero (neg_ne_zero.mpr I_ne_zero) (zpow_ne_zero _ (neg_ne_zero.mpr one_ne_zero))
   exact (mul_eq_zero.mp ((div_eq_zero_iff.mp hz).resolve_right hden)).resolve_left hfactor
-
-/-- Section 5: a continuous Hermitian logarithm with uniformly bounded
-width below `2π` supplies a free arc of fixed positive length with a continuous
-location, determined by the least eigenvalue of the logarithm. -/
-theorem continuous_logarithm_gives_free_arc [NeZero d] (H W : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hc : ContinuousOn H (Icc (0 : ℝ) 1)) {w : ℝ} (hw : w < 2 * π)
-    (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1) p q,
-      |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w)
-    (hlog : ∀ s ∈ Icc (0 : ℝ) 1, evol (H s) 1 = W s) :
-    spectrumAvoidsOpenArc W (2 * π - w) (fun s ↦ spectralBottom (H s)) := by
-  have hw0 : 0 ≤ w := by simpa using hwidth 0 (by norm_num) 0 0
-  obtain ⟨ha, _, harc⟩ := PaperProof.hamiltonian_window_arc H hH hc hwidth
-  have hunit : (walk W 1).1 := by
-    intro s hs
-    rw [← hlog s hs]
-    exact star_evol_mul_self (hH s hs) 1
-  apply (spectrumAvoidsOpenArc_iff_closedArc W (2 * π - w) _ hunit
-    (sub_le_self _ hw0)).mpr
-  refine ⟨sub_pos.mpr hw, ha, ?_⟩
-  intro s hs z hz
-  rw [← hlog s hs] at hz
-  simpa only [sub_sub_cancel] using harc s hs z hz
-
 
 /-- Section 2: a regulated Hermitian family can have an actual jump.
 The two one-sided limits at `1/2` are the distinct matrices `0` and `1`. -/

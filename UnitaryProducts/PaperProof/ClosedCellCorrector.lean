@@ -8,6 +8,7 @@ public import UnitaryProducts.PaperProof.FactAdjoint
 public import UnitaryProducts.Prose.Introduction
 public import UnitaryProducts.PaperProof.ExponentialDefinitions
 public import UnitaryProducts.Corrector.SineBounds
+public import UnitaryProducts.Corrector.PartialFractionMultiplier
 /-! # The closed-form corrector used by Appendix A -/
 @[expose] public section
 open scoped BigOperators Matrix.Norms.L2Operator Topology
@@ -178,111 +179,40 @@ theorem periodicCorrector_eq_closedCell {Ω : 𝕄} (hΩ : Ω.IsHermitian)
       (hasDerivAt_periodic_corrector Ω hΩ D t) p q)
     ((congrArg (E p q) hinit).trans (corrector_end_eigenbasis_entry hΩ D p q (hw p q))) τ
 
-/-- Scalar multiples of the adjoint map have the expected frame-series entries.
-This is the convergent power-series calculation used at the corrector center. -/
-theorem frameSeries_smul_ad_entry [NeZero d] (Ω : 𝕄) (hΩ : Ω.IsHermitian) (D : 𝕄)
-    (z : ℂ) (hz : ‖z • adL Ω‖ < 2 * π) (p q : Fin d) :
-    let U : 𝕄 := hΩ.eigenvectorUnitary
-    (star U * (frameSeries (z • adL Ω) D) * U) p q =
-      frameSeries (z * ((hΩ.eigenvalues p - hΩ.eigenvalues q : ℝ) : ℂ)) *
-        (star U * D * U) p q := by
-  intro U
-  have hs := (summable_norm_frameSeries_terms (z • adL Ω) hz).of_norm
-  have hsD := (ContinuousLinearMap.apply ℂ 𝕄 D).summable hs
-  have he := ((entryCLM p q).comp
-    (ContinuousLinearMap.mulLeftRight ℂ 𝕄 (star U) U)).map_tsum hsD
-  simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.mulLeftRight_apply,
-    ContinuousLinearMap.apply_apply,
-    show ∀ X : 𝕄, entryCLM p q X = X p q from fun _ ↦ rfl] at he
-  rw [frameSeries, frameSeries, tsum_apply_of_summable hs, he, ← tsum_mul_right]
-  refine tsum_congr fun n ↦ ?_
-  rw [ContinuousLinearMap.smul_apply, UnitaryProducts.Prose.complex_smul_pow z (adL Ω) n,
-    ContinuousLinearMap.smul_apply, Matrix.mul_smul, Matrix.smul_mul,
-    Matrix.smul_apply, Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_apply,
-    ad_power_eigenbasis_entry]
-  simp only [mul_pow, smul_eq_mul]
-  ring
-
-/-- Scalar norm identity instantiated only after elaboration in a generic algebra. -/
-theorem closedCell_norm_smul {A : Type*} [NormedRing A] [NormedAlgebra ℂ A]
-    (z : ℂ) (a : A) : ‖z • a‖ = ‖z‖ * ‖a‖ := norm_smul z a
-
-/-- The two inequalities in Appendix A's general positive-series estimate,
-stated in a generic normed algebra before specializing to adjoint operators. -/
-theorem norm_nonnegative_power_series_le {A : Type*} [NormedRing A]
-    [NormedAlgebra ℂ A] [NormOneClass A]
-    (a : A) {w : ℝ} (haw : ‖a‖ ≤ w) (c : ℕ → ℝ)
-    (hc : ∀ n, 0 ≤ c n) (hs : Summable (fun n ↦ c n * w ^ n)) :
-    ‖∑' n, (c n : ℂ) • a ^ n‖ ≤ ∑' n, c n * ‖a‖ ^ n ∧
-      (∑' n, c n * ‖a‖ ^ n) ≤ ∑' n, c n * w ^ n := by
-  have hterm (n : ℕ) : c n * ‖a‖ ^ n ≤ c n * w ^ n :=
-    mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (norm_nonneg a) haw n) (hc n)
-  have hsmall : Summable (fun n ↦ c n * ‖a‖ ^ n) :=
-    Summable.of_nonneg_of_le (fun n ↦ mul_nonneg (hc n) (pow_nonneg (norm_nonneg a) n)) hterm hs
-  have hnorm (n : ℕ) : ‖(c n : ℂ) • a ^ n‖ ≤ c n * ‖a‖ ^ n := by
-    rw [norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (hc n)]
-    exact mul_le_mul_of_nonneg_left (norm_pow_le a n) (hc n)
-  have hsNorm := Summable.of_nonneg_of_le (fun n ↦ norm_nonneg _) hnorm hsmall
-  exact ⟨(norm_tsum_le_tsum_norm hsNorm).trans (hsNorm.tsum_le_tsum hnorm hsmall),
-    hsmall.tsum_le_tsum hterm hs⟩
-
-/-- Equation `eq:series-bound`: the spectral multiplier of a convergent series
-with nonnegative coefficients satisfies both displayed operator-norm bounds. -/
-theorem spectralMultiplier_nonnegative_series_bound [NeZero d] {Ω : 𝕄}
-    (hΩ : Ω.IsHermitian) {w : ℝ}
-    (hw : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w)
-    (c : ℕ → ℝ) (hc : ∀ n, 0 ≤ c n)
-    (hs : Summable (fun n ↦ c n * w ^ n)) :
-    ‖spectralMultiplier Ω hΩ (fun x ↦ ∑' n, c n * x ^ n)‖ ≤
-      ∑' n, c n * ‖adL Ω‖ ^ n ∧
-    (∑' n, c n * ‖adL Ω‖ ^ n) ≤ ∑' n, c n * w ^ n := by
-  rw [spectralMultiplier_eq_series_signed hΩ hw
-    (by simpa only [abs_of_nonneg (hc _)] using hs)]
-  exact norm_nonnegative_power_series_le (adL Ω)
-    (by simpa only [pow_one] using ad_power_norm_le hΩ hw 1) c hc hs
-
-/-- The nonnegative-coefficient expansion in equation `eq:N-series`, valid for
-both signs of the frequency. -/
+/-- Appendix A: the cotangent multiplier has the positive coefficient expansion
+obtained directly from its partial fractions. -/
 theorem frameMult_positive_power_series {x : ℝ} (hx : |x| < 2 * π) :
-    frameMult x = ∑' n : ℕ,
-      |((bernoulli (n+2) : ℚ) : ℝ)| / (Nat.factorial (n+2) : ℝ) * x^n := by
-  rw [← frameBound_abs_eq_frameMult hx, frameBound_abs, frameBound]
-  exact tsum_congr fun n ↦ by ring
+    frameMult x = ∑' n : ℕ, frameCoeff n * x ^ n :=
+  frameMult_eq_frameCoeff_series hx
 
-/-- The Taylor coefficients of the positive cosecant center multiplier are
-`(1 - 2^(-n-1)) νₙ`. This verifies the center guess and its coefficient signs. -/
-theorem cellConstant_positive_power_series {x : ℝ} (hx : |x| < 2 * π) :
-    let c : ℕ → ℝ := fun n ↦ (1 - (1 / 2 : ℝ)^(n + 1)) *
-      |((bernoulli (n + 2) : ℚ) : ℝ)| / (Nat.factorial (n + 2) : ℝ)
-    (∀ n, 0 ≤ c n) ∧ Summable (fun n ↦ c n * x^n) ∧
-      cellConstant x = ∑' n, c n * x^n := by
-  intro c
-  have hs (y : ℝ) (hy : |y| < 2 * π) :
-      Summable (fun n : ℕ ↦ |((bernoulli (n + 2) : ℚ) : ℝ)| /
-        (Nat.factorial (n + 2) : ℝ) * y^n) := by
-    apply (summable_frameBound_majorant (abs_nonneg y) hy).of_norm_bounded
-    intro n
-    simp only [Real.norm_eq_abs, abs_mul, abs_div, abs_abs, abs_pow,
-      abs_of_nonneg (show (0 : ℝ) ≤ (Nat.factorial (n + 2) : ℝ) from
-        Nat.cast_nonneg _)]
-    exact le_of_eq (by ring)
+/-- The cosecant partial fractions in Lemma A.1, including the removable value at zero.
+The cotangent half-angle identity identifies the scalar value; summing the
+alternating coefficients gives the cosecant pole sum. -/
+theorem cellConstant_eq_partialFractions {x : ℝ} (hx : |x| < 2 * π) :
+    cellConstant x = ∑' m : ℕ, (-1 : ℝ) ^ m *
+      (2 / (4 * π ^ 2 * (m + 1 : ℝ) ^ 2 - x ^ 2)) := by
   have hxhalf : |x / 2| < 2 * π := by
     rw [abs_div, abs_of_pos (by norm_num : (0 : ℝ) < 2)]
     linarith [abs_nonneg x, pi_pos]
-  have hsub := (hs x hx).sub ((hs (x / 2) hxhalf).mul_right (1 / 2 : ℝ))
-  have he (n : ℕ) :
-      |((bernoulli (n + 2) : ℚ) : ℝ)| / (Nat.factorial (n + 2) : ℝ) * x^n -
-      (|((bernoulli (n + 2) : ℚ) : ℝ)| / (Nat.factorial (n + 2) : ℝ) * (x / 2)^n) *
-        (1 / 2 : ℝ) = c n * x^n := by
-    dsimp [c]
-    rw [pow_succ, div_pow, div_pow]
-    ring
-  refine ⟨fun n ↦ div_nonneg
-    (mul_nonneg (sub_nonneg.mpr (pow_le_one₀ (by norm_num) (by norm_num)))
-      (abs_nonneg _)) (Nat.cast_nonneg _), hsub.congr he, ?_⟩
-  rw [cellConstant_eq_frameMult hx, frameMult_positive_power_series hx,
-    frameMult_positive_power_series hxhalf, div_eq_mul_inv, ← tsum_mul_right,
-    ← (hs x hx).tsum_sub ((hs (x / 2) hxhalf).mul_right (2 : ℝ)⁻¹)]
-  exact tsum_congr fun n ↦ by simpa only [one_div] using he n
+  rw [cellConstant_eq_frameMult hx, frameMult_eq_frameCoeff_series hx,
+    frameMult_eq_frameCoeff_series hxhalf, ← centerCoeff_power_eq_difference hx,
+    centerCoeff_power_eq_partialFractions hx]
+  apply tsum_congr
+  intro m
+  congr 2
+  ring
+
+/-- The negative center multiplier has a nonnegative Taylor series: its scalar
+value comes from the cosecant partial fractions, and each even coefficient is
+an alternating inverse-power sum with strictly decreasing terms. -/
+theorem cellConstant_positive_power_series {x : ℝ} (hx : |x| < 2 * π) :
+    (∀ n, 0 ≤ centerCoeff n) ∧ Summable (fun n ↦ centerCoeff n * x ^ n) ∧
+      cellConstant x = ∑' n, centerCoeff n * x ^ n := by
+  refine ⟨centerCoeff_nonneg, summable_centerCoeff_power hx, ?_⟩
+  rw [cellConstant_eq_partialFractions hx, centerCoeff_power_eq_partialFractions hx]
+  apply tsum_congr
+  intro m
+  congr 2
+  ring
 
 end UnitaryProducts.PaperProof

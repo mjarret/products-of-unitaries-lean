@@ -5,8 +5,9 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Corrector.PartialFractionMultiplier
 public import UnitaryProducts.Corrector.PeriodicCharacterization
-public import UnitaryProducts.Corrector.BernoulliBounds
+public import UnitaryProducts.Corrector.FrameBounds
 public import UnitaryProducts.Prose.GeneralSpectralSeries
 public import UnitaryProducts.Walks.WalkScalarCut
 
@@ -47,8 +48,7 @@ def paperFrameOp (Ω E : 𝕄) : 𝕄 :=
 /-- The closed scalar multiplier agrees with its absolutely convergent series. -/
 theorem paperFrameMult_eq_series {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * Real.pi) :
     Corrector.frameMult w = Corrector.frameBound w := by
-  simpa only [abs_of_nonneg hw0] using
-    (Corrector.frameBound_abs_eq_frameMult (x := w) (by rwa [abs_of_nonneg hw0])).symm
+  exact Corrector.frameMult_eq_frameCoeff_series (by rwa [abs_of_nonneg hw0])
 
 /-- The derivative of the closed scalar multiplier agrees with the derivative series. -/
 theorem paperFrameMult_deriv_eq_series {w : ℝ} (hw0 : 0 ≤ w)

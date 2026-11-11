@@ -5,7 +5,7 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Corrector.ScalarCorrector
+public import UnitaryProducts.Corrector.ExponentialAverage
 public import UnitaryProducts.Evolution.Simulation
 public import UnitaryProducts.Spectral.SinTheta
 
@@ -14,7 +14,6 @@ public import UnitaryProducts.Spectral.SinTheta
 
 ## Declarations
 
-- `summable_norm_psiSeries_term`
 - `adL`
 - `adL_apply`
 - `adPow_apply`
@@ -36,7 +35,6 @@ public import UnitaryProducts.Spectral.SinTheta
 - `norm_sub_smul_one_le_of_eigenvalues`
 - `phiSeries_adL_apply`
 - `proj_univ`
-- `psiSeries_adL_apply`
 - `summable_norm_conj_terms`
 - `summable_norm_exp_smul`
 - `tsum_apply_of_summable`
@@ -49,17 +47,6 @@ namespace UnitaryProducts.Corrector
 section PsiSummable
 
 variable {A : Type*} [NormedRing A] [NormedAlgebra ℂ A] [NormOneClass A]
-
-/-- The terms of `Ψ` are absolutely summable in any Banach algebra. -/
-theorem summable_norm_psiSeries_term (a : A) :
-    Summable (fun n : ℕ ↦ ‖(((Nat.factorial n : ℂ) * ((n : ℂ) + 2))⁻¹) • a ^ n‖) := by
-  refine Summable.of_nonneg_of_le (fun n ↦ norm_nonneg _) (fun n ↦ ?_)
-    (Real.summable_pow_div_factorial ‖a‖)
-  have hn2 : ‖((n : ℂ) + 2)‖ = (n : ℝ) + 2 := by exact_mod_cast Complex.norm_natCast (n + 2)
-  rw [norm_smul, norm_inv, norm_mul, hn2, Complex.norm_natCast, div_eq_inv_mul]
-  exact mul_le_mul (inv_anti₀ (by positivity) (le_mul_of_one_le_right (by positivity)
-    (by linarith [(n.cast_nonneg : (0 : ℝ) ≤ n)]))) (norm_pow_le a n) (norm_nonneg _)
-    (by positivity)
 
 end PsiSummable
 
@@ -293,20 +280,6 @@ theorem phiSeries_adL_apply [NeZero d] (H E : 𝕄) :
   refine tsum_congr fun n ↦ ?_
   simp only [ContinuousLinearMap.smul_apply, Nat.factorial_succ, Nat.cast_mul, Nat.cast_add,
     Nat.cast_one, mul_inv]
-  ring_nf
-
-/-- **The first-moment operator is the series `Ψ`.**
-`Ψ(i·ad_H) E = ∫₀¹ τ e^{iτH} E e^{-iτH} dτ`. -/
-theorem psiSeries_adL_apply [NeZero d] (H E : 𝕄) :
-    psiSeries (I • adL H) E = ∫ τ in (0 : ℝ)..1, (τ : ℂ) • (evol H (-τ) * E * evol H τ) := by
-  have hsum : Summable (fun n : ℕ ↦
-      (((Nat.factorial n : ℂ) * ((n : ℂ) + 2))⁻¹) • (I • adL H) ^ n) :=
-    (UnitaryProducts.Corrector.summable_norm_psiSeries_term (I • adL H)).of_norm
-  have hkey := integral_conj_smul H E 1
-  simp only [pow_one, Nat.cast_one] at hkey
-  rw [psiSeries, tsum_apply_of_summable hsum, hkey]
-  refine tsum_congr fun n ↦ ?_
-  simp only [ContinuousLinearMap.smul_apply, mul_inv]
   ring_nf
 
 end UnitaryProducts

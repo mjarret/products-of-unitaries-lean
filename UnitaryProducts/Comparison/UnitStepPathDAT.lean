@@ -10,13 +10,12 @@ public import UnitaryProducts.Approximation.JRSComparison
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.CommutatorRegularity
 public import UnitaryProducts.Corrector.IntegratedComparison
-public import UnitaryProducts.Corrector.SecondDerivative
 public import UnitaryProducts.Evolution.DuhamelIntegral
 public import UnitaryProducts.Evolution.Simulation
 public import UnitaryProducts.Spectral.Weyl
 public import UnitaryProducts.Walks.Logarithm
-public import UnitaryProducts.Walks.LogarithmConstruction
-public import UnitaryProducts.Walks.LogarithmSmoothness
+public import UnitaryProducts.Walks.LogarithmBranch
+public import UnitaryProducts.Corrector.PowerSeries
 
 /-!
 # Taylor remainder for a Lipschitz derivative

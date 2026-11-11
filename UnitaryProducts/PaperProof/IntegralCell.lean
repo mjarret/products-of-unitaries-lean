@@ -6,6 +6,8 @@ Authors: Michael Jarret
 module
 public import UnitaryProducts.PaperProof.ClosedCellCorrector
 public import UnitaryProducts.Comparison.EndpointComparison
+public import UnitaryProducts.PaperProof.GeneralSeries
+public import UnitaryProducts.Corrector.PartialFractions
 /-! # The center-integral construction in the proof of Lemma A.1 -/
 @[expose] public section
 open scoped BigOperators Matrix.Norms.L2Operator Topology
@@ -14,6 +16,7 @@ open UnitaryProducts UnitaryProducts.Corrector UnitaryProducts.Dressed
 open UnitaryProducts.Paper UnitaryProducts.Paper.UnitStepsProse
 noncomputable section
 namespace UnitaryProducts.PaperProof
+attribute [local instance] matrixCStarAlgebra
 
 /-- The scalar integral in the endpoint calculation, evaluated by its antiderivative. -/
 theorem cell_scalar_integral {x : ℝ} (hx : x ≠ 0) (τ : ℝ) :
@@ -94,67 +97,30 @@ theorem cell_scalar_endpoint {x : ℝ} (hx : |x| < 2 * π) {τ : ℝ}
       field_simp
       linear_combination -(4 * (x : ℂ)) * hc + (4 * (x : ℂ)) * he.2
 
-/-- Bounded scalar weights preserve absolute convergence of the frame series.
-Elaborate this Banach-algebra fact before specializing to operator algebras. -/
-theorem summable_frameSeries_center_terms {A : Type*} [NormedRing A]
-    [NormedAlgebra ℂ A] [CompleteSpace A] [NormOneClass A]
-    {a : A} (ha : ‖a‖ < 2 * π) :
-    Summable (fun n : ℕ ↦ ((1 - (1 / 2 : ℝ)^(n + 1) : ℝ) : ℂ) •
-      (((bernoulli (n + 2) : ℂ) / (Nat.factorial (n + 2) : ℂ)) • a ^ n)) := by
-  apply (summable_norm_frameSeries_terms a ha).of_norm_bounded
-  intro n
-  rw [norm_smul, Complex.norm_real, Real.norm_eq_abs,
-    abs_of_nonneg (sub_nonneg.mpr (pow_le_one₀ (by norm_num) (by norm_num)))]
-  exact mul_le_of_le_one_left (norm_nonneg _) (sub_le_self _ (pow_nonneg (by norm_num) _))
-
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- The negative center series in the construction of Lemma A.1. -/
-def integralCellCenter (Ω D : 𝕄) : 𝕄 :=
-  -((frameSeries (I • adL Ω) -
-    (1 / 2 : ℂ) • frameSeries ((1 / 2 : ℂ) • (I • adL Ω))) D)
+/-- The cosecant center coefficients satisfy the general series hypotheses.
+Their signs come from pairing the decreasing terms of the alternating partial fractions. -/
+theorem center_nonnegative_series : NonnegativeSeries centerCoeff :=
+  ⟨centerCoeff_nonneg, fun r hr0 hr ↦
+    summable_centerCoeff_power (by rwa [abs_of_nonneg hr0])⟩
 
-/-- The center is exactly the norm-convergent positive commutator series
-printed in the defining equation of Lemma A.1. -/
+/-- The negative center multiplier in the construction of Lemma A.1. -/
+def integralCellCenter (Ω D : 𝕄) : 𝕄 :=
+  -commutatorSeries centerCoeff Ω D
+
+/-- The matrix center is the negative of the cosecant's nonnegative power series. -/
 theorem integralCellCenter_series [NeZero d] {Ω : 𝕄} (D : 𝕄)
-    (hA : ‖I • adL Ω‖ < 2 * π) :
-    Summable (fun n : ℕ ↦
-      (((1 - (1 / 2 : ℝ)^(n + 1)) * |((bernoulli (n + 2) : ℚ) : ℝ)| /
-        (Nat.factorial (n + 2) : ℝ) : ℝ) : ℂ) • (adL Ω ^ n) D) ∧
-    integralCellCenter Ω D = -∑' n : ℕ,
-      (((1 - (1 / 2 : ℝ)^(n + 1)) * |((bernoulli (n + 2) : ℚ) : ℝ)| /
-        (Nat.factorial (n + 2) : ℝ) : ℝ) : ℂ) • (adL Ω ^ n) D := by
-  let k : ℕ → ℝ := fun n ↦ 1 - (1 / 2 : ℝ)^(n + 1)
-  let c : ℕ → ℂ := fun n ↦ (bernoulli (n + 2) : ℂ) / (Nat.factorial (n + 2) : ℂ)
-  have hs : Summable (fun n ↦ ((k n : ℂ) * c n) • (I • adL Ω) ^ n) := by
-    simpa only [k, c, smul_smul] using
-      summable_frameSeries_center_terms (A := 𝕄 →L[ℂ] 𝕄) hA
-  have he (n : ℕ) : (((k n : ℂ) * c n) • (I • adL Ω) ^ n) D =
-      (((1 - (1 / 2 : ℝ)^(n + 1)) * |((bernoulli (n + 2) : ℚ) : ℝ)| /
-        (Nat.factorial (n + 2) : ℝ) : ℝ) : ℂ) • (adL Ω ^ n) D := by
-    rw [SemigroupAction.mul_smul (k n : ℂ) (c n) ((I • adL Ω) ^ n)]
-    dsimp only [c]
-    rw [Prose.frame_term_I_smul (adL Ω) n]
-    simp only [ContinuousLinearMap.smul_apply, smul_smul]
-    congr 1
-    dsimp [k]
-    push_cast
-    ring
-  have hsD := (ContinuousLinearMap.apply ℂ 𝕄 D).summable hs
-  have hsD' : Summable (fun n ↦ (((k n : ℂ) * c n) • (I • adL Ω) ^ n) D) := hsD
-  refine ⟨hsD'.congr he, ?_⟩
-  rw [integralCellCenter, frameSeries_sub_half_eq_tsum hA]
-  have heq : (fun n : ℕ ↦ ((1 - (1 / 2 : ℂ)^(n + 1)) *
-      ((bernoulli (n + 2) : ℂ) / (Nat.factorial (n + 2) : ℂ))) • (I • adL Ω) ^ n) =
-      (fun n ↦ ((k n : ℂ) * c n) • (I • adL Ω) ^ n) := by
-    ext n
-    dsimp [k, c]
-    push_cast
-    rfl
-  rw [heq, tsum_apply_of_summable hs]
-  congr 1
-  exact tsum_congr he
+    (ha : ‖adL Ω‖ < 2 * π) :
+    Summable (fun n : ℕ ↦ (centerCoeff n : ℂ) • (adL Ω ^ n) D) ∧
+    integralCellCenter Ω D = -∑' n : ℕ, (centerCoeff n : ℂ) • (adL Ω ^ n) D := by
+  have hs := (center_nonnegative_series.summable_norm
+    (A := 𝕄 →L[ℂ] 𝕄) (a := adL Ω) le_rfl ha).of_norm
+  refine ⟨?_, ?_⟩
+  · simpa only [ContinuousLinearMap.apply_apply, ContinuousLinearMap.smul_apply] using
+      (ContinuousLinearMap.apply ℂ 𝕄 D).summable hs
+  · rw [integralCellCenter, commutatorSeries_eq_tsum center_nonnegative_series Ω D ha]
 
 /-- The cell constructed by its center value and the conjugated integral. -/
 def integralCell (Ω D : 𝕄) (τ : ℝ) : 𝕄 :=
@@ -208,10 +174,10 @@ theorem centeredCorrection_hasDerivAt (Ω D C : 𝕄) (t : ℝ) :
   simp only [mul_add, add_mul, smul_add, smul_mul_assoc, neg_mul, mul_assoc]
   abel
 
-/-- The second guess in Lemma A.1 is the conjugated integral with the
-actual value at zero. It agrees with the constructed corrector and is verified
-by its differential equation and initial value. -/
-theorem cell_integral_ansatz_verified (Ω D : 𝕄) :
+/-- The conjugated integral representation with the actual value at zero.
+Its derivative satisfies the cell equation; the integrating-factor theorem below
+derives this representation for every solution of that equation. -/
+theorem cell_integral_formula (Ω D : 𝕄) :
     let Z : ℝ → 𝕄 := fun τ ↦ evol Ω τ * (integralCell Ω D 0 +
       ∫ s in (0 : ℝ)..τ, s • (evol Ω (-s) * D * evol Ω s)) * evol Ω (-τ)
     (∀ τ, integralCell Ω D τ = Z τ) ∧ Z 0 = integralCell Ω D 0 ∧
@@ -233,7 +199,50 @@ theorem integralCell_hasDerivAt (Ω D : 𝕄) (t : ℝ) :
     HasDerivAt (integralCell Ω D)
       (t • D - I • (Ω * integralCell Ω D t - integralCell Ω D t * Ω)) t :=
   by
-    simpa only [integralCell_zero] using (cell_integral_ansatz_verified Ω D).2.2 t
+    simpa only [integralCell_zero] using (cell_integral_formula Ω D).2.2 t
+
+/-- Lemma A.1: multiplying the cell equation by the two integrating factors
+cancels its commutator. This applies to any solution, not just the constructed one. -/
+theorem cell_conjugated_hasDerivAt (Ω D : 𝕄) {Y : ℝ → 𝕄} {τ : ℝ}
+    (hY : HasDerivAt Y (τ • D - I • (Ω * Y τ - Y τ * Ω)) τ) :
+    HasDerivAt (fun t ↦ evol Ω (-t) * Y t * evol Ω t)
+      (τ • (evol Ω (-τ) * D * evol Ω τ)) τ := by
+  have hcomm (t : ℝ) : Ω * evol Ω t = evol Ω t * Ω := by
+    have hh := (commute_evol Ω t).eq
+    simp only [smul_mul_assoc, mul_smul_comm] at hh
+    exact (smul_right_injective 𝕄 (neg_ne_zero.mpr I_ne_zero)) hh
+  have hn : HasDerivAt (fun t : ℝ ↦ evol Ω (-t))
+      (I • (Ω * evol Ω (-τ))) τ := by
+    simpa only [smul_mul_assoc, neg_smul, neg_neg, one_smul, neg_mul] using
+      (hasDerivAt_evol Ω (-τ)).scomp τ (hasDerivAt_neg τ)
+  convert (hn.mul hY).mul (hasDerivAt_evol Ω τ) using 1
+  simp only [Pi.mul_apply, smul_mul_assoc, mul_smul_comm, smul_sub, neg_smul,
+    neg_mul, mul_neg, add_mul, mul_sub, sub_mul, mul_assoc]
+  rw [← mul_assoc Ω (evol Ω (-τ)), hcomm (-τ)]
+  simp only [mul_assoc]
+  module
+
+/-- Lemma A.1: integration of the conjugated derivative from zero to local time
+produces the displayed variation-of-constants formula, with the actual value `Y 0`. -/
+theorem cell_integrating_factor (Ω D : 𝕄) {Y : ℝ → 𝕄}
+    (hY : ∀ t, HasDerivAt Y (t • D - I • (Ω * Y t - Y t * Ω)) t) (τ : ℝ) :
+    Y τ = evol Ω τ * (Y 0 + ∫ σ in (0 : ℝ)..τ,
+      σ • (evol Ω (-σ) * D * evol Ω σ)) * evol Ω (-τ) := by
+  have hc : Continuous (fun σ : ℝ ↦ σ • (evol Ω (-σ) * D * evol Ω σ)) := by
+    exact continuous_id.smul
+      ((((continuous_evol Ω).comp continuous_neg).mul continuous_const).mul (continuous_evol Ω))
+  have hFTC := intervalIntegral.integral_eq_sub_of_hasDerivAt
+    (fun t _ ↦ cell_conjugated_hasDerivAt Ω D (hY t)) (hc.intervalIntegrable 0 τ)
+  simp only [neg_zero, evol_zero, one_mul, mul_one] at hFTC
+  have heq : Y 0 + (∫ σ in (0 : ℝ)..τ,
+      σ • (evol Ω (-σ) * D * evol Ω σ)) = evol Ω (-τ) * Y τ * evol Ω τ := by
+    rw [hFTC]
+    abel
+  have hi : evol Ω τ * evol Ω (-τ) = 1 := by
+    rw [← evol_add, add_neg_cancel, evol_zero]
+  rw [heq]
+  simp only [← mul_assoc, hi, one_mul]
+  rw [mul_assoc, hi, mul_one]
 
 /-- The center in an eigenbasis is the negative scalar center multiplier. -/
 theorem integralCellCenter_entry [NeZero d] {w : ℝ} (hw : w < 2 * π)
@@ -245,29 +254,21 @@ theorem integralCellCenter_entry [NeZero d] {w : ℝ} (hw : w < 2 * π)
         frameMult ((hΩ.eigenvalues p - hΩ.eigenvalues q) / 2) / 2 : ℝ) : ℂ) *
         (star U * D * U) p q := by
   intro U
-  have hA : ‖I • adL Ω‖ < 2 * π := by
-    rw [closedCell_norm_smul I (adL Ω), Complex.norm_I, one_mul]
-    exact ((fact_adjoint Ω Ω Ω hΩ hwid 0).1.2.2.2.2).trans_lt hw
-  have hhalf : ‖((1 / 2 : ℂ) * I) • adL Ω‖ < 2 * π := by
-    rw [← smul_smul, closedCell_norm_smul (1 / 2 : ℂ) (I • adL Ω)]
-    norm_num
-    linarith [norm_nonneg (I • adL Ω), Real.pi_pos]
-  simp only [integralCellCenter, ContinuousLinearMap.sub_apply, ContinuousLinearMap.smul_apply,
-    Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_sub, Matrix.sub_mul,
-    Matrix.mul_smul, Matrix.smul_mul, smul_smul, Matrix.neg_apply, Matrix.sub_apply,
-    Matrix.smul_apply]
-  rw [frameSeries_smul_ad_entry Ω hΩ D I hA,
-    frameSeries_smul_ad_entry Ω hΩ D ((1 / 2:ℂ)*I) hhalf]
+  have ha : ‖adL Ω‖ < 2 * π :=
+    (show ‖adL Ω‖ ≤ w by simpa only [pow_one] using ad_power_norm_le hΩ hwid 1).trans_lt hw
+  have hdiag : star U * Ω * U = diagonal (fun p ↦ (hΩ.eigenvalues p : ℂ)) := by
+    simpa only [Unitary.conjStarAlgAut_apply, Unitary.coe_star, star_star]
+      using hΩ.conjStarAlgAut_star_eigenvectorUnitary
+  have he := general_series_eigenbasis_entry center_nonnegative_series Ω D ha
+    hΩ.eigenvectorUnitary hΩ.eigenvalues hdiag p q
   have hx := (hwid p q).trans_lt hw
-  have hxhalf : |(hΩ.eigenvalues p-hΩ.eigenvalues q) / 2| < 2 * π := by
-    rw [abs_div, abs_of_pos (by norm_num : (0:ℝ)<2)]
-    linarith [abs_nonneg (hΩ.eigenvalues p-hΩ.eigenvalues q), pi_pos]
-  rw [mul_comm I, frameSeries_ofReal_mul_I, frameBound_abs_eq_frameMult hx]
-  rw [show (1 / 2:ℂ)*I*((hΩ.eigenvalues p-hΩ.eigenvalues q:ℝ):ℂ) =
-    (((hΩ.eigenvalues p-hΩ.eigenvalues q) / 2:ℝ):ℂ)*I by push_cast; ring,
-    frameSeries_ofReal_mul_I, frameBound_abs_eq_frameMult hxhalf]
-  push_cast
-  simp only [smul_eq_mul]
+  have hscalar : scalarSeries centerCoeff (hΩ.eigenvalues p - hΩ.eigenvalues q) =
+      frameMult (hΩ.eigenvalues p - hΩ.eigenvalues q) -
+        frameMult ((hΩ.eigenvalues p - hΩ.eigenvalues q) / 2) / 2 := by
+    rw [← cellConstant_eq_frameMult hx]
+    exact (cellConstant_positive_power_series hx).2.2.symm
+  simp only [integralCellCenter, Matrix.mul_neg, Matrix.neg_mul, Matrix.neg_apply]
+  rw [he, hscalar]
   ring
 
 /-- Integrating the scalar cell equation after conjugation. This is the
@@ -320,7 +321,8 @@ theorem integralCell_endpoints {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
   rw [hE] at hi
   convert hi using 1 <;> dsimp [U] <;> push_cast <;> ring
 
-/-- The nonnegative center-series majorant, used directly in the norm profile. -/
+/-- Equation `eq:series-bound`, applied to the positive cosecant coefficients,
+gives the center norm in Lemma A.1. -/
 theorem integralCellCenter_norm {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
     (hΩ : Ω.IsHermitian)
     (hwid : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w) (D : 𝕄) :
@@ -329,33 +331,22 @@ theorem integralCellCenter_norm {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
   · have hz (X : Matrix (Fin 0) (Fin 0) ℂ) : X = 0 := Subsingleton.elim _ _
     simp only [hz, norm_zero, mul_zero, le_refl]
   letI : NeZero d := ⟨hd.ne'⟩
-  have hA : ‖I • adL Ω‖ ≤ w := by
-    rw [closedCell_norm_smul I (adL Ω), Complex.norm_I, one_mul]
-    exact (fact_adjoint Ω Ω Ω hΩ hwid 0).1.2.2.2.2
-  let c : ℕ → ℝ := fun n ↦ (1 - (1 / 2 : ℝ)^(n + 1)) *
-    |((bernoulli (n + 2) : ℚ) : ℝ)| / (Nat.factorial (n + 2) : ℝ)
-  have hw0 : 0 ≤ w := (norm_nonneg (I • adL Ω)).trans hA
-  obtain ⟨hc, hs, hsum⟩ := cellConstant_positive_power_series
-    (show |w| < 2 * π by rwa [abs_of_nonneg hw0])
-  have hseries := integralCellCenter_series D (hA.trans_lt hw)
-  have hterm (n : ℕ) : ‖(c n : ℂ) • (adL Ω ^ n) D‖ ≤ c n * w^n * ‖D‖ := by
-    rw [norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (hc n)]
-    have hop : ‖(adL Ω ^ n) D‖ ≤ w^n * ‖D‖ :=
-      ((adL Ω ^ n).le_opNorm D).trans
-        (mul_le_mul_of_nonneg_right (ad_power_norm_le hΩ hwid n) (norm_nonneg D))
-    exact (mul_le_mul_of_nonneg_left hop (hc n)).trans_eq (by ring)
-  rw [hseries.2, norm_neg]
-  have hbound := hseries.1.hasSum.norm_le_of_bounded (hs.mul_right ‖D‖).hasSum hterm
-  rw [tsum_mul_right, ← hsum, cellConstant_eq_frameBound hw0 hw] at hbound
-  exact hbound
+  have hw0 : 0 ≤ w := (norm_nonneg (adL Ω)).trans
+    (show ‖adL Ω‖ ≤ w by simpa only [pow_one] using ad_power_norm_le hΩ hwid 1)
+  have hs := (cellConstant_positive_power_series
+    (show |w| < 2 * π by rwa [abs_of_nonneg hw0])).2.2
+  have hb := general_series_bound center_nonnegative_series hΩ hw0 hw hwid D
+  rw [integralCellCenter, norm_neg]
+  rw [scalarSeries, ← hs, cellConstant_eq_frameBound hw0 hw] at hb
+  exact hb
 
 /-- The final equality in Lemma A.1: unitary invariance applied to the
-verified integral guess leaves exactly its center-plus-integral bracket. -/
+integrating-factor formula leaves exactly its center-plus-integral bracket. -/
 theorem integralCell_norm_eq_integral {Ω : 𝕄} (hΩ : Ω.IsHermitian)
     (D : 𝕄) (τ : ℝ) :
     ‖integralCell Ω D τ‖ = ‖integralCell Ω D 0 +
       ∫ s in (0 : ℝ)..τ, s • (evol Ω (-s) * D * evol Ω s)‖ := by
-  rw [(cell_integral_ansatz_verified Ω D).1 τ,
+  rw [cell_integrating_factor Ω D (integralCell_hasDerivAt Ω D) τ,
     CStarRing.norm_mul_mem_unitary _ (evol_mem_unitary hΩ _),
     CStarRing.norm_mem_unitary_mul _ (evol_mem_unitary hΩ _)]
 
@@ -381,8 +372,7 @@ theorem integralCell_spec {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
     (hwid : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w) (D : 𝕄) :
     ContDiff ℝ 1 (integralCell Ω D) ∧
     ∀ τ : ℝ, evol Ω (-τ) * integralCell Ω D τ * evol Ω τ =
-      -(∑' n : ℕ, (((1 - (1 / 2 : ℝ)^(n + 1)) * |((bernoulli (n + 2) : ℚ) : ℝ)| /
-        (Nat.factorial (n + 2) : ℝ) : ℝ) : ℂ) • (adL Ω ^ n) D) +
+      -(∑' n : ℕ, (centerCoeff n : ℂ) • (adL Ω ^ n) D) +
       ∫ s in (0 : ℝ)..τ, s • (evol Ω (-s) * D * evol Ω s) := by
   have hd := integralCell_hasDerivAt Ω D
   have hc : Continuous (integralCell Ω D) :=
@@ -396,9 +386,8 @@ theorem integralCell_spec {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
     rcases Nat.eq_zero_or_pos d with rfl | hdim
     · exact Subsingleton.elim _ _
     · letI : NeZero d := ⟨hdim.ne'⟩
-      have hA : ‖I • adL Ω‖ < 2 * π := by
-        rw [closedCell_norm_smul I (adL Ω), Complex.norm_I, one_mul]
-        exact ((fact_adjoint Ω Ω Ω hΩ hwid 0).1.2.2.2.2).trans_lt hw
+      have hA : ‖adL Ω‖ < 2 * π :=
+        ((fact_adjoint Ω Ω Ω hΩ hwid 0).1.2.2.2.2).trans_lt hw
       rw [(integralCellCenter_series D hA).2]
 
 

@@ -5,7 +5,12 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Walks.FrameDerivativeBounds
+public import UnitaryProducts.Corrector.PowerDerivative
+public import UnitaryProducts.Comparison.EndpointConstants
+public import UnitaryProducts.Corrector.FrameOperator
+public import UnitaryProducts.Walks.LogHessian
+public import UnitaryProducts.Walks.LogMoving
+public import UnitaryProducts.Comparison.UnitSteps
 public import UnitaryProducts.Walks.TrackedBands
 
 /-!
@@ -106,7 +111,6 @@ private theorem spectrum_turn [NeZero d] {A : 𝕄} {α : ℝ}
     (by simpa only [Algebra.algebraMap_eq_smul_one,Complex.coe_smul] using hn)
   exact ⟨by linarith [(abs_lt.mp hh).1],by linarith [(abs_lt.mp hh).2]⟩
 
-
 /-- Spectral data of a Hermitian logarithm with spectrum in one open turn `(α, α+2π)`:
 its least eigenvalue `a` is a band phase, and its spectrum fits in `[a, a+2π-ϑ]`. -/
 private theorem turn_bottom [NeZero d] {A U : 𝕄} (hA : A.IsHermitian) {α β g ϑ : ℝ}
@@ -147,7 +151,6 @@ private theorem turn_bottom [NeZero d] {A U : 𝕄} (hA : A.IsHermitian) {α β 
   · have hx' := htop x hx ⟨h,(hopen x hx).2⟩
     linarith
 
-
 /-- The band of a Hermitian logarithm with spectrum in one open turn `(α, α+2π)`. -/
 private theorem turn_band [NeZero d] {A U : 𝕄} (hA : A.IsHermitian) {α β g : ℝ}
     (hU : spectrum ℂ U = (fun θ : ℝ ↦ Complex.exp (-I*(θ:ℂ))) '' spectrum ℝ A)
@@ -179,7 +182,6 @@ private theorem turn_band [NeZero d] {A U : 𝕄} (hA : A.IsHermitian) {α β g 
   · rintro ⟨θ,hθ,he⟩
     rw [← phase_inj ⟨hθ.1,hθ.2.trans hβ2⟩ (hopen _ (hmem i)) he]
     exact ⟨hθ.1.le,hθ.2.le⟩
-
 
 /-- The walk paragraph in §4.3: a band of a walk on moving arcs with spectral gap
 at least `g ≥ ϑ` puts the spectrum in a closed arc of length `2π - ϑ`, whose complementary

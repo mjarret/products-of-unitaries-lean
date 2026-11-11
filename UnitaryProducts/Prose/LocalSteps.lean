@@ -40,9 +40,9 @@ multiplier into its argument change and its operator change, before bounding eac
 theorem frameOp_change_split (Ω Ω' D D' : 𝕄) :
     ‖frameOp Ω' D' - frameOp Ω D‖ ≤
       ‖frameOp Ω' (D' - D)‖ +
-      ‖(frameSeries (I • adL Ω') - frameSeries (I • adL Ω)) D‖ := by
+      ‖(positiveFrameSeries (adL Ω') - positiveFrameSeries (adL Ω)) D‖ := by
   have he : frameOp Ω' D' - frameOp Ω D = frameOp Ω' (D' - D) +
-      (frameSeries (I • adL Ω') - frameSeries (I • adL Ω)) D := by
+      (positiveFrameSeries (adL Ω') - positiveFrameSeries (adL Ω)) D := by
     rw [frameOp_sub]
     simp only [frameOp, ContinuousLinearMap.sub_apply]
     abel
@@ -227,23 +227,37 @@ theorem frameOp_split_norm_bound [NeZero d] {Ω Ω' D D' : 𝕄} {c c' w : ℝ}
     (hw : w < 2 * Real.pi) (hwidth : ‖Ω - (c : ℂ) • 1‖ ≤ w / 2)
     (hwidth' : ‖Ω' - (c' : ℂ) • 1‖ ≤ w / 2) :
     ‖frameOp Ω' (D' - D)‖ +
-      ‖(frameSeries (I • adL Ω') - frameSeries (I • adL Ω)) D‖ ≤
+      ‖(positiveFrameSeries (adL Ω') - positiveFrameSeries (adL Ω)) D‖ ≤
       frameBound w * ‖D' - D‖ + 2 * frameLip w * ‖Ω' - Ω‖ * ‖D‖ := by
-  have ha : ‖(I • adL Ω : 𝕄 →L[ℂ] 𝕄)‖ ≤ w :=
-    (norm_I_smul_adL_le Ω (c : ℂ)).trans (by linarith)
-  have ha' : ‖(I • adL Ω' : 𝕄 →L[ℂ] 𝕄)‖ ≤ w :=
-    (norm_I_smul_adL_le Ω' (c' : ℂ)).trans (by linarith)
+  have ha : ‖adL Ω‖ ≤ w := by
+    apply ContinuousLinearMap.opNorm_le_bound _ (by linarith [(norm_nonneg _).trans hwidth])
+    intro E
+    exact (norm_adL_apply_le Ω E (c : ℂ)).trans
+      (mul_le_mul_of_nonneg_right (by linarith) (norm_nonneg E))
+  have ha' : ‖adL Ω'‖ ≤ w := by
+    apply ContinuousLinearMap.opNorm_le_bound _ (by linarith [(norm_nonneg _).trans hwidth'])
+    intro E
+    exact (norm_adL_apply_le Ω' E (c' : ℂ)).trans
+      (mul_le_mul_of_nonneg_right (by linarith) (norm_nonneg E))
+  have hd : ‖adL Ω' - adL Ω‖ ≤ 2 * ‖Ω' - Ω‖ := by
+    apply ContinuousLinearMap.opNorm_le_bound _ (by positivity)
+    intro E
+    have he : (adL Ω' - adL Ω) E = adL (Ω' - Ω) E := by
+      simp only [ContinuousLinearMap.sub_apply, adL_apply, sub_mul, mul_sub]
+      abel
+    rw [he]
+    simpa only [zero_smul, sub_zero] using norm_adL_apply_le (Ω' - Ω) E 0
+  have hL : ‖positiveFrameSeries (adL Ω') - positiveFrameSeries (adL Ω)‖ ≤
+      frameLip w * (2 * ‖Ω' - Ω‖) :=
+    (norm_positiveFrameSeries_sub_le (a := adL Ω') (b := adL Ω) ha' ha hw).trans
+      (mul_le_mul_of_nonneg_left hd
+        (frameLip_nonneg (by linarith [(norm_nonneg _).trans hwidth])))
   apply add_le_add (norm_frameOp_le hw hwidth')
   calc
-    _ ≤ ‖frameSeries (I • adL Ω') - frameSeries (I • adL Ω)‖ * ‖D‖ :=
+    _ ≤ ‖positiveFrameSeries (adL Ω') - positiveFrameSeries (adL Ω)‖ * ‖D‖ :=
       ContinuousLinearMap.le_opNorm _ _
-    _ ≤ (frameLip w * ‖(I • adL Ω' : 𝕄 →L[ℂ] 𝕄) - I • adL Ω‖) * ‖D‖ := by
-      gcongr
-      exact norm_frameSeries_sub_le ha' ha hw
-    _ ≤ (frameLip w * (2 * ‖Ω' - Ω‖)) * ‖D‖ := by
-      gcongr
-      · exact frameLip_nonneg (by linarith [(norm_nonneg _).trans hwidth])
-      · exact norm_I_smul_adL_sub_le Ω' Ω
+    _ ≤ (frameLip w * (2 * ‖Ω' - Ω‖)) * ‖D‖ :=
+      mul_le_mul_of_nonneg_right hL (norm_nonneg D)
     _ = _ := by ring
 
 end UnitaryProducts.Prose

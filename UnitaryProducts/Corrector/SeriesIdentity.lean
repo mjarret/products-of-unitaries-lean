@@ -5,7 +5,7 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Corrector.InverseOperator
+public import UnitaryProducts.Corrector.Commutator
 public import UnitaryProducts.Evolution.DysonSeries
 
 /-!

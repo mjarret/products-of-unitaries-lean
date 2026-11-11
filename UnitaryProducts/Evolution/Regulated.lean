@@ -7,7 +7,7 @@ module
 
 public import UnitaryProducts.Approximation.LevelPartitions
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
-public import UnitaryProducts.Walks.LogarithmSmoothness
+public import UnitaryProducts.Corrector.PowerSeries
 
 /-!
 # Regulated families

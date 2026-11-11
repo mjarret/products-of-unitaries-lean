@@ -41,45 +41,129 @@ attribute [local instance] matrixCStarAlgebra
 variable {d : ℕ} [NeZero d]
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- Pointwise spectral construction in Lemma A.2 (existence and uniqueness). Phase injectivity
-brings
-an auxiliary open-turn logarithm back into the prescribed closed window. -/
-theorem walk_log_pointwise (a w : ℝ) (hw0 : 0 ≤ w) (hw : w < 2 * π)
+/-- The spectral projector at `z`, defined by the characteristic function of its
+singleton on the finite spectrum. -/
+def finiteSpectralProjector (U : 𝕄) (z : ℂ) : 𝕄 :=
+  cfc (fun ζ : ℂ ↦ if ζ = z then 1 else 0) U
+
+omit [NeZero d] in
+/-- The finite-dimensional spectral theorem written as the sum of its named
+spectral projectors. Any scalar function is continuous on the finite spectrum. -/
+theorem finite_spectral_expansion (U : 𝕄) (f : ℂ → ℂ) :
+    cfc f U = ∑ z ∈ (Matrix.finite_spectrum U).toFinset,
+      f z • finiteSpectralProjector U z := by
+  classical
+  let S := (Matrix.finite_spectrum U).toFinset
+  have hsum : cfc f U = cfc (fun ζ ↦ ∑ z ∈ S,
+      f z • (if ζ = z then (1 : ℂ) else 0)) U := by
+    apply cfc_congr
+    intro ζ hζ
+    have hmem : ζ ∈ S := (Matrix.finite_spectrum U).mem_toFinset.mpr hζ
+    simp only [smul_eq_mul, mul_ite, mul_one, mul_zero]
+    rw [Finset.sum_eq_single ζ]
+    · simp
+    · intro z _ hz
+      simp [Ne.symm hz]
+    · exact fun hz ↦ (hz hmem).elim
+  rw [hsum]
+  have hmap := cfc_sum (fun z ζ : ℂ ↦ f z • (if ζ = z then (1 : ℂ) else 0))
+    U S (fun _ _ ↦ (Matrix.finite_spectrum U).continuousOn _)
+  simp only [Finset.sum_fn] at hmap
+  rw [hmap]
+  apply Finset.sum_congr rfl
+  intro z _
+  exact cfc_smul (f z) _ U ((Matrix.finite_spectrum U).continuousOn _)
+
+omit [NeZero d] in
+/-- The characteristic functions give self-adjoint idempotent projectors. -/
+theorem finiteSpectralProjector_properties (U : 𝕄) (z : ℂ) :
+    (finiteSpectralProjector U z).IsHermitian ∧
+    finiteSpectralProjector U z * finiteSpectralProjector U z =
+      finiteSpectralProjector U z := by
+  classical
+  let e : ℂ → ℂ := fun ζ ↦ if ζ = z then 1 else 0
+  have hc := (Matrix.finite_spectrum U).continuousOn e
+  constructor
+  · change star (cfc e U) = cfc e U
+    rw [← cfc_star]
+    apply cfc_congr
+    intro ζ _
+    simp [e]
+  · change cfc e U * cfc e U = cfc e U
+    rw [← cfc_mul e e U hc hc]
+    apply cfc_congr
+    intro ζ _
+    by_cases h : ζ = z <;> simp [e, h]
+
+omit [NeZero d] in
+/-- Lemma A.2: a unitary matrix is the sum of its eigenvalues times the
+spectral projectors. Replacing each eigenvalue by its chosen phase constructs its logarithm. -/
+theorem unitary_spectral_decomposition (U : 𝕄) (hu : star U * U = 1) :
+    U = ∑ z ∈ (Matrix.finite_spectrum U).toFinset,
+      z • finiteSpectralProjector U z := by
+  letI : IsStarNormal U :=
+    ⟨by change star U * U = U * star U; rw [hu, mul_eq_one_comm.mp hu]⟩
+  simpa only [cfc_id, id_eq] using finite_spectral_expansion U id
+
+omit [NeZero d] in
+/-- Pointwise spectral construction in Lemma A.2. Choose each phase in the
+prescribed interval, then sum those phases times the spectral projectors. The
+functional calculus proves Hermiticity, the spectral window, and exponentiation. -/
+theorem walk_log_pointwise (a w : ℝ)
     (U : 𝕄) (hu : star U * U = 1)
     (harc : ∀ z ∈ spectrum ℂ U,
       ∃ θ ∈ Icc a (a + w), z = Complex.exp (-I * (θ : ℂ))) :
     ∃ H : 𝕄, ∃ hH : H.IsHermitian,
       (∀ i, hH.eigenvalues i ∈ Icc a (a + w)) ∧ evol H 1 = U := by
-  let μ := a + w / 2
-  let r := (π + w / 2) / 2
-  obtain ⟨H, hH, hn, he⟩ := exists_isHermitian_evol_eq
-    (α := -μ) (r := r) (by dsimp [r]; positivity)
-    (by dsimp [r]; linarith) hu (by
-      intro z hz
-      obtain ⟨θ, hθ, rfl⟩ := harc z hz
-      refine ⟨-θ, ⟨?_, ?_⟩, ?_⟩
-      · dsimp [μ, r]; linarith [hθ.2]
-      · dsimp [μ, r]; linarith [hθ.1]
-      · congr 1; push_cast; ring)
-  have hn' : ‖H - (μ : ℂ) • 1‖ < π := by
-    simpa only [neg_neg] using hn.trans_lt (show r < π by dsimp [r]; linarith)
-  have hopen := eigenvalues_mem_open_turn_of_norm (α := μ - π) hH
-    (by simpa only [sub_add_cancel] using hn')
-  refine ⟨H, hH, ?_, he⟩
-  intro i
-  have hs : Complex.exp (-I * (hH.eigenvalues i : ℂ)) ∈ spectrum ℂ U := by
-    rw [← he, spectrum_evol_image hH]
-    exact ⟨_, hH.eigenvalues_mem_spectrum_real i, rfl⟩
-  obtain ⟨θ, hθ, hphase⟩ := harc _ hs
-  have hθ' : θ ∈ Ioo (μ - π) (μ - π + 2 * π) := by
-    dsimp [μ]; constructor <;> linarith [hθ.1, hθ.2]
-  rw [Paper.phase_inj (hopen i) hθ' hphase]
-  exact hθ
+  classical
+  letI : IsStarNormal U :=
+    ⟨by change star U * U = U * star U; rw [hu, mul_eq_one_comm.mp hu]⟩
+  let θ : ℂ → ℝ := fun z ↦ if hz : z ∈ spectrum ℂ U then (harc z hz).choose else a
+  have hθ (z : ℂ) (hz : z ∈ spectrum ℂ U) :
+      θ z ∈ Icc a (a + w) ∧ z = Complex.exp (-I * (θ z : ℂ)) := by
+    simpa only [θ, dif_pos hz] using (harc z hz).choose_spec
+  let f : ℂ → ℂ := fun z ↦ (θ z : ℂ)
+  let H := ∑ z ∈ (Matrix.finite_spectrum U).toFinset,
+    f z • finiteSpectralProjector U z
+  have hHcfc : H = cfc f U := (finite_spectral_expansion U f).symm
+  have hc := (Matrix.finite_spectrum U).continuousOn f
+  have hH : H.IsHermitian := by
+    change star H = H
+    simp only [H, star_sum, star_smul]
+    apply Finset.sum_congr rfl
+    intro z _
+    rw [show star (finiteSpectralProjector U z) = finiteSpectralProjector U z from
+      (finiteSpectralProjector_properties U z).1]
+    simp only [f, Complex.star_def, Complex.conj_ofReal]
+  refine ⟨H, hH, ?_, ?_⟩
+  · intro i
+    have hspec : (hH.eigenvalues i : ℂ) ∈ spectrum ℂ H :=
+      (spectrum.algebraMap_mem_iff ℂ).mpr (hH.eigenvalues_mem_spectrum_real i)
+    have hmap : spectrum ℂ H = f '' spectrum ℂ U := by
+      rw [hHcfc, cfc_map_spectrum f U (inferInstance : IsStarNormal U) hc]
+    rw [hmap] at hspec
+    obtain ⟨z, hz, heq⟩ := hspec
+    have he : θ z = hH.eigenvalues i := Complex.ofReal_injective heq
+    rw [← he]
+    exact (hθ z hz).1
+  · rw [hHcfc, evol, one_smul, ← cfc_smul (-I) f U hc,
+      ← CFC.complex_exp_eq_normedSpace_exp, ← cfc_comp (R := ℂ) Complex.exp (fun z : ℂ ↦ -I • f z) U
+        (inferInstance : IsStarNormal U) Complex.continuous_exp.continuousOn (hc.const_smul (-I))]
+    calc
+      _ = ∑ z ∈ (Matrix.finite_spectrum U).toFinset,
+          Complex.exp (-I * f z) • finiteSpectralProjector U z :=
+        finite_spectral_expansion U (fun z ↦ Complex.exp (-I * f z))
+      _ = ∑ z ∈ (Matrix.finite_spectrum U).toFinset,
+          z • finiteSpectralProjector U z := by
+        apply Finset.sum_congr rfl
+        intro z hz
+        rw [← (hθ z ((Matrix.finite_spectrum U).mem_toFinset.mp hz)).2]
+      _ = U := (unitary_spectral_decomposition U hu).symm
 
-/-- Lemma A.2: the guessed logarithm integral evaluates to `-iφ` on every
+/-- Lemma A.2: the principal logarithm integral evaluates to `-iφ` on every
 phase in the principal turn. This is the scalar verification used by the matrix
 functional calculus below. -/
-theorem walk_log_integral_ansatz_eigenvalue {φ : ℝ} (hφ : |φ| < π) :
+theorem walk_log_integral_eigenvalue {φ : ℝ} (hφ : |φ| < π) :
     (∫ u : ℝ in (0 : ℝ)..1,
       (Complex.exp (-I * (φ : ℂ)) - 1) /
         (1 + (u : ℂ) * (Complex.exp (-I * (φ : ℂ)) - 1))) = -I * (φ : ℂ) := by
@@ -117,13 +201,13 @@ theorem centered_integral {H : 𝕄} (hH : H.IsHermitian) (hn : ‖H‖ < π)
     change Complex.log (Complex.exp (-I * z)) = -I * z
     rw [hzreal]
     rw [← integral_log_chord (exp_neg_I_mem_slitPlane (abs_lt.mp hb))]
-    exact walk_log_integral_ansatz_eigenvalue hb
+    exact walk_log_integral_eigenvalue hb
   rw [he, cfc_const_mul_id (-I) H]
 
-/-- Lemma A.2 after removal of the constant phase: the centered guess
+/-- Lemma A.2 after removal of the constant phase: the centered formula
 `H = i ∫ (W - 1) S_u` is verified on each eigenvalue in the principal turn.
 The shifted theorem below applies this identity to `H - μ` and `exp(iμ) W`. -/
-theorem walk_log_centered_ansatz_verified {H W : 𝕄}
+theorem walk_log_centered_integral {H W : 𝕄}
     (hH : H.IsHermitian) (hn : ‖H‖ < π) (he : evol H 1 = W)
     (hcut : spectrum ℂ (evol H 1) ⊆ Complex.slitPlane) :
     H = I • (∫ u : ℝ in (0 : ℝ)..1, (W - 1) * walkLogResolvent W u) := by
@@ -132,9 +216,9 @@ theorem walk_log_centered_ansatz_verified {H W : 𝕄}
   change H = I • walkLogIntegral W
   rw [hi, smul_smul, show I * (-I) = (1 : ℂ) by simp, one_smul]
 
-/-- Lemma A.2: the shifted integral guess for `H`, verified by the
+/-- Lemma A.2: the shifted integral formula for `H`, verified by the
 principal-turn eigenvalue calculation in `centered_integral`. -/
-theorem walk_log_integral_ansatz_verified {H W : 𝕄} (μ : ℝ)
+theorem walk_log_integral {H W : 𝕄} (μ : ℝ)
     (hH : (H - (μ : ℂ) • 1).IsHermitian)
     (hn : ‖H - (μ : ℂ) • 1‖ < π)
     (he : evol H 1 = W)
@@ -146,7 +230,7 @@ theorem walk_log_integral_ansatz_verified {H W : 𝕄} (μ : ℝ)
   have hphase : evol (H - (μ : ℂ) • 1) 1 =
       Complex.exp (I * (μ : ℂ)) • W := by
     rw [evol_sub_scalar_one, he]
-  have hi := walk_log_centered_ansatz_verified hH hn hphase hcut
+  have hi := walk_log_centered_integral hH hn hphase hcut
   rw [← hi]
   abel
 
@@ -491,7 +575,7 @@ theorem lem_walk_log [NeZero d] (a : ℝ → ℝ) (w : ℝ)
         (∀ i, hH.eigenvalues i ∈ Icc (a s) (a s + w)) ∧ evol H 1 = W s := by
     intro s
     by_cases hs : s ∈ Icc (0 : ℝ) 1
-    · obtain ⟨H, hH, hwin, he⟩ := walk_log_pointwise (a s) w hw0 hw (W s)
+    · obtain ⟨H, hH, hwin, he⟩ := walk_log_pointwise (a s) w (W s)
         (hunit s hs) (harc s hs)
       exact ⟨H, hH, fun _ ↦ ⟨hwin, he⟩⟩
     · exact ⟨0, Matrix.isHermitian_zero, fun h ↦ (hs h).elim⟩
@@ -542,7 +626,7 @@ theorem lem_walk_log [NeZero d] (a : ℝ → ℝ) (w : ℝ)
       have hcut : spectrum ℂ (evol (H t - (μ : ℂ) • 1) 1) ⊆ Complex.slitPlane := by
         rw [hev]
         exact (hsep t htI (by simpa only [Metric.mem_closedBall, Real.dist_eq] using htρ)).2.1
-      exact walk_log_integral_ansatz_verified μ hG hnorm (hevol t htI) hcut
+      exact walk_log_integral μ hG hnorm (hevol t htI) hcut
     exact hF'.congr_of_eventuallyEq heq (heq.self_of_nhdsWithin hs)
   have hb := bounds_on_Icc hw hherm hcd hc
     (fun s hs ↦ ⟨a s + w / 2, hcenter s hs⟩) hevol

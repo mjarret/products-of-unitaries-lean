@@ -15,8 +15,6 @@ public import Mathlib
 - `norm_pow_sub_pow_le`
 - `pow_sub_pow_sum`
 - `SolvesSchrodinger`
-- `mono`
-- `star_mul_self_eq`
 - `abs_sub_level_lt`
 - `abs_sub_truncBits_le`
 - `abs_sub_truncBits_lt`
@@ -26,7 +24,6 @@ public import Mathlib
 - `evol`
 - `evol_add`
 - `evol_mem_unitary`
-- `evol_neg_mul_self`
 - `evol_zero`
 - `hasDerivAt_evol`
 - `isHermitian_truncHerm`
@@ -389,25 +386,6 @@ it holds vacuously. -/
 def SolvesSchrodinger (H U : ℝ → 𝕄) (a b : ℝ) : Prop :=
   ∀ s ∈ Icc a b, HasDerivWithinAt U (-I • (H s * U s)) (Icc a b) s
 
-/-- A solution on $[a,b]$ is a solution on every subinterval. -/
-theorem SolvesSchrodinger.mono {H U : ℝ → 𝕄} {a b a' b' : ℝ} (h : SolvesSchrodinger H U a b)
-    (hsub : Icc a' b' ⊆ Icc a b) : SolvesSchrodinger H U a' b' :=
-  fun s hs ↦ (h s (hsub hs)).mono hsub
-
-/-- **Evolution under a Hermitian Hamiltonian preserves unitarity**:
-`(U s)⋆ U s` is constant, because its derivative is `i U⋆ H⋆ U - i U⋆ H U = 0`. -/
-theorem SolvesSchrodinger.star_mul_self_eq {H U : ℝ → 𝕄} {a b : ℝ}
-    (hH : ∀ s ∈ Icc a b, (H s).IsHermitian) (hU : SolvesSchrodinger H U a b) :
-    ∀ s ∈ Icc a b, star (U s) * U s = star (U a) * U a := by
-  intro s hs
-  have hderiv : ∀ x ∈ Icc a b,
-      HasDerivWithinAt (fun y ↦ star (U y) * U y) (0 : 𝕄) (Icc a b) x := by
-    intro x hx
-    convert (hU x hx).star.mul (hU x hx) using 1
-    simp [star_smul, star_mul, show star (H x) = H x from (hH x hx).eq, conj_I, neg_neg, mul_assoc]
-  simpa [sub_eq_zero] using
-    norm_image_sub_le_of_norm_deriv_le_segment' hderiv (C := 0) (fun x _ ↦ by simp) s hs
-
 /-- The frozen evolution $e^{-iuG}$ of the constant Hamiltonian $G$ for time $u$, the factor of
 (2.5). It is defined for every $G$ and $u$, and is unitary when $G$ is Hermitian
 (`star_evol_mul_self`). -/
@@ -548,10 +526,6 @@ theorem isHermitian_truncHerm (k : ℕ) {A : 𝕄} (hA : A.IsHermitian) :
     (truncHerm k A).IsHermitian := by
   ext i j
   simp only [Matrix.conjTranspose_apply, truncHerm, Matrix.of_apply, star_truncBitsC, hA.apply]
-
-/-- $e^{iuG}e^{-iuG} = 1$. -/
-theorem evol_neg_mul_self (G : 𝕄) (u : ℝ) : evol G (-u) * evol G u = 1 := by
-  rw [← evol_add, neg_add_cancel, evol_zero]
 
 /-- Matrices that act equally on every vector are equal. -/
 theorem toEuclideanCLM_injective {M N : 𝕄} (h : ∀ v, Matrix.toEuclideanCLM (n := Fin d) (𝕜 := ℂ) M

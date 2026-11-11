@@ -13,7 +13,6 @@ public import UnitaryProducts.Evolution.ExplicitSchedule
 ## Declarations
 
 - `continuousOn_energy_rescale`
-- `evol_energy_rescale`
 - `schrodinger_energy_rescale_off_set`
 -/
 
@@ -24,11 +23,6 @@ open scoped Matrix.Norms.L2Operator
 open Complex Set
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- Rescaling energy and time together: $e^{-i(t/c)(cG)} = e^{-itG}$ for $c \ne 0$. -/
-theorem evol_energy_rescale (G : 𝕄) (t : ℝ) {c : ℝ} (hc : c ≠ 0) :
-    evol (c • G) (t / c) = evol G t := by
-  rw [evol, evol, smul_comm (-I) c, smul_smul, div_mul_cancel₀ _ hc]
 
 /-- If $U$ solves $iU' = HU$ on $[0,T]$ outside $S$, then $t \mapsto U(ct)$ solves the equation of
 $cH(ct)$ on $[0, T/c]$ outside the preimage of $S$. -/

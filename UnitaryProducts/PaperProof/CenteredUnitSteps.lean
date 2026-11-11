@@ -273,7 +273,7 @@ theorem frameOp_centered {H D : 𝕄} (hH : H.IsHermitian) {w : ℝ}
       frameOp H (D - b • (1 : 𝕄)) := by
     simpa only [Complex.coe_smul] using frameOp_sub_smul_one H (a : ℂ) (D - b • (1 : 𝕄))
   rw [had]
-  change frameSeries (I • adL H) (D - b • (1 : 𝕄)) = _
+  change positiveFrameSeries (adL H) (D - b • (1 : 𝕄)) = _
   rw [map_sub, ContinuousLinearMap.map_smul_of_tower]
   change frameOp H D - b • frameOp H (1 : 𝕄) = _
   rw [frameOp_one hH hw hwidth]

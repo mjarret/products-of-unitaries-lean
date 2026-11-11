@@ -96,7 +96,7 @@ theorem continuous_centeredPrimitive (Ω D : 𝕄) : Continuous (centeredPrimiti
   intervalIntegral.continuous_primitive
     (fun a b ↦ (continuous_centeredConjugation Ω D).intervalIntegrable a b) 0
 
-/-- Lemma A.3: the guessed conjugated derivative satisfies
+/-- Lemma A.3: the conjugated derivative satisfies
 `∂σ Ω'σ = i[Ω, Ω'σ]`, equivalently the commutator is `-i` times that derivative. -/
 theorem centered_conjugation_hasDerivAt (Ω D : 𝕄) (σ : ℝ) :
     HasDerivAt (fun t : ℝ ↦ evol Ω (-t) * D * evol Ω t)
@@ -118,7 +118,7 @@ theorem centered_conjugation_hasDerivAt (Ω D : 𝕄) (σ : ℝ) :
   module
 
 /-- Lemma A.3: `[Ω, Ω'σ] = -i ∂σ Ω'σ`, the identity used to check
-the double-integral guess for `Λ`. -/
+the double integral for `Λ`. -/
 theorem centered_conjugation_commutator_eq_deriv (Ω D : 𝕄) (σ : ℝ) :
     adL Ω (evol Ω (-σ) * D * evol Ω σ) =
       -I • deriv (fun t : ℝ ↦ evol Ω (-t) * D * evol Ω t) σ := by
@@ -126,7 +126,7 @@ theorem centered_conjugation_commutator_eq_deriv (Ω D : 𝕄) (σ : ℝ) :
   simp
 
 /-- Integrating the verified derivative of conjugation gives the endpoint
-identity used in the third line of Lemma A.3's ansatz verification. -/
+identity used in the third line of Lemma A.3's derivation. -/
 theorem conjugation_sub_eq_commutator_integral (Ω D : 𝕄) (τ : ℝ) :
     evol Ω (-τ) * D * evol Ω τ - D = I • adL Ω (centeredPrimitive Ω D τ) := by
   let f : ℝ → 𝕄 := fun σ ↦ evol Ω (-σ) * D * evol Ω σ
@@ -140,7 +140,7 @@ theorem conjugation_sub_eq_commutator_integral (Ω D : 𝕄) (τ : ℝ) :
   simpa [f, centeredPrimitive, evol_zero] using hFTC.symm
 
 /-- Lemma A.3, first verification line: the commutator passes through the
-two integrals defining the guessed `Λ`. -/
+two integrals defining `Λ`. -/
 theorem centeredRemainder_commutator_integral (Ω D : 𝕄) :
     adL Ω (centeredRemainder Ω D) =
       -I • ∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ),
@@ -182,9 +182,9 @@ theorem centeredRemainder_commutator_boundary (Ω D : 𝕄) :
     ((continuous_centeredConjugation Ω D).intervalIntegrable 0 τ)]
   exact (conjugation_sub_eq_commutator_integral Ω D τ).symm
 
-/-- Lemma A.3: the two integral guesses for `X` and `Λ`, together with the
+/-- Lemma A.3: the two integrals for `X` and `Λ`, together with the
 last verification line `[Ω, Λ] = Ω' - X`. -/
-theorem centeredDuhamel_ansatz_verified (Ω D : 𝕄) :
+theorem centeredDuhamel_decomposition (Ω D : 𝕄) :
     centeredDuhamel Ω D =
       (∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ), evol Ω (-τ) * D * evol Ω τ) ∧
     centeredRemainder Ω D =
@@ -200,10 +200,10 @@ theorem centeredDuhamel_ansatz_verified (Ω D : 𝕄) :
   simp only [centeredDuhamel, neg_div]
   abel
 
-/-- The verified integral ansatz gives precisely `D = X + [Ω,Λ]`. -/
+/-- The integral decomposition gives precisely `D = X + [Ω,Λ]`. -/
 theorem centeredDuhamel_add_commutator (Ω D : 𝕄) :
     D = centeredDuhamel Ω D + adL Ω (centeredRemainder Ω D) := by
-  rw [(centeredDuhamel_ansatz_verified Ω D).2.2]
+  rw [(centeredDuhamel_decomposition Ω D).2.2]
   abel
 
 /-- Unitary conjugation gives the sharp length bound for the inner primitive. -/

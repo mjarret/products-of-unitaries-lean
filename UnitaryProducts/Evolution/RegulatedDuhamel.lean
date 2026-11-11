@@ -8,14 +8,15 @@ module
 public import Mathlib.MeasureTheory.Integral.Bochner.Set
 public import UnitaryProducts.Approximation.VariationMain
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
-public import UnitaryProducts.Comparison.IntegralDressedCell
+public import UnitaryProducts.Corrector.PeriodicFrameDecomposition
 public import UnitaryProducts.Evolution.DuhamelIntegral
 public import UnitaryProducts.Evolution.PartitionIndependent
 public import UnitaryProducts.Evolution.Pieces
 public import UnitaryProducts.Evolution.PiecewiseDressedComparison
 public import UnitaryProducts.Evolution.RegulatedExistence
-public import UnitaryProducts.Evolution.RoundedClock
-public import UnitaryProducts.Walks.LogarithmSmoothness
+public import UnitaryProducts.Corrector.FrameOperator
+public import UnitaryProducts.Walks.LogarithmDerivative
+public import UnitaryProducts.Corrector.PowerSeries
 
 /-!
 # Duhamel's estimate for regulated families

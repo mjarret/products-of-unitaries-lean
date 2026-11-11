@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+public import UnitaryProducts.PaperProof.ScalarGapLimits
 public import UnitaryProducts.PaperProof.UniformConstants
 
 /-! # Scalar coefficients for the Jacobi end-value estimate -/
@@ -119,7 +120,7 @@ theorem walk_square_leading_terms :
     Tendsto (fun θ ↦ θ ^ 3 * ((frameBound (2 * π - θ) - frameBound 0) *
       walkLogSlope (2 * π - θ) ^ 2)) (𝓝[>] 0) (𝓝 (2 * π)) := by
   obtain ⟨hS, hN, hD, _, hC⟩ := scalar_edge_limits
-  obtain ⟨_, hR, _⟩ := walk_constant_chord_limit
+  have hR := tendsto_gap_div_cos
   have hid : Tendsto (fun θ : ℝ ↦ θ) (𝓝[>] 0) (𝓝 0) := nhdsWithin_le_nhds
   refine ⟨?_, ?_, ?_, ?_⟩
   · have h := ((hid.div_const 24).add hN).mul (hR.pow 2)
@@ -197,7 +198,7 @@ theorem walk_leading_limit :
     Tendsto (fun θ ↦ walk_leading (2 * π - θ) * θ ^ 3)
       (𝓝[>] 0) (𝓝 (8 / π + 5 * π / 2 + 2)) := by
   obtain ⟨hS, hN, hD, _, _⟩ := scalar_edge_limits
-  obtain ⟨_, hR, _⟩ := walk_constant_chord_limit
+  have hR := tendsto_gap_div_cos
   have h1 := hN.mul (hR.pow 2)
   have h2 := (hN.div_const 4).mul (hS.pow 2)
   have h3 := (hD.const_mul 2).mul hS

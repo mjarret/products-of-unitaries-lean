@@ -53,13 +53,11 @@ theorem frameOp_arbitrary_eigenbasis_entry [NeZero d] {Ω : 𝕄}
     (hev : ∀ p q, |ev p - ev q| < 2 * π) (p q : Fin d) :
     (star (U : 𝕄) * frameOp Ω E * (U : 𝕄)) p q =
       (frameMult (ev p - ev q) : ℂ) * (star (U : 𝕄) * E * (U : 𝕄)) p q := by
-  have ha : ‖I • adL Ω‖ < 2 * π := by
-    rw [norm_smul, Complex.norm_I, one_mul]
+  have ha : ‖adL Ω‖ < 2 * π := by
     exact (show ‖adL Ω‖ ≤ w by simpa using ad_power_norm_le hΩ hwidth 1).trans_lt hw
-  let c : ℕ → ℝ := fun n ↦ |((bernoulli (n + 2) : ℚ) : ℝ)| / (Nat.factorial (n + 2) : ℝ)
-  have hs := (summable_norm_frameSeries_terms (I • adL Ω) ha).of_norm
+  let c : ℕ → ℝ := frameCoeff
   have hpos : Summable (fun n ↦ (c n : ℂ) • adL Ω ^ n) :=
-    hs.congr (UnitaryProducts.Prose.frame_term_I_smul (adL Ω))
+    (summable_norm_positiveFrameSeries (adL Ω) ha).of_norm
   have hsE := (ContinuousLinearMap.apply ℂ 𝕄 E).summable hpos
   have he := ((entryCLM p q).comp
     (ContinuousLinearMap.mulLeftRight ℂ 𝕄 (star (U : 𝕄)) (U : 𝕄))).map_tsum hsE

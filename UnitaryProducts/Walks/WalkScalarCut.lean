@@ -14,7 +14,7 @@ public import UnitaryProducts.Walks.LogHessian
 
 The complex extension of the correction's end-value multiplier agrees with
 the real multiplier on real arguments. Its power series is developed in
-`ComplexMultiplierSeries`.
+`Corrector.PartialFractions`.
 -/
 
 @[expose] public section

@@ -9,7 +9,8 @@ public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Integra
 public import Mathlib.Analysis.Calculus.ParametricIntervalIntegral
 public import Mathlib.Analysis.SpecialFunctions.Complex.LogBounds
 public import UnitaryProducts.Comparison.EndpointFrame
-public import UnitaryProducts.Walks.CubicScalar
+public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 
 /-!
 # The Hessian of the walk logarithm
@@ -32,16 +33,11 @@ public import UnitaryProducts.Walks.CubicScalar
 - `hasDerivWithinAt_walkLogResolvent`
 - `hasDerivWithinAt_walkLogSandwich`
 - `isStarNormal_evol_one`
-- `neg_one_lt_cos_half`
 - `norm_inv_unit_chord_le`
-- `norm_inverse_le_walkLogSlope`
 - `norm_sq_unit_chord`
-- `norm_walkLogHessian_centered_le`
 - `norm_walkLogHessian_integral_le`
 - `norm_walkLogHessian_integrand_le`
-- `norm_walkLogResolvent_le`
 - `spectrum_evol_one_eq_exp_real`
-- `spectrum_evol_one_norm_re`
 - `spectrum_evol_one_subset_slitPlane`
 - `walkLogDenom_halfAngle`
 - `walkLogDenom_pos`
@@ -50,8 +46,6 @@ public import UnitaryProducts.Walks.CubicScalar
 - `walkLogIntegral_eq_cfc`
 - `walkLogIntegral_evol`
 - `walkLogResolvent`
-- `walkLogResolvent_cube_integral`
-- `walkLogResolvent_square_integral`
 - `walkLogSlope`
 - `walkLogSlope_eq_sinBound`
 - `walkLogSlope_nonneg`
@@ -106,26 +100,6 @@ theorem walkLogSlope_nonneg {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) :
   rcases eq_or_lt_of_le hw0 with he | hp
   · rw [← he, walkLogSlope_zero]; exact zero_le_one
   · rw [walkLogSlope_eq_sinBound hp hw]; exact sinBound_nonneg hp hw
-
-/-- The Bernoulli series `bernSeries (I • adL H)`, the inverse $\Phi_H^{-1}$ of the averaging
-operator `phiSeries (I • adL H)`, has norm at most $S$ when $\|i\,\mathrm{ad}_H\| \le w < 2\pi$;
-used for the logarithmic derivative bound in Lemma A.2(i). -/
-theorem norm_inverse_le_walkLogSlope {d : ℕ} [NeZero d]
-    {H : Matrix (Fin d) (Fin d) ℂ} (hH : H.IsHermitian)
-    {w : ℝ} (hw : w < 2 * π) (ha : ‖I • adL H‖ ≤ w) :
-    ‖bernSeries (I • adL H)‖ ≤ walkLogSlope w := by
-  -- The norm bound implies w ≥ 0; no separate nonnegativity hypothesis is needed.
-  have hw0 : 0 ≤ w := (norm_nonneg (I • adL H)).trans ha
-  rcases eq_or_lt_of_le hw0 with he | hp
-  · subst w
-    have hb := norm_bernSeries_le_of_le
-      (A := Matrix (Fin d) (Fin d) ℂ →L[ℂ] Matrix (Fin d) (Fin d) ℂ) ha hw
-    change ‖bernSeries (I • adL H)‖ ≤ bernBound 0 at hb
-    rw [bernBound_eq_one_add_half_add_sq_mul_frameBound
-      (show |(0 : ℝ)| < 2 * π by simpa only [abs_zero] using hw)] at hb
-    simpa [walkLogSlope] using hb
-  · rw [walkLogSlope_eq_sinBound hp hw]
-    exact norm_bernSeries_I_adL_le_sinBound hH hp hw ha
 
 section Resolvent
 
@@ -327,32 +301,6 @@ theorem cfc_unit_chord {d : ℕ} (V : Matrix (Fin d) (Fin d) ℂ)
     cfc_id' ℂ V, cfc_const (p := IsStarNormal) 1 V]
   simp only [map_one]
 
-/-- Normality converts the scalar chord estimate into the operator resolvent bound. -/
-theorem norm_walkLogResolvent_le {d : ℕ}
-    (V : Matrix (Fin d) (Fin d) ℂ) [IsStarNormal V] {c t : ℝ}
-    (hc0 : -1 < c) (hc1 : c ≤ 1) (ht : t ∈ Icc (0 : ℝ) 1)
-    (hspec : ∀ z ∈ spectrum ℂ V, ‖z‖ = 1 ∧ c ≤ z.re) :
-    IsUnit (1 + t • (V - 1)) ∧
-      ‖walkLogResolvent V t‖ ≤
-        (Real.sqrt (1 - 2 * t * (1 - t) * (1 - c)))⁻¹ := by
-  have hne : ∀ z ∈ spectrum ℂ V, 1 + t • (z - 1) ≠ 0 := fun z hz he ↦ by
-    have hsq := norm_sq_unit_chord z (hspec z hz).1 t
-    rw [he, norm_zero, zero_pow two_ne_zero] at hsq
-    linarith [walkLogDenom_pos (t := t) hc0 hc1, mul_le_mul_of_nonneg_left (hspec z hz).2
-      (mul_nonneg (mul_nonneg two_pos.le ht.1) (sub_nonneg.mpr ht.2))]
-  have hu := isUnit_cfc (fun z : ℂ ↦ 1 + t • (z - 1)) V
-    (by fun_prop) inferInstance hne
-  rw [cfc_unit_chord] at hu
-  refine ⟨hu, ?_⟩
-  have he : cfc (fun z : ℂ ↦ (1 + t • (z - 1))⁻¹) V =
-      walkLogResolvent V t := by
-    rw [cfc_inv (p := IsStarNormal) (fun z : ℂ ↦ 1 + t • (z - 1)) V hne (by fun_prop) inferInstance,
-      cfc_unit_chord]
-    rfl
-  rw [← he]
-  exact norm_cfc_le (inv_nonneg.mpr (Real.sqrt_nonneg _))
-    fun z hz ↦ norm_inv_unit_chord_le (hspec z hz).1 hc0 hc1 ht (hspec z hz).2
-
 end SpectralResolvent
 
 namespace Prose
@@ -491,33 +439,11 @@ theorem spectrum_evol_one_subset_slitPlane {H : 𝕄} (hH : H.IsHermitian)
   simpa only [argDomain, neg_zero, ofReal_zero, zero_mul, Complex.exp_zero, mul_one,
     Set.mem_setOf_eq] using exp_mul_I_mem_argDomain hangle
 
-/-- For $\|H\| \le \theta \le \pi$, every eigenvalue $z$ of $e^{-iH}$ has $|z| = 1$ and
-$\operatorname{Re} z \ge \cos\theta$. -/
-theorem spectrum_evol_one_norm_re {H : 𝕄} (hH : H.IsHermitian) {θ : ℝ}
-    (hθ : θ ≤ π) (hHn : ‖H‖ ≤ θ) :
-    ∀ z ∈ spectrum ℂ (evol H 1), ‖z‖ = 1 ∧ Real.cos θ ≤ z.re := by
-  intro z hz
-  obtain ⟨u, hu, rfl⟩ := spectrum_evol_one_eq_exp_real hH hz
-  constructor
-  · simp [Complex.norm_exp]
-  · rw [Complex.exp_re]
-    simp only [Complex.neg_re, Complex.I_re, neg_zero, Complex.mul_re,
-      Complex.ofReal_re, Complex.neg_im, Complex.I_im, Complex.ofReal_im,
-      zero_mul, mul_zero, sub_zero, Complex.mul_im, zero_add, neg_mul,
-      one_mul, Real.exp_zero, Real.cos_neg]
-    simpa only [Real.cos_abs, one_mul] using
-      Real.cos_le_cos_of_nonneg_of_le_pi (abs_nonneg u) hθ (hu.trans hHn)
-
 omit [NeZero d] in
 /-- $e^{-iH}$ is normal for Hermitian $H$. -/
 theorem isStarNormal_evol_one {H : 𝕄} (hH : H.IsHermitian) : IsStarNormal (evol H 1) :=
   ⟨by change star (evol H 1) * evol H 1 = evol H 1 * star (evol H 1)
       rw [star_evol_mul_self hH 1, mul_eq_one_comm.mpr (star_evol_mul_self hH 1)]⟩
-
-/-- $\cos(w/2) > -1$ for $0 \le w < 2\pi$. -/
-theorem neg_one_lt_cos_half {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) : -1 < Real.cos (w / 2) := by
-  simpa only [Real.cos_pi] using Real.cos_lt_cos_of_nonneg_of_le_pi
-    (by linarith : 0 ≤ w / 2) le_rfl (by linarith : w / 2 < π)
 
 /-- On a centered window smaller than a full turn, the integral is the prescribed branch. -/
 theorem walkLogIntegral_evol {H : 𝕄} (hH : H.IsHermitian) (hHn : ‖H‖ < π) :
@@ -775,72 +701,8 @@ theorem walkLogDenom_halfAngle (w t : ℝ) :
   rw [show w / 2 = 2 * (w / 4) by ring, Real.cos_two_mul]
   linear_combination (-(2 * t - 1) ^ 2) * Real.sin_sq_add_cos_sq (w / 4)
 
-/-- The first quadrature of the proof of Lemma A.2: the square of the bound on $\|Z_u\|$
-integrates to $S$. -/
-theorem walkLogResolvent_square_integral {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) :
-    (∫ t : ℝ in (0 : ℝ)..1,
-      ((Real.sqrt (1 - 2 * t * (1 - t) * (1 - Real.cos (w / 2))))⁻¹) ^ 2) =
-      walkLogSlope w := by
-  have hc0 := neg_one_lt_cos_half hw0 hw
-  have hq (t : ℝ) := walkLogDenom_pos (t := t) hc0 (Real.cos_le_one _)
-  have he (t : ℝ) :
-      ((Real.sqrt (1 - 2 * t * (1 - t) * (1 - Real.cos (w / 2))))⁻¹) ^ 2 =
-        1 / (Real.cos (w / 4) ^ 2 + Real.sin (w / 4) ^ 2 * (2 * t - 1) ^ 2) := by
-    rw [inv_pow, Real.sq_sqrt (hq t).le, walkLogDenom_halfAngle, one_div]
-  simp_rw [he]
-  rcases eq_or_lt_of_le hw0 with hzero | hpos
-  · subst w; simp [walkLogSlope]
-  · rw [walk_slope_quadrature hpos hw, walkLogSlope_eq_sinBound hpos hw]; rfl
-
-/-- The second quadrature of the proof of Lemma A.2: $2u$ times the cube of the bound on
-$\|Z_u\|$ integrates to $\cos^{-2}(w/4)$. -/
-theorem walkLogResolvent_cube_integral {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) :
-    (∫ t : ℝ in (0 : ℝ)..1, (2 * t) *
-      ((Real.sqrt (1 - 2 * t * (1 - t) * (1 - Real.cos (w / 2))))⁻¹) ^ 3) =
-      (Real.cos (w / 4))⁻¹ ^ 2 := by
-  have hc0 := neg_one_lt_cos_half hw0 hw
-  have he (t : ℝ) :
-      (2 * t) * ((Real.sqrt (1 - 2 * t * (1 - t) * (1 - Real.cos (w / 2))))⁻¹) ^ 3 =
-        2 * t / (Real.sqrt ((1 - t) ^ 2 + t ^ 2 + 2 * t * (1 - t) * Real.cos (w / 2))) ^ 3 := by
-    rw [show 1 - 2 * t * (1 - t) * (1 - Real.cos (w / 2)) =
-      (1 - t) ^ 2 + t ^ 2 + 2 * t * (1 - t) * Real.cos (w / 2) by ring]
-    simp only [div_eq_mul_inv, inv_pow]
-  simp_rw [he]
-  rw [walk_hessian_quadrature_re hc0 (Real.cos_le_one _),
-    show w / 2 = 2 * (w / 4) by ring, Real.cos_two_mul]
-  have hc : 0 < Real.cos (w / 4) := Real.cos_pos_of_mem_Ioo
-    ⟨by linarith [Real.pi_pos], by linarith⟩
-  field_simp; ring
-
 variable {d : ℕ} [NeZero d]
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- The centered local logarithm Hessian bound, with the exact slope and quadratic coefficients.
-The moving cut is frozen before applying this theorem. -/
-theorem norm_walkLogHessian_centered_le {H Hd V Vd Vdd : ℝ → 𝕄} {Hdd : 𝕄}
-    {a b s w : ℝ} (hs : s ∈ Ioo a b) (hw : w < 2 * π) (hHs : ‖H s‖ ≤ w / 2)
-    (hH : ∀ x ∈ Icc a b, (H x).IsHermitian) (hwindow : ∀ x ∈ Icc a b, ‖H x‖ < π)
-    (he : ∀ x ∈ Icc a b, evol (H x) 1 = V x) (hHd : ∀ x ∈ Ioo a b, HasDerivAt H (Hd x) x)
-    (hHdd : HasDerivAt Hd Hdd s) (hV : ContinuousOn V (Icc a b))
-    (hVd : ContinuousOn Vd (Icc a b)) (hVdd : ContinuousOn Vdd (Icc a b))
-    (hd : ∀ x ∈ Ioo a b, HasDerivAt V (Vd x) x) (hdd : ∀ x ∈ Ioo a b, HasDerivAt Vd (Vdd x) x) :
-    ‖Hdd‖ ≤ walkLogSlope w * ‖Vdd s‖ + (Real.cos (w / 4))⁻¹ ^ 2 * ‖Vd s‖ ^ 2 := by
-  -- The norm bound implies w ≥ 0; no separate nonnegativity hypothesis is needed.
-  have hw0 : 0 ≤ w := by linarith [(norm_nonneg _).trans hHs]
-  have hs' : s ∈ Icc a b := ⟨hs.1.le, hs.2.le⟩
-  have hc0 := neg_one_lt_cos_half hw0 hw
-  have hspec : ∀ z ∈ spectrum ℂ (V s), ‖z‖ = 1 ∧ Real.cos (w / 2) ≤ z.re := by
-    rw [← he s hs']
-    exact spectrum_evol_one_norm_re (hH s hs') (by linarith) hHs
-  letI : IsStarNormal (V s) := by rw [← he s hs']; exact isStarNormal_evol_one (hH s hs')
-  have hZ := fun (t : ℝ) (ht : t ∈ Icc (0 : ℝ) 1) ↦
-    (norm_walkLogResolvent_le (V s) hc0 (Real.cos_le_one _) ht hspec).2
-  have hbound := norm_walkLogHessian_integral_le (V s) (Vd s) (Vdd s)
-    hc0 (Real.cos_le_one _) hZ
-  rw [← walkLogHessian_identity hs hH hwindow he hHd hHdd hV hVd hVdd hd hdd,
-    norm_smul, norm_neg, Complex.norm_I, one_mul,
-    walkLogResolvent_square_integral hw0 hw, walkLogResolvent_cube_integral hw0 hw] at hbound
-  exact hbound
 
 end FinalEstimate
 

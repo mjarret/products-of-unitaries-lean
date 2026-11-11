@@ -5,7 +5,7 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Walks.LogarithmSmoothness
+public import UnitaryProducts.Corrector.PowerSeries
 
 /-!
 # The differential of the matrix exponential
@@ -14,14 +14,9 @@ public import UnitaryProducts.Walks.LogarithmSmoothness
 
 - `contDiffAt_evol_one`
 - `evolDeriv`
-- `evolDerivInv`
-- `evolDerivInv_apply`
-- `evolDerivInv_evolDeriv`
 - `evolDeriv_apply`
-- `evolDeriv_evolDerivInv`
 - `evol_mul_phiSeries_eq`
 - `evol_sub_evol`
-- `hasDerivAt_evol_path`
 - `hasFDerivAt_evol_one`
 - `norm_evol_duhamel_two_le`
 - `norm_evol_sub_evol_le_exp`
@@ -139,49 +134,9 @@ theorem norm_evol_duhamel_two_le [NeZero d] {A B : 𝕄} {Q : ℝ} (hB : B.IsHer
 noncomputable def evolDeriv (X : 𝕄) : 𝕄 →L[ℂ] 𝕄 :=
   (-I) • (mulL (evol X 1) * phiSeries (I • adL X))
 
-/-- Its inverse, $Y \mapsto \Phi_X^{-1}(i(e^{-iX})^\dagger Y)$ through the Bernoulli series
-`bernSeries`. It is the inverse (`evolDerivInv_evolDeriv`) for Hermitian `X` with
-$\|i\,\mathrm{ad}_X\| < 2\pi$, where the series converges; every use assumes that. -/
-noncomputable def evolDerivInv (X : 𝕄) : 𝕄 →L[ℂ] 𝕄 :=
-  bernSeries (I • adL X) * (I • mulL (star (evol X 1)))
-
 /-- `evolDeriv` applied to `E`. -/
 theorem evolDeriv_apply (X E : 𝕄) :
     evolDeriv X E = -I • (evol X 1 * phiSeries (I • adL X) E) := rfl
-
-/-- `evolDerivInv` applied to `Y`. -/
-theorem evolDerivInv_apply (X Y : 𝕄) :
-    evolDerivInv X Y = bernSeries (I • adL X) (I • (star (evol X 1) * Y)) := rfl
-
-/-- `evolDerivInv X` is a left inverse of `evolDeriv X` for Hermitian `X` with
-$\|i\,\mathrm{ad}_X\| < 2\pi$. -/
-theorem evolDerivInv_evolDeriv [NeZero d] {X : 𝕄} (hX : X.IsHermitian)
-    (hw : ‖(I • adL X : 𝕄 →L[ℂ] 𝕄)‖ < 2 * π) (E : 𝕄) :
-    evolDerivInv X (evolDeriv X E) = E := by
-  have hUU : star (evol X 1) * evol X 1 = 1 := star_evol_mul_self hX 1
-  have h2 : (bernSeries (I • adL X) * phiSeries (I • adL X)) E = E := by
-    rw [bernSeries_mul_phiSeries _ hw]; rfl
-  rw [evolDeriv_apply, evolDerivInv_apply]
-  have h1 : star (evol X 1) * (-I • (evol X 1 * phiSeries (I • adL X) E))
-      = -I • phiSeries (I • adL X) E := by
-    rw [mul_smul_comm, ← mul_assoc, hUU, one_mul]
-  rw [h1, smul_smul]
-  norm_num
-  exact h2
-
-/-- `evolDerivInv X` is also a right inverse of `evolDeriv X`, under the same hypotheses. -/
-theorem evolDeriv_evolDerivInv [NeZero d] {X : 𝕄} (hX : X.IsHermitian)
-    (hw : ‖(I • adL X : 𝕄 →L[ℂ] 𝕄)‖ < 2 * π) (Y : 𝕄) :
-    evolDeriv X (evolDerivInv X Y) = Y := by
-  have hUU : star (evol X 1) * evol X 1 = 1 := star_evol_mul_self hX 1
-  have hUU' : evol X 1 * star (evol X 1) = 1 := mul_eq_one_comm.mp hUU
-  rw [evolDeriv_apply, evolDerivInv_apply]
-  have h2 : phiSeries (I • adL X) (bernSeries (I • adL X) (I • (star (evol X 1) * Y)))
-      = I • (star (evol X 1) * Y) := by
-    rw [← ContinuousLinearMap.mul_apply, phiSeries_mul_bernSeries _ hw,
-      ContinuousLinearMap.one_apply]
-  rw [h2, mul_smul_comm, ← mul_assoc, hUU', one_mul, smul_smul]
-  norm_num
 
 /-- **`X ↦ e^{-iX}` is differentiable**, with differential `evolDeriv X₀` at a Hermitian `X₀`
 (the second-order Duhamel expansion gives a quadratic remainder). -/
@@ -226,14 +181,5 @@ theorem contDiffAt_evol_one (X₀ : 𝕄) {n : WithTop ℕ∞} :
     funext X; simp [evol]
   rw [heq]
   exact hanal.contDiffAt.comp X₀ hlin
-
-/-- **The derivative of a path of exponentials.**  If `G` is differentiable at `s` with `G s`
-Hermitian, then `t ↦ e^{-iG(t)}` is differentiable at `s` with derivative
-`-i e^{-iG(s)} Φ_{G(s)}(Ġ(s))`: the chain rule for `hasFDerivAt_evol_one`. -/
-theorem hasDerivAt_evol_path [NeZero d] {G : ℝ → 𝕄} {Gd : 𝕄} {s : ℝ}
-    (hG : (G s).IsHermitian) (hGd : HasDerivAt G Gd s) :
-    HasDerivAt (fun t ↦ evol (G t) 1)
-      (-I • (evol (G s) 1 * phiSeries (I • adL (G s)) Gd)) s :=
-  ((hasFDerivAt_evol_one hG).restrictScalars ℝ).comp_hasDerivAt s hGd
 
 end UnitaryProducts

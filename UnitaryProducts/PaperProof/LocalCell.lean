@@ -131,8 +131,8 @@ theorem lem_cell {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π) {Ω : 𝕄}
 
 /-- The derivative-series estimate: the self-input multiplier is continuously
  differentiable and satisfies both estimates, including the one-sided endpoints.
- Both estimates instantiate the same split bound: the first with zero commutator
- direction, and the second with the centered Duhamel average and remainder. -/
+ The first estimate specializes the general derivative-series inequality, and
+ the second uses the centered Duhamel decomposition and Jacobi telescope. -/
 theorem self_frame_series_curve {Ω : ℝ → 𝕄} {w : ℝ}
     (hw0 : 0 ≤ w) (hw : w < 2 * π)
     (hΩ : ∀ s ∈ Icc (0 : ℝ) 1, (Ω s).IsHermitian)
@@ -159,7 +159,7 @@ theorem self_frame_series_curve {Ω : ℝ → 𝕄} {w : ℝ}
     simp only [hz, norm_zero, zero_pow (by decide : 2 ≠ 0), mul_zero, add_zero, le_refl, and_self]
   · letI : NeZero d := ⟨hdim.ne'⟩
     -- The uniformly convergent derivative series supplies continuous differentiability.
-    refine ⟨contDiffOn_self_frame_uniform hw0 hw hΩ hwidth hcΩ, ?_⟩
+    refine ⟨self_frame_series_contDiffOn hw hΩ hwidth hcΩ, ?_⟩
     intro s hs
     let K := Icc (0 : ℝ) 1
     let D := derivWithin Ω K s
@@ -175,14 +175,11 @@ theorem self_frame_series_curve {Ω : ℝ → 𝕄} {w : ℝ}
     have hder := (hasDerivWithinAt_frameOp hdΩ hdD ha).derivWithin
       (uniqueDiffOn_Icc_zero_one s hs)
     have hinput : ‖frameOp (Ω s) Dd‖ ≤ frameBound w * ‖Dd‖ :=
-      norm_frameOp_le hw (norm_sub_smul_one_le_of_eigenvalues (hΩ s hs) hw0
-        (eigen_interval (hΩ s hs) (hwidth s hs)))
+      general_series_bound frame_nonnegativeSeries (hΩ s hs) hw0 hw (hwidth s hs) Dd
     have hbase := (norm_add_le (unifiedFrameError (Ω s) D D) (frameOp (Ω s) Dd))
-    -- Case (i) is the zero-commutator instance of the common split bound.
-    have hfirst : ‖unifiedFrameError (Ω s) D D‖ ≤ 2 * frameLip w * ‖D‖ ^ 2 := by
-      have hsplit := norm_unifiedFrameError_split_le (hΩ s hs) hw0 hw (hwidth s hs)
-        D D 0 (by simp)
-      simpa only [norm_zero, mul_zero, zero_mul, add_zero, pow_two, mul_assoc] using hsplit
+    -- Case (i) specializes the general derivative bound to the input Ω'.
+    have hfirst := frame_series_derivative_bound hdΩ hdD
+      (uniqueDiffOn_Icc_zero_one s hs) (hΩ s hs) hw0 hw (hwidth s hs)
     -- Case (ii) uses the same split with the centered integral decomposition.
     have hsplit := norm_unifiedFrameError_split_le (hΩ s hs) hw0 hw (hwidth s hs)
       D (centeredDuhamel (Ω s) D) (centeredRemainder (Ω s) D)
@@ -201,10 +198,10 @@ theorem self_frame_series_curve {Ω : ℝ → 𝕄} {w : ℝ}
     have hExp := ((hasFDerivAt_evol_one (hΩ s hs)).restrictScalars ℝ).comp_hasDerivWithinAt s hdΩ
     have hX := hExp.derivWithin (uniqueDiffOn_Icc_zero_one s hs)
     change derivWithin (fun t ↦ evol (Ω t) 1) K s = evolDeriv (Ω s) D at hX
-    rw [hder, hX]
     constructor
-    · exact hbase.trans ((add_le_add hfirst hinput).trans_eq (by dsimp [D, Dd, K]; ring))
-    · exact hbase.trans ((add_le_add hsecond hinput).trans_eq (by dsimp [D, Dd, K]; ring))
+    · simpa only [D, Dd, K, pow_two, mul_assoc] using hfirst
+    · rw [hder, hX]
+      exact hbase.trans ((add_le_add hsecond hinput).trans_eq (by dsimp [D, Dd, K]; ring))
 
 /-- **Lemma A.3** (`lem:end-value`): both derivative estimates for the
 entrywise multiplier of Definition 4.1, with its closed scalar constants. -/

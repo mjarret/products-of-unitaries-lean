@@ -5,7 +5,7 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Walks.LogarithmConstruction
+public import UnitaryProducts.Walks.LogarithmBranch
 
 /-!
 # Sampled products of walks

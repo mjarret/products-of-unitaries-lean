@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+public import UnitaryProducts.PaperProof.ScalarGapLimits
 
 public import UnitaryProducts.Prose.WalkComparisonJRS
 public import UnitaryProducts.Prose.UnitStepsWalks
@@ -141,7 +142,7 @@ theorem walk_uniform_square_leading_terms :
   intro N S
   obtain ⟨_, _, hS, _, _, _, _, _, _⟩ := Paper.walk_constant_limit
   have hid : Tendsto (fun θ : ℝ ↦ θ) (𝓝[>] 0) (𝓝 0) := nhdsWithin_le_nhds
-  obtain ⟨_, hR, _⟩ := Paper.walk_constant_chord_limit
+  have hR := tendsto_gap_div_cos
   have hev : ∀ᶠ θ in 𝓝[>] (0 : ℝ), θ ∈ Ioo 0 π := Ioo_mem_nhdsGT pi_pos
   refine ⟨fun θ ↦ by ring, ?_, ?_, ?_, ?_⟩
   · have h := ((tendsto_const_nhds (x := 2 * π)).sub (hid.div_const 2)).div_const 2

@@ -12,7 +12,6 @@ public import UnitaryProducts.Prose.UnitStepsCorrector
 ## Declarations
 
 - `sum_Icc_one_eq_sum_range`
-- `uniform_cell_domains`
 - `uniform_local_hamiltonian_derivative`
 -/
 @[expose] public section
@@ -26,30 +25,6 @@ theorem sum_Icc_one_eq_sum_range {E : Type*} [AddCommMonoid E] (f : ℕ → E) (
     ∑ j ∈ Finset.Icc 1 N, f j = ∑ k ∈ Finset.range N, f (k + 1) := by
   simpa [Finset.Ico_add_one_right_eq_Icc, Nat.add_comm] using
     Finset.sum_Ico_eq_sum_range f 1 (N + 1)
-
-
-/-- Intersecting the centered cells with [0,1] leaves a full cell at each
-interior sample and exactly a half-cell at each endpoint sample. -/
-theorem uniform_cell_domains {N : ℕ} (hN : 0 < N) :
-    let δ : ℝ := 1/(2*N)
-    Icc (-δ) δ ∩ Icc (0 : ℝ) 1 = Icc 0 δ ∧
-    Icc (1-δ) (1+δ) ∩ Icc (0 : ℝ) 1 = Icc (1-δ) 1 ∧
-    ∀ j : ℕ, 0 < j → j < N →
-      Icc (((j : ℝ)-1/2)/N) (((j : ℝ)+1/2)/N) ⊆ Icc (0 : ℝ) 1 := by
-  intro δ
-  have hn : (0 : ℝ) < N := Nat.cast_pos.mpr hN
-  have hn1 : (1 : ℝ) ≤ N := by exact_mod_cast (show 1 ≤ N by omega)
-  have hδ0 : 0 ≤ δ := by dsimp [δ]; positivity
-  have hδ1 : δ ≤ 1 := div_le_one_of_le₀ (by linarith) (by positivity)
-  refine ⟨?_, ?_, ?_⟩
-  · rw [Icc_inter_Icc, sup_eq_right.mpr (neg_nonpos.mpr hδ0), inf_eq_left.mpr hδ1]
-  · rw [Icc_inter_Icc, sup_eq_left.mpr (sub_nonneg.mpr hδ1),
-      inf_eq_right.mpr (le_add_of_nonneg_right hδ0)]
-  · intro j hj hjN
-    have hj1 : (1 : ℝ) ≤ j := by exact_mod_cast (show 1 ≤ j by omega)
-    have hjN1 : (j : ℝ)+1 ≤ N := by exact_mod_cast (show j+1 ≤ N by omega)
-    exact Icc_subset_Icc (div_nonneg (by linarith) hn.le)
-      ((div_le_one hn).mpr (by linarith))
 
 /-- Section 4.1: the rounded cell includes its left tie and excludes its right tie. -/
 theorem rounded_cell_iff (t : ℝ) (j : ℤ) :

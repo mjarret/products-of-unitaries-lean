@@ -1,6 +1,6 @@
 # Products of unitaries
 
-Lean proofs accompanying Michael Jarret's *Products of unitaries as continuous evolutions at finite precision*.
+Lean proofs accompanying Michael Jarret's *Rounded clocks and finite precision: a transfer principle between continuous and discrete quantum dynamics*.
 
 The library compares finite products of unitary matrices with continuous Schrödinger evolutions.
 It proves fine-step error bounds for truncated midpoint samples, a unit-step comparison for

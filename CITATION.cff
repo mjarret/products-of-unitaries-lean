@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "Please cite the accompanying paper when using this formalization."
-title: "Products of unitaries as continuous evolutions at finite precision"
+title: "Rounded clocks and finite precision: a transfer principle between continuous and discrete quantum dynamics"
 authors:
   - family-names: Jarret
     given-names: Michael

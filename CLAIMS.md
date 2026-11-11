@@ -136,7 +136,9 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     $\sched$ is regulated, with one-sided limits everywhere, so that it can be sampled at every time and may jump.
 
-    UnitaryProducts.Paper.piecewise_constant_one_sided_limits
+    UnitaryProducts.Paper.piecewise_constant_one_sided_limits; UnitaryProducts.Prose.regulated_family_with_jump; UnitaryProducts.Regulated
+
+    Regulated states the one-sided-limit condition for general families. regulated_family_with_jump supplies a regulated Hermitian family with distinct one-sided limits; the family is defined at every time.
 
 24. **LEAN** — Section 1
 
@@ -2443,13 +2445,17 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     \sched'&=i\int_0^1S_u\devprod'S_u\,du,\\
 
-    UnitaryProducts.PaperProof.centered_log_derivatives
+    UnitaryProducts.PaperProof.centered_log_derivatives; UnitaryProducts.PaperProof.lem_walk_log
+
+    centered_log_derivatives proves the first-derivative integral identity on the interior of a centered principal-branch neighborhood. lem_walk_log supplies C² regularity on the closed interval and the one-sided endpoint derivative bounds by continuity extension.
 
 381. **LEAN** — Appendix A, Lemma A.2
 
     \sched''&=i\int_0^1\bigl(S_u\devprod''S_u-2uS_u\devprod'S_u\devprod'S_u\bigr)\,du,
 
-    UnitaryProducts.PaperProof.centered_log_derivatives
+    UnitaryProducts.PaperProof.centered_log_derivatives; UnitaryProducts.PaperProof.lem_walk_log
+
+    centered_log_derivatives proves the second-derivative integral identity on the interior of a centered principal-branch neighborhood. lem_walk_log supplies C² regularity on the closed interval and the one-sided endpoint derivative bounds by continuity extension.
 
 382. **LEAN** — Appendix A, Lemma A.2
 
@@ -3084,7 +3090,9 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     A product of given unitaries, such as the walk of a discrete adiabatic theorem, is the $T$-step product of any Hermitian logarithm of the family, and a band with eigenphase gap $\freearc$ supplies a logarithm of width $2\pi-\freearc$ (\Cref{cor:walk-leakage}).
 
-    UnitaryProducts.PaperProof.cor_walk_leakage; UnitaryProducts.PaperProof.walk_band_gap_minimum; UnitaryProducts.PaperProof.walk_band_log_support; UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.Paper.unitary_product_evolution
+    UnitaryProducts.PaperProof.cor_walk_leakage; UnitaryProducts.PaperProof.walk_band_gap_minimum; UnitaryProducts.PaperProof.walk_band_log_support; UnitaryProducts.PaperProof.lem_walk_log; UnitaryProducts.Paper.unitary_product_evolution; UnitaryProducts.stepProduct_eq_pieceProduct
+
+    stepProduct_eq_pieceProduct applies to any chosen logarithm family G satisfying evol (G (j/T)) 1 = W (j/T), with n = T; no particular branch is required for this product identity. Under Corollary 4.7 hypotheses, the minimum circular gap is positive and the constructed logarithm has width 2π minus that gap.
 
 481. **EXTERNAL** — Section 6
 
@@ -3140,7 +3148,9 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     Where the values of $\sched$ commute, they turn the left-endpoint sum into the trapezoidal sum, and in \Cref{ex:unit-sharp} the distance from the evolution is $2\sin(1/(12T))$ with them and tends to $2\sin(1/4)$ without them.
 
-    UnitaryProducts.Prose.commuting_trapezoidal_product; UnitaryProducts.PaperProof.ex_unit_sharp
+    UnitaryProducts.Prose.commuting_trapezoidal_product; UnitaryProducts.PaperProof.ex_unit_sharp; UnitaryProducts.Prose.commuting_rescaled_evolution
+
+    commuting_trapezoidal_product identifies the endpoint-corrected product with the trapezoidal sum; commuting_rescaled_evolution identifies the continuous evolution with the integral. ex_unit_sharp supplies both stated distances.
 
 492. **LEAN** — Section 6
 
@@ -3168,7 +3178,9 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     Where the values of $\sched$ commute, the comparison is the trapezoidal rule.
 
-    UnitaryProducts.Prose.commuting_trapezoidal_product
+    UnitaryProducts.Prose.commuting_trapezoidal_product; UnitaryProducts.Prose.commuting_rescaled_evolution
+
+    commuting_trapezoidal_product identifies the endpoint-corrected product with the trapezoidal sum; commuting_rescaled_evolution identifies the continuous evolution with the integral.
 
 497. **EXTERNAL** — Section 6
 
@@ -3202,7 +3214,9 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     When the Trotter steps form a $C^2$ unitary family whose spectrum avoids an arc of fixed length that moves continuously, \Cref{cor:walks} is the bound on the change from time discretization that their argument lacked.
 
-    UnitaryProducts.PaperProof.thm_unitary_products
+    UnitaryProducts.PaperProof.thm_unitary_products; UnitaryProducts.PaperProof.lem_walk_log
+
+    Lemma A.2 constructs the C² Hermitian logarithm in the moving spectral window; Theorem 4.5 supplies the time-discretization comparison. The comparison with the cited argument is bibliographic interpretation.
 
 503. **PROSPECTIVE** — Section 6
 
@@ -3422,7 +3436,9 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     The simplest is the product $e^{-i\sched((T-1)/T)}\cdots e^{-i\sched(0)}$ of the exponentials of the samples, whose steps have length one. Its generator differs from $\sched(t/T)$ by $O(1/T)$ for a time $T$, so Duhamel's formula bounds its distance from $\evol(T)$ only by a constant.
 
-    UnitaryProducts.Paper.step_products_factors; UnitaryProducts.PaperProof.left_held_generator_error; UnitaryProducts.PaperProof.left_held_error_integral; UnitaryProducts.PaperProof.left_held_duhamel_bound
+    UnitaryProducts.Paper.step_products_factors; UnitaryProducts.PaperProof.left_held_generator_error; UnitaryProducts.PaperProof.left_held_error_integral; UnitaryProducts.PaperProof.left_held_duhamel_bound; UnitaryProducts.continuousOn_of_norm_sub_le; UnitaryProducts.Paper.norm_le_unitSupNorm
+
+    This scaling sentence uses the smooth Hamiltonian comparison context: the derivative is bounded on [0,1], as follows from the Lipschitz-derivative hypothesis of Theorem B. continuousOn_of_norm_sub_le and norm_le_unitSupNorm give the bound D = ‖H′‖∞. left_held_generator_error gives D/T, left_held_error_integral integrates it over time T to D, and left_held_duhamel_bound applies Duhamel.
 
 539. **EXTERNAL** — Section 1
 
@@ -3450,7 +3466,9 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     No gap enters the comparison for a Hamiltonian, and for a walk only the length of an arc free of its spectrum does.
 
-    UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.PaperProof.thm_unitary_products
+    UnitaryProducts.PaperProof.unit_steps_endpoint_bounds; UnitaryProducts.PaperProof.thm_unitary_products; UnitaryProducts.PaperProof.lem_walk_log
+
+    The Hamiltonian comparison uses no spectral gap. For the walk, Lemma A.2 constructs the C² logarithm from the continuously moving free arc before Theorem 4.5 is applied.
 
 544. **LEAN** — Section 1
 
@@ -3584,7 +3602,9 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
     When the angles follow a smooth schedule, the layers form a walk, and the comparison reads the circuit itself, not a Trotterized approximation of it, as an evolution whenever the spectra of the layers avoid an arc of fixed length that moves continuously (\Cref{cor:walks}).
 
-    UnitaryProducts.PaperProof.qaoa_smooth_unitary_family; UnitaryProducts.PaperProof.thm_unitary_products
+    UnitaryProducts.PaperProof.qaoa_smooth_unitary_family; UnitaryProducts.PaperProof.thm_unitary_products; UnitaryProducts.PaperProof.lem_walk_log
+
+    qaoa_smooth_unitary_family gives the smooth unitary circuit family. Lemma A.2 supplies its C² Hermitian logarithm under the moving-free-arc hypothesis, and Theorem 4.5 supplies the comparison.
 
 568. **PROSPECTIVE** — Section 6
 
@@ -3884,6 +3904,8 @@ The entries pair the paper’s equations and mathematical prose with their suppo
     For odd $T$, $\cos(\pi T/2)=0$ and $\sin(\pi T/2)\sin\rho=\cos(\rho-\pi T/2)$, so
 
     UnitaryProducts.PaperProof.Spin.odd_error_squared
+
+    Inside Spin.odd_error_squared, the local identity hc states cos (T * (π/2)) = 0 and hs states sin (T * (π/2)) * sin ρ = cos (ρ - π*T/2), for T = 2*k+1. The factor order is identified by ring. hc uses Real.cos_add, Real.cos_nat_mul_pi, Real.sin_nat_mul_pi, Real.cos_pi_div_two and Real.sin_pi_div_two; hs uses Real.cos_sub and hc. These are the two displayed trigonometric steps, before the squared-error formula.
 
 618. **LEAN** — Section 5, Example 5.2
 

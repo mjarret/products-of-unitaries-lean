@@ -38,7 +38,7 @@ theorem pauli_relations :
     simp [X, Y, Z, Matrix.conjTranspose_apply,
       Matrix.mul_apply, Fin.sum_univ_two, Complex.conj_I]
 
-/-- The elementary exponential formula used in the proof of (5.2).
+/-- The elementary exponential formula used in the inline identity of Example 5.2.
 The spectral mapping theorem reduces the calculation to the scalar values ±1. -/
 theorem evol_involution {d : ℕ} [NeZero d]
     {N : Matrix (Fin d) (Fin d) ℂ} (hN : N.IsHermitian) (hNN : N * N = 1)
@@ -79,7 +79,7 @@ theorem evol_involution {d : ℕ} [NeZero d]
         (continuous_const.mul continuous_id).continuousOn,
         cfc_const _ N hnormal, cfc_const_mul_id _ N hnormal, Algebra.algebraMap_eq_smul_one]
 
-/-- Equation (5.2): the squared difference of two spin rotations is scalar.
+/-- The inline identity of Example 5.2: the squared difference of two spin rotations is scalar.
 This is the paper's anticommutator calculation, before taking the norm. -/
 theorem spin_distance_matrix {d : ℕ} [NeZero d]
     {N M : Matrix (Fin d) (Fin d) ℂ}
@@ -111,7 +111,7 @@ theorem spin_distance_matrix {d : ℕ} [NeZero d]
     (1 : Matrix (Fin d) (Fin d) ℂ) i j * hb -
     (Complex.sin (a : ℂ) * Complex.sin (b : ℂ)) * hnm
 
-/-- The scalar on the right of (5.2) equals the squared operator norm. -/
+/-- The inline squared operator-norm identity in the proof of Example 5.2. -/
 theorem spin_distance {d : ℕ} [NeZero d]
     {N M : Matrix (Fin d) (Fin d) ℂ}
     (hN : N.IsHermitian) (hM : M.IsHermitian)
@@ -302,7 +302,8 @@ theorem sampled_product (ω θ : ℝ) (T n : ℕ) :
     rw [← mul_assoc (evol Z (-(n * (θ / (2 * T))))), hcancel, one_mul]
     rw [← mul_assoc (evol Z ((n + 1 : ℕ) * (θ / (2 * T)))), hjoin]
 
-/-- The closed form of the unit-step product in the proof of Example 5.2(i). -/
+/-- The closed form of the unit-step product in the opening computation
+of Example 5.2. -/
 theorem unit_product_closed (ω θ : ℝ) {T : ℕ} (hT : 0 < T) :
     (unitProduct (family ω θ) T).1 = evol Z (θ / 2) *
       (evol Z (-(θ / (2 * T))) * evol X (ω / 2)) ^ T := by
@@ -311,7 +312,7 @@ theorem unit_product_closed (ω θ : ℝ) {T : ℕ} (hT : 0 < T) :
   field_simp
 
 /-- The half-step phases symmetrize the factor in the rotating frame,
-giving the second closed form of Example 5.2(i). -/
+giving the second closed form of the opening computation of Example 5.2. -/
 theorem rounded_product_closed (ω θ : ℝ) {T : ℕ} (hT : 0 < T) :
     evol (family ω θ 1) (1 / 2) * (unitProduct (family ω θ) T).1 *
       evol (family ω θ 0) (-(1 / 2)) =
@@ -367,7 +368,7 @@ theorem full_turn_factor (θ s : ℝ) :
   have hh := CFC.eq_algebraMap_of_spectrum_subset_singleton
     (evol (family (2 * π) θ s) 1) (-1 : ℂ) hspec.subset hn
   simpa using hh
-/-- The rotating-frame solution appearing in Example 5.2(i). -/
+/-- The rotating-frame solution appearing in the opening computation of Example 5.2. -/
 def solution (ω θ T t : ℝ) : Matrix (Fin 2) (Fin 2) ℂ :=
   evol Z (θ / (2 * T) * t) * evol ((ω / 2) • X - (θ / (2 * T)) • Z) t
 
@@ -404,7 +405,7 @@ theorem solution_derivative (ω θ T t : ℝ) :
   rw [hRZ]
   module
 
-/-- The continuous evolution has the first closed form in Example 5.2(i). -/
+/-- The continuous evolution has the first closed form in the opening computation of Example 5.2. -/
 theorem evolution_closed (ω θ : ℝ) {T : ℕ} (hT : 0 < T)
     {U : ℝ → Matrix (Fin 2) (Fin 2) ℂ}
     (hU : IsEvolution (fun t ↦ family ω θ (t / T)) U 0 T) :
@@ -458,7 +459,7 @@ theorem xz_spectrum (a b : ℝ) :
     linear_combination hr
 
 /-- The frozen frame exponential has exactly the two scalar phases used in
-the proof of Example 5.2(iii), with `ρ=√(a²+b²)/2`. -/
+the proof of Example 5.2(ii), with `ρ=√(a²+b²)/2`. -/
 theorem xz_evol_spectrum (a b : ℝ) :
     spectrum ℂ (evol (xz a b) (1 / 2)) =
       {Complex.exp (-I * ((Real.sqrt (a ^ 2 + b ^ 2) / 2 : ℝ) : ℂ)),
@@ -564,7 +565,7 @@ theorem phase_defect_rationalized {a t : ℝ} (ha : 0 < a) (ht : 0 < t) (θ : �
   field_simp at hs ⊢
   linear_combination hs
 
-/-- The phase displacement used in Example 5.2(ii); `a = π` gives
+/-- The phase displacement used in Example 5.2(i); `a = π` gives
 `T (ρ - πT/2) → θ²/(4π)`. The full-turn proof uses `a = 2π`. -/
 theorem phase_defect_limit {a : ℝ} (ha : 0 < a) (θ : ℝ) :
     Tendsto (fun T : ℕ ↦ (T : ℝ) *
@@ -593,7 +594,7 @@ theorem phase_defect_limit {a : ℝ} (ha : 0 < a) (θ : ℝ) :
   simpa only [show 2 * (a + a) = 4 * a by ring] using hlim.congr' heq.symm
 
 /-- The unscaled phase defect tends to zero; this is the small quantity in
-Example 5.2(iii). -/
+Example 5.2(ii). -/
 theorem phase_defect_tendsto_zero {a : ℝ} (ha : 0 < a) (θ : ℝ) :
     Tendsto (fun T : ℕ ↦ Real.sqrt (a ^ 2 * (T : ℝ) ^ 2 + θ ^ 2) / 2 - a * T / 2)
       atTop (𝓝 0) := by
@@ -634,7 +635,7 @@ theorem integer_phase_sign (T : ℕ) :
     norm_num
 
 /-- The two frozen-factor eigenvalues give the full-turn residual bound by
-continuous functional calculus, as in Example 5.2(iii). -/
+continuous functional calculus, as in Example 5.2(ii). -/
 theorem full_turn_residual (θ : ℝ) (T : ℕ) :
     ‖evol (((2 * π * T : ℝ) • X) - θ • Z) (1 / 2) - ((-1 : ℂ) ^ T) • 1‖ ≤
       2 * |Real.sin ((Real.sqrt ((2 * π) ^ 2 * (T : ℝ) ^ 2 + θ ^ 2) / 2 - π * T) / 2)| := by
@@ -690,7 +691,7 @@ theorem full_turn_residual_limit (θ : ℝ) :
     ring
   exact squeeze_zero (fun _ ↦ norm_nonneg _) (fun T ↦ full_turn_residual θ T) hscalar
 
-/-- The full-turn endpoint distance of Example 5.2(iii), for the actual
+/-- The full-turn endpoint distance of Example 5.2(ii), for the actual
 rounded product and the continuous closed form. -/
 theorem full_turn_error_limit (θ : ℝ) :
     Tendsto (fun T : ℕ ↦
@@ -810,7 +811,7 @@ theorem discussion_full_turn_factor (θ s : ℝ) :
   simp [Unitary.mul_star_self_of_mem cyclic_unitary]
 
 /-- The resonant example in the Discussion has the same limiting error as
-Example 5.2(iii); a fixed unitary change of basis preserves its operator norm. -/
+Example 5.2(ii); a fixed unitary change of basis preserves its operator norm. -/
 theorem discussion_error_limit (θ : ℝ) :
     let H := fun s ↦ π • (evol Y (θ * s / 2) * Z * evol Y (-(θ * s / 2)))
     Tendsto (fun T : ℕ ↦
@@ -1099,7 +1100,7 @@ theorem family_derivative (ω θ s : ℝ) :
       Real.sin_pi_div_two, Complex.real_smul]
     ring
 
-/-- The endpoint derivative norms used in the statement of Example 5.2(ii). -/
+/-- The endpoint derivative norms used in the statement of Example 5.2(i). -/
 theorem family_derivWithin_norm {ω : ℝ} (hω : 0 ≤ ω) (θ : ℝ)
     {s : ℝ} (hs : s ∈ Icc (0 : ℝ) 1) :
     ‖derivWithin (family ω θ) (Icc (0 : ℝ) 1) s‖ = ω * |θ| / 2 := by
@@ -1155,53 +1156,7 @@ theorem family_derivative_lipschitz {ω : ℝ} (hω : 0 ≤ ω) (θ s t : ℝ) :
       (fun x _ ↦ hbound x) (mem_univ s) (mem_univ t)
 
 
-/-- A derivative at zero controls the rescaled norm along inverse step counts. -/
-theorem inverse_step_derivative_norm {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    {f : ℝ → E} {v : E} (hf : HasDerivAt f v 0) (θ : ℝ) :
-    Tendsto (fun n : ℕ ↦ (n : ℝ) * ‖f (θ / n) - f 0‖) atTop (𝓝 (|θ| * ‖v‖)) := by
-  have hds := (continuousAt_dslope_same.mpr hf.differentiableAt).tendsto
-  rw [dslope_same, hf.deriv] at hds
-  have hh := ((hds.comp (tendsto_const_div_atTop_nhds_zero_nat θ)).norm).const_mul |θ|
-  apply hh.congr'
-  filter_upwards [eventually_ge_atTop 1] with n hn
-  dsimp only [Function.comp_def]
-  have hn0 : (n : ℝ) ≠ 0 := by exact_mod_cast (show n ≠ 0 by omega)
-  have he := sub_smul_dslope f 0 (θ / n)
-  rw [sub_zero] at he
-  rw [← he, norm_smul, Real.norm_eq_abs, abs_div,
-    show |(n : ℝ)| = (n : ℝ) from abs_of_nonneg (Nat.cast_nonneg n)]
-  field_simp
-
-/-- One symmetric step has the same leading small-precession error as the
-endpoint term of the odd-step comparison. -/
-theorem one_step_error_limit (θ : ℝ) :
-    Tendsto (fun n : ℕ ↦ (n : ℝ) *
-      ‖step π (θ / (2 * n)) - evol (π • X - (θ / n) • Z) (1 / 2)‖)
-      atTop (𝓝 ((π - 2) * |θ| / (2 * π))) := by
-  have hd := frameError_derivative pi_pos (T := 1) (by decide)
-    (by rw [Real.sin_pi_div_two]; norm_num)
-  have hh := inverse_step_derivative_norm hd θ
-  simp only [frameError_zero, sub_zero] at hh
-  have hc : 0 ≤ (1 / 2 : ℝ) - 1 / π := by
-    have hpi : 2 ≤ π := by linarith [pi_gt_three]
-    exact sub_nonneg.mpr (one_div_le_one_div_of_le (by norm_num) hpi)
-  have hn : ‖((I * Real.sin ((1 : ℕ) * (π / 2)) *
-      (1 / (2 * (1 : ℕ) * Real.sin (π / 2)) - 1 / (π * (1 : ℕ))) : ℂ) • Z)‖ =
-      1 / 2 - 1 / π := by
-    norm_num only [Nat.cast_one, one_mul, mul_one, Real.sin_pi_div_two, Complex.ofReal_one]
-    rw [norm_smul, norm_Z, mul_one, norm_mul, Complex.norm_I, one_mul]
-    have he : (1 / 2 - 1 / (π : ℂ)) = ((1 / 2 - 1 / π : ℝ) : ℂ) := by push_cast; rfl
-    rw [he, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hc]
-  rw [hn] at hh
-  convert hh using 1
-  · funext n
-    simp only [frameError, Nat.cast_one, mul_one, pow_one]
-    congr 3
-    ring
-  · congr 1
-    field_simp
-
-/-- The axis-angle displacement appearing in the proof of Example 5.2(ii). -/
+/-- The axis-angle displacement appearing in the proof of Example 5.2(i). -/
 theorem axis_angle_limit (θ : ℝ) :
     Tendsto (fun n : ℕ ↦ (n : ℝ) *
       (θ / (2 * n) - Real.arctan (θ / (π * n)))) atTop
@@ -1280,7 +1235,7 @@ theorem frozen_axis_angle {a : ℝ} (ha : 0 < a) (θ : ℝ) :
   congr 1
   ring
 
-/-- The squared-error display in the proof of Example 5.2(ii), including the
+/-- The squared-error display in the proof of Example 5.2(i), including the
 paper's explicit arctangent angle between the two axes. -/
 theorem odd_error_squared (θ : ℝ) (k : ℕ) :
     let T : ℕ := 2 * k + 1
@@ -1385,7 +1340,8 @@ theorem odd_error_limit (θ : ℝ) :
   rw [Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq (Nat.cast_nonneg _),
     Real.sqrt_sq (norm_nonneg _)]
 
-/-- Example 5.2: both closed forms and the two limiting comparisons. The endpoint
+/-- Example 5.2: the two limiting comparisons, retaining their closed forms as
+extra conclusions. The endpoint
 norms are those of the actual derivative of the Hamiltonian in the statement. -/
 theorem ex_precessing_spin (ω θ : ℝ) :
     let H := family ω θ
@@ -1491,5 +1447,43 @@ theorem precessing_spin_optimal {w c A B : ℝ} (hw : 0 < w) (hw2 : w < 2 * π)
     simp only [div_pow, mul_pow, sq_abs]
     ring
 
+
+/-- The odd-runtime limit in Example 5.2(i) forces the endpoint coefficient
+at width pi. The other terms, after multiplication by the runtime, are
+quadratic in the angular speed and cannot reduce this linear coefficient. -/
+theorem precessing_spin_pi_optimal {c K : ℝ}
+    (hcomparison : ∀ (T : ℕ), 0 < T → ∀ θ : ℝ,
+      (T : ℝ) * ‖frameError π θ T‖ ≤
+        c * (‖familySlope π θ 0‖ + ‖familySlope π θ 1‖) + K * θ ^ 2) :
+    1 / (2 * π) - 1 / π ^ 2 ≤ c := by
+  let a := 1 / (2 * π) - 1 / π ^ 2
+  have hlinear (θ : ℝ) : a * (π * |θ|) ≤ c * π * |θ| + K * θ ^ 2 := by
+    have hlimit := le_of_tendsto (odd_error_limit θ)
+      (Eventually.of_forall (fun k : ℕ ↦ hcomparison (2 * k + 1) (by omega) θ))
+    rw [familySlope_norm pi_pos.le, familySlope_norm pi_pos.le,
+      show π * |θ| / 2 + π * |θ| / 2 = π * |θ| by ring,
+      odd_limit_factored] at hlimit
+    have hnonneg : 0 ≤ a * (π * |θ|) := by
+      have he : a * (π * |θ|) = (π - 2) * |θ| / (2 * π) := by
+        dsimp [a]
+        field_simp
+      rw [he]
+      exact div_nonneg (mul_nonneg (by linarith [pi_gt_three]) (abs_nonneg _))
+        (by positivity)
+    have hroot : 1 ≤ Real.sqrt (1 + θ ^ 2 / (4 * (π - 2) ^ 2)) := by
+      simpa only [Real.sqrt_one] using Real.sqrt_le_sqrt
+        (show (1 : ℝ) ≤ 1 + θ ^ 2 / (4 * (π - 2) ^ 2) from
+          le_add_of_nonneg_right (by positivity))
+    calc
+      a * (π * |θ|) ≤ a * (π * |θ|) *
+          Real.sqrt (1 + θ ^ 2 / (4 * (π - 2) ^ 2)) := le_mul_of_one_le_right hnonneg hroot
+      _ ≤ c * π * |θ| + K * θ ^ 2 := by simpa only [mul_assoc] using hlimit
+  apply linear_coefficient_le_of_quadratic_error (E := fun θ ↦ a * (π * |θ|)) pi_pos
+  · apply tendsto_const_nhds.congr'
+    filter_upwards [self_mem_nhdsWithin] with θ hθ
+    have hne : θ ≠ 0 := hθ
+    dsimp [a]
+    field_simp [pi_ne_zero, abs_ne_zero.mpr hne]
+  · exact Eventually.of_forall hlinear
 
 end UnitaryProducts.PaperProof.Spin

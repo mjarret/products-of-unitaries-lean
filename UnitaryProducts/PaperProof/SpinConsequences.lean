@@ -79,9 +79,6 @@ theorem discussion_actual_error_limit (θ : ℝ)
   filter_upwards [eventually_ge_atTop 1] with T hT
   rw [discussion_evolution_closed θ (by omega) (hU T (by omega))]
 
-/-- At θ=2π the field completes a turn and returns to its initial value. -/
-theorem full_turn_field_returns : family (2 * π) (2 * π) 1 = family (2 * π) (2 * π) 0 := by
-  simp [family, axis, Real.cos_two_pi, Real.sin_two_pi]
 
 /-- The continuous endpoint and rounded product become opposite at θ=2π.
 The norm of their sum is exactly the residual already shown to vanish. -/
@@ -128,18 +125,6 @@ theorem full_turn_antiphase (U : ℕ → ℝ → Matrix (Fin 2) (Fin 2) ℂ)
     filter_upwards [eventually_ge_atTop 1] with T hT
     rw [evolution_closed (2 * π) (2 * π) (by omega) (hU T (by omega))]
 
-/-- Two is the greatest possible operator-norm distance between unitaries. -/
-theorem unitary_distance_le_two {d : ℕ} [NeZero d]
-    (A B : Matrix (Fin d) (Fin d) ℂ)
-    (hA : A ∈ unitary (Matrix (Fin d) (Fin d) ℂ))
-    (hB : B ∈ unitary (Matrix (Fin d) (Fin d) ℂ)) : ‖A - B‖ ≤ 2 := by
-  have hnA : ‖A‖ = 1 := by
-    simpa only [one_mul, norm_one] using
-      CStarRing.norm_mul_mem_unitary (1 : Matrix (Fin d) (Fin d) ℂ) hA
-  have hnB : ‖B‖ = 1 := by
-    simpa only [one_mul, norm_one] using
-      CStarRing.norm_mul_mem_unitary (1 : Matrix (Fin d) (Fin d) ℂ) hB
-  exact (norm_sub_le A B).trans_eq (by rw [hnA, hnB]; norm_num)
 
 /-- The resonant example really satisfies a spectral-width bound of 2π at
 every parameter, so its nonvanishing error tests the proposed closed boundary. -/

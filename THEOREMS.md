@@ -1,6 +1,6 @@
 # Paper statement and proof index
 
-Numbered rows correspond to the paper’s statements; unnumbered rows support its equations and mathematical prose.
+Each numbered row gives the declaration for that statement. Unnumbered rows give mathematical support for the paper’s equations and arguments.
 
 | Paper number | Label | Declaration | File:line |
 | --- | --- | --- | --- |
@@ -32,7 +32,7 @@ Numbered rows correspond to the paper’s statements; unnumbered rows support it
 | 4.7 | `cor:walk-leakage` | `UnitaryProducts.PaperProof.cor_walk_leakage` | [UnitaryProducts/PaperProof/CorWalkLeakage.lean:165](UnitaryProducts/PaperProof/CorWalkLeakage.lean#L165) |
 | 5.1 | `ex:gap-adapted` | `UnitaryProducts.PaperProof.ex_gap_adapted` | [UnitaryProducts/PaperProof/GapAdapted.lean:468](UnitaryProducts/PaperProof/GapAdapted.lean#L468) |
 | 5.3 | `ex:crossings` | `UnitaryProducts.PaperProof.ex_crossings` | [UnitaryProducts/PaperProof/Crossings.lean:37](UnitaryProducts/PaperProof/Crossings.lean#L37) |
-| 5.2 | `ex:precessing-spin` | `UnitaryProducts.PaperProof.Spin.ex_precessing_spin` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1390](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1390) |
+| 5.2 | `ex:precessing-spin` | `UnitaryProducts.PaperProof.Spin.ex_precessing_spin` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1346](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1346) |
 | unnumbered | `claim:0` | `UnitaryProducts.PaperProof.thm_unit_steps_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:169](UnitaryProducts/PaperProof/UniformConsequences.lean#L169) |
 | unnumbered | `eq:products` | `UnitaryProducts.PaperProof.unit_steps_endpoint_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:140](UnitaryProducts/PaperProof/UniformConsequences.lean#L140) |
 | unnumbered | `claim:0` | `UnitaryProducts.PaperProof.cor_unit_transfer_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:219](UnitaryProducts/PaperProof/UniformConsequences.lean#L219) |
@@ -50,6 +50,8 @@ Numbered rows correspond to the paper’s statements; unnumbered rows support it
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.duhamel` | [UnitaryProducts/Paper/Preliminaries.lean:229](UnitaryProducts/Paper/Preliminaries.lean#L229) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.duhamel_bound` | [UnitaryProducts/PaperProof/ThmComparison.lean:120](UnitaryProducts/PaperProof/ThmComparison.lean#L120) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.piecewise_constant_one_sided_limits` | [UnitaryProducts/Prose/Introduction.lean:77](UnitaryProducts/Prose/Introduction.lean#L77) |
+| unnumbered | `claim:1` | `UnitaryProducts.Prose.regulated_family_with_jump` | [UnitaryProducts/Prose/Fidelity.lean:188](UnitaryProducts/Prose/Fidelity.lean#L188) |
+| unnumbered | `claim:1` | `UnitaryProducts.Regulated` | [UnitaryProducts/Evolution/Regulated.lean:37](UnitaryProducts/Evolution/Regulated.lean#L37) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.truncation_error` | [UnitaryProducts/Paper/FineStepBounds.lean:89](UnitaryProducts/Paper/FineStepBounds.lean#L89) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.path_midpoint_error_of_odd` | [UnitaryProducts/Prose/Introduction.lean:204](UnitaryProducts/Prose/Introduction.lean#L204) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.path_midpoint_error_of_hermitian_samples` | [UnitaryProducts/Prose/Fidelity.lean:80](UnitaryProducts/Prose/Fidelity.lean#L80) |
@@ -119,8 +121,6 @@ Numbered rows correspond to the paper’s statements; unnumbered rows support it
 | unnumbered | `claim:2` | `UnitaryProducts.eVariationOn_le_lipschitz` | [UnitaryProducts/Approximation/VariationGauge.lean:61](UnitaryProducts/Approximation/VariationGauge.lean#L61) |
 | unnumbered | `claim:2` | `UnitaryProducts.regulated_of_boundedVariation` | [UnitaryProducts/Approximation/VariationRegulated.lean:80](UnitaryProducts/Approximation/VariationRegulated.lean#L80) |
 | unnumbered | `claim:2` | `UnitaryProducts.Paper.piecewise_regulated` | [UnitaryProducts/Paper/Preliminaries.lean:162](UnitaryProducts/Paper/Preliminaries.lean#L162) |
-| unnumbered | `claim:2` | `UnitaryProducts.Regulated` | [UnitaryProducts/Evolution/Regulated.lean:37](UnitaryProducts/Evolution/Regulated.lean#L37) |
-| unnumbered | `claim:2` | `UnitaryProducts.Prose.regulated_family_with_jump` | [UnitaryProducts/Prose/Fidelity.lean:188](UnitaryProducts/Prose/Fidelity.lean#L188) |
 | unnumbered | `claim:2` | `UnitaryProducts.Regulated.countable_not_continuousWithinAt` | [UnitaryProducts/Evolution/RegulatedExistence.lean:142](UnitaryProducts/Evolution/RegulatedExistence.lean#L142) |
 | unnumbered | `claim:2` | `UnitaryProducts.Regulated.translate_to_zero` | [UnitaryProducts/Evolution/RegulatedDuhamel.lean:43](UnitaryProducts/Evolution/RegulatedDuhamel.lean#L43) |
 | unnumbered | `claim:2` | `UnitaryProducts.Regulated.exists_norm_le` | [UnitaryProducts/Evolution/RegulatedExistence.lean:63](UnitaryProducts/Evolution/RegulatedExistence.lean#L63) |
@@ -527,8 +527,8 @@ Numbered rows correspond to the paper’s statements; unnumbered rows support it
 | unnumbered | `claim:6` | `UnitaryProducts.PaperProof.commuting_family_derivative` | [UnitaryProducts/PaperProof/ExamplesProse.lean:49](UnitaryProducts/PaperProof/ExamplesProse.lean#L49) |
 | unnumbered | `claim:6` | `UnitaryProducts.PaperProof.commuting_diagonal_offdiagonal_zero` | [UnitaryProducts/PaperProof/ExamplesProse.lean:65](UnitaryProducts/PaperProof/ExamplesProse.lean#L65) |
 | unnumbered | `claim:6` | `UnitaryProducts.PaperProof.eigenbasis_derivative_entry` | [UnitaryProducts/PaperProof/ExamplesProse.lean:77](UnitaryProducts/PaperProof/ExamplesProse.lean#L77) |
-| unnumbered | `claim:6` | `UnitaryProducts.PaperProof.Spin.discussion_family` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:790](UnitaryProducts/PaperProof/PrecessingSpin.lean#L790) |
-| unnumbered | `claim:6` | `UnitaryProducts.PaperProof.Spin.discussion_full_turn_factor` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:807](UnitaryProducts/PaperProof/PrecessingSpin.lean#L807) |
+| unnumbered | `claim:6` | `UnitaryProducts.PaperProof.Spin.discussion_family` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:791](UnitaryProducts/PaperProof/PrecessingSpin.lean#L791) |
+| unnumbered | `claim:6` | `UnitaryProducts.PaperProof.Spin.discussion_full_turn_factor` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:808](UnitaryProducts/PaperProof/PrecessingSpin.lean#L808) |
 | unnumbered | `claim:6` | `UnitaryProducts.PaperProof.Spin.discussion_actual_error_limit` | [UnitaryProducts/PaperProof/SpinConsequences.lean:69](UnitaryProducts/PaperProof/SpinConsequences.lean#L69) |
 | unnumbered | `claim:6` | `UnitaryProducts.PaperProof.Spin.discussion_evolution_closed` | [UnitaryProducts/PaperProof/SpinConsequences.lean:45](UnitaryProducts/PaperProof/SpinConsequences.lean#L45) |
 | unnumbered | `claim:6` | `UnitaryProducts.PaperProof.qaoa_smooth_unitary_family` | [UnitaryProducts/PaperProof/ExamplesProse.lean:22](UnitaryProducts/PaperProof/ExamplesProse.lean#L22) |
@@ -563,61 +563,48 @@ Numbered rows correspond to the paper’s statements; unnumbered rows support it
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.crossing_leakage_tendsto_zero` | [UnitaryProducts/PaperProof/Crossings.lean:68](UnitaryProducts/PaperProof/Crossings.lean#L68) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.family` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:245](UnitaryProducts/PaperProof/PrecessingSpin.lean#L245) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.pauli_conj` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:190](UnitaryProducts/PaperProof/PrecessingSpin.lean#L190) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.solution_derivative` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:375](UnitaryProducts/PaperProof/PrecessingSpin.lean#L375) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.evol_family` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:277](UnitaryProducts/PaperProof/PrecessingSpin.lean#L277) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.sampled_product` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:283](UnitaryProducts/PaperProof/PrecessingSpin.lean#L283) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.unit_product_closed` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:306](UnitaryProducts/PaperProof/PrecessingSpin.lean#L306) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.rounded_product_closed` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:315](UnitaryProducts/PaperProof/PrecessingSpin.lean#L315) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_distance_matrix` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:84](UnitaryProducts/PaperProof/PrecessingSpin.lean#L84) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.evolution_closed` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:409](UnitaryProducts/PaperProof/PrecessingSpin.lean#L409) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.rounded_product_closed` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:316](UnitaryProducts/PaperProof/PrecessingSpin.lean#L316) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_distance` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:115](UnitaryProducts/PaperProof/PrecessingSpin.lean#L115) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.evol_involution` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:43](UnitaryProducts/PaperProof/PrecessingSpin.lean#L43) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.half_turn_step` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1072](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1072) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.frozen_axis_angle` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1267](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1267) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.axis_arctan_coordinates` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1240](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1240) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.xz_angle_anticommutator` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1258](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1258) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.odd_error_squared` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1285](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1285) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.error_norm_frame` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:965](UnitaryProducts/PaperProof/PrecessingSpin.lean#L965) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.evol_nat_mul` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:524](UnitaryProducts/PaperProof/PrecessingSpin.lean#L524) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.phase_defect_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:569](UnitaryProducts/PaperProof/PrecessingSpin.lean#L569) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.axis_angle_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1205](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1205) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.odd_error_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1331](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1331) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.family_derivWithin_norm` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1103](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1103) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.odd_limit_factored` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1111](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1111) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.one_step_error_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1177](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1177) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.precessing_spin_every_width` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1022](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1022) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.family_derivative_lipschitz` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1145](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1145) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.familySlope_supNorm` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1432](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1432) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_jump_quadratic` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1458](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1458) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.precessing_spin_optimal` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1477](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1477) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_factor` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:351](UnitaryProducts/PaperProof/PrecessingSpin.lean#L351) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.pauli_relations` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:32](UnitaryProducts/PaperProof/PrecessingSpin.lean#L32) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_step` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:517](UnitaryProducts/PaperProof/PrecessingSpin.lean#L517) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_product` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:532](UnitaryProducts/PaperProof/PrecessingSpin.lean#L532) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_residual` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:638](UnitaryProducts/PaperProof/PrecessingSpin.lean#L638) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_residual_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:674](UnitaryProducts/PaperProof/PrecessingSpin.lean#L674) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_error_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:695](UnitaryProducts/PaperProof/PrecessingSpin.lean#L695) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.involution_distance` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:500](UnitaryProducts/PaperProof/PrecessingSpin.lean#L500) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.half_turn_factor` | [UnitaryProducts/PaperProof/SpinProse.lean:49](UnitaryProducts/PaperProof/SpinProse.lean#L49) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.axis_commutator` | [UnitaryProducts/PaperProof/SpinProse.lean:23](UnitaryProducts/PaperProof/SpinProse.lean#L23) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.half_turn_commute_iff` | [UnitaryProducts/PaperProof/SpinProse.lean:31](UnitaryProducts/PaperProof/SpinProse.lean#L31) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.half_turn_step` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1073](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1073) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.frozen_axis_angle` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1222](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1222) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.axis_arctan_coordinates` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1195](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1195) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.xz_angle_anticommutator` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1213](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1213) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.error_norm_frame` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:966](UnitaryProducts/PaperProof/PrecessingSpin.lean#L966) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.odd_error_squared` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1240](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1240) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.phase_defect_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:570](UnitaryProducts/PaperProof/PrecessingSpin.lean#L570) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.axis_angle_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1160](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1160) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.odd_error_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1286](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1286) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.family_derivWithin_norm` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1104](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1104) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.odd_limit_factored` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1112](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1112) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.consecutive_half_turns_commute_iff` | [UnitaryProducts/PaperProof/SpinProse.lean:57](UnitaryProducts/PaperProof/SpinProse.lean#L57) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_step_phase_axis` | [UnitaryProducts/PaperProof/SpinRemainders.lean:258](UnitaryProducts/PaperProof/SpinRemainders.lean#L258) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spinPhase` | [UnitaryProducts/PaperProof/SpinRemainders.lean:104](UnitaryProducts/PaperProof/SpinRemainders.lean#L104) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spinStepAxis` | [UnitaryProducts/PaperProof/SpinRemainders.lean:252](UnitaryProducts/PaperProof/SpinRemainders.lean#L252) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.step_closed` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:218](UnitaryProducts/PaperProof/PrecessingSpin.lean#L218) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_phase_quadratic` | [UnitaryProducts/PaperProof/SpinRemainders.lean:108](UnitaryProducts/PaperProof/SpinRemainders.lean#L108) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_axis_angle_cubic` | [UnitaryProducts/PaperProof/SpinRemainders.lean:146](UnitaryProducts/PaperProof/SpinRemainders.lean#L146) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_step_axis_arctan` | [UnitaryProducts/PaperProof/SpinRemainders.lean:321](UnitaryProducts/PaperProof/SpinRemainders.lean#L321) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_axis_angle_anticommutator` | [UnitaryProducts/PaperProof/SpinRemainders.lean:350](UnitaryProducts/PaperProof/SpinRemainders.lean#L350) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.odd_resonance_error_quadratic` | [UnitaryProducts/PaperProof/SpinRemainders.lean:234](UnitaryProducts/PaperProof/SpinRemainders.lean#L234) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.evolution_closed` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:408](UnitaryProducts/PaperProof/PrecessingSpin.lean#L408) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.family_spectrum` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:249](UnitaryProducts/PaperProof/PrecessingSpin.lean#L249) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_frozen_spectrum` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:471](UnitaryProducts/PaperProof/PrecessingSpin.lean#L471) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.xz_evol_spectrum` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:462](UnitaryProducts/PaperProof/PrecessingSpin.lean#L462) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_field_returns` | [UnitaryProducts/PaperProof/SpinConsequences.lean:83](UnitaryProducts/PaperProof/SpinConsequences.lean#L83) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_antiphase` | [UnitaryProducts/PaperProof/SpinConsequences.lean:111](UnitaryProducts/PaperProof/SpinConsequences.lean#L111) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.unitary_distance_le_two` | [UnitaryProducts/PaperProof/SpinConsequences.lean:132](UnitaryProducts/PaperProof/SpinConsequences.lean#L132) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_width` | [UnitaryProducts/PaperProof/SpinConsequences.lean:146](UnitaryProducts/PaperProof/SpinConsequences.lean#L146) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_not_tendsto_zero` | [UnitaryProducts/PaperProof/SpinConsequences.lean:163](UnitaryProducts/PaperProof/SpinConsequences.lean#L163) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.family_derivative_lipschitz` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1146](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1146) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.familySlope_supNorm` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1388](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1388) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.spin_jump_quadratic` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1414](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1414) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.precessing_spin_pi_optimal` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1454](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1454) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_factor` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:352](UnitaryProducts/PaperProof/PrecessingSpin.lean#L352) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_product` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:533](UnitaryProducts/PaperProof/PrecessingSpin.lean#L533) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_residual_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:675](UnitaryProducts/PaperProof/PrecessingSpin.lean#L675) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_error_limit` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:696](UnitaryProducts/PaperProof/PrecessingSpin.lean#L696) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.involution_distance` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:501](UnitaryProducts/PaperProof/PrecessingSpin.lean#L501) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.odd_resonance_error_quadratic` | [UnitaryProducts/PaperProof/SpinRemainders.lean:125](UnitaryProducts/PaperProof/SpinRemainders.lean#L125) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.precessing_spin_optimal` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1433](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1433) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.endpoint_coefficient_optimal` | [UnitaryProducts/PaperProof/OddResonance.lean:118](UnitaryProducts/PaperProof/OddResonance.lean#L118) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.coefficient_le_of_odd_resonances` | [UnitaryProducts/PaperProof/OddResonance.lean:54](UnitaryProducts/PaperProof/OddResonance.lean#L54) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.exists_odd_resonant_width` | [UnitaryProducts/PaperProof/OddResonance.lean:22](UnitaryProducts/PaperProof/OddResonance.lean#L22) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_antiphase` | [UnitaryProducts/PaperProof/SpinConsequences.lean:108](UnitaryProducts/PaperProof/SpinConsequences.lean#L108) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_width` | [UnitaryProducts/PaperProof/SpinConsequences.lean:131](UnitaryProducts/PaperProof/SpinConsequences.lean#L131) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_not_tendsto_zero` | [UnitaryProducts/PaperProof/SpinConsequences.lean:148](UnitaryProducts/PaperProof/SpinConsequences.lean#L148) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.X` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:25](UnitaryProducts/PaperProof/PrecessingSpin.lean#L25) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.Y` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:27](UnitaryProducts/PaperProof/PrecessingSpin.lean#L27) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.Z` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:29](UnitaryProducts/PaperProof/PrecessingSpin.lean#L29) |
+
+The statement labeled `cor:walks` is Theorem 4.5.
+
+Remark 3.9 also uses the following declarations for equal rank, separation, and the projector norm identity:
+
+- [`UnitaryProducts.PaperProof.truncated_endpoint_equal_rank`](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L70)
+- [`UnitaryProducts.PaperProof.truncated_endpoint_weyl_separation`](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L91)
+- [`UnitaryProducts.PaperProof.truncated_endpoint_norm_identity`](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L139)

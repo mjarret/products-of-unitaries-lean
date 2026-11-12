@@ -464,7 +464,8 @@ theorem gap_derivative_endpoints (D : 𝕄) {Γ u : ℝ → ℝ} {p cp : ℝ}
 /-- **Example 5.1** (`ex:gap-adapted`): the gap-adapted path satisfies the
 unit-step hypotheses at width two, with the three displayed derivative bounds.
 The proof checks Weyl regularity, ODE normalization, and the derivative bounds;
-Example 4.6 then applies with any continuous leakage bound. -/
+The least-eigenvalue spectral projectors commute with the endpoint Hamiltonians;
+Example 4.6 gives the truncated-product bound for every continuous leakage bound. -/
 theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁.IsHermitian)
     (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1)
     (Γ : ℝ → ℝ) (hΓ : ∀ x ∈ Icc (0 : ℝ) 1, IsLeastGap H₀ H₁ h₀ h₁ x (Γ x))
@@ -489,7 +490,19 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
     ‖Hd 0‖ + ‖Hd 1‖ = cp * ‖H₁ - H₀‖ * (Γ 0 ^ p + Γ 1 ^ p) ∧
     unitSupNorm Hd ≤ 2 ^ p * cp * ‖H₁ - H₀‖ ∧
     (∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ p * 4 ^ p * cp ^ 2 * ‖H₁ - H₀‖ ^ 2 * |t - s|) := by
+      ‖Hd t - Hd s‖ ≤ p * 4 ^ p * cp ^ 2 * ‖H₁ - H₀‖ ^ 2 * |t - s|) ∧
+    (let P := specProj h₀ {h₀.eigenvalues₀ ⟨Fin.last d, by simp⟩}
+     let Q := specProj h₁ {h₁.eigenvalues₀ ⟨Fin.last d, by simp⟩}
+     IsStarProjection P ∧ IsStarProjection Q ∧ Commute P (H 0) ∧ Commute Q (H 1) ∧
+     ∀ (U : ℝ → 𝕄) (T k : ℕ), 0 < T →
+       IsEvolution (fun t ↦ H (t / T)) U 0 T →
+       ∀ (C : NNReal) (δ : ℝ), 0 < δ → ‖(1 - Q) * U T * P‖ ≤ (C : ℝ) / T →
+       let σ := ⨆ s : Icc (0 : ℝ) 1, ⨆ i : Fin (d + 1),
+         (Finset.univ.filter fun j ↦ truncHerm k (H s) i j ≠ H s i j).card
+       2 * ((C : ℝ) + hamiltonianEnergy 2
+         (p * 4 ^ p * cp ^ 2 * ‖H₁ - H₀‖ ^ 2) H) / δ ≤ T →
+       Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) →
+       ‖(1 - Q) * (unitProduct (fun s ↦ scalarEntryMap (truncBits k) (H s)) T).1 * P‖ ≤ δ) := by
   intro cp H Hd
   let D := H₁ - H₀
   have hpos : ∀ x ∈ Icc (0 : ℝ) 1, 0 < Γ x := fun x hx ↦ hΓstar.trans_le (hΓlow x hx)
@@ -524,8 +537,30 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
     gap_derivative_endpoints D hcp (hpos 0 (by norm_num)).le (hpos 1 (by norm_num)).le hu0 hu1
   have hsup : unitSupNorm Hd ≤ 2 ^ p * cp * ‖D‖ :=
     gap_derivative_supNorm_le D (by linarith) hcp hbounds hurange
-  exact ⟨hu1, hH0, hH1, hH, hd, hc, hdc, hderiv, hwidth,
-    by linarith [pi_gt_three], hends, hsup, hlip⟩
+  have hnonresonant : (2 : ℝ) < 2 * π := by linarith [pi_gt_three]
+  refine ⟨hu1, hH0, hH1, hH, hd, hc, hdc, hderiv, hwidth,
+    hnonresonant, hends, hsup, hlip, ?_⟩
+  let P := specProj h₀ {h₀.eigenvalues₀ ⟨Fin.last d, by simp⟩}
+  let Q := specProj h₁ {h₁.eigenvalues₀ ⟨Fin.last d, by simp⟩}
+  have hP : IsStarProjection P := isStarProjection_specProj h₀ _
+  have hQ : IsStarProjection Q := isStarProjection_specProj h₁ _
+  have hPc : Commute P (H 0) := by rw [hH0]; exact commute_specProj h₀ _
+  have hQc : Commute Q (H 1) := by rw [hH1]; exact commute_specProj h₁ _
+  refine ⟨hP, hQ, hPc, hQc, ?_⟩
+  intro U T k hT hU C δ hδ hcont
+  have hderivLip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
+      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤
+        p * 4 ^ p * cp ^ 2 * ‖H₁ - H₀‖ ^ 2 * |t - s| := by
+    intro s hs t ht
+    rw [hderiv s hs, hderiv t ht]
+    exact hlip s hs t ht
+  have hsampleWidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ i q,
+      |(hH _ (walkCubic_sample hj)).eigenvalues i -
+        (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ 2 :=
+    fun j hj i q ↦ hwidth _ (walkCubic_sample hj) i q
+  exact ex_unit_transfer_bounds 2 hnonresonant H U T k hT hH hc
+    (p * 4 ^ p * cp ^ 2 * ‖H₁ - H₀‖ ^ 2) hderivLip hsampleWidth hU
+    P Q hP hQ hPc hQc C δ hδ hcont
 
 
 /-- Orthogonal projection decomposes the squared norm into success probability

@@ -5,7 +5,6 @@ Authors: Michael Jarret
 -/
 module
 
-public import Mathlib.Analysis.Calculus.InverseFunctionTheorem.Deriv
 public import Mathlib.MeasureTheory.Integral.Layercake
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 public import UnitaryProducts.Spectral.Weyl
@@ -844,52 +843,6 @@ theorem gap_factor_count {Edis Econt Kcont Kdisc ε g T : ℝ}
     _ ≤ Kcont / (T * g) + Kdisc / (T * g) := add_le_add_left hcontinuous _
     _ = (Kcont + Kdisc) / (T * g) := by ring
     _ ≤ ε := herr
-
-/-- A corner of the gap prevents the gap-adapted schedule from being `C²` at
-its preimage. If the schedule were `C²`, its strictly positive speed would
-provide a differentiable local inverse and recover the gap as
-`(u' / cp)^(1/p)` in that inverse coordinate. -/
-theorem gap_corner_obstructs_C2 {Γ u : ℝ → ℝ} {cp p s : ℝ}
-    (hcp : 0 < cp) (hp : 0 < p) (hs : s ∈ Ioo (0 : ℝ) 1)
-    (hpos : ∀ x ∈ Icc (0 : ℝ) 1, 0 < Γ x)
-    (hurange : MapsTo u (Icc (0 : ℝ) 1) (Icc (0 : ℝ) 1))
-    (hu : ∀ t ∈ Icc (0 : ℝ) 1,
-      HasDerivWithinAt u (cp * Γ (u t) ^ p) (Icc 0 1) t)
-    (hcorner : ¬ DifferentiableAt ℝ Γ (u s)) : ¬ ContDiffAt ℝ 2 u s := by
-  intro hc2
-  have hs' : s ∈ Icc (0 : ℝ) 1 := ⟨hs.1.le, hs.2.le⟩
-  have hspeed : 0 < cp * Γ (u s) ^ p :=
-    mul_pos hcp (Real.rpow_pos_of_pos (hpos (u s) (hurange hs')) _)
-  have hd := (hu s hs').hasDerivAt (Icc_mem_nhds hs.1 hs.2)
-  have hstrict := hc2.hasStrictDerivAt' hd (by norm_num)
-  let v := HasStrictDerivAt.localInverse u (cp * Γ (u s) ^ p) s hstrict hspeed.ne'
-  have hv : HasDerivAt v (cp * Γ (u s) ^ p)⁻¹ (u s) :=
-    (hstrict.to_localInverse hspeed.ne').hasDerivAt
-  have hv0 : v (u s) = s := (hstrict.eventually_left_inverse hspeed.ne').self_of_nhds
-  let F := fun t ↦ (deriv u t / cp) ^ (1 / p)
-  have hdu : DifferentiableAt ℝ (deriv u) s :=
-    (hc2.derivWithin (m := 1) (by norm_num)).differentiableAt (by norm_num)
-  have hF : DifferentiableAt ℝ F s :=
-    (hdu.div_const cp).rpow_const (Or.inl (by rw [hd.deriv]; positivity))
-  have hF_eq : ∀ᶠ t in 𝓝 s, F t = Γ (u t) := by
-    filter_upwards [Ioo_mem_nhds hs.1 hs.2] with t ht
-    have ht' : t ∈ Icc (0 : ℝ) 1 := ⟨ht.1.le, ht.2.le⟩
-    have hdt := ((hu t ht').hasDerivAt (Icc_mem_nhds ht.1 ht.2)).deriv
-    dsimp only [F]
-    rw [hdt, mul_div_cancel_left₀ _ hcp.ne', ← Real.rpow_mul (hpos (u t) (hurange ht')).le,
-      mul_one_div_cancel hp.ne', Real.rpow_one]
-  have hcomp : DifferentiableAt ℝ (F ∘ v) (u s) := by
-    apply DifferentiableAt.comp _ ?_ hv.differentiableAt
-    simpa only [hv0] using hF
-  have hveq : ∀ᶠ y in 𝓝 (u s), u (v y) = y := hstrict.eventually_right_inverse hspeed.ne'
-  have hFveq : ∀ᶠ y in 𝓝 (u s), F (v y) = Γ (u (v y)) := by
-    have hvcont : Tendsto v (𝓝 (u s)) (𝓝 s) := by
-      simpa only [ContinuousAt, hv0] using hv.continuousAt
-    exact hvcont.eventually hF_eq
-  apply hcorner
-  apply hcomp.congr_of_eventuallyEq
-  filter_upwards [hveq, hFveq] with y hright hformula
-  simpa only [Function.comp_apply, hright] using hformula.symm
 
 /-- The matrix form of the vector-to-operator inference after Example 5.1. -/
 theorem gap_probability_to_matrix {P Q U : 𝕄}

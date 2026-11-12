@@ -3712,25 +3712,47 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 
     Interpretation, organization, or author-approved nonmathematical declaration.
 
-581. **EXTERNAL — Section 5**
+581. **LEAN — Section 5**
 
-    Schedules that slow down where the spectral gap is small let bounds on the error of adiabatic state preparation reach an inverse-linear dependence on the gap. Guo and An~\cite{guo2025} prove such a bound for a power-law schedule, where their bound for a linear schedule is inverse-quadratic \cite[Theorem~3]{guo2025}, and they leave open whether a quantum circuit keeps that dependence, noting that it requires further analysis at the discrete level \cite[Section~5]{guo2025}.
+    I apply \eqref{eq:products} and \Cref{prop:transfer} to schedules adapted to the spectral gap, to a precessing spin, and to eigenvalue crossings.
 
-    Guo–An [guo2025], Theorem 3 and §5
+    UnitaryProducts.PaperProof.ex_gap_adapted; UnitaryProducts.PaperProof.Spin.ex_precessing_spin; UnitaryProducts.PaperProof.ex_crossings
 
 582. **LEAN — Section 5**
+
+    Throughout, $T\ge1$ is an integer, $X$, $Y$, and $Z=\operatorname{diag}(1,-1)$ are the Pauli matrices, $\evol$ is the evolution of a Hamiltonian $\sched$ over time $T$, $\devprod_T$ is its $T$-step product, and $\compevol(T)=e^{-i\sched(1)/2}\devprod_Te^{i\sched(0)/2}$, as in \eqref{eq:rounded}.
+
+    UnitaryProducts.Paper.IsEvolution; UnitaryProducts.Paper.unitProduct; UnitaryProducts.Paper.regulated_evolution_rounded; UnitaryProducts.PaperProof.Spin.X; UnitaryProducts.PaperProof.Spin.Y; UnitaryProducts.PaperProof.Spin.Z
+
+583. **LEAN — Section 5**
+
+    At width $\pi$, with $L$ the Lipschitz constant of $\sched'$, the values computed after \eqref{eq:products} give
+    \begin{equation}\label{eq:products-pi}
+     \|\compevol(T)-\evol(T)\|\le\frac1T\Bigl(c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)+\Bigl(\frac1{24}+\frac1{\pi^2}\Bigr)L+b\|\sched'\|_\infty^2\Bigr),
+    \end{equation}
+    where $c_0=1/(2\pi)-1/\pi^2$ and $b=c_1+2\cormult'(\pi)<0.061$.
+
+    UnitaryProducts.PaperProof.products_pi; UnitaryProducts.PaperProof.products_pi_decimal_coefficients
+
+584. **EXTERNAL — Section 5**
+
+    Guo and An~\cite{guo2025} prove that a power-law schedule adapted to the spectral gap gives adiabatic state preparation an error inverse-linear in the gap, where their bound for a linear schedule is inverse-quadratic \cite[Theorem~3]{guo2025}, and they leave open whether a quantum circuit keeps that dependence \cite[Section~5]{guo2025}.
+
+    Guo–An [guo2025], Theorem 3 and Section 5
+
+585. **LEAN — Section 5**
 
     For products of the exponentials of samples, \Cref{ex:gap-adapted} answers that question as an immediate consequence of \eqref{eq:products}.
 
     UnitaryProducts.PaperProof.ex_gap_adapted; UnitaryProducts.PaperProof.gap_added_term_isBigO; UnitaryProducts.PaperProof.gap_three_halves_order; UnitaryProducts.PaperProof.gap_factor_count
 
-583. **EXTERNAL — Section 5**
+586. **EXTERNAL — Section 5**
 
-    For discrete evolutions, inverse-linear dependence on the gap is known, up to a factor $\log N$, in adiabatic Grover search among $N$ items \cite[Theorem~15]{an2025}, in the quantum linear systems problem \cite{costa2022}, and for Szegedy walks under assumed bounds on their discrete variation, a multistep gap comparable to the instantaneous one, a quadrature estimate, and conditions on the schedule's path integrals, normalization, and runtime \cite[Theorem~15]{costa2026}.
+    Earlier discrete results with inverse-linear dependence treat Grover search, up to a factor $\log N$ \cite[Theorem~15]{an2025}, and linear systems \cite{costa2022}, or assume bounds on the discrete variation and a multistep gap \cite[Theorem~15]{costa2026}.
 
-    An–Costa–Berry [an2025], Theorem 15; Costa et al. [costa2022]; Costa et al. [costa2026], Theorem 15
+    An–Costa–Berry [an2025], Theorem 15; Costa et al. [costa2022] (no theorem locator supplied in the paper); Costa et al. [costa2026], Theorem 15
 
-584. **LEAN — Example 5.1**
+587. **LEAN — Example 5.1**
 
     Let $\sched_0$ and $\sched_1$ be Hermitian matrices with $\|\sched_0\|\le1$ and $\|\sched_1\|\le1$. For $x\in[0,1]$, let $\Gamma(x)=\gap{(1-x)\sched_0+x\sched_1}$ be the spectral gap of the least eigenvalue of $(1-x)\sched_0+x\sched_1$, and suppose that $\Gamma_*=\inf_{x\in[0,1]}\Gamma(x)>0$. Let $1<p<2$, let $c_p=\int_0^1\Gamma(x)^{-p}\,dx$, let $u(s)$ for $s\in[0,1]$ solve $u'(s)=c_p\Gamma(u(s))^p$ with $u(0)=0$, and let $\sched(s)=(1-u(s))\sched_0+u(s)\sched_1$. Let $P$ and $Q$ be the spectral projectors of $\sched_0$ and $\sched_1$ for their least eigenvalues. Then
     \[
@@ -3740,147 +3762,186 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 
     UnitaryProducts.PaperProof.ex_gap_adapted
 
-585. **LEAN — Section 5**
+588. **EXTERNAL — Section 5**
 
-    By Weyl's perturbation theorem \cite[Corollary~III.2.6]{bhatia1997}, the ordered eigenvalues $\lambda_1(x)\le\lambda_2(x)\le\cdots$ of $(1-x)\sched_0+x\sched_1$ are Lipschitz in $x$ with constant $\|\sched_1-\sched_0\|$, and they lie in $[-1,1]$, as $\|(1-x)\sched_0+x\sched_1\|\le1$.
+    By Weyl's perturbation theorem \cite[Corollary~III.2.6]{bhatia1997}, the ordered eigenvalues $\lambda_1(x)\le\lambda_2(x)\le\cdots$ of $(1-x)\sched_0+x\sched_1$ lie in $[-1,1]$ and are Lipschitz in $x$ with constant $\|\sched_1-\sched_0\|$.
 
-    UnitaryProducts.PaperProof.gapEigen_lipschitz; UnitaryProducts.PaperProof.gapInterp_norm_le; UnitaryProducts.PaperProof.gapInterp_eigenvalue_bounds
-
-586. **LEAN — Section 5**
-
-    As $\Gamma_*>0$, the least eigenvalue has the same multiplicity $m$ for every $x$, so $\Gamma=\lambda_{m+1}-\lambda_1\le2$ is Lipschitz with constant $2\|\sched_1-\sched_0\|$, and every sample $\sched(j/T)$ has eigenvalue differences of modulus at most $2<\pi$.
-
-    UnitaryProducts.PaperProof.gap_ground_multiplicity_constant; UnitaryProducts.PaperProof.gap_first_excited_fixed; UnitaryProducts.PaperProof.interp_gap_lipschitz; UnitaryProducts.PaperProof.interp_gap_le_two; UnitaryProducts.PaperProof.gapInterp_width
-
-587. **LEAN — Section 5**
-
-    As $\Gamma(u(s))^{-p}u'(s)=c_p$, $\int_0^{u(s)}\Gamma(x)^{-p}\,dx=c_ps$, so $u(1)=1$ by the definition of $c_p$, $\sched(0)=\sched_0$, $\sched(1)=\sched_1$, and $\sched'(s)=c_p\Gamma(u(s))^p(\sched_1-\sched_0)$ satisfies
-    \begin{align*}
-     \|\sched'(0)\|+\|\sched'(1)\|&=c_p\|\sched_1-\sched_0\|\bigl(\Gamma(0)^p+\Gamma(1)^p\bigr),\\
-     \|\sched'\|_\infty&\le2^pc_p\|\sched_1-\sched_0\|,\\
-     \|\sched'(s_1)-\sched'(s_2)\|&\le p4^pc_p^2\|\sched_1-\sched_0\|^2|s_1-s_2|.
-    \end{align*}
-
-    UnitaryProducts.PaperProof.gap_schedule_integral; UnitaryProducts.PaperProof.gap_schedule_endpoint; UnitaryProducts.PaperProof.gap_schedule_derivative; UnitaryProducts.PaperProof.gap_derivative_endpoints; UnitaryProducts.PaperProof.gap_derivative_norm_le; UnitaryProducts.PaperProof.gap_derivative_lipschitz; UnitaryProducts.PaperProof.ex_gap_adapted; UnitaryProducts.PaperProof.gap_derivative_supNorm_le
-
-588. **LEAN — Section 5**
-
-    The second line uses $\Gamma\le2$, and the third multiplies $c_p\|\sched_1-\sched_0\|$ by the Lipschitz constants $p2^{p-1}$ of $y\mapsto y^p$ for $0<y\le2$, $2\|\sched_1-\sched_0\|$ of $\Gamma$, and $2^pc_p$ of $u$, as $u'\le2^pc_p$.
-
-    UnitaryProducts.PaperProof.rpow_lipschitz_two; UnitaryProducts.PaperProof.gap_schedule_lipschitz; UnitaryProducts.PaperProof.gap_derivative_lipschitz
+    Bhatia [bhatia1997], Corollary III.2.6
 
 589. **LEAN — Section 5**
 
-    As $P$ and $Q$ commute with $\sched(0)$ and $\sched(1)$, \Cref{prop:transfer} with $A=e^{-i\sched(1)/2}$, $B=e^{i\sched(0)/2}$, $\tilde P=P$, and $\tilde Q=Q$ gives $\|(1-Q)\devprod_TP\|\le\|(1-Q)\evol(T)P\|+\|\compevol(T)-\evol(T)\|$, and \eqref{eq:products-pi} with these three bounds proves the example.
+    the ordered eigenvalues $\lambda_1(x)\le\lambda_2(x)\le\cdots$ of $(1-x)\sched_0+x\sched_1$ lie in $[-1,1]$ and are Lipschitz in $x$ with constant $\|\sched_1-\sched_0\|$.
 
-    UnitaryProducts.PaperProof.ex_gap_adapted
+    UnitaryProducts.PaperProof.gapEigen_lipschitz; UnitaryProducts.PaperProof.gapInterp_norm_le; UnitaryProducts.PaperProof.gapInterp_eigenvalue_bounds
 
-590. **EXTERNAL — Section 5**
+590. **LEAN — Section 5**
 
-    Guo and An's theorem bounds the first term on the right. If $u$ is twice continuously differentiable, which their proof uses
+    As $\Gamma_*>0$, the least eigenvalue has a fixed multiplicity $m$, so $\Gamma=\lambda_{m+1}-\lambda_1\le2$ is Lipschitz with constant $2\|\sched_1-\sched_0\|$, and every sample has eigenvalue differences of modulus at most $2<\pi$.
 
-    Guo–An [guo2025], Lemma 1, (18), Theorem 5
+    UnitaryProducts.PaperProof.gap_ground_multiplicity_constant; UnitaryProducts.PaperProof.gap_first_excited_fixed; UnitaryProducts.PaperProof.interp_gap_lipschitz; UnitaryProducts.PaperProof.interp_gap_le_two; UnitaryProducts.PaperProof.gapInterp_width
 
-591. **EXTERNAL — Section 5**
+591. **LEAN — Section 5**
 
-    and the set of $x\in[0,1]$ with $\Gamma(x)\le y$ has length at most $Cy$ for every $y>0$, they prove that every unit vector $\psi$ with $P\psi=\psi$ satisfies $1-\|Q\evol(T)\psi\|^2\le\eta^2$, where $\eta$ is $1/T$ times a quantity independent of $T$ \cite[Lemma~1, (18), and Theorem~5]{guo2025}
+    Integrating $\Gamma(u)^{-p}u'=c_p$ gives $u(1)=1$, so $\sched(0)=\sched_0$, $\sched(1)=\sched_1$, and $\sched'=c_p\Gamma(u)^p(\sched_1-\sched_0)$ satisfies
+    \begin{align*}
+     \|\sched'(0)\|+\|\sched'(1)\|&=c_p\|\sched_1-\sched_0\|\bigl(\Gamma(0)^p+\Gamma(1)^p\bigr),\\
+     \|\sched'\|_\infty&\le2^pc_p\|\sched_1-\sched_0\|,\\
+     L&\le p4^pc_p^2\|\sched_1-\sched_0\|^2,
+    \end{align*}
+    where the last line multiplies the Lipschitz constants $p2^{p-1}$ of $y\mapsto y^p$ for $0<y\le2$, $2\|\sched_1-\sched_0\|$ of $\Gamma$, and $2^pc_p$ of $u$.
 
-    Guo–An [guo2025], Lemma 1, (18), Theorem 5
+    UnitaryProducts.PaperProof.gap_schedule_integral; UnitaryProducts.PaperProof.gap_schedule_endpoint; UnitaryProducts.PaperProof.gap_schedule_derivative; UnitaryProducts.PaperProof.gap_derivative_endpoints; UnitaryProducts.PaperProof.gap_derivative_norm_le; UnitaryProducts.PaperProof.gap_derivative_lipschitz; UnitaryProducts.PaperProof.ex_gap_adapted; UnitaryProducts.PaperProof.gap_derivative_supNorm_le; UnitaryProducts.PaperProof.rpow_lipschitz_two; UnitaryProducts.PaperProof.gap_schedule_lipschitz
 
 592. **LEAN — Section 5**
 
-    which fails where $\Gamma$ has a corner
+    As $P$ and $Q$ commute with $\sched(0)$ and $\sched(1)$, \Cref{prop:transfer} with $A=e^{-i\sched(1)/2}$, $B=e^{i\sched(0)/2}$, $\tilde P=P$, and $\tilde Q=Q$ gives $\|(1-Q)\devprod_TP\|\le\|(1-Q)\evol(T)P\|+\|\compevol(T)-\evol(T)\|$, and \eqref{eq:products-pi} with these bounds proves the example.
 
-    UnitaryProducts.PaperProof.gap_corner_obstructs_C2
+    UnitaryProducts.PaperProof.ex_gap_adapted
 
-593. **LEAN — Section 5**
+593. **EXTERNAL — Section 5**
 
-    so $\|(1-Q)\evol(T)P\|\le\eta$.
+    If $u$ is twice continuously differentiable, as their proof uses, and the set of $x\in[0,1]$ with $\Gamma(x)\le y$ has length at most $Cy$ for every $y>0$, Guo and An bound the infidelity $1-\|Q\evol(T)\psi\|^2$ of every unit vector $\psi=P\psi$ by $\eta^2$, so $\|(1-Q)\evol(T)P\|\le\eta$, where $\eta=O(1/(T\Gamma_*))$ over paths with fixed $p$ and $C$ \cite[Lemma~1, (18), and Theorem~5]{guo2025}.
 
-    UnitaryProducts.PaperProof.gap_projection_probability; UnitaryProducts.PaperProof.gap_probability_to_operator; UnitaryProducts.PaperProof.gap_probability_to_matrix
+    Guo–An [guo2025], Lemma 1, (18), and Theorem 5; operator-norm inference separately backed below
 
 594. **LEAN — Section 5**
 
-    The same condition gives $c_p\le pC\Gamma_*^{1-p}/(p-1)$ \cite[(19)]{guo2025}, as $c_p=\int_0^{\Gamma_*^{-p}}|\{x\in[0,1]:\Gamma(x)<y^{-1/p}\}|\,dy\le\int_0^{\Gamma_*^{-p}}Cy^{-1/p}\,dy$.
+    so $\|(1-Q)\evol(T)P\|\le\eta$
 
-    UnitaryProducts.PaperProof.gap_normalization_layercake; UnitaryProducts.PaperProof.gap_normalization_bound
+    UnitaryProducts.PaperProof.gap_projection_probability; UnitaryProducts.PaperProof.gap_probability_to_operator; UnitaryProducts.PaperProof.gap_probability_to_matrix
 
-595. **EXTERNAL — Section 5**
+595. **LEAN — Section 5**
 
-    Over a family of paths along which $\Gamma_*$ varies while $p$ and $C$ stay fixed, $\eta$ is $O(1/(T\Gamma_*))$ \cite[Theorem~5]{guo2025}
+    The same condition gives $c_p=\int_0^{\Gamma_*^{-p}}|\{x\in[0,1]:\Gamma(x)<y^{-1/p}\}|\,dy\le pC\Gamma_*^{1-p}/(p-1)$ \cite[(19)]{guo2025}, so the added term in \Cref{ex:gap-adapted} is $O(\Gamma_*^{2-2p}/T)$, of the order of $\eta$ for $p=3/2$ \cite[Result~2]{guo2025}.
 
-    Guo–An [guo2025], Theorem 5
+    UnitaryProducts.PaperProof.gap_normalization_layercake; UnitaryProducts.PaperProof.gap_normalization_bound; UnitaryProducts.PaperProof.gap_added_term_bound; UnitaryProducts.PaperProof.gap_added_term_isBigO; UnitaryProducts.PaperProof.gap_three_halves_order
 
 596. **LEAN — Section 5**
 
-    and the added term in \Cref{ex:gap-adapted} is $O(\Gamma_*^{2-2p}/T)$.
-
-    UnitaryProducts.PaperProof.gap_added_term_bound; UnitaryProducts.PaperProof.gap_added_term_isBigO
-
-597. **EXTERNAL — Section 5**
-
-    For $p=3/2$, the exponent Guo and An single out \cite[Result~2]{guo2025}
-
-    Guo–An [guo2025], Result 2
-
-598. **LEAN — Section 5**
-
-    the added term has the order $1/(T\Gamma_*)$ of $\eta$, and, for $\varepsilon>0$, $O(1/(\varepsilon\Gamma_*))$ factors, each the evolution under a fixed Hamiltonian for unit time, prepare the ground space of $\sched_1$ to within $\varepsilon$, as the continuous schedule does in time $O(1/(\varepsilon\Gamma_*))$.
+    Then $O(1/(\varepsilon\Gamma_*))$ factors prepare the ground space of $\sched_1$ to within $\varepsilon$, as the continuous schedule does in time $O(1/(\varepsilon\Gamma_*))$.
 
     UnitaryProducts.PaperProof.gap_added_term_isBigO; UnitaryProducts.PaperProof.gap_three_halves_order; UnitaryProducts.PaperProof.gap_factor_count; UnitaryProducts.PaperProof.gap_factor_count_exists
 
-599. **LEAN — Section 5**
+597. **LEAN — Section 5**
 
-    When $\sched$ satisfies the hypotheses of \Cref{thm:clocks} at width $\pi$, where $\sched'$ has Lipschitz constant $L$, inserting the values computed after \eqref{eq:products} into \eqref{eq:products} gives
-    \begin{equation}\label{eq:products-pi}
-     \|\compevol(T)-\evol(T)\|\le\frac1T\Bigl(c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)+\Bigl(\frac1{24}+\frac1{\pi^2}\Bigr)L+b\|\sched'\|_\infty^2\Bigr),
-    \end{equation}
-    where $c_0=1/(2\pi)-1/\pi^2$ and $b=c_1+2\cormult'(\pi)<0.061$.
+    A spin in a field of fixed strength whose direction precesses is the simplest system whose Hamiltonians at different times do not commute, and holding the field fixed over each time step keeps it solvable.
 
-    UnitaryProducts.PaperProof.products_pi; UnitaryProducts.PaperProof.products_pi_decimal_coefficients
+    UnitaryProducts.PaperProof.Spin.family; UnitaryProducts.PaperProof.Spin.consecutive_half_turns_commute_iff; UnitaryProducts.PaperProof.Spin.evolution_closed; UnitaryProducts.PaperProof.Spin.rounded_product_closed
 
-600. **LEAN — Section 5**
+598. **LEAN — Example 5.2**
 
-    When eigenvalues of $\sched$ cross, the eigenprojector of one level can continue through the crossing as a continuous family of projectors, and the comparison carries its leakage over to the product with no gap at all.
+    Let $0<\omega\le2\pi$ and $\theta$ be real, and let $\sched(s)=\frac\omega2\bigl(\cos(\theta s)X+\sin(\theta s)Y\bigr)$ for $s\in[0,1]$.
+
+    UnitaryProducts.PaperProof.Spin.family
+
+599. **LEAN — Example 5.2**
+
+    \item If $\omega$ is $\pi$, then, as $T\to\infty$ through odd integers, $T\|\compevol(T)-\evol(T)\|$ tends to $c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)\bigl(1+\theta^2/(4(\pi-2)^2)\bigr)^{1/2}$.
+
+    UnitaryProducts.PaperProof.Spin.ex_precessing_spin
+
+600. **LEAN — Example 5.2**
+
+    \item If $\omega$ is $2\pi$, then $\|\compevol(T)-\evol(T)\|$ tends to $2|\sin(\theta/4)|$ as $T\to\infty$.
+
+    UnitaryProducts.PaperProof.Spin.ex_precessing_spin
+
+601. **LEAN — Section 5**
+
+    With $R(t)=e^{-i\theta tZ/(2T)}$, $\sched(t/T)=R(t)\frac\omega2XR(t)^\dagger$, so $\evol(T)=e^{-i\theta Z/2}e^{-i(\omega TX-\theta Z)/2}$, and the factors $R(j)e^{-i\omega X/2}R(j)^\dagger$ with \eqref{eq:rounded} give $\compevol(T)=e^{-i\theta Z/2}S^T$ for $S=e^{-i\omega X/4}e^{i\theta Z/(2T)}e^{-i\omega X/4}$.
+
+    UnitaryProducts.PaperProof.Spin.pauli_conj; UnitaryProducts.PaperProof.Spin.evol_family; UnitaryProducts.PaperProof.Spin.evolution_closed; UnitaryProducts.PaperProof.Spin.rounded_product_closed
+
+602. **LEAN — Section 5**
+
+    For (i), $e^{-i\pi X/4}=(1-iX)/\sqrt2$ makes $S$ equal to $e^{-i\pi N/2}=-iN$ with $N=\cos\frac\theta{2T}X-\sin\frac\theta{2T}Z$, and $e^{-i(\pi TX-\theta Z)/2}=e^{-i\rho M}$ with $\rho=\frac12(\pi^2T^2+\theta^2)^{1/2}$ and $M=(\pi TX-\theta Z)/(2\rho)$.
+
+    UnitaryProducts.PaperProof.Spin.quarter_turn_X; UnitaryProducts.PaperProof.Spin.half_turn_step; UnitaryProducts.PaperProof.Spin.half_turn_step_scalar; UnitaryProducts.PaperProof.Spin.frozen_axis_angle; UnitaryProducts.PaperProof.Spin.axis_arctan_coordinates
+
+603. **LEAN — Section 5**
+
+    For odd $T$ and $\delta=\rho-\pi T/2$, $S^T=(-i)^TN$ and $e^{-i\rho M}=(-i)^TMe^{-i\delta M}=(-i)^T(M\cos\delta-i\sin\delta)$, so
+    \[
+     \|\compevol(T)-\evol(T)\|=\|N-M\cos\delta+i\sin\delta\|=\bigl(\|N-M\cos\delta\|^2+\sin^2\delta\bigr)^{1/2},
+    \]
+    as $(A+is)^\dagger(A+is)=A^2+s^2$ for Hermitian $A$ and real $s$, and $A^2=\|A\|^2$ for $A=N-M\cos\delta$, a real combination of $X$ and $Z$.
+
+    UnitaryProducts.PaperProof.Spin.odd_step_power; UnitaryProducts.PaperProof.Spin.odd_frozen_rotation_factor; UnitaryProducts.PaperProof.Spin.odd_frozen_rotation; UnitaryProducts.PaperProof.Spin.error_norm_frame; UnitaryProducts.PaperProof.Spin.odd_error_geometric; UnitaryProducts.PaperProof.Spin.hermitian_imaginary_square; UnitaryProducts.PaperProof.Spin.xz_square_norm; UnitaryProducts.PaperProof.Spin.xz_imaginary_norm
+
+604. **LEAN — Section 5**
+
+    The axes of $N$ and $M$ make the angle $\frac\theta{2T}-\arctan\frac\theta{\pi T}$, so $T\|N-M\cos\delta\|\to(\pi-2)|\theta|/(2\pi)$, as $1-\cos\delta=O(T^{-2})$, while $T\delta\to\theta^2/(4\pi)$, and $c_0(\|\sched'(0)\|+\|\sched'(1)\|)=(\pi-2)|\theta|/(2\pi)$ gives (i).
+
+    UnitaryProducts.PaperProof.Spin.axis_arctan_coordinates; UnitaryProducts.PaperProof.Spin.axis_angle_limit; UnitaryProducts.PaperProof.Spin.odd_axis_norm_limit; UnitaryProducts.PaperProof.Spin.phase_cosine_quadratic; UnitaryProducts.PaperProof.Spin.phase_defect_limit; UnitaryProducts.PaperProof.Spin.family_derivWithin_norm; UnitaryProducts.PaperProof.Spin.odd_limit_factored; UnitaryProducts.PaperProof.Spin.odd_error_limit
+
+605. **LEAN — Section 5**
+
+    For (ii), every factor is $-1$, so $\compevol(T)=(-1)^Te^{-i\theta Z}$, while $e^{-i(2\pi TX-\theta Z)/2}-(-1)^T\to0$, so $\|\compevol(T)-\evol(T)\|\to\|e^{-i\theta Z}-e^{-i\theta Z/2}\|=2|\sin(\theta/4)|$.
+
+    UnitaryProducts.PaperProof.Spin.full_turn_factor; UnitaryProducts.PaperProof.Spin.full_turn_product; UnitaryProducts.PaperProof.Spin.full_turn_residual_limit; UnitaryProducts.PaperProof.Spin.full_turn_error_limit; UnitaryProducts.PaperProof.Spin.involution_distance
+
+606. **LEAN — Section 5**
+
+    In (i), consecutive factors do not commute unless $\sin(\theta/T)=0$, and the other terms of the bound of \Cref{thm:clocks} are $O(\theta^2/T)$, by \Cref{thm:jumps}(i) for the jumps, so no constant smaller than $c_0$ can replace it at width $\pi$.
+
+    UnitaryProducts.PaperProof.Spin.consecutive_half_turns_commute_iff; UnitaryProducts.PaperProof.Spin.family_derivative_lipschitz; UnitaryProducts.PaperProof.Spin.familySlope_supNorm; UnitaryProducts.PaperProof.Spin.spin_jump_quadratic; UnitaryProducts.PaperProof.Spin.precessing_spin_pi_optimal
+
+607. **LEAN — Section 5**
+
+    The same computation for $0<\omega<2\pi$, with $T\omega/\pi$ odd, gives $T\|\compevol(T)-\evol(T)\|=c_0(\|\sched'(0)\|+\|\sched'(1)\|)+O(\theta^2)$ with $c_0$ at width $\omega$, so $c_0$ is optimal at every width $\width$ with $0<\width<2\pi$.
+
+    UnitaryProducts.PaperProof.Spin.odd_resonance_error_quadratic; UnitaryProducts.PaperProof.Spin.error_norm_frame; UnitaryProducts.PaperProof.Spin.evolution_closed; UnitaryProducts.PaperProof.Spin.family_derivWithin_norm; UnitaryProducts.PaperProof.Spin.precessing_spin_optimal; UnitaryProducts.PaperProof.endpoint_coefficient_optimal; UnitaryProducts.PaperProof.coefficient_le_of_odd_resonances; UnitaryProducts.PaperProof.exists_odd_resonant_width; UnitaryProducts.PaperProof.cellConstant_eq_frameBound; UnitaryProducts.PaperProof.cellConstant
+
+608. **LEAN — Section 5**
+
+    In (ii), with $\theta=2\pi$, the distance tends to $2$, so the width hypothesis cannot be relaxed to $\width\le2\pi$.
+
+    UnitaryProducts.PaperProof.Spin.full_turn_antiphase; UnitaryProducts.PaperProof.Spin.full_turn_width; UnitaryProducts.PaperProof.Spin.full_turn_not_tendsto_zero
+
+609. **LEAN — Section 5**
+
+    When eigenvalues of $\sched$ cross, the eigenprojector of a level can continue through the crossing, and the comparison carries Avron and Elgart's adiabatic theorem without a gap to the product.
 
     UnitaryProducts.PaperProof.ex_crossings; UnitaryProducts.PaperProof.diagonal_crossing_witness
 
-601. **LEAN — Example 5.3**
+610. **LEAN — Example 5.3**
 
-    Let $T$, $\sched$, $L$, and $\width$ satisfy the hypotheses of \Cref{thm:clocks}, and let $P(s)$ for $s\in[0,1]$ be a continuous family of orthogonal projectors with $\sched(s)P(s)=P(s)\sched(s)$ for every $s$. Then
-    \[
-     \Bigl|\|(1-P(1))\devprod_TP(0)\|-\|(1-P(1))\evol(T)P(0)\|\Bigr|\le\|\compevol(T)-\evol(T)\|,
-    \]
-    and \eqref{eq:products} bounds the right side by $1/T$ times a quantity independent of $T$.
+    Let $T$, $\sched$, $L$, and $\width$ satisfy the hypotheses of \Cref{thm:clocks}, and let $P(s)$ for $s\in[0,1]$ be continuous, piecewise twice differentiable, and, for every $s$ other than one point $s_0$, a finite-rank spectral projector of $\sched(s)$ for one eigenvalue. Then $\|(1-P(1))\devprod_TP(0)\|\to0$ as $T\to\infty$.
     \end{example}
 
     UnitaryProducts.PaperProof.ex_crossings
 
-602. **LEAN — Section 5**
+611. **LEAN — Section 5**
 
-    As $P(0)$ commutes with $\sched(0)$ and $P(1)$ with $\sched(1)$, \Cref{prop:transfer} with $A=e^{-i\sched(1)/2}$, $B=e^{i\sched(0)/2}$, $\tilde P=P=P(0)$, and $\tilde Q=Q=P(1)$, together with \eqref{eq:rounded}, gives the inequality.
+    By continuity, $P(0)$ and $P(1)$ commute with $\sched(0)$ and $\sched(1)$, so \Cref{prop:transfer} with $A=e^{-i\sched(1)/2}$, $B=e^{i\sched(0)/2}$, $\tilde P=P=P(0)$, and $\tilde Q=Q=P(1)$, together with \eqref{eq:rounded}, gives $\|(1-P(1))\devprod_TP(0)\|\le\|(1-P(1))\evol(T)P(0)\|+\|\compevol(T)-\evol(T)\|$.
 
-    UnitaryProducts.PaperProof.commuting_endpoint_transfer; UnitaryProducts.PaperProof.ex_crossings
+    UnitaryProducts.PaperProof.crossing_projectors_extend; UnitaryProducts.PaperProof.commuting_endpoint_transfer; UnitaryProducts.PaperProof.crossing_comparison_bound; UnitaryProducts.PaperProof.ex_crossings
 
-603. **EXTERNAL — Section 5**
+612. **EXTERNAL — Section 5**
 
-    Avron and Elgart \cite[Theorem~4]{avronelgart1999} prove, with no gap condition, that if $P(s)$ is a finite-rank spectral projector of $\sched(s)$ for every $s$ other than one crossing point $s_0$, piecewise twice differentiable, and continuous for $s\in[0,1]$, then $\|(1-P(1))\evol(T)P(0)\|$ tends to zero as $T\to\infty$.
+    Avron and Elgart \cite[Theorem~4]{avronelgart1999} prove that the first term tends to zero, and \eqref{eq:products} bounds the second by $1/T$ times a quantity independent of $T$.
 
-    Avron–Elgart (1999), Theorem 4.
+    Avron–Elgart [avronelgart1999], Theorem 4; comparison-error inference separately backed below
 
-604. **LEAN — Section 5**
+613. **LEAN — Section 5**
 
-    \Cref{ex:crossings} then gives the same limit for the product, a discrete adiabatic theorem through an eigenvalue crossing.
+    \eqref{eq:products} bounds the second by $1/T$ times a quantity independent of $T$.
 
-    UnitaryProducts.PaperProof.crossing_leakage_tendsto_zero; UnitaryProducts.PaperProof.ex_crossings
+    UnitaryProducts.PaperProof.crossing_comparison_bound; UnitaryProducts.PaperProof.ex_crossings
 
-605. **EXTERNAL — Section 5**
+614. **LEAN — Section 5**
+
+    This is a discrete adiabatic theorem through an eigenvalue crossing.
+
+    UnitaryProducts.PaperProof.ex_crossings
+
+615. **EXTERNAL — Section 5**
 
     The discrete adiabatic theorems of \Cref{sec:intro} all assume an eigenphase gap, and Tanaka \cite{tanaka2011} excludes crossings.
 
-    Discrete adiabatic results cited in Section 1; Tanaka (2011), spectral noncrossing assumption.
+    Introduction cited discrete theorems; Tanaka [tanaka2011], discrete adiabatic theorem (eigenphase noncrossing assumption)
 
-606. **LEAN — Introthm B**
+616. **LEAN — Introthm B**
 
     Let $T\ge1$ be an integer, let $\sched(s)$ for $s\in[0,1]$ be a Hamiltonian whose derivative $\sched'$ has Lipschitz constant $L$, and let $\evol$ be its evolution over time $T$. If every sample $\sched(j/T)$ with $0\le j\le T$ has eigenvalue differences of modulus at most $\pi$, then
     \[
@@ -3889,122 +3950,39 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 
     UnitaryProducts.PaperProof.introthm_unit
 
-607. **LEAN — Section 1.1**
+617. **LEAN — Section 1.1**
 
     For $\sched(t/T)$ and $\sched(\lfloor t+1/2\rfloor/T)$, which runs $\sched$ on the rounded clock, that integral is $O(1/T)$ at every time
 
     UnitaryProducts.PaperProof.burgarth_primitive_uniform; UnitaryProducts.PaperProof.burgarth_primitive_bigO
 
-608. **LEAN — Section 1.1**
+618. **LEAN — Section 1.1**
 
     the integrals over $[0,T]$ of the norms of the two Hamiltonians, which grow linearly in $T$
 
     UnitaryProducts.PaperProof.burgarth_generator_integrals; UnitaryProducts.PaperProof.burgarth_rounded_integral_error; UnitaryProducts.PaperProof.burgarth_rounded_integral_linear_limit
 
-609. **LEAN — Section 1.1**
+619. **LEAN — Section 1.1**
 
     so their bound is $O(1)$ as well.
 
     UnitaryProducts.PaperProof.burgarth_bound_scaling; UnitaryProducts.PaperProof.burgarth_bound_bigO
 
-610. **LEAN — Example 5.2**
-
-    \item If $\omega$ is $\pi$, then, as $T\to\infty$ through odd integers, $T\|\compevol(T)-\evol(T)\|$ tends to $c_0\bigl(\|\sched'(0)\|+\|\sched'(1)\|\bigr)\bigl(1+\theta^2/(4(\pi-2)^2)\bigr)^{1/2}$.
-
-    UnitaryProducts.PaperProof.Spin.ex_precessing_spin
-
-611. **LEAN — Example 5.2**
-
-    \item If $\omega$ is $2\pi$, then $\|\compevol(T)-\evol(T)\|$ tends to $2|\sin(\theta/4)|$ as $T\to\infty$.
-
-    UnitaryProducts.PaperProof.Spin.ex_precessing_spin
-
-612. **LEAN — Example 5.2**
-
-    Let $0<\omega\le2\pi$ and $\theta$ be real, and let $\sched(s)=\frac\omega2\bigl(\cos(\theta s)X+\sin(\theta s)Y\bigr)$ for $s\in[0,1]$.
-
-    UnitaryProducts.PaperProof.Spin.family
-
-613. **LEAN — Section 5**
-
-    With $R(t)=e^{-i\theta tZ/(2T)}$, $\sched(t/T)=R(t)\frac\omega2XR(t)^\dagger$, so $\evol(T)=e^{-i\theta Z/2}e^{-i(\omega TX-\theta Z)/2}$, and the factors $R(j)e^{-i\omega X/2}R(j)^\dagger$ with \eqref{eq:rounded} give $\compevol(T)=e^{-i\theta Z/2}S^T$ for $S=e^{-i\omega X/4}e^{i\theta Z/(2T)}e^{-i\omega X/4}$.
-
-    UnitaryProducts.PaperProof.Spin.pauli_conj; UnitaryProducts.PaperProof.Spin.evol_family; UnitaryProducts.PaperProof.Spin.evolution_closed; UnitaryProducts.PaperProof.Spin.rounded_product_closed
-
-614. **LEAN — Section 5**
-
-    Hermitian $N$ and $M$ with $N^2=M^2=1$ and $NM+MN=2\cos\phi$ satisfy $\|e^{-i\alpha N}-e^{-i\beta M}\|^2=2-2\cos\alpha\cos\beta-2\sin\alpha\sin\beta\cos\phi$, as $e^{-i\alpha N}=\cos\alpha-i\sin\alpha N$.
-
-    UnitaryProducts.PaperProof.Spin.spin_distance; UnitaryProducts.PaperProof.Spin.evol_involution
-
-615. **LEAN — Section 5**
-
-    For (i), the matrix $S$ is $e^{-i\pi N/2}$ with $N=\cos\frac\theta{2T}X-\sin\frac\theta{2T}Z$, and $e^{-i(\pi TX-\theta Z)/2}=e^{-i\rho M}$ with $\rho=\frac12(\pi^2T^2+\theta^2)^{1/2}$, where the axes of $N$ and $M$ make the angle $\phi_T=\frac\theta{2T}-\arctan\frac\theta{\pi T}$.
-
-    UnitaryProducts.PaperProof.Spin.half_turn_step; UnitaryProducts.PaperProof.Spin.frozen_axis_angle; UnitaryProducts.PaperProof.Spin.axis_arctan_coordinates; UnitaryProducts.PaperProof.Spin.xz_angle_anticommutator
-
-616. **LEAN — Section 5**
-
-    For odd $T$, this gives
-    \[
-     \|\compevol(T)-\evol(T)\|^2=4\sin^2\frac{\rho-\pi T/2}2+4\cos\Bigl(\rho-\frac{\pi T}2\Bigr)\sin^2\frac{\phi_T}2,
-    \]
-    and $T(\rho-\pi T/2)\to\theta^2/(4\pi)$, $T\phi_T\to(\pi-2)\theta/(2\pi)$, and $c_0(\|\sched'(0)\|+\|\sched'(1)\|)=(\pi-2)|\theta|/(2\pi)$ give (i).
-
-    UnitaryProducts.PaperProof.Spin.error_norm_frame; UnitaryProducts.PaperProof.Spin.odd_error_squared; UnitaryProducts.PaperProof.Spin.phase_defect_limit; UnitaryProducts.PaperProof.Spin.axis_angle_limit; UnitaryProducts.PaperProof.Spin.odd_error_limit; UnitaryProducts.PaperProof.Spin.family_derivWithin_norm; UnitaryProducts.PaperProof.Spin.odd_limit_factored
-
-617. **LEAN — Section 5**
-
-    In (i), consecutive factors do not commute unless $\sin(\theta/T)=0$, and the other terms of the bound of \Cref{thm:clocks} are $O(\theta^2/T)$, by \Cref{thm:jumps}(i) for the jumps, so no constant smaller than $c_0$ can replace it at width $\pi$.
-
-    UnitaryProducts.PaperProof.Spin.consecutive_half_turns_commute_iff; UnitaryProducts.PaperProof.Spin.family_derivative_lipschitz; UnitaryProducts.PaperProof.Spin.familySlope_supNorm; UnitaryProducts.PaperProof.Spin.spin_jump_quadratic; UnitaryProducts.PaperProof.Spin.precessing_spin_pi_optimal
-
-618. **LEAN — Section 5**
-
-    For (ii), every factor is $-1$, so $\compevol(T)=(-1)^Te^{-i\theta Z}$, while $e^{-i(2\pi TX-\theta Z)/2}-(-1)^T\to0$, so $\|\compevol(T)-\evol(T)\|\to\|e^{-i\theta Z}-e^{-i\theta Z/2}\|=2|\sin(\theta/4)|$.
-
-    UnitaryProducts.PaperProof.Spin.full_turn_factor; UnitaryProducts.PaperProof.Spin.full_turn_product; UnitaryProducts.PaperProof.Spin.full_turn_residual_limit; UnitaryProducts.PaperProof.Spin.full_turn_error_limit; UnitaryProducts.PaperProof.Spin.involution_distance
-
-619. **LEAN — Section 5**
-
-    The same computation for $0<\omega<2\pi$, with $T\omega/\pi$ odd, gives $T\|\compevol(T)-\evol(T)\|=c_0(\|\sched'(0)\|+\|\sched'(1)\|)+O(\theta^2)$ with $c_0$ at width $\omega$, so $c_0$ is optimal at every width $\width$ with $0<\width<2\pi$.
-
-    UnitaryProducts.PaperProof.Spin.odd_resonance_error_quadratic; UnitaryProducts.PaperProof.Spin.error_norm_frame; UnitaryProducts.PaperProof.Spin.evolution_closed; UnitaryProducts.PaperProof.Spin.family_derivWithin_norm; UnitaryProducts.PaperProof.Spin.precessing_spin_optimal; UnitaryProducts.PaperProof.endpoint_coefficient_optimal; UnitaryProducts.PaperProof.coefficient_le_of_odd_resonances; UnitaryProducts.PaperProof.exists_odd_resonant_width; UnitaryProducts.PaperProof.cellConstant_eq_frameBound; UnitaryProducts.PaperProof.cellConstant
-
-620. **LEAN — Section 5**
-
-    In (ii), with $\theta=2\pi$, the distance tends to $2$, so the width hypothesis cannot be relaxed to $\width\le2\pi$.
-
-    UnitaryProducts.PaperProof.Spin.full_turn_antiphase; UnitaryProducts.PaperProof.Spin.full_turn_width; UnitaryProducts.PaperProof.Spin.full_turn_not_tendsto_zero
-
-621. **LEAN — Section 5**
-
-    In this section, I apply the comparison \eqref{eq:products} and the transfer of \Cref{prop:transfer} to adiabatic state preparation with a schedule adapted to the spectral gap, a spin in a precessing field, and eigenvalue crossings. Throughout, $T\ge1$ is an integer, $X=\bigl(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\bigr)$, $Y=\bigl(\begin{smallmatrix}0&-i\\i&0\end{smallmatrix}\bigr)$, and $Z=\operatorname{diag}(1,-1)$ are the Pauli matrices, $\evol$ is the evolution of a Hamiltonian $\sched$ over time $T$, $\devprod_T$ is its $T$-step product, and $\compevol(T)=e^{-i\sched(1)/2}\devprod_Te^{i\sched(0)/2}$, as in \eqref{eq:rounded}.
-
-    UnitaryProducts.Paper.IsEvolution; UnitaryProducts.Paper.unitProduct; UnitaryProducts.Paper.regulated_evolution_rounded; UnitaryProducts.PaperProof.Spin.X; UnitaryProducts.PaperProof.Spin.Y; UnitaryProducts.PaperProof.Spin.Z
-
-622. **LEAN — Section 1.1**
+620. **LEAN — Section 1.1**
 
     a precessing spin, which shows that the endpoint coefficient $c_0$ of \Cref{thm:clocks} is optimal at every positive width
 
     UnitaryProducts.PaperProof.Spin.precessing_spin_optimal
 
-623. **PROSPECTIVE — Section 6**
+621. **PROSPECTIVE — Section 6**
 
     A natural form for the answer is a corrected Hamiltonian. Is the product, up to $O(T^{-k})$, the evolution of $\sched+T^{-1}\sched_1+\cdots+T^{-k}\sched_k$, with each $\sched_n$ a universal expression in $\sched$ and its first $n$ derivatives, under the width hypothesis alone, and do the half-step phases and the correction $Y$ account for $\sched_1$?
 
     Explicit corrected-Hamiltonian question, including its proposed asymptotic formula.
 
-624. **LEAN — Section 1.1**
+622. **LEAN — Section 1.1**
 
     In its choice of $Y$, \Cref{thm:comparison} generalizes the lemma of Burgarth et al.
 
     UnitaryProducts.Paper.comparison_integrated_difference; UnitaryProducts.PaperProof.thm_comparison
 
-## Notes on Example 5.2
-
-The local identities hc and hs in odd_error_squared remove the odd-runtime phase. phase_defect_limit at a=π and axis_angle_limit are the first two limits; odd_error_limit combines them using the squared-error identity. The endpoint equality is hc in odd_limit_factored together with family_derivWithin_norm.
-
-The width-π optimality proof uses the odd-runtime limit in item (i), then lets θ tend to zero. The Lipschitz, squared-derivative and jump contributions are quadratic in θ after multiplication by T.
-
-The remainder is as θ tends to zero for each fixed positive integer T and width ω satisfying Tω=(2m+1)π. No bound uniform in T is asserted. error_norm_frame and evolution_closed identify the actual error; family_derivWithin_norm identifies the endpoint sum as ω|θ|. The closed coefficient is cellConstant, by cellConstant_eq_frameBound and the definition of cellConstant. The density and continuity declarations extend the forced coefficient from resonant widths below w to every 0<w<2π.

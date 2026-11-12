@@ -17,12 +17,17 @@ open scoped Topology
 namespace UnitaryProducts.PaperProof
 
 /-- Every positive open interval contains a width whose total phase at some
-integer runtime is an odd multiple of pi. The construction rounds the lower
-endpoint upwards, then adds a half-period. -/
-theorem exists_odd_resonant_width {a b : ℝ} (ha : 0 < a) (hab : a < b) :
-    ∃ (ω : ℝ) (T m : ℕ), a < ω ∧ ω < b ∧ 0 < T ∧
+odd integer runtime is an odd multiple of pi. Thus the width divided by pi
+is a ratio of odd integers, exactly as in the paper. The construction chooses
+an odd denominator, rounds the lower endpoint upwards, then adds a half-period. -/
+theorem exists_odd_odd_resonant_width {a b : ℝ} (ha : 0 < a) (hab : a < b) :
+    ∃ (ω : ℝ) (T m : ℕ), a < ω ∧ ω < b ∧ 0 < T ∧ Odd T ∧
       (T : ℝ) * ω = (2 * m + 1) * π := by
-  obtain ⟨T, hTlarge⟩ := exists_nat_gt (3 * π / (b - a))
+  obtain ⟨n, hnlarge⟩ := exists_nat_gt (3 * π / (b - a))
+  let T := 2 * n + 1
+  have hnT : n ≤ T := by dsimp only [T]; omega
+  have hTlarge : 3 * π / (b - a) < T :=
+    hnlarge.trans_le (Nat.cast_le.mpr hnT)
   have hgap : 0 < b - a := sub_pos.mpr hab
   have hTreal : 0 < (T : ℝ) := (by positivity : (0 : ℝ) < 3 * π / (b - a)).trans hTlarge
   have hT : 0 < T := Nat.cast_pos.mp hTreal
@@ -45,9 +50,42 @@ theorem exists_odd_resonant_width {a b : ℝ} (ha : 0 < a) (hab : a < b) :
     have halgebra : (T : ℝ) * (b - a) = b * T - a * T := by ring
     rw [halgebra] at hlarge
     linarith
-  refine ⟨ω, T, m, hlo, hhi, hT, ?_⟩
+  refine ⟨ω, T, m, hlo, hhi, hT, ⟨n, by dsimp only [T]⟩, ?_⟩
   dsimp only [ω]
   field_simp [hTreal.ne']
+
+/-- The odd-over-odd density statement supplies the unrestricted odd-resonance
+form used by the continuity argument. -/
+theorem exists_odd_resonant_width {a b : ℝ} (ha : 0 < a) (hab : a < b) :
+    ∃ (ω : ℝ) (T m : ℕ), a < ω ∧ ω < b ∧ 0 < T ∧
+      (T : ℝ) * ω = (2 * m + 1) * π := by
+  obtain ⟨ω, T, m, hlo, hhi, hT, _, hres⟩ := exists_odd_odd_resonant_width ha hab
+  exact ⟨ω, T, m, hlo, hhi, hT, hres⟩
+
+/-- Every odd multiple of a resonant denominator is resonant, and these
+integer runtimes tend to infinity. This is the first limiting sequence in the
+all-width optimality paragraph after Example 5.2. -/
+theorem odd_resonant_runtimes {ω : ℝ} {q m : ℕ} (hq : 0 < q)
+    (hres : (q : ℝ) * ω = (2 * m + 1) * π) :
+    (∀ k : ℕ, 0 < q * (2 * k + 1) ∧
+      ((q * (2 * k + 1) : ℕ) : ℝ) * ω =
+        (2 * ((2 * m * k + m + k : ℕ) : ℝ) + 1) * π) ∧
+    Tendsto (fun k : ℕ ↦ q * (2 * k + 1)) atTop atTop := by
+  constructor
+  · intro k
+    refine ⟨Nat.mul_pos hq (by omega), ?_⟩
+    push_cast
+    calc
+      (q : ℝ) * (2 * k + 1) * ω = (2 * k + 1) * ((q : ℝ) * ω) := by ring
+      _ = (2 * k + 1) * ((2 * m + 1) * π) := by rw [hres]
+      _ = _ := by ring
+  · apply tendsto_atTop_mono (f := fun k : ℕ ↦ k) ?_ tendsto_id
+    intro k
+    have hqone : 1 ≤ q := hq
+    have hmul := Nat.mul_le_mul_right (2 * k + 1) hqone
+    change k ≤ q * (2 * k + 1)
+    simp only [one_mul] at hmul
+    exact (show k ≤ 2 * k + 1 by omega).trans hmul
 
 /-- A continuous coefficient bounded at all odd-resonant widths below `w`
 is bounded at `w` itself. This makes the paper's density argument explicit. -/
@@ -112,23 +150,62 @@ theorem linear_coefficient_le_of_quadratic_error {E : ℝ → ℝ} {ω c K a : �
     field_simp [hω.ne', habs.ne']
   exact (div_le_div_of_nonneg_right hb (mul_pos hω habs).le).trans_eq he
 
-/-- The endpoint coefficient cannot be decreased at any positive width: a
-comparison with quadratic remainder and the odd-resonant spin limits forces
-its linear coefficient to be at least the paper's closed value. -/
-theorem endpoint_coefficient_optimal {E : ℝ → ℕ → ℝ → ℝ} {w c : ℝ}
+
+/-- The paper's order of limits: first take unbounded odd-resonant runtimes
+in a uniform quadratic comparison with the axis distance, then let the
+precession angle tend to zero, and finally use density and continuity in the
+width. `E` is the runtime-scaled evolution error and `A` the runtime-scaled
+axis distance. The two remainder constants are independent of runtime. -/
+theorem endpoint_coefficient_optimal_time_first
+    {E A : ℝ → ℕ → ℝ → ℝ} {w c : ℝ}
     (hw : 0 < w) (hw2 : w < 2 * π)
-    (hlimit : ∀ (ω : ℝ) (T m : ℕ), 0 < ω → ω < w → 0 < T →
-      (T : ℝ) * ω = (2 * m + 1) * π →
-      Tendsto (fun θ : ℝ ↦ E ω T θ / (ω * |θ|)) (𝓝[≠] 0)
-        (𝓝 (1 / (2 * ω * Real.sin (ω / 2)) - 1 / ω ^ 2)))
-    (hcomparison : ∀ (ω : ℝ) (T m : ℕ), 0 < ω → ω < w → 0 < T →
-      (T : ℝ) * ω = (2 * m + 1) * π →
-      ∃ K : ℝ, ∀ᶠ θ in 𝓝[≠] (0 : ℝ), E ω T θ ≤ c * ω * |θ| + K * θ ^ 2) :
+    (haxis : ∀ ω : ℝ, 0 < ω → ω < w → ∀ θ : ℝ,
+      Tendsto (fun T : ℕ ↦ A ω T θ) atTop
+        (𝓝 (|θ| * (1 / (2 * Real.sin (ω / 2)) - 1 / ω))))
+    (herror : ∀ ω : ℝ, 0 < ω → ω < w →
+      ∃ C : ℝ, ∀ᶠ θ in 𝓝[≠] (0 : ℝ), ∀ T m : ℕ, 0 < T →
+        (T : ℝ) * ω = (2 * m + 1) * π →
+        |E ω T θ - A ω T θ| ≤ C * θ ^ 2)
+    (hcomparison : ∀ ω : ℝ, 0 < ω → ω < w →
+      ∃ K : ℝ, ∀ᶠ θ in 𝓝[≠] (0 : ℝ), ∀ T m : ℕ, 0 < T →
+        (T : ℝ) * ω = (2 * m + 1) * π →
+        E ω T θ ≤ c * ω * |θ| + K * θ ^ 2) :
     1 / (2 * w * Real.sin (w / 2)) - 1 / w ^ 2 ≤ c := by
   apply endpoint_coefficient_le_of_odd_resonances hw hw2
-  intro ω T m hω hωw hT hodd
-  obtain ⟨K, hK⟩ := hcomparison ω T m hω hωw hT hodd
-  exact linear_coefficient_le_of_quadratic_error hω
-    (hlimit ω T m hω hωw hT hodd) hK
+  intro ω q m hω hωw hq hres
+  obtain ⟨C, hC⟩ := herror ω hω hωw
+  obtain ⟨K, hK⟩ := hcomparison ω hω hωw
+  have hruntimes := odd_resonant_runtimes hq hres
+  let a := 1 / (2 * ω * Real.sin (ω / 2)) - 1 / ω ^ 2
+  have hsin : Real.sin (ω / 2) ≠ 0 :=
+    (Real.sin_pos_of_pos_of_lt_pi (by positivity : 0 < ω / 2)
+      (by linarith)).ne'
+  have hfactor (θ : ℝ) :
+      |θ| * (1 / (2 * Real.sin (ω / 2)) - 1 / ω) = a * (ω * |θ|) := by
+    dsimp only [a]
+    field_simp
+  have hfirst : ∀ᶠ θ in 𝓝[≠] (0 : ℝ),
+      a * (ω * |θ|) ≤ c * ω * |θ| + (K + C) * θ ^ 2 := by
+    filter_upwards [hC, hK] with θ hCθ hKθ
+    have hlim := (haxis ω hω hωw θ).comp hruntimes.2
+    rw [hfactor θ] at hlim
+    apply le_of_tendsto hlim
+    apply Eventually.of_forall
+    intro k
+    have hT := (hruntimes.1 k).1
+    have hodd := (hruntimes.1 k).2
+    have he := (abs_le.mp (hCθ _ _ hT hodd)).1
+    have hc := hKθ _ _ hT hodd
+    change A ω (q * (2 * k + 1)) θ ≤ _
+    rw [add_mul]
+    linarith only [he, hc]
+  have hnormalized : Tendsto (fun θ : ℝ ↦ a * (ω * |θ|) / (ω * |θ|))
+      (𝓝[≠] 0) (𝓝 a) := by
+    apply tendsto_const_nhds.congr'
+    filter_upwards [self_mem_nhdsWithin] with θ hθ
+    have hθne : θ ≠ 0 := hθ
+    have hn : ω * |θ| ≠ 0 := mul_ne_zero hω.ne' (abs_ne_zero.mpr hθne)
+    simp only [mul_div_cancel_right₀ _ hn]
+  exact linear_coefficient_le_of_quadratic_error hω hnormalized hfirst
 
 end UnitaryProducts.PaperProof

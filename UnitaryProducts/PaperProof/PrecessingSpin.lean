@@ -21,9 +21,9 @@ namespace UnitaryProducts.PaperProof.Spin
 
 attribute [local instance] matrixCStarAlgebra
 
-/-- The three Pauli matrices used throughout Section 5. -/
+/-- The first Pauli matrix, used in Section 5. -/
 def X : Matrix (Fin 2) (Fin 2) ℂ := !![0, 1; 1, 0]
-/-- The second Pauli matrix. -/
+/-- The auxiliary second Pauli matrix used to compute the rotating frame. -/
 def Y : Matrix (Fin 2) (Fin 2) ℂ := !![0, -I; I, 0]
 /-- The third Pauli matrix. -/
 def Z : Matrix (Fin 2) (Fin 2) ℂ := !![1, 0; 0, -1]
@@ -243,6 +243,14 @@ theorem step_closed (ω ε : ℝ) :
 
 /-- The Hamiltonian in Example 5.2. -/
 def family (ω θ s : ℝ) : Matrix (Fin 2) (Fin 2) ℂ := (ω / 2 : ℝ) • axis (θ * s)
+
+/-- The cosine-sine coordinates used in the computation are exactly the
+rotated-X Hamiltonian stated in Example 5.2. -/
+theorem family_rotated (ω θ s : ℝ) :
+    family ω θ s = (ω / 2 : ℝ) •
+      (evol Z (θ * s / 2) * X * evol Z (-(θ * s / 2))) := by
+  rw [pauli_conj]
+  rfl
 
 /-- Every sample of the precessing-spin Hamiltonian has precisely the
 paper's eigenvalues `±ω/2`; at `ω=2π` these are `±π`. -/
@@ -479,23 +487,6 @@ theorem full_turn_frozen_spectrum (θ : ℝ) (T : ℕ) :
   have hrad : (2 * π * (T : ℝ)) ^ 2 + (-θ) ^ 2 = 4 * π ^ 2 * (T : ℝ) ^ 2 + θ ^ 2 := by ring
   rw [hrad]
 
-/-- Normalizing a nonzero real Pauli combination gives a Hermitian involution. -/
-theorem xz_normalized {a b : ℝ} (h : 0 < a ^ 2 + b ^ 2) :
-    let N := (Real.sqrt (a ^ 2 + b ^ 2))⁻¹ • xz a b
-    N.IsHermitian ∧ N * N = 1 := by
-  intro N
-  have hr : Real.sqrt (a ^ 2 + b ^ 2) ≠ 0 := (Real.sqrt_pos.mpr h).ne'
-  constructor
-  · exact Matrix.isHermitian_iff_isSelfAdjoint.mpr
-      ((show IsSelfAdjoint ((Real.sqrt (a ^ 2 + b ^ 2))⁻¹) from rfl).smul
-        (xz_relations a b).1.isSelfAdjoint)
-  · dsimp [N]
-    rw [smul_mul_assoc, mul_smul_comm, (xz_relations a b).2, smul_smul, smul_smul]
-    rw [show (Real.sqrt (a ^ 2 + b ^ 2))⁻¹ *
-        (Real.sqrt (a ^ 2 + b ^ 2))⁻¹ * (a ^ 2 + b ^ 2) = 1 by
-      field_simp
-      exact (Real.sq_sqrt h.le).symm]
-    exact one_smul ℝ _
 
 /-- The distance between two rotations about one involutive axis. -/
 theorem involution_distance {d : ℕ} [NeZero d]
@@ -724,239 +715,6 @@ theorem full_turn_error_limit (θ : ℝ) :
     (evol_mem_unitary pauli_relations.2.2.1 (θ / 2))] at hbound
   simpa only [Real.norm_eq_abs] using hbound
 
-/-- The fixed change of basis taking `(X,Y,Z)` to `(Z,X,Y)`. -/
-def cyclic : Matrix (Fin 2) (Fin 2) ℂ :=
-  (1 / 2 : ℂ) • !![1 + I, 1 + I; -1 + I, 1 - I]
-
-/-- The change of basis used for the Discussion's spin convention is unitary. -/
-theorem cyclic_unitary : cyclic ∈ unitary (Matrix (Fin 2) (Fin 2) ℂ) := by
-  have htwo : (starRingEnd ℂ) (2 : ℂ) = 2 := Complex.conj_ofReal (2 : ℝ)
-  rw [Unitary.mem_iff]
-  constructor
-  all_goals ext i j; fin_cases i <;> fin_cases j <;>
-    simp [cyclic, Matrix.mul_apply, Fin.sum_univ_two, Matrix.star_apply,
-      Complex.conj_I] <;> ring_nf <;> simp [Complex.I_sq, htwo] <;> norm_num
-
-/-- Its action on the Pauli triple is the cyclic permutation. -/
-theorem cyclic_pauli : cyclic * X * star cyclic = Z ∧
-    cyclic * Y * star cyclic = X ∧ cyclic * Z * star cyclic = Y := by
-  have htwo : (starRingEnd ℂ) (2 : ℂ) = 2 := Complex.conj_ofReal (2 : ℝ)
-  repeat' constructor
-  all_goals ext i j; fin_cases i <;> fin_cases j <;>
-    simp [cyclic, X, Y, Z, Matrix.mul_apply, Fin.sum_univ_two, Matrix.star_apply,
-      Complex.conj_I] <;> ring_nf <;> simp [Complex.I_sq, htwo,
-        show (I : ℂ) ^ 3 = -I by rw [pow_succ, Complex.I_sq]; ring] <;> norm_num
-
-/-- Frozen evolution is equivariant under a unitary change of basis. -/
-theorem evol_conjugate {d : ℕ} (C H : Matrix (Fin d) (Fin d) ℂ)
-    (hC : C ∈ unitary (Matrix (Fin d) (Fin d) ℂ)) (t : ℝ) :
-    evol (C * H * star C) t = C * evol H t * star C := by
-  let +nondep : NormedAlgebra ℚ (Matrix (Fin d) (Fin d) ℂ) :=
-    .restrictScalars ℚ ℂ _
-  let u : (Matrix (Fin d) (Fin d) ℂ)ˣ :=
-    ⟨C, star C, Unitary.mul_star_self_of_mem hC, Unitary.star_mul_self_of_mem hC⟩
-  have he := NormedSpace.exp_units_conj u (t • (-I • H))
-  simpa only [evol, mul_smul_comm, smul_mul_assoc] using he
-
-/-- Products of sampled evolutions respect the same fixed change of basis. -/
-theorem product_conjugate {d : ℕ} (C : Matrix (Fin d) (Fin d) ℂ)
-    (hC : C ∈ unitary (Matrix (Fin d) (Fin d) ℂ))
-    (H : ℝ → Matrix (Fin d) (Fin d) ℂ) (T : ℕ) :
-    (unitProduct (fun s ↦ C * H s * star C) T).1 =
-      C * (unitProduct H T).1 * star C := by
-  have hp (n : ℕ) : pieceProduct (fun _ ↦ 1) (fun j ↦ C * H ((j : ℝ) / T) * star C) n =
-      C * pieceProduct (fun _ ↦ 1) (fun j ↦ H ((j : ℝ) / T)) n * star C := by
-    induction n with
-    | zero => simp [pieceProduct, Unitary.mul_star_self_of_mem hC]
-    | succ n ih =>
-      rw [pieceProduct, pieceProduct, evol_conjugate C _ hC, ih]
-      simp only [mul_assoc]
-      rw [← mul_assoc (star C), Unitary.star_mul_self_of_mem hC, one_mul]
-  exact hp T
-
-/-- The rounded product transforms by conjugation as well. -/
-theorem rounded_conjugate {d : ℕ} (C : Matrix (Fin d) (Fin d) ℂ)
-    (hC : C ∈ unitary (Matrix (Fin d) (Fin d) ℂ))
-    (H : ℝ → Matrix (Fin d) (Fin d) ℂ) (T : ℕ) :
-    evol (C * H 1 * star C) (1 / 2) *
-      (unitProduct (fun s ↦ C * H s * star C) T).1 *
-      evol (C * H 0 * star C) (-(1 / 2)) =
-    C * (evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2))) * star C := by
-  rw [evol_conjugate C _ hC, evol_conjugate C _ hC, product_conjugate C hC]
-  simp only [mul_assoc]
-  rw [← mul_assoc (star C), Unitary.star_mul_self_of_mem hC, one_mul,
-    ← mul_assoc (star C), Unitary.star_mul_self_of_mem hC, one_mul]
-
-/-- The Discussion uses the same precessing spin, conjugated by `cyclic`. -/
-theorem discussion_family (θ s : ℝ) :
-    π • (evol Y (θ * s / 2) * Z * evol Y (-(θ * s / 2))) =
-      cyclic * family (2 * π) θ s * star cyclic := by
-  have hy (t : ℝ) : evol Y t = cyclic * evol Z t * star cyclic := by
-    rw [← cyclic_pauli.2.2, evol_conjugate cyclic _ cyclic_unitary]
-  have hz : Z = cyclic * X * star cyclic := cyclic_pauli.1.symm
-  rw [hz, hy, hy]
-  simp only [mul_assoc]
-  rw [← mul_assoc (star cyclic), Unitary.star_mul_self_of_mem cyclic_unitary, one_mul,
-    ← mul_assoc (star cyclic), Unitary.star_mul_self_of_mem cyclic_unitary, one_mul]
-  rw [← mul_assoc (evol Z (θ * s / 2)),
-    ← mul_assoc (evol Z (θ * s / 2) * X), pauli_conj]
-  simp only [family, mul_smul_comm, smul_mul_assoc]
-  congr 2
-  ring
-
-/-- The resonant Hamiltonian in the Discussion has exactly scalar samples. -/
-theorem discussion_full_turn_factor (θ s : ℝ) :
-    evol (π • (evol Y (θ * s / 2) * Z * evol Y (-(θ * s / 2)))) 1 = -1 := by
-  rw [discussion_family, evol_conjugate cyclic _ cyclic_unitary, full_turn_factor]
-  simp [Unitary.mul_star_self_of_mem cyclic_unitary]
-
-/-- The resonant example in the Discussion has the same limiting error as
-Example 5.2(ii); a fixed unitary change of basis preserves its operator norm. -/
-theorem discussion_error_limit (θ : ℝ) :
-    let H := fun s ↦ π • (evol Y (θ * s / 2) * Z * evol Y (-(θ * s / 2)))
-    Tendsto (fun T : ℕ ↦
-      ‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) -
-        cyclic * (evol Z (θ / 2) * evol (((2 * π * T : ℝ) • X) - θ • Z) (1 / 2)) *
-          star cyclic‖) atTop (𝓝 (2 * |Real.sin (θ / 4)|)) := by
-  intro H
-  have hH : H = fun s ↦ cyclic * family (2 * π) θ s * star cyclic :=
-    funext (discussion_family θ)
-  rw [hH]
-  have heq (T : ℕ) :
-      ‖evol (cyclic * family (2 * π) θ 1 * star cyclic) (1 / 2) *
-        (unitProduct (fun s ↦ cyclic * family (2 * π) θ s * star cyclic) T).1 *
-        evol (cyclic * family (2 * π) θ 0 * star cyclic) (-(1 / 2)) -
-        cyclic * (evol Z (θ / 2) * evol (((2 * π * T : ℝ) • X) - θ • Z) (1 / 2)) * star cyclic‖ =
-      ‖evol (family (2 * π) θ 1) (1 / 2) * (unitProduct (family (2 * π) θ) T).1 *
-        evol (family (2 * π) θ 0) (-(1 / 2)) -
-        evol Z (θ / 2) * evol (((2 * π * T : ℝ) • X) - θ • Z) (1 / 2)‖ := by
-    rw [rounded_conjugate cyclic cyclic_unitary]
-    rw [← sub_mul, ← mul_sub, CStarRing.norm_mul_mem_unitary _ (Unitary.star_mem cyclic_unitary),
-      CStarRing.norm_mem_unitary_mul _ cyclic_unitary]
-  simpa only [heq] using full_turn_error_limit θ
-
-/-- With no precession the symmetric step is the constant-field rotation. -/
-theorem step_zero (ω : ℝ) : step ω 0 = evol X (ω / 2) := by
-  simp only [step, neg_zero, evol_zero, mul_one]
-  rw [← evol_add]
-  congr 1
-  ring
-
-/-- To first order in the precession angle, the symmetric step changes only
-in the third Pauli direction. -/
-theorem step_derivative (ω : ℝ) (T : ℕ) :
-    HasDerivAt (fun θ : ℝ ↦ step ω (θ / (2 * T)))
-      ((I / (2 * T) : ℂ) • Z) 0 := by
-  have hc : HasDerivAt (fun θ : ℝ ↦ Real.cos (θ / (2 * T))) 0 0 := by
-    simpa using (Real.hasDerivAt_cos ((0 : ℝ) / (2 * T))).comp 0
-      ((hasDerivAt_id (0 : ℝ)).div_const (2 * (T : ℝ)))
-  have hs : HasDerivAt (fun θ : ℝ ↦ Real.sin (θ / (2 * T))) (1 / (2 * T)) 0 := by
-    simpa using (Real.hasDerivAt_sin ((0 : ℝ) / (2 * T))).comp 0
-      ((hasDerivAt_id (0 : ℝ)).div_const (2 * (T : ℝ)))
-  have hd := ((hc.const_mul (Real.cos (ω / 2))).ofReal_comp.smul_const
-      (1 : Matrix (Fin 2) (Fin 2) ℂ)).sub
-    ((((hc.const_mul (Real.sin (ω / 2))).ofReal_comp.smul_const X).sub
-      (hs.ofReal_comp.smul_const Z)).const_smul I)
-  convert hd using 1
-  · funext θ
-    simpa only [Pi.sub_apply, Pi.smul_apply, Complex.ofReal_mul] using step_closed ω (θ / (2 * T))
-  · simp only [mul_zero, Complex.ofReal_zero, zero_smul, zero_sub, smul_neg,
-      neg_neg, Complex.ofReal_div, Complex.ofReal_one, Complex.ofReal_mul,
-      Complex.ofReal_ofNat, Complex.ofReal_natCast, smul_smul]
-    congr 1
-    ring
-
-/-- Differentiating the finite product at zero precession gives a sine
-quotient. The proof follows the product rule and the sine addition formula. -/
-theorem step_power_derivative (ω : ℝ) {T : ℕ} (hT : 0 < T)
-    (hs : Real.sin (ω / 2) ≠ 0) (n : ℕ) :
-    HasDerivAt (fun θ : ℝ ↦ step ω (θ / (2 * T)) ^ n)
-      ((I * Real.sin (n * (ω / 2)) / (2 * T * Real.sin (ω / 2)) : ℂ) • Z) 0 := by
-  induction n with
-  | zero => simpa using hasDerivAt_const (0 : ℝ) (1 : Matrix (Fin 2) (Fin 2) ℂ)
-  | succ n ih =>
-    have hd := ih.mul (step_derivative ω T)
-    convert hd using 1
-    simp only [zero_div, step_zero]
-    rw [← evol_nat_mul, evol_involution pauli_relations.1 pauli_relations.2.2.2.1,
-      evol_involution pauli_relations.1 pauli_relations.2.2.2.1]
-    have htr : (T : ℂ) ≠ 0 := by exact_mod_cast hT.ne'
-    have hsc : (Real.sin (ω / 2) : ℂ) ≠ 0 := by exact_mod_cast hs
-    rw [show ((n + 1 : ℕ) : ℝ) * (ω / 2) = n * (ω / 2) + ω / 2 by push_cast; ring,
-      Real.sin_add]
-    ext i j
-    fin_cases i <;> fin_cases j <;>
-      simp [X, Z, Matrix.mul_apply, Matrix.vecMul, dotProduct, Fin.sum_univ_two,
-        Complex.real_smul, -Complex.ofReal_cos, -Complex.ofReal_sin] <;> field_simp <;> ring
-
-
-/-- Closed exponential of a nonzero real Pauli combination, obtained by
-normalizing its axis in the SU(2) formula. -/
-theorem evol_xz_formula {a b : ℝ} (h : 0 < a ^ 2 + b ^ 2) :
-    let r := Real.sqrt (a ^ 2 + b ^ 2)
-    evol (xz a b) (1 / 2) = (Real.cos (r / 2) : ℂ) • 1 -
-      (I * Real.sin (r / 2) / r : ℂ) • xz a b := by
-  intro r
-  let N := r⁻¹ • xz a b
-  obtain ⟨hN, hNN⟩ := xz_normalized h
-  have hr : r ≠ 0 := (Real.sqrt_pos.mpr h).ne'
-  have hG : xz a b = r • N := by
-    dsimp [N]
-    rw [smul_smul, mul_inv_cancel₀ hr, one_smul]
-  conv_lhs => rw [hG, Prose.localSteps_evol_smul_sharp, evol_involution hN hNN]
-  rw [show (1 / 2 : ℝ) * r = r / 2 by ring]
-  congr 1
-  dsimp [N]
-  rw [← IsScalarTower.algebraMap_smul ℂ r⁻¹ (xz a b), smul_smul]
-  congr 1
-  change I * (Real.sin (r / 2) : ℂ) * (↑(r⁻¹) : ℂ) =
-    I * (Real.sin (r / 2) : ℂ) / (r : ℂ)
-  simp only [Complex.ofReal_inv, div_eq_mul_inv]
-
-/-- The derivative of the continuous frame factor at zero precession. -/
-theorem frozen_derivative {a : ℝ} (ha : 0 < a) :
-    HasDerivAt (fun θ : ℝ ↦ evol (a • X - θ • Z) (1 / 2))
-      ((I * Real.sin (a / 2) / a : ℂ) • Z) 0 := by
-  let r : ℝ → ℝ := fun θ ↦ Real.sqrt (a ^ 2 + θ ^ 2)
-  have ha0 : a ≠ 0 := ha.ne'
-  have hr0 : r 0 = a := by simp [r, Real.sqrt_sq ha.le]
-  have harg : HasDerivAt (fun θ : ℝ ↦ a ^ 2 + θ ^ 2) 0 0 := by
-    simpa using ((hasDerivAt_id (0 : ℝ)).pow 2).const_add (a ^ 2)
-  have hr : HasDerivAt r 0 0 := by
-    have hh := (Real.hasDerivAt_sqrt
-      (show a ^ 2 + (0 : ℝ) ^ 2 ≠ 0 by simpa using pow_ne_zero 2 ha0)).comp 0 harg
-    simpa only [mul_zero] using hh
-  have hc : HasDerivAt (fun θ ↦ Real.cos (r θ / 2)) 0 0 := by
-    have hh := (Real.hasDerivAt_cos (r 0 / 2)).comp 0 (hr.div_const 2)
-    simpa using hh
-  have hs : HasDerivAt (fun θ ↦ Real.sin (r θ / 2)) 0 0 := by
-    have hh := (Real.hasDerivAt_sin (r 0 / 2)).comp 0 (hr.div_const 2)
-    simpa using hh
-  have hratio : HasDerivAt (fun θ ↦ Real.sin (r θ / 2) / r θ) 0 0 := by
-    simpa using hs.div hr (by rw [hr0]; exact ha0)
-  have hx : HasDerivAt (fun θ : ℝ ↦ a • X - θ • Z) (-Z) 0 := by
-    simpa using (hasDerivAt_const (0 : ℝ) (a • X)).sub
-      ((hasDerivAt_id (0 : ℝ)).smul_const Z)
-  have hd := (hc.ofReal_comp.smul_const (1 : Matrix (Fin 2) (Fin 2) ℂ)).sub
-    ((hratio.ofReal_comp.smul hx).const_smul I)
-  convert hd using 1
-  · funext θ
-    have hp : 0 < a ^ 2 + (-θ) ^ 2 :=
-      add_pos_of_pos_of_nonneg (sq_pos_of_pos ha) (sq_nonneg _)
-    have he := evol_xz_formula hp
-    simp only [xz, neg_smul, ← sub_eq_add_neg, neg_sq] at he
-    rw [he]
-    dsimp [r]
-    congr 1
-    rw [smul_comm I (Real.sin (Real.sqrt (a ^ 2 + θ ^ 2) / 2) / Real.sqrt (a ^ 2 + θ ^ 2)),
-      ← smul_assoc, Complex.real_smul]
-    congr 1
-    push_cast
-    ring
-  · simp only [Complex.ofReal_zero, zero_smul, add_zero, zero_sub, hr0, smul_neg,
-      neg_neg, smul_smul, Complex.ofReal_div]
-    congr 1
-    ring
 
 /-- The difference of the two closed forms in the rotating frame. -/
 def frameError (ω θ : ℝ) (T : ℕ) : Matrix (Fin 2) (Fin 2) ℂ :=
@@ -972,85 +730,12 @@ theorem error_norm_frame (ω θ : ℝ) {T : ℕ} (hT : 0 < T) :
     CStarRing.norm_mem_unitary_mul _ (evol_mem_unitary pauli_relations.2.2.1 (θ / 2))]
   rfl
 
-/-- The error vanishes when the field does not precess. -/
-theorem frameError_zero (ω : ℝ) (T : ℕ) : frameError ω 0 T = 0 := by
-  simp only [frameError, zero_div, step_zero, zero_smul, sub_zero]
-  rw [← evol_nat_mul, Prose.localSteps_evol_smul_sharp]
-  have ht : (T : ℝ) * (ω / 2) = 1 / 2 * (ω * T) := by ring
-  rw [ht, sub_self]
-
-/-- First variation of the comparison error in the precession angle.
-This is the finite-product version of the axis computation after Example 5.2. -/
-theorem frameError_derivative {ω : ℝ} (hω : 0 < ω) {T : ℕ} (hT : 0 < T)
-    (hs : Real.sin (ω / 2) ≠ 0) :
-    HasDerivAt (fun θ : ℝ ↦ frameError ω θ T)
-      ((I * Real.sin (T * (ω / 2)) *
-        (1 / (2 * T * Real.sin (ω / 2)) - 1 / (ω * T)) : ℂ) • Z) 0 := by
-  have hd := (step_power_derivative ω hT hs T).sub
-    (frozen_derivative (mul_pos hω (Nat.cast_pos.mpr hT)))
-  convert hd using 1
-  rw [← sub_smul]
-  congr 1
-  rw [show ω * (T : ℝ) / 2 = T * (ω / 2) by ring]
-  push_cast
-  ring
 
 /-- The norm of the third Pauli matrix is one in the operator norm. -/
 theorem norm_Z : ‖Z‖ = 1 := by
   have hh := congrArg norm pauli_relations.2.2.2.2.2.1
   rw [pauli_relations.2.2.1.isSelfAdjoint.norm_mul_self, norm_one] at hh
   exact (sq_eq_sq₀ (norm_nonneg Z) zero_le_one).mp (by simpa using hh)
-
-/-- The leading comparison error at a fixed number of steps, before imposing
-the odd-resonance condition. -/
-theorem frameError_normalized_limit {ω : ℝ} (hω : 0 < ω) {T : ℕ} (hT : 0 < T)
-    (hs : Real.sin (ω / 2) ≠ 0) :
-    Tendsto (fun θ : ℝ ↦ (T : ℝ) * ‖frameError ω θ T‖ / (ω * |θ|)) (𝓝[≠] 0)
-      (𝓝 ((T : ℝ) / ω *
-        ‖((I * Real.sin (T * (ω / 2)) *
-          (1 / (2 * T * Real.sin (ω / 2)) - 1 / (ω * T)) : ℂ) • Z)‖)) := by
-  rw [norm_smul]
-  have hh := ((frameError_derivative hω hT hs).tendsto_slope_zero.norm).const_mul
-    ((T : ℝ) / ω)
-  simp only [zero_add, frameError_zero, sub_zero, norm_smul, norm_inv, Real.norm_eq_abs] at hh
-  convert hh using 1
-  funext θ
-  dsimp
-  ring
-
-/-- The fixed-`T`, small-precession limit proving the endpoint coefficient
-sharp at every odd-resonant width. The notation `m` makes "odd" precise. -/
-theorem precessing_spin_every_width {ω : ℝ} (hω : 0 < ω) (hω2 : ω < 2 * π)
-    {T : ℕ} (hT : 0 < T) (m : ℕ) (hodd : (T : ℝ) * ω = (2 * m + 1) * π) :
-    Tendsto (fun θ : ℝ ↦ (T : ℝ) * ‖frameError ω θ T‖ / (ω * |θ|)) (𝓝[≠] 0)
-      (𝓝 (1 / (2 * ω * Real.sin (ω / 2)) - 1 / ω ^ 2)) := by
-  have hspos : 0 < Real.sin (ω / 2) := Real.sin_pos_of_pos_of_lt_pi (by positivity) (by linarith)
-  have hTpos : 0 < (T : ℝ) := Nat.cast_pos.mpr hT
-  have hh := frameError_normalized_limit hω hT hspos.ne'
-  have hcoeff : 0 ≤ 1 / (2 * (T : ℝ) * Real.sin (ω / 2)) - 1 / (ω * T) := by
-    apply sub_nonneg.mpr
-    apply one_div_le_one_div_of_le (by positivity)
-    have hsin := Real.sin_le (by positivity : 0 ≤ ω / 2)
-    have hmul := mul_le_mul_of_nonneg_left hsin (show 0 ≤ 2 * (T : ℝ) by positivity)
-    linarith
-  have hphase : (T : ℝ) * (ω / 2) = m * π + π / 2 := by
-    linear_combination hodd / 2
-  have hsabs : |Real.sin (T * (ω / 2))| = 1 := by
-    rw [hphase, Real.sin_add, Real.sin_nat_mul_pi, Real.cos_nat_mul_pi,
-      Real.cos_pi_div_two, Real.sin_pi_div_two]
-    simp
-  have hnorm : ‖((I * Real.sin (T * (ω / 2)) *
-      (1 / (2 * T * Real.sin (ω / 2)) - 1 / (ω * T)) : ℂ) • Z)‖ =
-      1 / (2 * (T : ℝ) * Real.sin (ω / 2)) - 1 / (ω * T) := by
-    rw [norm_smul, norm_Z, mul_one, norm_mul, norm_mul, Complex.norm_I,
-      Complex.norm_real, Real.norm_eq_abs, hsabs, one_mul, one_mul]
-    have hc : (1 / (2 * (T : ℂ) * Real.sin (ω / 2)) - 1 / ((ω : ℂ) * T)) =
-        ((1 / (2 * (T : ℝ) * Real.sin (ω / 2)) - 1 / (ω * T) : ℝ) : ℂ) := by push_cast; rfl
-    rw [hc, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hcoeff]
-  rw [hnorm] at hh
-  convert hh using 1
-  congr 1
-  field_simp
 
 
 /-- Multiplying a small angle by its sine preserves its first-order limit. -/
@@ -1302,10 +987,10 @@ theorem odd_step_power (ε : ℝ) (k : ℕ) :
 
 /-- The odd resonant phase factors out before expanding the residual
 rotation, as in the first equality for the continuous factor in Example 5.2(i). -/
-theorem odd_frozen_rotation_factor (β δ : ℝ) (k : ℕ) :
-    evol (xz (Real.cos β) (-Real.sin β)) (π * (2 * k + 1) / 2 + δ) =
+theorem odd_frozen_rotation_factor (β ζ : ℝ) (k : ℕ) :
+    evol (xz (Real.cos β) (-Real.sin β)) (π * (2 * k + 1) / 2 + ζ) =
       (-I) ^ (2 * k + 1) •
-        (xz (Real.cos β) (-Real.sin β) * evol (xz (Real.cos β) (-Real.sin β)) δ) := by
+        (xz (Real.cos β) (-Real.sin β) * evol (xz (Real.cos β) (-Real.sin β)) ζ) := by
   have hp := odd_step_power β k
   rw [half_turn_step, ← evol_nat_mul] at hp
   have ht : ((2 * k + 1 : ℕ) : ℝ) * (π / 2) = π * (2 * k + 1) / 2 := by
@@ -1316,10 +1001,10 @@ theorem odd_frozen_rotation_factor (β δ : ℝ) (k : ℕ) :
 
 /-- Expanding the residual rotation gives the continuous factor's real axis
 part and imaginary scalar part. -/
-theorem odd_frozen_rotation (β δ : ℝ) (k : ℕ) :
-    evol (xz (Real.cos β) (-Real.sin β)) (π * (2 * k + 1) / 2 + δ) =
+theorem odd_frozen_rotation (β ζ : ℝ) (k : ℕ) :
+    evol (xz (Real.cos β) (-Real.sin β)) (π * (2 * k + 1) / 2 + ζ) =
       (-I) ^ (2 * k + 1) •
-        ((Real.cos δ : ℂ) • xz (Real.cos β) (-Real.sin β) - (I * Real.sin δ) • 1) := by
+        ((Real.cos ζ : ℂ) • xz (Real.cos β) (-Real.sin β) - (I * Real.sin ζ) • 1) := by
   rw [odd_frozen_rotation_factor,
     evol_involution (xz_angle_relations _).1 (xz_angle_relations _).2,
     mul_sub, mul_smul_comm, mul_smul_comm, mul_one, (xz_angle_relations _).2]
@@ -1328,15 +1013,15 @@ theorem odd_frozen_rotation (β δ : ℝ) (k : ℕ) :
 the common rotating frame, both factors are powers of their Pauli axes. -/
 theorem odd_error_powered (θ : ℝ) (k : ℕ) :
     let T : ℕ := 2 * k + 1
-    let δ := Real.sqrt (π ^ 2 * (T : ℝ) ^ 2 + θ ^ 2) / 2 - π * T / 2
+    let ζ := Real.sqrt (π ^ 2 * (T : ℝ) ^ 2 + θ ^ 2) / 2 - π * T / 2
     let N := xz (Real.cos (θ / (2 * T))) (-Real.sin (θ / (2 * T)))
     let M := xz (Real.cos (Real.arctan (θ / (π * T))))
       (-Real.sin (Real.arctan (θ / (π * T))))
-    ‖frameError π θ T‖ = ‖((-I) • N) ^ T - ((-I) • M) ^ T * evol M δ‖ := by
-  intro T δ N M
+    ‖frameError π θ T‖ = ‖((-I) • N) ^ T - ((-I) • M) ^ T * evol M ζ‖ := by
+  intro T ζ N M
   have ht : 0 < (T : ℝ) := by dsimp [T]; positivity
-  have hr : Real.sqrt ((π * (T : ℝ)) ^ 2 + θ ^ 2) / 2 = π * T / 2 + δ := by
-    dsimp [δ]
+  have hr : Real.sqrt ((π * (T : ℝ)) ^ 2 + θ ^ 2) / 2 = π * T / 2 + ζ := by
+    dsimp [ζ]
     rw [mul_pow]
     ring
   have hhalf : evol M (π / 2) = (-I) • M := by
@@ -1345,7 +1030,7 @@ theorem odd_error_powered (θ : ℝ) (k : ℕ) :
   apply congrArg norm
   unfold frameError
   rw [half_turn_step_scalar, frozen_axis_angle (mul_pos pi_pos ht), hr, evol_add]
-  change ((-I) • N) ^ T - evol M (π * T / 2) * evol M δ = _
+  change ((-I) • N) ^ T - evol M (π * T / 2) * evol M ζ = _
   rw [show π * (T : ℝ) / 2 = (T : ℝ) * (π / 2) by ring, evol_nat_mul, hhalf]
 
 /-- The three-line norm calculation in Example 5.2(i): first expose the
@@ -1353,41 +1038,41 @@ powered axes, then remove their common unit phase and expand the residual
 rotation, and finally take the square root of the adjoint square. -/
 theorem odd_error_geometric (θ : ℝ) (k : ℕ) :
     let T : ℕ := 2 * k + 1
-    let δ := Real.sqrt (π ^ 2 * (T : ℝ) ^ 2 + θ ^ 2) / 2 - π * T / 2
+    let ζ := Real.sqrt (π ^ 2 * (T : ℝ) ^ 2 + θ ^ 2) / 2 - π * T / 2
     let α := θ / (2 * T)
     let β := Real.arctan (θ / (π * T))
     let A := xz (Real.cos α) (-Real.sin α) -
-      (Real.cos δ : ℂ) • xz (Real.cos β) (-Real.sin β)
-    ‖frameError π θ T‖ = ‖A + (I * Real.sin δ) • 1‖ ∧
-      ‖frameError π θ T‖ = Real.sqrt (‖A‖ ^ 2 + Real.sin δ ^ 2) := by
-  intro T δ α β A
+      (Real.cos ζ : ℂ) • xz (Real.cos β) (-Real.sin β)
+    ‖frameError π θ T‖ = ‖A + (I * Real.sin ζ) • 1‖ ∧
+      ‖frameError π θ T‖ = Real.sqrt (‖A‖ ^ 2 + Real.sin ζ ^ 2) := by
+  intro T ζ α β A
   let N := xz (Real.cos α) (-Real.sin α)
   let M := xz (Real.cos β) (-Real.sin β)
   have hN : ((-I) • N) ^ T = (-I) ^ T • N := by
     simpa only [half_turn_step_scalar] using odd_step_power α k
   have hM : ((-I) • M) ^ T = (-I) ^ T • M := by
     simpa only [half_turn_step_scalar] using odd_step_power β k
-  have hresidual : (-I) ^ T • (M * evol M δ) =
-      (-I) ^ T • ((Real.cos δ : ℂ) • M - (I * Real.sin δ) • 1) := by
-    have hrotation := odd_frozen_rotation β δ k
+  have hresidual : (-I) ^ T • (M * evol M ζ) =
+      (-I) ^ T • ((Real.cos ζ : ℂ) • M - (I * Real.sin ζ) • 1) := by
+    have hrotation := odd_frozen_rotation β ζ k
     rw [odd_frozen_rotation_factor] at hrotation
     exact hrotation
-  have hsecond : ((-I) • N) ^ T - ((-I) • M) ^ T * evol M δ =
-      (-I) ^ T • (A + (I * Real.sin δ) • 1) := by
+  have hsecond : ((-I) • N) ^ T - ((-I) • M) ^ T * evol M ζ =
+      (-I) ^ T • (A + (I * Real.sin ζ) • 1) := by
     rw [hN, hM, smul_mul_assoc, hresidual]
     dsimp [N, M, A]
     simp only [smul_add, smul_sub]
     abel
-  have hn : ‖frameError π θ T‖ = ‖A + (I * Real.sin δ) • 1‖ := by
+  have hn : ‖frameError π θ T‖ = ‖A + (I * Real.sin ζ) • 1‖ := by
     calc
-      ‖frameError π θ T‖ = ‖((-I) • N) ^ T - ((-I) • M) ^ T * evol M δ‖ :=
+      ‖frameError π θ T‖ = ‖((-I) • N) ^ T - ((-I) • M) ^ T * evol M ζ‖ :=
         odd_error_powered θ k
-      _ = ‖A + (I * Real.sin δ) • 1‖ := by
+      _ = ‖A + (I * Real.sin ζ) • 1‖ := by
         rw [hsecond, norm_smul, norm_pow]
         simp
   refine ⟨hn, hn.trans ?_⟩
-  have ha : A = xz (Real.cos α - Real.cos δ * Real.cos β)
-      (-Real.sin α + Real.cos δ * Real.sin β) := by
+  have ha : A = xz (Real.cos α - Real.cos ζ * Real.cos β)
+      (-Real.sin α + Real.cos ζ * Real.sin β) := by
     ext i j
     simp [A, xz, Complex.real_smul]
     ring
@@ -1417,14 +1102,14 @@ theorem scaled_cos_sub_one_limit {x : ℕ → ℝ} {a : ℝ}
 theorem phase_cosine_quadratic (θ : ℝ) :
     (fun n : ℕ ↦ 1 - Real.cos (Real.sqrt (π ^ 2 * (n : ℝ) ^ 2 + θ ^ 2) / 2 - π * n / 2))
       =O[atTop] (fun n : ℕ ↦ (n : ℝ)⁻¹ ^ 2) := by
-  let δ := fun n : ℕ ↦ Real.sqrt (π ^ 2 * (n : ℝ) ^ 2 + θ ^ 2) / 2 - π * n / 2
-  have hd : Tendsto (fun n ↦ δ n / 2) atTop (𝓝 0) := by
-    simpa [δ] using (phase_defect_tendsto_zero pi_pos θ).div_const 2
-  have hnd : Tendsto (fun n : ℕ ↦ (n : ℝ) * (δ n / 2))
+  let ζ := fun n : ℕ ↦ Real.sqrt (π ^ 2 * (n : ℝ) ^ 2 + θ ^ 2) / 2 - π * n / 2
+  have hd : Tendsto (fun n ↦ ζ n / 2) atTop (𝓝 0) := by
+    simpa [ζ] using (phase_defect_tendsto_zero pi_pos θ).div_const 2
+  have hnd : Tendsto (fun n : ℕ ↦ (n : ℝ) * (ζ n / 2))
       atTop (𝓝 ((θ ^ 2 / (4 * π)) / 2)) := by
     convert (phase_defect_limit pi_pos θ).div_const 2 using 1
     funext n
-    dsimp [δ]
+    dsimp [ζ]
     ring
   have hs := ((scaled_sin_limit hd hnd).pow 2).const_mul 2
   apply Asymptotics.isBigO_of_div_tendsto_nhds ?_ (2 * ((θ ^ 2 / (4 * π)) / 2) ^ 2) ?_
@@ -1434,26 +1119,26 @@ theorem phase_cosine_quadratic (θ : ℝ) :
   · apply hs.congr'
     filter_upwards [eventually_ge_atTop 1] with n hn
     have hn0 : (n : ℝ) ≠ 0 := by exact_mod_cast (show n ≠ 0 by omega)
-    have hc : 1 - Real.cos (δ n) = 2 * Real.sin (δ n / 2) ^ 2 := by
-      have hh := Real.cos_two_mul (δ n / 2)
-      have ht := Real.sin_sq_add_cos_sq (δ n / 2)
-      rw [show 2 * (δ n / 2) = δ n by ring] at hh
+    have hc : 1 - Real.cos (ζ n) = 2 * Real.sin (ζ n / 2) ^ 2 := by
+      have hh := Real.cos_two_mul (ζ n / 2)
+      have ht := Real.sin_sq_add_cos_sq (ζ n / 2)
+      rw [show 2 * (ζ n / 2) = ζ n by ring] at hh
       linear_combination -hh - 2 * ht
-    change 2 * ((n : ℝ) * Real.sin (δ n / 2)) ^ 2 =
-      (1 - Real.cos (δ n)) / ((n : ℝ)⁻¹ ^ 2)
+    change 2 * ((n : ℝ) * Real.sin (ζ n / 2)) ^ 2 =
+      (1 - Real.cos (ζ n)) / ((n : ℝ)⁻¹ ^ 2)
     rw [hc]
     field_simp
 
 /-- The axes in the norm display have the first-order separation asserted
 in Example 5.2(i); the cosine defect contributes zero at that order. -/
 theorem odd_axis_norm_limit (θ : ℝ) :
-    let δ := fun n : ℕ ↦ Real.sqrt (π ^ 2 * (n : ℝ) ^ 2 + θ ^ 2) / 2 - π * n / 2
+    let ζ := fun n : ℕ ↦ Real.sqrt (π ^ 2 * (n : ℝ) ^ 2 + θ ^ 2) / 2 - π * n / 2
     let α := fun n : ℕ ↦ θ / (2 * n)
     let β := fun n : ℕ ↦ Real.arctan (θ / (π * n))
     Tendsto (fun n : ℕ ↦ (n : ℝ) * ‖xz (Real.cos (α n)) (-Real.sin (α n)) -
-      (Real.cos (δ n) : ℂ) • xz (Real.cos (β n)) (-Real.sin (β n))‖)
+      (Real.cos (ζ n) : ℂ) • xz (Real.cos (β n)) (-Real.sin (β n))‖)
       atTop (𝓝 ((π - 2) * |θ| / (2 * π))) := by
-  intro δ α β
+  intro ζ α β
   have hα : Tendsto α atTop (𝓝 0) := by
     simpa [α, div_div] using tendsto_const_div_atTop_nhds_zero_nat (θ / 2)
   have hnα : Tendsto (fun n : ℕ ↦ (n : ℝ) * α n) atTop (𝓝 (θ / 2)) := by
@@ -1479,26 +1164,26 @@ theorem odd_axis_norm_limit (θ : ℝ) :
   have hcβ := scaled_cos_sub_one_limit hβ hnβ
   have hbound := ((phase_cosine_quadratic θ).mul
     (Asymptotics.isBigO_refl (fun n : ℕ ↦ (n : ℝ)) atTop)).neg_left
-  have hscaled : (fun n : ℕ ↦ (n : ℝ) * (Real.cos (δ n) - 1))
+  have hscaled : (fun n : ℕ ↦ (n : ℝ) * (Real.cos (ζ n) - 1))
       =O[atTop] (fun n : ℕ ↦ (n : ℝ)⁻¹) := by
     apply hbound.congr
     · intro n
-      dsimp [δ]
+      dsimp [ζ]
       ring
     · intro n
       by_cases hn : (n : ℝ) = 0
       · simp [hn]
       · field_simp
-  have hcδ : Tendsto (fun n : ℕ ↦ (n : ℝ) * (Real.cos (δ n) - 1))
+  have hcζ : Tendsto (fun n : ℕ ↦ (n : ℝ) * (Real.cos (ζ n) - 1))
       atTop (𝓝 0) := hscaled.trans_tendsto (by
     simpa only [one_div] using tendsto_const_div_atTop_nhds_zero_nat (1 : ℝ))
   have hcβ0 : Tendsto (fun n ↦ Real.cos (β n)) atTop (𝓝 1) := by
     simpa using (Real.continuous_cos.tendsto 0).comp hβ
   have hsβ0 : Tendsto (fun n ↦ Real.sin (β n)) atTop (𝓝 0) := by
     simpa using (Real.continuous_sin.tendsto 0).comp hβ
-  have hx := (hcα.sub hcβ).sub (hcδ.mul hcβ0)
+  have hx := (hcα.sub hcβ).sub (hcζ.mul hcβ0)
   have hz := ((scaled_sin_limit hβ hnβ).sub (scaled_sin_limit hα hnα)).add
-    (hcδ.mul hsβ0)
+    (hcζ.mul hsβ0)
   have hv := (hx.smul_const X).add (hz.smul_const Z)
   have hh := hv.norm
   simp only [sub_zero, zero_mul, add_zero, zero_smul, zero_add,
@@ -1512,11 +1197,11 @@ theorem odd_axis_norm_limit (θ : ℝ) :
   apply Eventually.of_forall
   intro n
   have he : ((n : ℝ) * (Real.cos (α n) - 1) - n * (Real.cos (β n) - 1) -
-        n * (Real.cos (δ n) - 1) * Real.cos (β n)) • X +
+        n * (Real.cos (ζ n) - 1) * Real.cos (β n)) • X +
       (n * Real.sin (β n) - n * Real.sin (α n) +
-        n * (Real.cos (δ n) - 1) * Real.sin (β n)) • Z =
+        n * (Real.cos (ζ n) - 1) * Real.sin (β n)) • Z =
       (n : ℝ) • (xz (Real.cos (α n)) (-Real.sin (α n)) -
-        (Real.cos (δ n) : ℂ) • xz (Real.cos (β n)) (-Real.sin (β n))) := by
+        (Real.cos (ζ n) : ℂ) • xz (Real.cos (β n)) (-Real.sin (β n))) := by
     ext i j
     simp [xz, Complex.real_smul]
     ring
@@ -1528,9 +1213,9 @@ limits of its axis and phase terms. -/
 theorem odd_error_limit (θ : ℝ) :
     Tendsto (fun k : ℕ ↦ ((2 * k + 1 : ℕ) : ℝ) * ‖frameError π θ (2 * k + 1)‖)
       atTop (𝓝 (Real.sqrt ((θ ^ 2 / (4 * π)) ^ 2 + (θ / 2 - θ / π) ^ 2))) := by
-  let δ := fun n : ℕ ↦ Real.sqrt (π ^ 2 * (n : ℝ) ^ 2 + θ ^ 2) / 2 - π * n / 2
+  let ζ := fun n : ℕ ↦ Real.sqrt (π ^ 2 * (n : ℝ) ^ 2 + θ ^ 2) / 2 - π * n / 2
   let A := fun n : ℕ ↦ xz (Real.cos (θ / (2 * n))) (-Real.sin (θ / (2 * n))) -
-    (Real.cos (δ n) : ℂ) • xz (Real.cos (Real.arctan (θ / (π * n))))
+    (Real.cos (ζ n) : ℂ) • xz (Real.cos (Real.arctan (θ / (π * n))))
       (-Real.sin (Real.arctan (θ / (π * n))))
   have hs := scaled_sin_limit (phase_defect_tendsto_zero pi_pos θ) (phase_defect_limit pi_pos θ)
   have ha := odd_axis_norm_limit θ
@@ -1547,11 +1232,11 @@ theorem odd_error_limit (θ : ℝ) :
   apply Eventually.of_forall
   intro k
   change Real.sqrt ((((2 * k + 1 : ℕ) : ℝ) * ‖A (2 * k + 1)‖) ^ 2 +
-    (((2 * k + 1 : ℕ) : ℝ) * Real.sin (δ (2 * k + 1))) ^ 2) = _
+    (((2 * k + 1 : ℕ) : ℝ) * Real.sin (ζ (2 * k + 1))) ^ 2) = _
   rw [show (((2 * k + 1 : ℕ) : ℝ) * ‖A (2 * k + 1)‖) ^ 2 +
-      (((2 * k + 1 : ℕ) : ℝ) * Real.sin (δ (2 * k + 1))) ^ 2 =
+      (((2 * k + 1 : ℕ) : ℝ) * Real.sin (ζ (2 * k + 1))) ^ 2 =
       ((2 * k + 1 : ℕ) : ℝ) ^ 2 *
-        (‖A (2 * k + 1)‖ ^ 2 + Real.sin (δ (2 * k + 1)) ^ 2) by ring,
+        (‖A (2 * k + 1)‖ ^ 2 + Real.sin (ζ (2 * k + 1)) ^ 2) by ring,
     Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq (Nat.cast_nonneg _)]
   exact congrArg (fun r : ℝ ↦ ((2 * k + 1 : ℕ) : ℝ) * r)
     (odd_error_geometric θ k).2.symm
@@ -1560,7 +1245,8 @@ theorem odd_error_limit (θ : ℝ) :
 extra conclusions. The endpoint
 norms are those of the actual derivative of the Hamiltonian in the statement. -/
 theorem ex_precessing_spin (ω θ : ℝ) :
-    let H := family ω θ
+    let H := fun s : ℝ ↦ (ω / 2 : ℝ) •
+      (evol Z (θ * s / 2) * X * evol Z (-(θ * s / 2)))
     let V := fun T : ℕ ↦ evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2))
     let Uend := fun T : ℕ ↦ evol Z (θ / 2) * evol ((ω * T) • X - θ • Z) (1 / 2)
     (∀ T : ℕ, 0 < T → ∀ U, IsEvolution (fun t ↦ H (t / T)) U 0 T → U T = Uend T) ∧
@@ -1572,6 +1258,11 @@ theorem ex_precessing_spin (ω θ : ℝ) :
         Real.sqrt (1 + θ ^ 2 / (4 * (π - 2) ^ 2))))) ∧
     (ω = 2 * π → (∀ T j : ℕ, evol (H (j / T)) 1 = -1) ∧
       Tendsto (fun T : ℕ ↦ ‖V T - Uend T‖) atTop (𝓝 (2 * |Real.sin (θ / 4)|))) := by
+  have hfamily : (fun s : ℝ ↦ (ω / 2 : ℝ) •
+      (evol Z (θ * s / 2) * X * evol Z (-(θ * s / 2)))) = family ω θ := by
+    funext s
+    exact (family_rotated ω θ s).symm
+  rw [hfamily]
   dsimp only
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro T hT U hU
@@ -1642,27 +1333,6 @@ theorem spin_jump_quadratic {ω w : ℝ} (hω : 0 ≤ ω) (hωw : ω ≤ w)
   convert hj using 1
   simp only [div_pow, mul_pow, sq_abs]
   ring
-
-/-- Odd-resonant spins force the endpoint coefficient at every positive width.
-The residual term contains exactly the Lipschitz and squared-derivative terms
-from the unit-step comparison, both quadratic in the angular speed. -/
-theorem precessing_spin_optimal {w c A B : ℝ} (hw : 0 < w) (hw2 : w < 2 * π)
-    (hcomparison : ∀ (ω : ℝ) (T : ℕ), 0 < ω → ω < w → 0 < T → ∀ θ : ℝ,
-      (T : ℝ) * ‖frameError ω θ T‖ ≤
-        c * (‖familySlope ω θ 0‖ + ‖familySlope ω θ 1‖) +
-        A * (ω * θ ^ 2 / 2) + B * unitSupNorm (familySlope ω θ) ^ 2) :
-    1 / (2 * w * Real.sin (w / 2)) - 1 / w ^ 2 ≤ c := by
-  apply endpoint_coefficient_optimal (E := fun ω T θ ↦ (T : ℝ) * ‖frameError ω θ T‖) hw hw2
-  · intro ω T m hω hωw hT hodd
-    exact precessing_spin_every_width hω (hωw.trans hw2) hT m hodd
-  · intro ω T _ hω hωw hT _
-    refine ⟨A * ω / 2 + B * ω ^ 2 / 4, Eventually.of_forall (fun θ ↦ ?_)⟩
-    have hh := hcomparison ω T hω hωw hT θ
-    rw [familySlope_norm hω.le, familySlope_norm hω.le, familySlope_supNorm hω.le] at hh
-    convert hh using 1
-    simp only [div_pow, mul_pow, sq_abs]
-    ring
-
 
 /-- The odd-runtime limit in Example 5.2(i) forces the endpoint coefficient
 at width pi. The other terms, after multiplication by the runtime, are

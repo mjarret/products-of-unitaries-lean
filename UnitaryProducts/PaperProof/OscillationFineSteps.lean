@@ -432,19 +432,19 @@ theorem rem_oscillation_count_lipschitz {H : ℝ → 𝕄}
 
 /-- **Remark 3.7** (`rem:oscillation-counts`): the Lipschitz count,
 including every-point midpoint geometry and the error bound.
-The paper's `L ≥ 0` follows from the Lipschitz hypothesis at 1 and 0. -/
+The paper's `ℓ ≥ 0` follows from the Lipschitz hypothesis at 1 and 0. -/
 theorem rem_oscillation_counts :
-    ∀ (H : ℝ → 𝕄) (L ε : ℝ), 0 < ε →
-      (∀ x ∈ Icc (0 : ℝ) 1, ∀ y ∈ Icc (0 : ℝ) 1, ‖H x - H y‖ ≤ L * |x - y|) →
-      ∀ n : ℕ, max 1 (L / (2 * ε)) ≤ (n : ℝ) →
+    ∀ (H : ℝ → 𝕄) (ℓ ε : ℝ), 0 < ε →
+      (∀ x ∈ Icc (0 : ℝ) 1, ∀ y ∈ Icc (0 : ℝ) 1, ‖H x - H y‖ ≤ ℓ * |x - y|) →
+      ∀ n : ℕ, max 1 (ℓ / (2 * ε)) ≤ (n : ℝ) →
       let s := fun j : ℕ ↦ (j : ℝ) / n
       IsCheckpointPartition n s ∧
         (∀ j < n, ∀ x ∈ Ioo (s j) (s (j + 1)),
           |x - (s j + s (j + 1)) / 2| ≤ 1 / (2 * n)) ∧
         (∀ j < n, ∀ x ∈ Ioo (s j) (s (j + 1)),
-          ‖H x - H ((s j + s (j + 1)) / 2)‖ ≤ L / (2 * n)) ∧
-        L / (2 * n) ≤ ε ∧ HasMidpointOscillation H n s ε := by
-  intro H L ε hε hLip n hn s
+          ‖H x - H ((s j + s (j + 1)) / 2)‖ ≤ ℓ / (2 * n)) ∧
+        ℓ / (2 * n) ≤ ε ∧ HasMidpointOscillation H n s ε := by
+  intro H ℓ ε hε hLip n hn s
   have h := rem_oscillation_count_lipschitz hε hLip n hn
   exact ⟨h.1, fun j _ x hx ↦ uniform_cell_midpoint_distance n j hx,
     h.2.1, h.2.2, fun j hj x hx ↦ (h.2.1 j hj x hx).trans h.2.2⟩

@@ -16,68 +16,9 @@ open scoped Topology
 open UnitaryProducts UnitaryProducts.Paper
 noncomputable section
 namespace UnitaryProducts.PaperProof
-variable {d : ℕ}
-local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- A fixed unitary change of basis conjugates a Hamiltonian and its actual
-evolution. This identifies the Discussion's spin with the conjugated example. -/
-theorem constant_unitary_conjugate_evolution {a b : ℝ} {H U : ℝ → 𝕄}
-    (C : 𝕄) (hC : C ∈ unitary 𝕄) (hU : IsEvolution H U a b) :
-    IsEvolution (fun t ↦ C * H t * star C) (fun t ↦ C * U t * star C) a b := by
-  have hCC := Unitary.mem_iff.mp hC
-  refine ⟨(continuousOn_const.mul hU.1).mul continuousOn_const, ?_, ?_, ?_⟩
-  · dsimp only
-    rw [hU.2.1, mul_one, hCC.2]
-  · intro t ht
-    have hUt : U t ∈ unitary 𝕄 := Matrix.mem_unitaryGroup_iff'.mpr (hU.2.2.1 t ht)
-    exact (Unitary.mem_iff.mp (mul_mem (mul_mem hC hUt) (Unitary.star_mem hC))).1
-  · obtain ⟨S, hS, hUd⟩ := hU.2.2.2
-    refine ⟨S, hS, fun t ht hnt ↦ ?_⟩
-    convert ((hUd t ht hnt).const_mul C).mul_const (star C) using 1
-    simp only [mul_smul_comm, smul_mul_assoc, mul_assoc]
-    rw [← mul_assoc (star C) C, hCC.1, one_mul]
 
 
 namespace Spin
-
-/-- The actual evolution of the Discussion's conjugated resonant spin has the
-conjugated closed form used in its limiting-error calculation. -/
-theorem discussion_evolution_closed (θ : ℝ) {T : ℕ} (hT : 0 < T)
-    {U : ℝ → Matrix (Fin 2) (Fin 2) ℂ}
-    (hU : IsEvolution (fun t ↦ π • (evol Y (θ * (t / T) / 2) * Z *
-      evol Y (-(θ * (t / T) / 2)))) U 0 T) :
-    U T = cyclic * (evol Z (θ / 2) *
-      evol (((2 * π * T : ℝ) • X) - θ • Z) (1 / 2)) * star cyclic := by
-  have hc := Unitary.mem_iff.mp cyclic_unitary
-  have hconj := constant_unitary_conjugate_evolution (star cyclic)
-    (Unitary.star_mem cyclic_unitary) hU
-  have hgen : (fun t ↦ star cyclic * (π • (evol Y (θ * (t / T) / 2) * Z *
-      evol Y (-(θ * (t / T) / 2)))) * star (star cyclic)) =
-      (fun t ↦ family (2 * π) θ (t / T)) := by
-    funext t
-    rw [discussion_family, star_star]
-    simp only [← mul_assoc, hc.1, one_mul]
-    rw [mul_assoc, hc.1, mul_one]
-  rw [hgen] at hconj
-  have hclosed := evolution_closed (2 * π) θ hT hconj
-  have hresult := congrArg (fun A ↦ cyclic * A * star cyclic) hclosed
-  simp only [star_star, ← mul_assoc, hc.2, one_mul] at hresult
-  simpa only [mul_assoc, hc.2, mul_one] using hresult
-
-/-- The Discussion's limiting error, explicitly stated for actual evolutions
-of its Hamiltonian rather than only for the conjugated closed expression. -/
-theorem discussion_actual_error_limit (θ : ℝ)
-    (U : ℕ → ℝ → Matrix (Fin 2) (Fin 2) ℂ)
-    (hU : ∀ T : ℕ, 0 < T → IsEvolution
-      (fun t ↦ π • (evol Y (θ * (t / T) / 2) * Z * evol Y (-(θ * (t / T) / 2))))
-      (U T) 0 T) :
-    let H := fun s ↦ π • (evol Y (θ * s / 2) * Z * evol Y (-(θ * s / 2)))
-    Tendsto (fun T : ℕ ↦ ‖evol (H 1) (1 / 2) * (unitProduct H T).1 *
-      evol (H 0) (-(1 / 2)) - U T T‖) atTop (𝓝 (2 * |Real.sin (θ / 4)|)) := by
-  intro H
-  apply (discussion_error_limit θ).congr'
-  filter_upwards [eventually_ge_atTop 1] with T hT
-  rw [discussion_evolution_closed θ (by omega) (hU T (by omega))]
 
 
 /-- The continuous endpoint and rounded product become opposite at θ=2π.

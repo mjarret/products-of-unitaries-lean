@@ -583,30 +583,30 @@ theorem gap_probability_to_operator {E : Type*} [NormedAddCommGroup E]
   exact (hvbound (P x) hPx).trans ((mul_le_mul_of_nonneg_left hcontract hη).trans_eq (mul_one _))
 
 /-- A uniform coefficient for the order estimate following Example 5.1. The
-constants depend only on the fixed `p,C`; the gap and runtime do not occur. -/
-def gapOrderCoefficient (p C : ℝ) : ℝ :=
-  let A := p * C / (p - 1)
+constants depend only on the fixed `p,K`; the gap and runtime do not occur. -/
+def gapOrderCoefficient (p K : ℝ) : ℝ :=
+  let A := p * K / (p - 1)
   let c₀ := cellConstant 2
   let b := cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2
   4 * c₀ * 2 ^ p * A * 2 ^ (p - 1) + 4 * 4 ^ p * (p / 24 + p * frameMult 2 + b) * A ^ 2
 
 /-- The added term in Example 5.1 is bounded by a constant depending only on
-`p,C` times `Γstar^(2-2p)/T`. The scalar inputs are the endpoint gap powers,
+`p,K` times `Γstar^(2-2p)/T`. The scalar inputs are the endpoint gap powers,
 the interpolation norm, and the normalization integral, already bounded above. -/
-theorem gap_added_term_bound {p C Γstar cp D e₀ e₁ T : ℝ}
-    (hp : 1 < p) (hC : 0 ≤ C) (hstar : 0 < Γstar) (hstar2 : Γstar ≤ 2)
-    (hcp0 : 0 ≤ cp) (hcp : cp ≤ p * C * Γstar ^ (1 - p) / (p - 1))
+theorem gap_added_term_bound {p K Γstar cp D e₀ e₁ T : ℝ}
+    (hp : 1 < p) (hK : 0 ≤ K) (hstar : 0 < Γstar) (hstar2 : Γstar ≤ 2)
+    (hcp0 : 0 ≤ cp) (hcp : cp ≤ p * K * Γstar ^ (1 - p) / (p - 1))
     (hD0 : 0 ≤ D) (hD : D ≤ 2) (he₀ : e₀ ≤ 2 ^ p) (he₁ : e₁ ≤ 2 ^ p)
     (he0 : 0 ≤ e₀) (he1 : 0 ≤ e₁) (hT : 0 < T) :
     let c₀ := cellConstant 2
     let b := cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2
     cp * D / T * (c₀ * (e₀ + e₁) + 4 ^ p * (p / 24 + p * frameMult 2 + b) * cp * D) ≤
-      gapOrderCoefficient p C * Γstar ^ (2 - 2 * p) / T := by
+      gapOrderCoefficient p K * Γstar ^ (2 - 2 * p) / T := by
   intro c₀ b
-  let A := p * C / (p - 1)
+  let A := p * K / (p - 1)
   let B := p / 24 + p * frameMult 2 + b
   have hp0 : 0 ≤ p := by linarith
-  have hA : 0 ≤ A := div_nonneg (mul_nonneg hp0 hC) (by linarith)
+  have hA : 0 ≤ A := div_nonneg (mul_nonneg hp0 hK) (by linarith)
   have hc₀ : 0 ≤ c₀ := gap_coefficients_nonneg.1
   have hb : 0 ≤ b := gap_coefficients_nonneg.2.2
   have hN := gap_coefficients_nonneg.2.1
@@ -643,11 +643,11 @@ theorem gap_added_term_bound {p C Γstar cp D e₀ e₁ T : ℝ}
 
 /-- The runtime-divided form of the width-two correction estimate, used in
 the discussion of the inverse-gap product bound. -/
-theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
-    (hp : 1 < p) (hC : 0 ≤ C) (g cp D e₀ e₁ T : ι → ℝ)
+theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p K : ℝ}
+    (hp : 1 < p) (hK : 0 ≤ K) (g cp D e₀ e₁ T : ι → ℝ)
     (hg : ∀ i, 0 < g i ∧ g i ≤ 2) (hT : ∀ i, 0 < T i)
     (hcp0 : ∀ i, 0 ≤ cp i)
-    (hcp : ∀ i, cp i ≤ p * C * g i ^ (1 - p) / (p - 1))
+    (hcp : ∀ i, cp i ≤ p * K * g i ^ (1 - p) / (p - 1))
     (hD : ∀ i, 0 ≤ D i ∧ D i ≤ 2)
     (he₀ : ∀ i, 0 ≤ e₀ i ∧ e₀ i ≤ 2 ^ p)
     (he₁ : ∀ i, 0 ≤ e₁ i ∧ e₁ i ≤ 2 ^ p) :
@@ -661,7 +661,7 @@ theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
   have hb : 0 ≤ b := gap_coefficients_nonneg.2.2
   have hp0 : 0 ≤ p := by linarith
   have hN := gap_coefficients_nonneg.2.1
-  apply Asymptotics.IsBigO.of_bound (gapOrderCoefficient p C)
+  apply Asymptotics.IsBigO.of_bound (gapOrderCoefficient p K)
   filter_upwards [] with i
   have hci := hcp0 i
   have hdi := (hD i).1
@@ -671,14 +671,14 @@ theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
   have hti := hT i
   rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg (by positivity),
     abs_of_nonneg (by positivity)]
-  simpa only [div_mul_eq_mul_div, mul_div_assoc] using gap_added_term_bound hp hC (hg i).1
+  simpa only [div_mul_eq_mul_div, mul_div_assoc] using gap_added_term_bound hp hK (hg i).1
     (hg i).2 (hcp0 i) (hcp i) (hD i).1 (hD i).2 (he₀ i).2 (he₁ i).2 (he₀ i).1 (he₁ i).1 (hT i)
 
 /-- The exact width-two correction `𝓔₂(H)` from Example 4.6, bounded using
 Example 5.1's endpoint, supremum, and Lipschitz estimates. -/
-theorem gap_correction_bound {p C g cp D e₀ e₁ E S L : ℝ}
-    (hp : 1 < p) (hC : 0 ≤ C) (hg : 0 < g) (hg2 : g ≤ 2)
-    (hcp0 : 0 ≤ cp) (hcp : cp ≤ p * C * g ^ (1 - p) / (p - 1))
+theorem gap_correction_bound {p K g cp D e₀ e₁ E S L : ℝ}
+    (hp : 1 < p) (hK : 0 ≤ K) (hg : 0 < g) (hg2 : g ≤ 2)
+    (hcp0 : 0 ≤ cp) (hcp : cp ≤ p * K * g ^ (1 - p) / (p - 1))
     (hD0 : 0 ≤ D) (hD : D ≤ 2) (he₀ : e₀ ≤ 2 ^ p) (he₁ : e₁ ≤ 2 ^ p)
     (he0 : 0 ≤ e₀) (he1 : 0 ≤ e₁)
     (hE : E ≤ cp * D * (e₀ + e₁))
@@ -686,7 +686,7 @@ theorem gap_correction_bound {p C g cp D e₀ e₁ E S L : ℝ}
     (hL : L ≤ p * 4 ^ p * cp ^ 2 * D ^ 2) :
     cellConstant 2 * E + (1 / 24 + frameMult 2) * L +
       (cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2) * S ^ 2 ≤
-      gapOrderCoefficient p C * g ^ (2 - 2 * p) := by
+      gapOrderCoefficient p K * g ^ (2 - 2 * p) := by
   let c₀ := cellConstant 2
   let b := cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2
   have hc₀ : 0 ≤ c₀ := gap_coefficients_nonneg.1
@@ -695,7 +695,7 @@ theorem gap_correction_bound {p C g cp D e₀ e₁ E S L : ℝ}
   have hsquare := pow_le_pow_left₀ hS0 hS 2
   have hfour : (4 : ℝ) ^ p = 2 ^ p * 2 ^ p := by
     rw [show (4 : ℝ) = 2 * 2 by norm_num, Real.mul_rpow (by norm_num) (by norm_num)]
-  have hscalar := gap_added_term_bound hp hC hg hg2 hcp0 hcp hD0 hD he₀ he₁ he0 he1
+  have hscalar := gap_added_term_bound hp hK hg hg2 hcp0 hcp hD0 hD he₀ he₁ he0 he1
     (T := 1) (by norm_num)
   simp only [div_one] at hscalar
   calc
@@ -711,13 +711,13 @@ theorem gap_correction_bound {p C g cp D e₀ e₁ E S L : ℝ}
 
 /-- The sentence `𝓔₂(H) = O(Γstar^(2-2p))` following Example 5.1, for the
 actual width-two coefficient of Example 4.6. The bounds are uniform over paths
-with fixed `p,C`; `E,S,L` denote their endpoint sum, derivative norm, and
+with fixed `p,K`; `E,S,L` denote their endpoint sum, derivative norm, and
 Lipschitz constant. -/
-theorem gap_correction_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
-    (hp : 1 < p) (hC : 0 ≤ C) (g cp D e₀ e₁ E S L : ι → ℝ)
+theorem gap_correction_isBigO {ι : Type*} (l : Filter ι) {p K : ℝ}
+    (hp : 1 < p) (hK : 0 ≤ K) (g cp D e₀ e₁ E S L : ι → ℝ)
     (hg : ∀ i, 0 < g i ∧ g i ≤ 2)
     (hcp0 : ∀ i, 0 ≤ cp i)
-    (hcp : ∀ i, cp i ≤ p * C * g i ^ (1 - p) / (p - 1))
+    (hcp : ∀ i, cp i ≤ p * K * g i ^ (1 - p) / (p - 1))
     (hD : ∀ i, 0 ≤ D i ∧ D i ≤ 2)
     (he₀ : ∀ i, 0 ≤ e₀ i ∧ e₀ i ≤ 2 ^ p)
     (he₁ : ∀ i, 0 ≤ e₁ i ∧ e₁ i ≤ 2 ^ p)
@@ -730,26 +730,26 @@ theorem gap_correction_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
   have hc₀ := gap_coefficients_nonneg.1
   have hN := gap_coefficients_nonneg.2.1
   have hb := gap_coefficients_nonneg.2.2
-  apply Asymptotics.IsBigO.of_bound (gapOrderCoefficient p C)
+  apply Asymptotics.IsBigO.of_bound (gapOrderCoefficient p K)
   filter_upwards [] with i
   have he := (hE i).1
   have hl := (hL i).1
   have hgi := (hg i).1
   rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg (by positivity),
     abs_of_nonneg (by positivity)]
-  exact gap_correction_bound hp hC (hg i).1 (hg i).2 (hcp0 i) (hcp i)
+  exact gap_correction_bound hp hK (hg i).1 (hg i).2 (hcp0 i) (hcp i)
     (hD i).1 (hD i).2 (he₀ i).2 (he₁ i).2 (he₀ i).1 (he₁ i).1
     (hE i).2 (hS i).1 (hS i).2 (hL i).2
 
 /-- The commentary after Example 5.1, expressed directly for the paper's
 Hamiltonian coefficient `𝓔₂(H)`. The endpoint, supremum, and Lipschitz bounds
 are exactly the three estimates of that example. -/
-theorem gap_energy_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
-    (hp : 1 < p) (hC : 0 ≤ C) (H : ι → ℝ → 𝕄)
+theorem gap_energy_isBigO {ι : Type*} (l : Filter ι) {p K : ℝ}
+    (hp : 1 < p) (hK : 0 ≤ K) (H : ι → ℝ → 𝕄)
     (g cp D e₀ e₁ L : ι → ℝ)
     (hg : ∀ i, 0 < g i ∧ g i ≤ 2)
     (hcp0 : ∀ i, 0 ≤ cp i)
-    (hcp : ∀ i, cp i ≤ p * C * g i ^ (1 - p) / (p - 1))
+    (hcp : ∀ i, cp i ≤ p * K * g i ^ (1 - p) / (p - 1))
     (hD : ∀ i, 0 ≤ D i ∧ D i ≤ 2)
     (he₀ : ∀ i, 0 ≤ e₀ i ∧ e₀ i ≤ 2 ^ p)
     (he₁ : ∀ i, 0 ≤ e₁ i ∧ e₁ i ≤ 2 ^ p)
@@ -760,11 +760,60 @@ theorem gap_energy_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
     (hL : ∀ i, 0 ≤ L i ∧ L i ≤ p * 4 ^ p * cp i ^ 2 * D i ^ 2) :
     (fun i ↦ hamiltonianEnergy 2 (L i) (H i)) =O[l]
       (fun i ↦ g i ^ (2 - 2 * p)) := by
-  exact gap_correction_isBigO l hp hC g cp D e₀ e₁
+  exact gap_correction_isBigO l hp hK g cp D e₀ e₁
     (fun i ↦ ‖derivWithin (H i) (Icc (0 : ℝ) 1) 0‖ +
       ‖derivWithin (H i) (Icc (0 : ℝ) 1) 1‖)
     (fun i ↦ unitSupNorm (derivWithin (H i) (Icc (0 : ℝ) 1))) L
     hg hcp0 hcp hD he₀ he₁ (fun i ↦ ⟨by positivity, hE i⟩) hS hL
+
+/-- For every `p ≤ 3/2`, the gap power in Example 5.1 is bounded by an
+inverse gap, uniformly for `0 < g ≤ 2`, including the endpoint `p = 3/2`. -/
+theorem gap_power_inverse_bound {p g : ℝ} (hp : p ≤ 3 / 2)
+    (hg : 0 < g) (hg2 : g ≤ 2) :
+    g ^ (2 - 2 * p) ≤ 2 ^ (3 - 2 * p) / g := by
+  have hexponent : 0 ≤ 3 - 2 * p := by linarith
+  calc
+    g ^ (2 - 2 * p) = g ^ (3 - 2 * p) / g := by
+      rw [← Real.rpow_sub_one hg.ne']
+      congr 1
+      ring
+    _ ≤ 2 ^ (3 - 2 * p) / g :=
+      div_le_div_of_nonneg_right (Real.rpow_le_rpow hg.le hg2 hexponent) hg.le
+
+/-- The inverse-gap order asserted after Example 5.1, including `p=3/2`.
+Composing this with `gap_energy_isBigO` gives the claimed order of `𝓔₂(H)`;
+the integer factor count then uses `gap_truncated_factor_count`. -/
+theorem gap_power_inverse_isBigO {ι : Type*} (l : Filter ι) {p : ℝ}
+    (hp : p ≤ 3 / 2) (g : ι → ℝ) (hg : ∀ i, 0 < g i ∧ g i ≤ 2) :
+    (fun i ↦ g i ^ (2 - 2 * p)) =O[l] (fun i ↦ 1 / g i) := by
+  apply Asymptotics.IsBigO.of_bound ((2 : ℝ) ^ (3 - 2 * p))
+  filter_upwards [] with i
+  rw [Real.norm_eq_abs, Real.norm_eq_abs,
+    abs_of_nonneg (Real.rpow_nonneg (hg i).1.le _),
+    abs_of_nonneg (one_div_nonneg.mpr (hg i).1.le)]
+  simpa only [mul_one_div] using gap_power_inverse_bound hp (hg i).1 (hg i).2
+
+/-- The actual energy coefficient in Example 5.1 has inverse-gap order
+through the endpoint `p=3/2`, with the measure constant `K` fixed. -/
+theorem gap_energy_inverse_isBigO {ι : Type*} (l : Filter ι) {p K : ℝ}
+    (hp : 1 < p) (hp_upper : p ≤ 3 / 2) (hK : 0 ≤ K) (H : ι → ℝ → 𝕄)
+    (g cp D e₀ e₁ L : ι → ℝ)
+    (hg : ∀ i, 0 < g i ∧ g i ≤ 2)
+    (hcp0 : ∀ i, 0 ≤ cp i)
+    (hcp : ∀ i, cp i ≤ p * K * g i ^ (1 - p) / (p - 1))
+    (hD : ∀ i, 0 ≤ D i ∧ D i ≤ 2)
+    (he₀ : ∀ i, 0 ≤ e₀ i ∧ e₀ i ≤ 2 ^ p)
+    (he₁ : ∀ i, 0 ≤ e₁ i ∧ e₁ i ≤ 2 ^ p)
+    (hE : ∀ i, ‖derivWithin (H i) (Icc (0 : ℝ) 1) 0‖ +
+      ‖derivWithin (H i) (Icc (0 : ℝ) 1) 1‖ ≤ cp i * D i * (e₀ i + e₁ i))
+    (hS : ∀ i, 0 ≤ unitSupNorm (derivWithin (H i) (Icc (0 : ℝ) 1)) ∧
+      unitSupNorm (derivWithin (H i) (Icc (0 : ℝ) 1)) ≤ 2 ^ p * cp i * D i)
+    (hL : ∀ i, 0 ≤ L i ∧ L i ≤ p * 4 ^ p * cp i ^ 2 * D i ^ 2) :
+    (fun i ↦ hamiltonianEnergy 2 (L i) (H i)) =O[l]
+      (fun i ↦ 1 / g i) := by
+  have henergy := gap_energy_isBigO l hp hK H g cp D e₀ e₁ L
+    hg hcp0 hcp hD he₀ he₁ hE hS hL
+  exact henergy.trans (gap_power_inverse_isBigO l hp_upper g hg)
 
 /-- At `p=3/2`, the gap power in the added term is exactly the inverse gap. -/
 theorem gap_three_halves_order {g T : ℝ} :

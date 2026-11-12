@@ -31,18 +31,6 @@ theorem commuting_endpoint_transfer (H : ℝ → 𝕄) (T : ℕ) (U P Q : 𝕄)
     (commute_evol_right hPc (-(1 / 2))).symm
   simpa only [sub_self, norm_zero, add_zero, mul_zero] using htransfer
 
-/-- Equation (5.2), `eq:leak-transfer`: commuting endpoint projectors remove
-the half-step phases, and the comparison error bounds the added leakage. -/
-theorem leak_transfer (H : ℝ → 𝕄) (T : ℕ) (U P Q : 𝕄)
-    (hH0 : (H 0).IsHermitian) (hH1 : (H 1).IsHermitian)
-    (hP : IsStarProjection P) (hQ : IsStarProjection Q)
-    (hPc : Commute P (H 0)) (hQc : Commute Q (H 1)) :
-    ‖(1 - Q) * (unitProduct H T).1 * P‖ ≤ ‖(1 - Q) * U * P‖ +
-      ‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) - U‖ := by
-  have htransfer := commuting_endpoint_transfer H T U P Q hH0 hH1 hP hQ hPc hQc
-  have hdifference := (le_abs_self _).trans htransfer
-  linarith
-
 /-- The crossing proof: the endpoint transfer and the explicit `1/T`
 comparison from (4.6), with a coefficient independent of the step count. -/
 theorem crossing_comparison_bound [NeZero d] {T : ℕ} (hT : 0 < T)
@@ -65,8 +53,14 @@ theorem crossing_comparison_bound [NeZero d] {T : ℕ} (hT : 0 < T)
       (1 / 24 + frameMult w) * L + (c₁ + 2 * deriv frameMult w) * unitSupNorm Hd ^ 2) := by
   have hzero : (0 : ℝ) ∈ Icc (0 : ℝ) 1 := by norm_num
   have hone : (1 : ℝ) ∈ Icc (0 : ℝ) 1 := by norm_num
-  refine ⟨leak_transfer H T (U T) (P 0) (P 1)
-    (hH 0 hzero) (hH 1 hone) (hP 0 hzero) (hP 1 hone) (hPc 0 hzero) (hPc 1 hone), ?_⟩
+  have htransfer := commuting_endpoint_transfer H T (U T) (P 0) (P 1)
+    (hH 0 hzero) (hH 1 hone) (hP 0 hzero) (hP 1 hone) (hPc 0 hzero) (hPc 1 hone)
+  have hdifference := (le_abs_self _).trans htransfer
+  have hleak : ‖(1 - P 1) * (unitProduct H T).1 * P 0‖ ≤
+      ‖(1 - P 1) * U T * P 0‖ +
+        ‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) - U T‖ := by
+    linarith only [hdifference]
+  refine ⟨hleak, ?_⟩
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
   have hbound := unit_steps_endpoint_bounds hT H Hd U V hH hd hlip hw hwidth hU hV
@@ -130,7 +124,7 @@ theorem crossing_projectors_extend (H P : ℝ → 𝕄)
 /-- **Example 5.3** (`ex:crossings`): a continuous spectral projector through
 one crossing transfers the assumed continuous leakage limit to the discrete
 product. The proof derives endpoint commutation by continuity, applies
-equation (5.2), and uses (4.6) with one coefficient
+Proposition 2.4 with endpoint half-step phases, then (4.6) with one coefficient
 independent of `T`. -/
 theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
     (U : ℕ → ℝ → 𝕄)

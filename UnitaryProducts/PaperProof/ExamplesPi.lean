@@ -7,7 +7,7 @@ module
 public import UnitaryProducts.PaperProof.UniformConsequences
 public import UnitaryProducts.PaperProof.WalkCoefficients
 
-/-! # The width-pi specialization used in Section 5 -/
+/-! # The width-pi specialization used in Theorem B -/
 @[expose] public section
 noncomputable section
 open scoped Matrix.Norms.L2Operator
@@ -17,8 +17,8 @@ namespace UnitaryProducts.PaperProof
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- Equation (5.1) (`eq:products-pi`): insert the exact width-pi coefficients
-in (4.6), and identify the rounded evolution by (2.5). -/
+/-- Theorem B uses the exact width-pi specialization of (4.6),
+with the rounded evolution identified by (2.5). -/
 theorem products_pi [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd U : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
@@ -72,7 +72,7 @@ theorem products_pi_supremum [NeZero d] {T : ℕ} (hT : 0 < T)
   exact (products_pi hT H Hd U hH hd hlip hwidth hU).trans (hcoarse.trans_eq (by ring))
 
 /-- The three decimal coefficients in Theorem B are upper bounds for the exact
-width-pi endpoint, Lipschitz, and quadratic coefficients of (5.1). -/
+width-pi endpoint, Lipschitz, and quadratic coefficients of (4.6). -/
 theorem products_pi_decimal_coefficients :
     2 * (1 / (2 * π) - 1 / π ^ 2) < (116 / 1000 : ℝ) ∧
     1 / 24 + 1 / π ^ 2 < (143 / 1000 : ℝ) ∧

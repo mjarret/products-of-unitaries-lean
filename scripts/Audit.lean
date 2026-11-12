@@ -558,9 +558,8 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.Spin.X,
     `UnitaryProducts.PaperProof.Spin.Y,
     `UnitaryProducts.PaperProof.Spin.Z,
-    `UnitaryProducts.PaperProof.products_pi,
-    `UnitaryProducts.PaperProof.leak_transfer,
-    `UnitaryProducts.PaperProof.gap_factor_count,
+    `UnitaryProducts.isStarProjection_specProj,
+    `UnitaryProducts.commute_specProj,
     `UnitaryProducts.PaperProof.gapEigen_lipschitz,
     `UnitaryProducts.PaperProof.gapInterp_norm_le,
     `UnitaryProducts.PaperProof.gapInterp_eigenvalue_bounds,
@@ -581,9 +580,9 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.gap_projection_probability,
     `UnitaryProducts.PaperProof.gap_probability_to_operator,
     `UnitaryProducts.PaperProof.gap_probability_to_matrix,
-    `UnitaryProducts.PaperProof.gap_normalization_layercake,
-    `UnitaryProducts.PaperProof.gap_normalization_bound,
-    `UnitaryProducts.PaperProof.gap_added_term_bound,
+    `UnitaryProducts.PaperProof.gap_correction_bound,
+    `UnitaryProducts.PaperProof.gap_correction_isBigO,
+    `UnitaryProducts.PaperProof.gap_truncated_factor_count,
     `UnitaryProducts.PaperProof.Spin.family,
     `UnitaryProducts.PaperProof.Spin.consecutive_half_turns_commute_iff,
     `UnitaryProducts.PaperProof.Spin.evolution_closed,
@@ -629,6 +628,7 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.Spin.full_turn_not_tendsto_zero,
     `UnitaryProducts.PaperProof.diagonal_crossing_witness,
     `UnitaryProducts.PaperProof.crossing_projectors_extend,
+    `UnitaryProducts.PaperProof.commuting_endpoint_transfer,
     `UnitaryProducts.PaperProof.crossing_comparison_bound]
   let mut missingDocs : List Name := []
   for name in heads do

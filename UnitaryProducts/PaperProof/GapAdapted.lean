@@ -5,11 +5,9 @@ Authors: Michael Jarret
 -/
 module
 
-public import Mathlib.MeasureTheory.Integral.Layercake
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 public import UnitaryProducts.Spectral.Weyl
-public import UnitaryProducts.PaperProof.ExamplesPi
-public import UnitaryProducts.PaperProof.Crossings
+public import UnitaryProducts.PaperProof.UniformConsequences
 
 /-! # Gap-adapted schedules
 
@@ -436,18 +434,21 @@ theorem gap_derivative_lipschitz (D : 𝕄) {Γ u : ℝ → ℝ} {p cp : ℝ}
         hcp) (norm_nonneg _)
     _ = _ := by rw [Real.rpow_sub_one (by norm_num), hfour]; ring
 
-/-- The two coefficients used in Example 5.1 are nonnegative. -/
+/-- The three coefficients in the width-two comparison are nonnegative. -/
 theorem gap_coefficients_nonneg :
-    0 ≤ (1 / (2 * π) - 1 / π ^ 2 : ℝ) ∧
-    0 ≤ (5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 : ℝ) := by
-  have hc := UnitaryProducts.Paper.UnitStepsProse.center_bound_nonneg pi_pos.le
-    (by linarith [pi_pos] : π < 2 * π)
-  rw [frameBound_center_pi] at hc
-  refine ⟨hc, ?_⟩
-  have hf := UnitaryProducts.Corrector.frameLip_nonneg pi_pos.le
-  calc
-    0 ≤ (1 / (2 * π) - 1 / π ^ 2) / 4 + 1 / 64 + 2 * frameLip π := by positivity
-    _ = _ := by rw [frameBound_frameLip_pi.2]; ring
+    0 ≤ cellConstant 2 ∧ 0 ≤ frameMult 2 ∧
+    0 ≤ cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2 := by
+  have hw : (2 : ℝ) < 2 * π := by linarith [pi_gt_three]
+  have hc : 0 ≤ cellConstant 2 := by
+    rw [cellConstant_eq_frameBound (by norm_num) hw]
+    exact UnitaryProducts.Paper.UnitStepsProse.center_bound_nonneg (by norm_num) hw
+  have hN : 0 ≤ frameMult 2 := by
+    rw [paperFrameMult_eq_series (by norm_num) hw]
+    exact frameBound_nonneg (by norm_num)
+  have hd : 0 ≤ deriv frameMult 2 := by
+    rw [paperFrameMult_deriv_eq_series (by norm_num) hw]
+    exact frameLip_nonneg (by norm_num)
+  exact ⟨hc, hN, by positivity⟩
 
 /-- The endpoint derivative identity in Example 5.1. -/
 theorem gap_derivative_endpoints (D : 𝕄) {Γ u : ℝ → ℝ} {p cp : ℝ}
@@ -460,11 +461,10 @@ theorem gap_derivative_endpoints (D : 𝕄) {Γ u : ℝ → ℝ} {p cp : ℝ}
     abs_of_nonneg (mul_nonneg hcp (Real.rpow_nonneg hΓ1 _))]
   ring
 
-/-- **Example 5.1** (`ex:gap-adapted`): the affine gap-adapted schedule transfers
-its continuous leakage bound to the sampled product. The ground projectors may
-be replaced by any commuting orthogonal endpoint projectors. The proof follows
-the paper: Weyl regularity, ODE normalization, derivative bounds, equation (5.2),
-and the width-pi specialization (5.1). -/
+/-- **Example 5.1** (`ex:gap-adapted`): the gap-adapted path satisfies the
+unit-step hypotheses at width two, with the three displayed derivative bounds.
+The proof checks Weyl regularity, ODE normalization, and the derivative bounds;
+Example 4.6 then applies with any continuous leakage bound. -/
 theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁.IsHermitian)
     (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1)
     (Γ : ℝ → ℝ) (hΓ : ∀ x ∈ Icc (0 : ℝ) 1, IsLeastGap H₀ H₁ h₀ h₁ x (Γ x))
@@ -472,21 +472,26 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
     (p : ℝ) (hp : 1 < p) (u : ℝ → ℝ) (hu0 : u 0 = 0)
     (hurange : MapsTo u (Icc (0 : ℝ) 1) (Icc (0 : ℝ) 1))
     (hu : ∀ s ∈ Icc (0 : ℝ) 1,
-      HasDerivWithinAt u ((∫ x in (0 : ℝ)..1, Γ x ^ (-p)) * Γ (u s) ^ p) (Icc 0 1) s)
-    (T : ℕ) (hT : 0 < T) (U : ℝ → 𝕄)
-    (hU : IsEvolution (fun t ↦ gapInterp H₀ H₁ (u (t / T))) U 0 T)
-    (P Q : 𝕄) (hP : IsStarProjection P) (hQ : IsStarProjection Q)
-    (hPc : Commute P H₀) (hQc : Commute Q H₁) :
+      HasDerivWithinAt u ((∫ x in (0 : ℝ)..1, Γ x ^ (-p)) * Γ (u s) ^ p) (Icc 0 1) s) :
     let cp := ∫ x in (0 : ℝ)..1, Γ x ^ (-p)
     let H := fun s ↦ gapInterp H₀ H₁ (u s)
-    let c₀ := 1 / (2 * π) - 1 / π ^ 2
-    let b := 5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64
-    ‖(1 - Q) * (unitProduct H T).1 * P‖ ≤ ‖(1 - Q) * U T * P‖ +
-      cp * ‖H₁ - H₀‖ / T * (c₀ * (Γ 0 ^ p + Γ 1 ^ p) +
-        4 ^ p * (p / 24 + p / π ^ 2 + b) * cp * ‖H₁ - H₀‖) := by
-  intro cp H c₀ b
+    let Hd := fun s ↦ (cp * Γ (u s) ^ p) • (H₁ - H₀)
+    u 1 = 1 ∧ H 0 = H₀ ∧ H 1 = H₁ ∧
+    (∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) ∧
+    (∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s) ∧
+    DifferentiableOn ℝ H (Icc (0 : ℝ) 1) ∧
+    ContinuousOn Hd (Icc (0 : ℝ) 1) ∧
+    (∀ s ∈ Icc (0 : ℝ) 1, derivWithin H (Icc (0 : ℝ) 1) s = Hd s) ∧
+    (∀ s ∈ Icc (0 : ℝ) 1, ∀ i k,
+      |(gapInterp_hermitian h₀ h₁ (u s)).eigenvalues i -
+        (gapInterp_hermitian h₀ h₁ (u s)).eigenvalues k| ≤ 2) ∧
+    (2 : ℝ) < 2 * π ∧
+    ‖Hd 0‖ + ‖Hd 1‖ = cp * ‖H₁ - H₀‖ * (Γ 0 ^ p + Γ 1 ^ p) ∧
+    unitSupNorm Hd ≤ 2 ^ p * cp * ‖H₁ - H₀‖ ∧
+    (∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
+      ‖Hd t - Hd s‖ ≤ p * 4 ^ p * cp ^ 2 * ‖H₁ - H₀‖ ^ 2 * |t - s|) := by
+  intro cp H Hd
   let D := H₁ - H₀
-  let Hd := fun s ↦ (cp * Γ (u s) ^ p) • D
   have hpos : ∀ x ∈ Icc (0 : ℝ) 1, 0 < Γ x := fun x hx ↦ hΓstar.trans_le (hΓlow x hx)
   have hbounds : ∀ x ∈ Icc (0 : ℝ) 1, Γ x ∈ Icc (0 : ℝ) 2 :=
     fun x hx ↦ ⟨(hpos x hx).le, interp_gap_le_two h₀ h₁ hn₀ hn₁ hx (hΓ x hx)⟩
@@ -506,171 +511,22 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
   have hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
       ‖Hd t - Hd s‖ ≤ p * 4 ^ p * cp ^ 2 * ‖D‖ ^ 2 * |t - s| :=
     fun s hs t ht ↦ gap_derivative_lipschitz D hp.le hcp hbounds hΓlip hurange hu hs ht
-  have hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ i k,
-      |(hH _ (walkCubic_sample hj)).eigenvalues i -
-        (hH _ (walkCubic_sample hj)).eigenvalues k| ≤ π := by
-    intro j hj i k
-    exact (gapInterp_width h₀ h₁ hn₀ hn₁ (hurange (walkCubic_sample hj)) i k).trans
-      (by linarith [Real.pi_gt_three])
-  have hcomparison := products_pi hT H Hd U hH hd hlip hwidth hU
-  have htransfer := leak_transfer H T (U T) P Q
-    (hH 0 (by norm_num)) (hH 1 (by norm_num)) hP hQ
-    (show Commute P (H 0) by rw [hH0]; exact hPc)
-    (show Commute Q (H 1) by rw [hH1]; exact hQc)
+  have hc : DifferentiableOn ℝ H (Icc (0 : ℝ) 1) :=
+    fun s hs ↦ (hd s hs).differentiableWithinAt
+  have hdc : ContinuousOn Hd (Icc (0 : ℝ) 1) := continuousOn_of_norm_sub_le hlip
+  have hderiv : ∀ s ∈ Icc (0 : ℝ) 1, derivWithin H (Icc (0 : ℝ) 1) s = Hd s :=
+    fun s hs ↦ (hd s hs).derivWithin ((uniqueDiffOn_Icc (by norm_num)) s hs)
+  have hwidth : ∀ s ∈ Icc (0 : ℝ) 1, ∀ i k,
+      |(gapInterp_hermitian h₀ h₁ (u s)).eigenvalues i -
+        (gapInterp_hermitian h₀ h₁ (u s)).eigenvalues k| ≤ 2 :=
+    fun s hs i k ↦ gapInterp_width h₀ h₁ hn₀ hn₁ (hurange hs) i k
   have hends : ‖Hd 0‖ + ‖Hd 1‖ = cp * ‖D‖ * (Γ 0 ^ p + Γ 1 ^ p) :=
     gap_derivative_endpoints D hcp (hpos 0 (by norm_num)).le (hpos 1 (by norm_num)).le hu0 hu1
   have hsup : unitSupNorm Hd ≤ 2 ^ p * cp * ‖D‖ :=
     gap_derivative_supNorm_le D (by linarith) hcp hbounds hurange
-  have hsup0 : 0 ≤ unitSupNorm Hd := (norm_nonneg (Hd 0)).trans
-    (norm_le_unitSupNorm (continuousOn_of_norm_sub_le hlip) (by norm_num))
-  have hsq := pow_le_pow_left₀ hsup0 hsup 2
-  have hb : 0 ≤ b := gap_coefficients_nonneg.2
-  have hfour : (4 : ℝ) ^ p = 2 ^ p * 2 ^ p := by
-    rw [show (4 : ℝ) = 2 * 2 by norm_num, Real.mul_rpow (by norm_num) (by norm_num)]
-  have hcoarse :
-      ‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) - U T‖ ≤
-      cp * ‖D‖ / T * (c₀ * (Γ 0 ^ p + Γ 1 ^ p) +
-        4 ^ p * (p / 24 + p / π ^ 2 + b) * cp * ‖D‖) := by
-    refine hcomparison.trans ?_
-    rw [hends]
-    calc
-      _ ≤ (1 / T : ℝ) * (c₀ * (cp * ‖D‖ * (Γ 0 ^ p + Γ 1 ^ p)) +
-        (1 / 24 + 1 / π ^ 2) * (p * 4 ^ p * cp ^ 2 * ‖D‖ ^ 2) +
-        b * (2 ^ p * cp * ‖D‖) ^ 2) := mul_le_mul_of_nonneg_left
-          (add_le_add_right (mul_le_mul_of_nonneg_left hsq hb) _) (by positivity)
-      _ = _ := by rw [hfour]; ring
-  linarith only [htransfer, hcoarse]
+  exact ⟨hu1, hH0, hH1, hH, hd, hc, hdc, hderiv, hwidth,
+    by linarith [pi_gt_three], hends, hsup, hlip⟩
 
-/-- The inverse-power threshold used in the layer-cake calculation following
-Example 5.1. -/
-theorem gap_inverse_power_threshold {a y p : ℝ} (ha : 0 < a) (hy : 0 < y)
-    (hp : 0 < p) :
-    (y < a ^ (-p) ↔ a < y ^ (-1 / p)) ∧
-    (y ≤ a ^ (-p) ↔ a ≤ y ^ (-1 / p)) := by
-  have ht : 0 < y ^ (-1 / p) := Real.rpow_pos_of_pos hy _
-  have he : (y ^ (-1 / p)) ^ (-p) = y := by
-    rw [← Real.rpow_mul hy.le, show (-1 / p) * (-p) = (1 : ℝ) by field_simp, Real.rpow_one]
-  constructor
-  · conv_lhs => rw [← he]
-    exact Real.rpow_lt_rpow_iff_of_neg ht ha (neg_neg_of_pos hp)
-  · conv_lhs => rw [← he]
-    exact Real.rpow_le_rpow_iff_of_neg ht ha (neg_neg_of_pos hp)
-
-/-- The layer-cake identity written in the paragraph following Example 5.1.
-The spectral gap has a positive lower bound, so the tail integral stops at
-`Γstar^(-p)`. -/
-theorem gap_normalization_layercake {Γ : ℝ → ℝ} {p Γstar : ℝ}
-    (hp : 0 < p) (hstar : 0 < Γstar)
-    (hΓ : ContinuousOn Γ (Icc (0 : ℝ) 1))
-    (hlow : ∀ x ∈ Icc (0 : ℝ) 1, Γstar ≤ Γ x) :
-    ∫ x in (0 : ℝ)..1, Γ x ^ (-p) =
-      ∫ y in (0 : ℝ)..Γstar ^ (-p),
-        volume.real {x | x ∈ Icc (0 : ℝ) 1 ∧ Γ x < y ^ (-1 / p)} := by
-  let μ := volume.restrict (Icc (0 : ℝ) 1)
-  let f := fun x ↦ Γ x ^ (-p)
-  have hpos : ∀ x ∈ Icc (0 : ℝ) 1, 0 < Γ x := fun x hx ↦ hstar.trans_le (hlow x hx)
-  have hfc : ContinuousOn f (Icc (0 : ℝ) 1) :=
-    hΓ.rpow_const (fun x hx ↦ Or.inl (ne_of_gt (hpos x hx)))
-  have hfi : Integrable f μ := hfc.integrableOn_Icc
-  have hnonneg : 0 ≤ᵐ[μ] f := by
-    filter_upwards [ae_restrict_mem measurableSet_Icc] with x hx
-    exact (Real.rpow_pos_of_pos (hpos x hx) _).le
-  have hbound : f ≤ᵐ[μ] fun _ ↦ Γstar ^ (-p) := by
-    filter_upwards [ae_restrict_mem measurableSet_Icc] with x hx
-    exact Real.rpow_le_rpow_of_nonpos hstar (hlow x hx) (neg_nonpos.mpr hp.le)
-  have hfinite := hfi.integral_eq_integral_Ioc_meas_le hnonneg hbound
-  have hae : (fun y ↦ μ.real {x | y ≤ f x}) =ᵐ[volume]
-      (fun y ↦ μ.real {x | y < f x}) := by
-    filter_upwards [meas_le_ae_eq_meas_lt μ volume f] with y hy
-    exact congrArg ENNReal.toReal hy
-  have hcut : 0 ≤ Γstar ^ (-p) := (Real.rpow_pos_of_pos hstar _).le
-  calc
-    _ = ∫ x, f x ∂μ := by
-      rw [intervalIntegral.integral_of_le (by norm_num : (0 : ℝ) ≤ 1)]
-      exact integral_Icc_eq_integral_Ioc.symm
-    _ = ∫ y in Ioc (0 : ℝ) (Γstar ^ (-p)), μ.real {x | y ≤ f x} := hfinite
-    _ = ∫ y in Ioc (0 : ℝ) (Γstar ^ (-p)), μ.real {x | y < f x} :=
-      integral_congr_ae (ae_restrict_of_ae hae)
-    _ = _ := by
-      rw [intervalIntegral.integral_of_le hcut]
-      apply setIntegral_congr_fun measurableSet_Ioc
-      intro y hy
-      dsimp only [Measure.real, μ]
-      rw [Measure.restrict_apply' measurableSet_Icc]
-      congr 2
-      ext x
-      simp only [mem_inter_iff, mem_setOf_eq, f]
-      constructor
-      · rintro ⟨hxy, hx⟩
-        exact ⟨hx, (gap_inverse_power_threshold (hpos x hx) hy.1 hp).1.mp hxy⟩
-      · rintro ⟨hx, hxy⟩
-        exact ⟨(gap_inverse_power_threshold (hpos x hx) hy.1 hp).1.mpr hxy, hx⟩
-
-/-- The normalization estimate following Example 5.1, proved from the paper's
-sublevel-set length hypothesis by layer cake and integration of `y^(-1/p)`. -/
-theorem gap_normalization_bound {Γ : ℝ → ℝ} {p Γstar C : ℝ}
-    (hp : 1 < p) (hstar : 0 < Γstar)
-    (hΓ : ContinuousOn Γ (Icc (0 : ℝ) 1))
-    (hlow : ∀ x ∈ Icc (0 : ℝ) 1, Γstar ≤ Γ x)
-    (hmeas : ∀ y > 0, volume.real {x | x ∈ Icc (0 : ℝ) 1 ∧ Γ x ≤ y} ≤ C * y) :
-    ∫ x in (0 : ℝ)..1, Γ x ^ (-p) ≤ p * C * Γstar ^ (1 - p) / (p - 1) := by
-  let μ := volume.restrict (Icc (0 : ℝ) 1)
-  let f := fun x ↦ Γ x ^ (-p)
-  let M := Γstar ^ (-p)
-  have hM : 0 < M := Real.rpow_pos_of_pos hstar _
-  have hp0 : 0 < p := by linarith
-  have hpos : ∀ x ∈ Icc (0 : ℝ) 1, 0 < Γ x := fun x hx ↦ hstar.trans_le (hlow x hx)
-  have hfc : ContinuousOn f (Icc (0 : ℝ) 1) :=
-    hΓ.rpow_const (fun x hx ↦ Or.inl (ne_of_gt (hpos x hx)))
-  have hfi : Integrable f μ := hfc.integrableOn_Icc
-  have hnonneg : 0 ≤ᵐ[μ] f := by
-    filter_upwards [ae_restrict_mem measurableSet_Icc] with x hx
-    exact (Real.rpow_pos_of_pos (hpos x hx) _).le
-  have hbound : f ≤ᵐ[μ] fun _ ↦ M := by
-    filter_upwards [ae_restrict_mem measurableSet_Icc] with x hx
-    exact Real.rpow_le_rpow_of_nonpos hstar (hlow x hx) (neg_nonpos.mpr hp0.le)
-  have hfinite := hfi.integral_eq_integral_Ioc_meas_le hnonneg hbound
-  have hanti : Antitone (fun y ↦ μ.real {x | y ≤ f x}) := by
-    intro a b hab
-    exact measureReal_mono (fun x hx ↦ hab.trans hx)
-  have hexp : -1 < -1 / p := by
-    apply (lt_div_iff₀ hp0).mpr
-    linarith
-  have hrint : IntervalIntegrable (fun y : ℝ ↦ C * y ^ (-1 / p)) volume 0 M :=
-    (intervalIntegral.intervalIntegrable_rpow' hexp).const_mul C
-  have heval : (∫ y in (0 : ℝ)..M, C * y ^ (-1 / p)) =
-      p * C * Γstar ^ (1 - p) / (p - 1) := by
-    rw [intervalIntegral.integral_const_mul, integral_rpow (Or.inl hexp),
-      Real.zero_rpow (by linarith : -1 / p + 1 ≠ 0), sub_zero]
-    dsimp only [M]
-    rw [← Real.rpow_mul hstar.le,
-      show -p * (-1 / p + 1) = 1 - p by field_simp; ring]
-    field_simp
-    ring
-  calc
-    _ = ∫ y in Ioc (0 : ℝ) M, μ.real {x | y ≤ f x} := by
-      rw [intervalIntegral.integral_of_le (by norm_num : (0 : ℝ) ≤ 1),
-        ← integral_Icc_eq_integral_Ioc]
-      exact hfinite
-    _ ≤ ∫ y in Ioc (0 : ℝ) M, C * y ^ (-1 / p) :=
-      setIntegral_mono_on (hanti.intervalIntegrable (μ := volume) (a := 0) (b := M)).1
-        hrint.1 measurableSet_Ioc (by
-          intro y hy
-          have heq : μ.real {x | y ≤ f x} =
-              volume.real {x | x ∈ Icc (0 : ℝ) 1 ∧ Γ x ≤ y ^ (-1 / p)} := by
-            dsimp only [Measure.real, μ]
-            rw [Measure.restrict_apply' measurableSet_Icc]
-            congr 2
-            ext x
-            simp only [mem_inter_iff, mem_setOf_eq, f]
-            constructor
-            · rintro ⟨hxy, hx⟩
-              exact ⟨hx, (gap_inverse_power_threshold (hpos x hx) hy.1 hp0).2.mp hxy⟩
-            · rintro ⟨hx, hxy⟩
-              exact ⟨(gap_inverse_power_threshold (hpos x hx) hy.1 hp0).2.mpr hxy, hx⟩
-          rw [heq]
-          exact hmeas _ (Real.rpow_pos_of_pos hy.1 _))
-    _ = _ := by rw [← intervalIntegral.integral_of_le hM.le]; exact heval
 
 /-- Orthogonal projection decomposes the squared norm into success probability
 and leakage probability, as used after Example 5.1. -/
@@ -730,9 +586,9 @@ theorem gap_probability_to_operator {E : Type*} [NormedAddCommGroup E]
 constants depend only on the fixed `p,C`; the gap and runtime do not occur. -/
 def gapOrderCoefficient (p C : ℝ) : ℝ :=
   let A := p * C / (p - 1)
-  let c₀ := 1 / (2 * π) - 1 / π ^ 2
-  let b := 5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64
-  4 * c₀ * 2 ^ p * A * 2 ^ (p - 1) + 4 * 4 ^ p * (p / 24 + p / π ^ 2 + b) * A ^ 2
+  let c₀ := cellConstant 2
+  let b := cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2
+  4 * c₀ * 2 ^ p * A * 2 ^ (p - 1) + 4 * 4 ^ p * (p / 24 + p * frameMult 2 + b) * A ^ 2
 
 /-- The added term in Example 5.1 is bounded by a constant depending only on
 `p,C` times `Γstar^(2-2p)/T`. The scalar inputs are the endpoint gap powers,
@@ -742,17 +598,18 @@ theorem gap_added_term_bound {p C Γstar cp D e₀ e₁ T : ℝ}
     (hcp0 : 0 ≤ cp) (hcp : cp ≤ p * C * Γstar ^ (1 - p) / (p - 1))
     (hD0 : 0 ≤ D) (hD : D ≤ 2) (he₀ : e₀ ≤ 2 ^ p) (he₁ : e₁ ≤ 2 ^ p)
     (he0 : 0 ≤ e₀) (he1 : 0 ≤ e₁) (hT : 0 < T) :
-    let c₀ := 1 / (2 * π) - 1 / π ^ 2
-    let b := 5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64
-    cp * D / T * (c₀ * (e₀ + e₁) + 4 ^ p * (p / 24 + p / π ^ 2 + b) * cp * D) ≤
+    let c₀ := cellConstant 2
+    let b := cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2
+    cp * D / T * (c₀ * (e₀ + e₁) + 4 ^ p * (p / 24 + p * frameMult 2 + b) * cp * D) ≤
       gapOrderCoefficient p C * Γstar ^ (2 - 2 * p) / T := by
   intro c₀ b
   let A := p * C / (p - 1)
-  let B := p / 24 + p / π ^ 2 + b
+  let B := p / 24 + p * frameMult 2 + b
   have hp0 : 0 ≤ p := by linarith
   have hA : 0 ≤ A := div_nonneg (mul_nonneg hp0 hC) (by linarith)
   have hc₀ : 0 ≤ c₀ := gap_coefficients_nonneg.1
-  have hb : 0 ≤ b := gap_coefficients_nonneg.2
+  have hb : 0 ≤ b := gap_coefficients_nonneg.2.2
+  have hN := gap_coefficients_nonneg.2.1
   have hB : 0 ≤ B := by dsimp only [B]; positivity
   have hcp' : cp ≤ A * Γstar ^ (1 - p) := by simpa only [A, div_mul_eq_mul_div] using hcp
   have hpower : Γstar ^ (1 - p) ≤ 2 ^ (p - 1) * Γstar ^ (2 - 2 * p) := by
@@ -784,8 +641,8 @@ theorem gap_added_term_bound {p C Γstar cp D e₀ e₁ T : ℝ}
       gcongr
     _ = _ := by dsimp only [gapOrderCoefficient, A, B, c₀, b]; ring
 
-/-- The precise `O(Γstar^(2-2p)/T)` assertion in the paragraph after Example 5.1,
-for any family of paths satisfying its uniform scalar bounds. -/
+/-- The runtime-divided form of the width-two correction estimate, used in
+the discussion of the inverse-gap product bound. -/
 theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
     (hp : 1 < p) (hC : 0 ≤ C) (g cp D e₀ e₁ T : ι → ℝ)
     (hg : ∀ i, 0 < g i ∧ g i ≤ 2) (hT : ∀ i, 0 < T i)
@@ -794,15 +651,16 @@ theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
     (hD : ∀ i, 0 ≤ D i ∧ D i ≤ 2)
     (he₀ : ∀ i, 0 ≤ e₀ i ∧ e₀ i ≤ 2 ^ p)
     (he₁ : ∀ i, 0 ≤ e₁ i ∧ e₁ i ≤ 2 ^ p) :
-    let c₀ := 1 / (2 * π) - 1 / π ^ 2
-    let b := 5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64
+    let c₀ := cellConstant 2
+    let b := cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2
     (fun i ↦ cp i * D i / T i * (c₀ * (e₀ i + e₁ i) +
-      4 ^ p * (p / 24 + p / π ^ 2 + b) * cp i * D i)) =O[l]
+      4 ^ p * (p / 24 + p * frameMult 2 + b) * cp i * D i)) =O[l]
       (fun i ↦ g i ^ (2 - 2 * p) / T i) := by
   intro c₀ b
   have hc₀ : 0 ≤ c₀ := gap_coefficients_nonneg.1
-  have hb : 0 ≤ b := gap_coefficients_nonneg.2
+  have hb : 0 ≤ b := gap_coefficients_nonneg.2.2
   have hp0 : 0 ≤ p := by linarith
+  have hN := gap_coefficients_nonneg.2.1
   apply Asymptotics.IsBigO.of_bound (gapOrderCoefficient p C)
   filter_upwards [] with i
   have hci := hcp0 i
@@ -816,31 +674,79 @@ theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
   simpa only [div_mul_eq_mul_div, mul_div_assoc] using gap_added_term_bound hp hC (hg i).1
     (hg i).2 (hcp0 i) (hcp i) (hD i).1 (hD i).2 (he₀ i).2 (he₁ i).2 (he₀ i).1 (he₁ i).1 (hT i)
 
+/-- The exact width-two correction `M-C` from Example 4.6, bounded using
+Example 5.1's endpoint, supremum, and Lipschitz estimates. -/
+theorem gap_correction_bound {p C g cp D e₀ e₁ E S L : ℝ}
+    (hp : 1 < p) (hC : 0 ≤ C) (hg : 0 < g) (hg2 : g ≤ 2)
+    (hcp0 : 0 ≤ cp) (hcp : cp ≤ p * C * g ^ (1 - p) / (p - 1))
+    (hD0 : 0 ≤ D) (hD : D ≤ 2) (he₀ : e₀ ≤ 2 ^ p) (he₁ : e₁ ≤ 2 ^ p)
+    (he0 : 0 ≤ e₀) (he1 : 0 ≤ e₁)
+    (hE : E ≤ cp * D * (e₀ + e₁))
+    (hS0 : 0 ≤ S) (hS : S ≤ 2 ^ p * cp * D)
+    (hL : L ≤ p * 4 ^ p * cp ^ 2 * D ^ 2) :
+    cellConstant 2 * E + (1 / 24 + frameMult 2) * L +
+      (cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2) * S ^ 2 ≤
+      gapOrderCoefficient p C * g ^ (2 - 2 * p) := by
+  let c₀ := cellConstant 2
+  let b := cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2
+  have hc₀ : 0 ≤ c₀ := gap_coefficients_nonneg.1
+  have hN := gap_coefficients_nonneg.2.1
+  have hb : 0 ≤ b := gap_coefficients_nonneg.2.2
+  have hsquare := pow_le_pow_left₀ hS0 hS 2
+  have hfour : (4 : ℝ) ^ p = 2 ^ p * 2 ^ p := by
+    rw [show (4 : ℝ) = 2 * 2 by norm_num, Real.mul_rpow (by norm_num) (by norm_num)]
+  have hscalar := gap_added_term_bound hp hC hg hg2 hcp0 hcp hD0 hD he₀ he₁ he0 he1
+    (T := 1) (by norm_num)
+  simp only [div_one] at hscalar
+  calc
+    _ ≤ c₀ * (cp * D * (e₀ + e₁)) +
+        (1 / 24 + frameMult 2) * (p * 4 ^ p * cp ^ 2 * D ^ 2) +
+        b * (2 ^ p * cp * D) ^ 2 :=
+      add_le_add (add_le_add (mul_le_mul_of_nonneg_left hE hc₀)
+        (mul_le_mul_of_nonneg_left hL (by positivity)))
+        (mul_le_mul_of_nonneg_left hsquare hb)
+    _ = cp * D * (c₀ * (e₀ + e₁) +
+        4 ^ p * (p / 24 + p * frameMult 2 + b) * cp * D) := by rw [hfour]; ring
+    _ ≤ _ := hscalar
+
+/-- The sentence `M-C = O(Γstar^(2-2p))` following Example 5.1, for the
+actual width-two coefficient of Example 4.6. The bounds are uniform over paths
+with fixed `p,C`; `E,S,L` denote their endpoint sum, derivative norm, and
+Lipschitz constant. -/
+theorem gap_correction_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
+    (hp : 1 < p) (hC : 0 ≤ C) (g cp D e₀ e₁ E S L : ι → ℝ)
+    (hg : ∀ i, 0 < g i ∧ g i ≤ 2)
+    (hcp0 : ∀ i, 0 ≤ cp i)
+    (hcp : ∀ i, cp i ≤ p * C * g i ^ (1 - p) / (p - 1))
+    (hD : ∀ i, 0 ≤ D i ∧ D i ≤ 2)
+    (he₀ : ∀ i, 0 ≤ e₀ i ∧ e₀ i ≤ 2 ^ p)
+    (he₁ : ∀ i, 0 ≤ e₁ i ∧ e₁ i ≤ 2 ^ p)
+    (hE : ∀ i, 0 ≤ E i ∧ E i ≤ cp i * D i * (e₀ i + e₁ i))
+    (hS : ∀ i, 0 ≤ S i ∧ S i ≤ 2 ^ p * cp i * D i)
+    (hL : ∀ i, 0 ≤ L i ∧ L i ≤ p * 4 ^ p * cp i ^ 2 * D i ^ 2) :
+    (fun i ↦ cellConstant 2 * E i + (1 / 24 + frameMult 2) * L i +
+      (cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2) * S i ^ 2) =O[l]
+      (fun i ↦ g i ^ (2 - 2 * p)) := by
+  have hc₀ := gap_coefficients_nonneg.1
+  have hN := gap_coefficients_nonneg.2.1
+  have hb := gap_coefficients_nonneg.2.2
+  apply Asymptotics.IsBigO.of_bound (gapOrderCoefficient p C)
+  filter_upwards [] with i
+  have he := (hE i).1
+  have hl := (hL i).1
+  have hgi := (hg i).1
+  rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg (by positivity),
+    abs_of_nonneg (by positivity)]
+  exact gap_correction_bound hp hC (hg i).1 (hg i).2 (hcp0 i) (hcp i)
+    (hD i).1 (hD i).2 (he₀ i).2 (he₁ i).2 (he₀ i).1 (he₁ i).1
+    (hE i).2 (hS i).1 (hS i).2 (hL i).2
+
 /-- At `p=3/2`, the gap power in the added term is exactly the inverse gap. -/
 theorem gap_three_halves_order {g T : ℝ} :
     g ^ (2 - 2 * (3 / 2 : ℝ)) / T = 1 / (T * g) := by
   norm_num [Real.rpow_neg_one]
   ring
 
-/-- Adding continuous and discrete inverse-gap errors needs a number of unit-time
-factors proportional to `1/(ε Γstar)`. The continuous coefficient is an explicit
-hypothesis supplied by the cited adiabatic theorem. -/
-theorem gap_factor_count {Edis Econt Kcont Kdisc ε g T : ℝ}
-    (hε : 0 < ε) (hg : 0 < g) (hT : 0 < T)
-    (hcontinuous : Econt ≤ Kcont / (T * g))
-    (htransfer : Edis ≤ Econt + Kdisc / (T * g))
-    (hsteps : (Kcont + Kdisc) / (ε * g) ≤ T) : Edis ≤ ε := by
-  have hbudget := (div_le_iff₀ (mul_pos hε hg)).mp hsteps
-  have herr : (Kcont + Kdisc) / (T * g) ≤ ε := by
-    apply (div_le_iff₀ (mul_pos hT hg)).mpr
-    calc
-      Kcont + Kdisc ≤ T * (ε * g) := hbudget
-      _ = ε * (T * g) := by ring
-  calc
-    Edis ≤ Econt + Kdisc / (T * g) := htransfer
-    _ ≤ Kcont / (T * g) + Kdisc / (T * g) := add_le_add_left hcontinuous _
-    _ = (Kcont + Kdisc) / (T * g) := by ring
-    _ ≤ ε := herr
 
 /-- The matrix form of the vector-to-operator inference after Example 5.1. -/
 theorem gap_probability_to_matrix {P Q U : 𝕄}
@@ -885,5 +791,62 @@ theorem gap_factor_count_exists {error : ℕ → ℝ} {K ε g : ℝ}
   apply (div_le_iff₀ (mul_pos hTr hg)).mpr
   have h := (div_le_iff₀ (mul_pos hε hg)).mp hbudget
   linarith [show (T : ℝ) * (ε * g) = ε * ((T : ℝ) * g) by ring]
+
+/-- The inverse-gap count after Example 5.1, including entry truncation.
+The cited continuous estimate and the preceding correction estimate give
+`M ≤ K/g`. Example 4.6 then supplies the stated accuracy for every truncation
+meeting its bit budget, with at most `(2K+2)/(δg)` factors. -/
+theorem gap_truncated_factor_count (H : ℝ → 𝕄) (U : ℕ → ℝ → 𝕄)
+    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hc : DifferentiableOn ℝ H (Icc (0 : ℝ) 1)) (L : ℝ)
+    (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
+      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ L * |t - s|)
+    (hwidth : ∀ s, ∀ hs : s ∈ Icc (0 : ℝ) 1, ∀ i j,
+      |(hH s hs).eigenvalues i - (hH s hs).eigenvalues j| ≤ 2)
+    (hU : ∀ T : ℕ, 0 < T → IsEvolution (fun t ↦ H (t / T)) (U T) 0 T)
+    (P Q : 𝕄) (hP : IsStarProjection P) (hQ : IsStarProjection Q)
+    (hPc : Commute P (H 0)) (hQc : Commute Q (H 1))
+    (C : NNReal) {K δ g : ℝ} (hK : 0 ≤ K) (hδ : 0 < δ) (hg : 0 < g)
+    (hsmall : δ * g ≤ 1)
+    (hcont : ∀ T : ℕ, 0 < T → ‖(1 - Q) * U T T * P‖ ≤ (C : ℝ) / T)
+    (hM : (C : ℝ) + cellConstant 2 *
+        (‖derivWithin H (Icc (0 : ℝ) 1) 0‖ + ‖derivWithin H (Icc (0 : ℝ) 1) 1‖) +
+        (1 / 24 + frameMult 2) * L +
+        (cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2) *
+          unitSupNorm (derivWithin H (Icc (0 : ℝ) 1)) ^ 2 ≤ K / g) :
+    ∃ T : ℕ, 0 < T ∧ (T : ℝ) ≤ (2 * K + 2) / (δ * g) ∧
+      ∀ k : ℕ,
+        let σ := ⨆ s : Icc (0 : ℝ) 1, ⨆ i : Fin (d + 1),
+          (Finset.univ.filter fun j ↦ truncHerm k (H s) i j ≠ H s i j).card
+        Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) →
+        ‖(1 - Q) * (unitProduct (fun s ↦ scalarEntryMap (truncBits k) (H s)) T).1 * P‖ ≤ δ := by
+  obtain ⟨T, hT, hcount, herr⟩ := gap_factor_count_exists
+    (error := fun T ↦ (2 * K) / ((T : ℝ) * g)) (K := 2 * K)
+    (by positivity) hδ hg hsmall (fun _ _ ↦ le_rfl)
+  have hTr : (0 : ℝ) < T := Nat.cast_pos.mpr hT
+  let Hd := derivWithin H (Icc (0 : ℝ) 1)
+  let A := cellConstant 2 * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + frameMult 2) * L +
+    (cellConstant 2 / 4 + 1 / 64 + 2 * deriv frameMult 2) * unitSupNorm Hd ^ 2
+  have hMA : (C : ℝ) + A ≤ K / g := by simpa only [A, Hd, add_assoc] using hM
+  have hbudget : 2 * ((C : ℝ) + A) / δ ≤ T := by
+    apply (div_le_iff₀ hδ).mpr
+    calc
+      2 * ((C : ℝ) + A) ≤ 2 * (K / g) := mul_le_mul_of_nonneg_left hMA (by norm_num)
+      _ = ((2 * K) / ((T : ℝ) * g)) * T := by field_simp [hTr.ne', hg.ne']
+      _ ≤ δ * T := mul_le_mul_of_nonneg_right herr hTr.le
+      _ = T * δ := mul_comm _ _
+  refine ⟨T, hT, hcount, ?_⟩
+  intro k σ hbits
+  have hdiff : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ i q,
+      |(hH _ (walkCubic_sample hj)).eigenvalues i -
+        (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ 2 :=
+    fun j hj i q ↦ hwidth _ (walkCubic_sample hj) i q
+  have htransfer := ex_unit_transfer_bounds 2 (by linarith [pi_gt_three]) H (U T)
+    T k hT hH hc L hlip hdiff (hU T hT) P Q hP hQ hPc hQc C δ hδ (hcont T hT)
+  have hcancel : (T : ℝ) * ((1 / T) * A) = A := by field_simp [hTr.ne']
+  change 2 * ((C : ℝ) + (T : ℝ) * ((1 / T) * A)) / δ ≤ T →
+    Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) → _ at htransfer
+  rw [hcancel] at htransfer
+  exact htransfer hbudget hbits
 
 end UnitaryProducts.PaperProof

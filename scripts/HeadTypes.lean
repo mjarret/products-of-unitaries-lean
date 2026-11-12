@@ -551,9 +551,8 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.Spin.X
 #check @UnitaryProducts.PaperProof.Spin.Y
 #check @UnitaryProducts.PaperProof.Spin.Z
-#check @UnitaryProducts.PaperProof.products_pi
-#check @UnitaryProducts.PaperProof.leak_transfer
-#check @UnitaryProducts.PaperProof.gap_factor_count
+#check @UnitaryProducts.isStarProjection_specProj
+#check @UnitaryProducts.commute_specProj
 #check @UnitaryProducts.PaperProof.gapEigen_lipschitz
 #check @UnitaryProducts.PaperProof.gapInterp_norm_le
 #check @UnitaryProducts.PaperProof.gapInterp_eigenvalue_bounds
@@ -574,9 +573,9 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.gap_projection_probability
 #check @UnitaryProducts.PaperProof.gap_probability_to_operator
 #check @UnitaryProducts.PaperProof.gap_probability_to_matrix
-#check @UnitaryProducts.PaperProof.gap_normalization_layercake
-#check @UnitaryProducts.PaperProof.gap_normalization_bound
-#check @UnitaryProducts.PaperProof.gap_added_term_bound
+#check @UnitaryProducts.PaperProof.gap_correction_bound
+#check @UnitaryProducts.PaperProof.gap_correction_isBigO
+#check @UnitaryProducts.PaperProof.gap_truncated_factor_count
 #check @UnitaryProducts.PaperProof.Spin.family
 #check @UnitaryProducts.PaperProof.Spin.consecutive_half_turns_commute_iff
 #check @UnitaryProducts.PaperProof.Spin.evolution_closed
@@ -622,4 +621,5 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.Spin.full_turn_not_tendsto_zero
 #check @UnitaryProducts.PaperProof.diagonal_crossing_witness
 #check @UnitaryProducts.PaperProof.crossing_projectors_extend
+#check @UnitaryProducts.PaperProof.commuting_endpoint_transfer
 #check @UnitaryProducts.PaperProof.crossing_comparison_bound

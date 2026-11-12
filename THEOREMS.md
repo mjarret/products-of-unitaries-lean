@@ -31,7 +31,7 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | 4.5 | `cor:walks` | `UnitaryProducts.PaperProof.thm_unitary_products` | [UnitaryProducts/PaperProof/CorProducts.lean:222](UnitaryProducts/PaperProof/CorProducts.lean#L222) |
 | 4.7 | `cor:walk-leakage` | `UnitaryProducts.PaperProof.cor_walk_leakage` | [UnitaryProducts/PaperProof/CorWalkLeakage.lean:165](UnitaryProducts/PaperProof/CorWalkLeakage.lean#L165) |
 | 5.1 | `ex:gap-adapted` | `UnitaryProducts.PaperProof.ex_gap_adapted` | [UnitaryProducts/PaperProof/GapAdapted.lean:467](UnitaryProducts/PaperProof/GapAdapted.lean#L467) |
-| 5.3 | `ex:crossings` | `UnitaryProducts.PaperProof.ex_crossings` | [UnitaryProducts/PaperProof/Crossings.lean:135](UnitaryProducts/PaperProof/Crossings.lean#L135) |
+| 5.3 | `ex:crossings` | `UnitaryProducts.PaperProof.ex_crossings` | [UnitaryProducts/PaperProof/Crossings.lean:124](UnitaryProducts/PaperProof/Crossings.lean#L124) |
 | 5.2 | `ex:precessing-spin` | `UnitaryProducts.PaperProof.Spin.ex_precessing_spin` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1530](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1530) |
 | unnumbered | `claim:0` | `UnitaryProducts.PaperProof.thm_unit_steps_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:169](UnitaryProducts/PaperProof/UniformConsequences.lean#L169) |
 | unnumbered | `eq:products` | `UnitaryProducts.PaperProof.unit_steps_endpoint_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:140](UnitaryProducts/PaperProof/UniformConsequences.lean#L140) |
@@ -603,8 +603,8 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_antiphase` | [UnitaryProducts/PaperProof/SpinConsequences.lean:108](UnitaryProducts/PaperProof/SpinConsequences.lean#L108) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_width` | [UnitaryProducts/PaperProof/SpinConsequences.lean:131](UnitaryProducts/PaperProof/SpinConsequences.lean#L131) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.full_turn_not_tendsto_zero` | [UnitaryProducts/PaperProof/SpinConsequences.lean:148](UnitaryProducts/PaperProof/SpinConsequences.lean#L148) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.diagonal_crossing_witness` | [UnitaryProducts/PaperProof/Crossings.lean:173](UnitaryProducts/PaperProof/Crossings.lean#L173) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.crossing_projectors_extend` | [UnitaryProducts/PaperProof/Crossings.lean:101](UnitaryProducts/PaperProof/Crossings.lean#L101) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.diagonal_crossing_witness` | [UnitaryProducts/PaperProof/Crossings.lean:162](UnitaryProducts/PaperProof/Crossings.lean#L162) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.crossing_projectors_extend` | [UnitaryProducts/PaperProof/Crossings.lean:91](UnitaryProducts/PaperProof/Crossings.lean#L91) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.commuting_endpoint_transfer` | [UnitaryProducts/PaperProof/Crossings.lean:21](UnitaryProducts/PaperProof/Crossings.lean#L21) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.crossing_comparison_bound` | [UnitaryProducts/PaperProof/Crossings.lean:36](UnitaryProducts/PaperProof/Crossings.lean#L36) |
 

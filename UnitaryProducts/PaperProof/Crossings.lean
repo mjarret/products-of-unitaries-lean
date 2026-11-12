@@ -73,16 +73,6 @@ theorem crossing_leakage_tendsto_zero {a b e : ℕ → ℝ}
       (squeeze_zero' (Filter.Eventually.of_forall (fun _ ↦ abs_nonneg _)) hbound he)
   simpa only [sub_add_cancel, zero_add] using hdiff.add hb
 
-/-- The cited Avron--Elgart Theorem 4, instantiated at `H` and `P`: the
-continuous evolution has vanishing leakage as its duration tends to infinity.
-The paper supplies continuity, piecewise twice differentiability, and the
-single-eigenvalue spectral-projector hypothesis away from one crossing to this
-external theorem. This named proposition is an explicit cited input, not an axiom. -/
-def AvronElgartTheorem4 (H P : ℝ → 𝕄) : Prop :=
-  ∀ U : ℕ → ℝ → 𝕄,
-    (∀ T : ℕ, 0 < T → IsEvolution (fun t ↦ H (t / T)) (U T) 0 T) →
-    Tendsto (fun T : ℕ ↦ ‖(1 - P 1) * U T T * P 0‖) atTop (𝓝 0)
-
 /-- Removing one point from the unit interval leaves a set dense in that
 interval; this is the continuity step at a possibly exceptional endpoint. -/
 theorem crossing_interval_dense (s₀ : ℝ) :
@@ -127,11 +117,10 @@ theorem crossing_projectors_extend (H P : ℝ → 𝕄)
   exact ⟨⟨hid hs, hstar hs⟩, hcomm hs⟩
 
 /-- **Example 5.3** (`ex:crossings`): a continuous spectral projector through
-one crossing has vanishing leakage for the discrete product. The external
-Avron--Elgart input supplies the continuous limit; the proof derives endpoint
-commutation by continuity, applies Proposition 2.4 with the half-step phases,
-and uses (4.6) with one coefficient independent of `T`. The piecewise C²
-hypothesis is needed only to discharge the named external input. -/
+one crossing transfers the assumed continuous leakage limit to the discrete
+product. The proof derives endpoint commutation by continuity, applies
+Proposition 2.4 with the half-step phases, and uses (4.6) with one coefficient
+independent of `T`. -/
 theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
     (U : ℕ → ℝ → 𝕄)
     (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
@@ -145,7 +134,8 @@ theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
     (hcP : ContinuousOn P (Icc (0 : ℝ) 1)) (s₀ : ℝ)
     (hP : ∀ s, ∀ hs : s ∈ Icc (0 : ℝ) 1, s ≠ s₀ →
       ∃ μ : ℝ, P s = specProj (hH s hs) {μ})
-    (hAE : AvronElgartTheorem4 H P) :
+    (hcontinuous : Tendsto (fun T : ℕ ↦ ‖(1 - P 1) * U T T * P 0‖)
+      atTop (𝓝 0)) :
     Tendsto (fun T : ℕ ↦ ‖(1 - P 1) * (unitProduct H T).1 * P 0‖)
       atTop (𝓝 0) := by
   have hcH : ContinuousOn H (Icc (0 : ℝ) 1) :=
@@ -162,7 +152,6 @@ theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
       (hwidth T hT) (hU T hT)
       (fun s hs ↦ (hprojectors s hs).1) (fun s hs ↦ (hprojectors s hs).2)
     exact hbound.1.trans hbound.2
-  have hcontinuous := hAE U hU
   have hvanishing : Tendsto (fun T : ℕ ↦ (1 / T : ℝ) * C) atTop (𝓝 0) := by
     simpa only [zero_mul] using
       (tendsto_const_div_atTop_nhds_zero_nat (1 : ℝ)).mul_const C

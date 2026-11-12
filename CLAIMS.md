@@ -1,6 +1,6 @@
 # Mathematical claims
 
-Each quotation is accompanied by its mathematical declarations or cited source.
+Each quotation is accompanied by its mathematical declarations or cited source. Source-link annotations are omitted from the quotations below; the claim registry retains the literal paper text.
 
 1. **LEAN — Abstract**
 
@@ -441,7 +441,7 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 
     For one initial state and sufficiently short fixed steps, Yi \cite{yi2021} obtains $O(1/T)$ leakage for an eigenstate of a nondegenerate spectrum, Kovalsky et al.\ \cite{kovalsky2023} for a gapped ground state, and Lu et al.\ \cite{lu2026} asymptotically for the ground state.
 
-    yi2021, discrete leakage analysis (source main.tex:144–210); kovalsky2023, Theorem 1; lu2026, Theorem 1
+    Yi [yi2021], Section III, Expansion of adiabatic error; Kovalsky et al. [kovalsky2023], Theorem 1; Lu et al. [lu2026], Theorem 1
 
 74. **EXTERNAL — Section 1.1**
 
@@ -1185,7 +1185,7 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 188. **LEAN — Section 3.2**
 
     Duhamel's bound \eqref{eq:duhamel} bounds the distance of the midpoint product of $\sched^{(F)}$ from $\evol(T)$ by the largest distance of $\sched$ from its truncated midpoint sample within an interval, which splits into the change of $\sched$ within the interval, controlled by the checkpoints, and the truncation error of the sample, controlled by $F$.
-    \begin{theorem}[\lean{UnitaryProducts/PaperProof/OscillationFineSteps.lean}{211}]\label{thm:fine-steps}
+    \begin{theorem}[Lean formalization]\label{thm:fine-steps}
     Let $F\colon\mathbb R\to\mathbb R$ be odd, and let $\sched$ be a regulated Hamiltonian with evolution $\evol$ over time $T>0$. The midpoint product $W$ of $\sched^{(F)}$ over time $T$ on any checkpoints $0=s_0\le\cdots\le s_N=1$ satisfies
     \[
      \|W-\evol(T)\|\le T\max_j\sup_{s_j<s<s_{j+1}}\bigl\|\sched(s)-\sched^{(F)}(s_{j+1/2})\bigr\|.
@@ -2873,7 +2873,7 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 
     The Jansen--Ruskai--Seiler bound of \Cref{sec:dat} therefore gives \Cref{cor:walk-leakage} with $C=J_m(\sched)$, a discrete adiabatic theorem for walks, with the gap entering through $J_m(\sched)$ and through $\width=2\pi-\freearc$.
 
-    UnitaryProducts/PaperProof/LemWalkBands.lean:209; UnitaryProducts/PaperProof/LemWalkBands.lean:247; UnitaryProducts/Prose/UnitTransfer.lean:80; UnitaryProducts/Prose/UnitTransfer.lean:101; UnitaryProducts/Walks/TrackedBandMultiplicity.lean:102; UnitaryProducts/PaperProof/LemWalkLog.lean:479; UnitaryProducts/PaperProof/CorProducts.lean:102
+    Jansen–Ruskai–Seiler [jansen2007], Theorem 3; the paper, Section 3.3 and equation (3.2)
 
 443. **LEAN — Section A**
 
@@ -3906,8 +3906,7 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 
 610. **LEAN — Example 5.3**
 
-    Let $T$, $\sched$, $L$, and $\width$ satisfy the hypotheses of \Cref{thm:clocks}, and let $P(s)$ for $s\in[0,1]$ be continuous, piecewise twice differentiable, and, for every $s$ other than one point $s_0$, a finite-rank spectral projector of $\sched(s)$ for one eigenvalue. Then $\|(1-P(1))\devprod_TP(0)\|\to0$ as $T\to\infty$.
-    \end{example}
+    Let $T$, $\sched$, $L$, and $\width$ satisfy the hypotheses of \Cref{thm:clocks}, and let $P(s)$ for $s\in[0,1]$ be continuous and, for every $s$ other than one point $s_0$, a finite-rank spectral projector of $\sched(s)$ for one eigenvalue. If $\|(1-P(1))\evol(T)P(0)\|\to0$ as $T\to\infty$, which Avron and Elgart \cite[Theorem~4]{avronelgart1999} prove when $P$ is also piecewise twice differentiable, then $\|(1-P(1))\devprod_TP(0)\|\to0$.
 
     UnitaryProducts.PaperProof.ex_crossings
 
@@ -3917,31 +3916,37 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 
     UnitaryProducts.PaperProof.crossing_projectors_extend; UnitaryProducts.PaperProof.commuting_endpoint_transfer; UnitaryProducts.PaperProof.crossing_comparison_bound; UnitaryProducts.PaperProof.ex_crossings
 
-612. **EXTERNAL — Section 5**
+612. **EXTERNAL — Example 5.3**
 
-    Avron and Elgart \cite[Theorem~4]{avronelgart1999} prove that the first term tends to zero, and \eqref{eq:products} bounds the second by $1/T$ times a quantity independent of $T$.
+    which Avron and Elgart \cite[Theorem~4]{avronelgart1999} prove when $P$ is also piecewise twice differentiable
 
-    Avron–Elgart [avronelgart1999], Theorem 4; comparison-error inference separately backed below
+    Avron–Elgart [avronelgart1999], Theorem 4
 
 613. **LEAN — Section 5**
+
+    The first term tends to zero by hypothesis, and \eqref{eq:products} bounds the second by $1/T$ times a quantity independent of $T$.
+
+    UnitaryProducts.PaperProof.ex_crossings; UnitaryProducts.PaperProof.crossing_comparison_bound
+
+614. **LEAN — Section 5**
 
     \eqref{eq:products} bounds the second by $1/T$ times a quantity independent of $T$.
 
     UnitaryProducts.PaperProof.crossing_comparison_bound; UnitaryProducts.PaperProof.ex_crossings
 
-614. **LEAN — Section 5**
+615. **LEAN — Section 5**
 
     This is a discrete adiabatic theorem through an eigenvalue crossing.
 
     UnitaryProducts.PaperProof.ex_crossings
 
-615. **EXTERNAL — Section 5**
+616. **EXTERNAL — Section 5**
 
     The discrete adiabatic theorems of \Cref{sec:intro} all assume an eigenphase gap, and Tanaka \cite{tanaka2011} excludes crossings.
 
     Introduction cited discrete theorems; Tanaka [tanaka2011], discrete adiabatic theorem (eigenphase noncrossing assumption)
 
-616. **LEAN — Introthm B**
+617. **LEAN — Introthm B**
 
     Let $T\ge1$ be an integer, let $\sched(s)$ for $s\in[0,1]$ be a Hamiltonian whose derivative $\sched'$ has Lipschitz constant $L$, and let $\evol$ be its evolution over time $T$. If every sample $\sched(j/T)$ with $0\le j\le T$ has eigenvalue differences of modulus at most $\pi$, then
     \[
@@ -3950,37 +3955,37 @@ Each quotation is accompanied by its mathematical declarations or cited source.
 
     UnitaryProducts.PaperProof.introthm_unit
 
-617. **LEAN — Section 1.1**
+618. **LEAN — Section 1.1**
 
     For $\sched(t/T)$ and $\sched(\lfloor t+1/2\rfloor/T)$, which runs $\sched$ on the rounded clock, that integral is $O(1/T)$ at every time
 
     UnitaryProducts.PaperProof.burgarth_primitive_uniform; UnitaryProducts.PaperProof.burgarth_primitive_bigO
 
-618. **LEAN — Section 1.1**
+619. **LEAN — Section 1.1**
 
     the integrals over $[0,T]$ of the norms of the two Hamiltonians, which grow linearly in $T$
 
     UnitaryProducts.PaperProof.burgarth_generator_integrals; UnitaryProducts.PaperProof.burgarth_rounded_integral_error; UnitaryProducts.PaperProof.burgarth_rounded_integral_linear_limit
 
-619. **LEAN — Section 1.1**
+620. **LEAN — Section 1.1**
 
     so their bound is $O(1)$ as well.
 
     UnitaryProducts.PaperProof.burgarth_bound_scaling; UnitaryProducts.PaperProof.burgarth_bound_bigO
 
-620. **LEAN — Section 1.1**
+621. **LEAN — Section 1.1**
 
     a precessing spin, which shows that the endpoint coefficient $c_0$ of \Cref{thm:clocks} is optimal at every positive width
 
     UnitaryProducts.PaperProof.Spin.precessing_spin_optimal
 
-621. **PROSPECTIVE — Section 6**
+622. **PROSPECTIVE — Section 6**
 
     A natural form for the answer is a corrected Hamiltonian. Is the product, up to $O(T^{-k})$, the evolution of $\sched+T^{-1}\sched_1+\cdots+T^{-k}\sched_k$, with each $\sched_n$ a universal expression in $\sched$ and its first $n$ derivatives, under the width hypothesis alone, and do the half-step phases and the correction $Y$ account for $\sched_1$?
 
     Explicit corrected-Hamiltonian question, including its proposed asymptotic formula.
 
-622. **LEAN — Section 1.1**
+623. **LEAN — Section 1.1**
 
     In its choice of $Y$, \Cref{thm:comparison} generalizes the lemma of Burgarth et al.
 

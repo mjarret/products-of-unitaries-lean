@@ -26,7 +26,7 @@ A.1	lem:cell	UnitaryProducts.PaperProof.lem_cell	UnitaryProducts/PaperProof/Loca
 4.5	cor:walks	UnitaryProducts.PaperProof.thm_unitary_products	UnitaryProducts/PaperProof/CorProducts.lean	222
 4.7	cor:walk-leakage	UnitaryProducts.PaperProof.cor_walk_leakage	UnitaryProducts/PaperProof/CorWalkLeakage.lean	165
 5.1	ex:gap-adapted	UnitaryProducts.PaperProof.ex_gap_adapted	UnitaryProducts/PaperProof/GapAdapted.lean	467
-5.3	ex:crossings	UnitaryProducts.PaperProof.ex_crossings	UnitaryProducts/PaperProof/Crossings.lean	135
+5.3	ex:crossings	UnitaryProducts.PaperProof.ex_crossings	UnitaryProducts/PaperProof/Crossings.lean	124
 5.2	ex:precessing-spin	UnitaryProducts.PaperProof.Spin.ex_precessing_spin	UnitaryProducts/PaperProof/PrecessingSpin.lean	1530
 unnumbered	claim:0	UnitaryProducts.PaperProof.thm_unit_steps_bounds	UnitaryProducts/PaperProof/UniformConsequences.lean	169
 unnumbered	eq:products	UnitaryProducts.PaperProof.unit_steps_endpoint_bounds	UnitaryProducts/PaperProof/UniformConsequences.lean	140
@@ -598,7 +598,7 @@ unnumbered	claim:5	UnitaryProducts.PaperProof.exists_odd_resonant_width	UnitaryP
 unnumbered	claim:5	UnitaryProducts.PaperProof.Spin.full_turn_antiphase	UnitaryProducts/PaperProof/SpinConsequences.lean	108
 unnumbered	claim:5	UnitaryProducts.PaperProof.Spin.full_turn_width	UnitaryProducts/PaperProof/SpinConsequences.lean	131
 unnumbered	claim:5	UnitaryProducts.PaperProof.Spin.full_turn_not_tendsto_zero	UnitaryProducts/PaperProof/SpinConsequences.lean	148
-unnumbered	claim:5	UnitaryProducts.PaperProof.diagonal_crossing_witness	UnitaryProducts/PaperProof/Crossings.lean	173
-unnumbered	claim:5	UnitaryProducts.PaperProof.crossing_projectors_extend	UnitaryProducts/PaperProof/Crossings.lean	101
+unnumbered	claim:5	UnitaryProducts.PaperProof.diagonal_crossing_witness	UnitaryProducts/PaperProof/Crossings.lean	162
+unnumbered	claim:5	UnitaryProducts.PaperProof.crossing_projectors_extend	UnitaryProducts/PaperProof/Crossings.lean	91
 unnumbered	claim:5	UnitaryProducts.PaperProof.commuting_endpoint_transfer	UnitaryProducts/PaperProof/Crossings.lean	21
 unnumbered	claim:5	UnitaryProducts.PaperProof.crossing_comparison_bound	UnitaryProducts/PaperProof/Crossings.lean	36

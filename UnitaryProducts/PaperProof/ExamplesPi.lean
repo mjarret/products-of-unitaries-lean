@@ -29,47 +29,14 @@ theorem products_pi [NeZero d] {T : ℕ} (hT : 0 < T)
         (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ π)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) :
     ‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) - U T‖ ≤
-      (1 / T : ℝ) * ((1 / (2 * π) - 1 / π ^ 2) * (‖Hd 0‖ + ‖Hd 1‖) +
-        (1 / 24 + 1 / π ^ 2) * L +
-        (5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64) * unitSupNorm Hd ^ 2) := by
+      hamiltonianEnergy π L H / T := by
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   have hw : π < 2 * π := by linarith [pi_pos]
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
   have hbound := unit_steps_endpoint_bounds hT H Hd U V hH hd hlip hw hwidth hU hV
-  rw [cellConstant_eq_frameBound pi_pos.le hw, paperFrameMult_eq_series pi_pos.le hw,
-    paperFrameMult_deriv_eq_series pi_pos.le hw, frameBound_center_pi,
-    frameBound_frameLip_pi.1, frameBound_frameLip_pi.2] at hbound
   have hhalf : (T : ℝ) / (2 * T) = 1 / 2 := by field_simp
   simp only [heV, div_self ht.ne', one_smul, hhalf] at hbound
-  exact hbound.trans_eq (by ring)
-
-/-- The display after (4.6): both endpoint norms are at most the derivative
-supremum, giving the three separate coefficients used in Theorem B. -/
-theorem products_pi_supremum [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L : ℝ} (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ L * |t - s|)
-    (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
-      |(hH _ (walkCubic_sample hj)).eigenvalues p -
-        (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ π)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) :
-    ‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) - U T‖ ≤
-      (1 / T : ℝ) * ((2 * (1 / (2 * π) - 1 / π ^ 2)) * unitSupNorm Hd +
-        (1 / 24 + 1 / π ^ 2) * L +
-        (5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64) * unitSupNorm Hd ^ 2) := by
-  have hc : ContinuousOn Hd (Icc (0 : ℝ) 1) := continuousOn_of_norm_sub_le hlip
-  have hzero := norm_le_unitSupNorm hc (show (0 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num)
-  have hone := norm_le_unitSupNorm hc (show (1 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num)
-  have hc₀ : 0 ≤ 1 / (2 * π) - 1 / π ^ 2 := by
-    rw [← frameBound_center_pi]
-    exact UnitStepsProse.center_bound_nonneg pi_pos.le (by linarith [pi_pos])
-  have hends := mul_le_mul_of_nonneg_left (add_le_add hzero hone) hc₀
-  have hcoarse := mul_le_mul_of_nonneg_left
-    (add_le_add (add_le_add hends (le_refl ((1 / 24 + 1 / π ^ 2) * L)))
-      (le_refl ((5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64) * unitSupNorm Hd ^ 2)))
-    (by positivity : (0 : ℝ) ≤ 1 / T)
-  exact (products_pi hT H Hd U hH hd hlip hwidth hU).trans (hcoarse.trans_eq (by ring))
+  exact hbound
 
 /-- The three decimal coefficients in Theorem B are upper bounds for the exact
 width-pi endpoint, Lipschitz, and quadratic coefficients of (4.6). -/
@@ -94,5 +61,43 @@ theorem products_pi_decimal_coefficients :
   · rw [show 5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 =
         5 / 8 * (1 / π) - 1 / 4 * (1 / π) ^ 2 - 4 * (1 / π) ^ 3 + 1 / 64 by ring]
     linarith
+
+/-- The display after (4.6): `𝓔_π(H)` is bounded by the three decimal
+coefficients of Theorem B. Bound the endpoint norms, then each coefficient. -/
+theorem hamiltonianEnergy_pi_le (H Hd : ℝ → 𝕄)
+    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
+    {L : ℝ} (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
+      ‖Hd t - Hd s‖ ≤ L * |t - s|) :
+    hamiltonianEnergy π L H ≤ (116 / 1000 : ℝ) * unitSupNorm Hd +
+      (143 / 1000 : ℝ) * L + (61 / 1000 : ℝ) * unitSupNorm Hd ^ 2 := by
+  have hL : 0 ≤ L := by
+    have h := hlip 0 (by norm_num) 1 (by norm_num)
+    simp only [sub_zero, abs_one, mul_one] at h
+    exact (norm_nonneg _).trans h
+  have hw : π < 2 * π := by linarith [pi_pos]
+  rw [hamiltonianEnergy_eq_of_hasDerivWithinAt π L H Hd hd,
+    cellConstant_eq_frameBound pi_pos.le hw, paperFrameMult_eq_series pi_pos.le hw,
+    paperFrameMult_deriv_eq_series pi_pos.le hw, frameBound_center_pi,
+    frameBound_frameLip_pi.1, frameBound_frameLip_pi.2]
+  have hc : ContinuousOn Hd (Icc (0 : ℝ) 1) := continuousOn_of_norm_sub_le hlip
+  have hzero := norm_le_unitSupNorm hc (show (0 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num)
+  have hone := norm_le_unitSupNorm hc (show (1 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num)
+  have hD : 0 ≤ unitSupNorm Hd := (norm_nonneg _).trans hzero
+  have hc₀ : 0 ≤ 1 / (2 * π) - 1 / π ^ 2 := by
+    rw [← frameBound_center_pi]
+    exact UnitStepsProse.center_bound_nonneg pi_pos.le hw
+  obtain ⟨hc0, hcL, hcb⟩ := products_pi_decimal_coefficients
+  have hends :
+      (1 / (2 * π) - 1 / π ^ 2) * (‖Hd 0‖ + ‖Hd 1‖) ≤
+        (116 / 1000 : ℝ) * unitSupNorm Hd := by
+    calc
+      _ ≤ (1 / (2 * π) - 1 / π ^ 2) * (unitSupNorm Hd + unitSupNorm Hd) :=
+        mul_le_mul_of_nonneg_left (add_le_add hzero hone) hc₀
+      _ = (2 * (1 / (2 * π) - 1 / π ^ 2)) * unitSupNorm Hd := by ring
+      _ ≤ _ := mul_le_mul_of_nonneg_right hc0.le hD
+  have hcoeff := add_le_add (add_le_add hends (mul_le_mul_of_nonneg_right hcL.le hL))
+    (mul_le_mul_of_nonneg_right hcb.le (sq_nonneg (unitSupNorm Hd)))
+  convert hcoeff using 1
+  ring
 
 end UnitaryProducts.PaperProof

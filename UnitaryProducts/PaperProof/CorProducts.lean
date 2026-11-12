@@ -215,6 +215,26 @@ theorem paperWalkSquare_eq_series {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) :
     paperFrameMult_eq_series (le_refl 0) (by positivity : (0 : ℝ) < 2 * π),
     cellConstant_eq_frameBound hw0 hw, ← walkLogSlope_closed hw0 hw]
 
+end UnitaryProducts.PaperProof
+
+namespace UnitaryProducts.Paper
+
+/-- The coefficient `𝓔̃_w(W)` in Theorem 4.5, equation (4.7), including the
+continuous value `κ = 1` at width zero. -/
+def walkEnergy {d : ℕ} (w : ℝ) (W : ℝ → Matrix (Fin d) (Fin d) ℂ) : ℝ :=
+  let Wd := derivWithin W (Icc (0 : ℝ) 1)
+  let Wdd := derivWithin Wd (Icc (0 : ℝ) 1)
+  let κ := if w = 0 then 1 else (w / 2) / Real.sin (w / 2)
+  PaperProof.cellConstant w * κ * (‖Wd 0‖ + ‖Wd 1‖) +
+    (1 / 24 + frameMult w) * κ * unitSupNorm Wdd +
+    PaperProof.paperWalkSquare w * unitSupNorm Wd ^ 2
+
+end UnitaryProducts.Paper
+
+namespace UnitaryProducts.PaperProof
+variable {d : ℕ}
+local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
+
 /-- **Theorem 4.5** (`cor:walks`): the unitary-family comparison with the
 closed constants of Definition 4.1. The phased product is the endpoint of the
 rounded Hamiltonian evolution. The unused Lipschitz premise is omitted, and the rounded evolution
@@ -225,18 +245,9 @@ theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
     (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1) p q,
       |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) :
     let W := fun s ↦ evol (H s) 1
-    let Wd := derivWithin W (Icc (0 : ℝ) 1)
-    let Wdd := derivWithin Wd (Icc (0 : ℝ) 1)
-    let c₀ : ℝ := cellConstant w
-    let κ : ℝ := if w = 0 then 1 else (w / 2) / Real.sin (w / 2)
-    let c₂ : ℝ := (1 / 24 + frameMult w) / Real.cos (w / 4) ^ 2 +
-      (c₀ / 4 + 1 / 64) * κ ^ 2 + 2 * deriv frameMult w * κ +
-      (frameMult w - frameMult 0) * κ ^ 2
     (∀ U : ℝ → 𝕄, IsEvolution (fun t ↦ H (t / T)) U 0 T →
         let V := evol (H 1) (1 / 2) * (walk W T).2 * evol (H 0) (-(1 / 2))
-        ‖V - U T‖ ≤
-          (1 / T) * (c₀ * κ * (‖Wd 0‖ + ‖Wd 1‖) +
-            (1 / 24 + frameMult w) * κ * unitSupNorm Wdd + c₂ * unitSupNorm Wd ^ 2)) ∧
+        ‖V - U T‖ ≤ walkEnergy w W / T) ∧
     Asymptotics.IsEquivalent (𝓝[>] 0)
       (fun δ ↦ cellConstant (2 * π - δ) * walkLogSlope (2 * π - δ)) (fun δ ↦ 1 / δ ^ 2) ∧
     Asymptotics.IsEquivalent (𝓝[>] 0)
@@ -254,9 +265,13 @@ theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
   dsimp only at hseries
   have hev : ∀ᶠ δ in 𝓝[>] (0 : ℝ), δ ∈ Ioo 0 π := Ioo_mem_nhdsGT pi_pos
   refine ⟨?_, hseries.2.1, ?_, ?_, ?_⟩
-  · rw [paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw,
+  · intro U hU
+    rw [div_eq_mul_one_div (walkEnergy w _) (T : ℝ),
+      mul_comm (walkEnergy w _) (1 / (T : ℝ))]
+    simp only [walkEnergy, paperWalkSquare]
+    rw [paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw,
       paperFrameMult_eq_series (le_refl 0) (by positivity)]
-    exact hseries.1
+    exact hseries.1 U hU
   · apply hseries.2.2.1.congr_left
     filter_upwards [hev] with δ hδ
     rw [paperFrameMult_eq_series (by linarith [hδ.2, pi_pos]) (by linarith [hδ.1])]

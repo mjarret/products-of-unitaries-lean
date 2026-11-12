@@ -42,6 +42,20 @@ open UnitaryProducts UnitaryProducts.Corrector UnitaryProducts.Paper
 open UnitaryProducts.Paper.UnitStepsProse
 
 noncomputable section
+namespace UnitaryProducts.Paper
+
+/-- The coefficient `𝓔_w(H)` defined before (4.6). The parameter `L` is the
+Lipschitz constant of the derivative on the unit interval. -/
+def hamiltonianEnergy {d : ℕ} (w L : ℝ)
+    (H : ℝ → Matrix (Fin d) (Fin d) ℂ) : ℝ :=
+  let Hd := derivWithin H (Icc (0 : ℝ) 1)
+  let c₀ := PaperProof.cellConstant w
+  let c₁ := c₀ / 4 + 1 / 64
+  c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + frameMult w) * L +
+    (c₁ + 2 * deriv frameMult w) * unitSupNorm Hd ^ 2
+
+end UnitaryProducts.Paper
+
 namespace UnitaryProducts.PaperProof
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
@@ -135,6 +149,22 @@ theorem endpoint_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
     paperFrameMult_deriv_eq_series hw0 hw] at hsum
   exact hclock.trans ((add_le_add_right hsum _).trans_eq (by ring))
 
+/-- Evaluate the coefficient in (4.6) using a prescribed derivative. Uniqueness
+of the one-sided derivative identifies the two endpoints and its supremum. -/
+theorem hamiltonianEnergy_eq_of_hasDerivWithinAt (w L : ℝ) (H Hd : ℝ → 𝕄)
+    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s) :
+    hamiltonianEnergy w L H = cellConstant w * (‖Hd 0‖ + ‖Hd 1‖) +
+      (1 / 24 + frameMult w) * L +
+      (cellConstant w / 4 + 1 / 64 + 2 * deriv frameMult w) * unitSupNorm Hd ^ 2 := by
+  have heq : EqOn (derivWithin H (Icc (0 : ℝ) 1)) Hd (Icc (0 : ℝ) 1) :=
+    fun s hs ↦ (hd s hs).derivWithin (uniqueDiffOn_Icc_zero_one s hs)
+  have hsup : unitSupNorm (derivWithin H (Icc (0 : ℝ) 1)) = unitSupNorm Hd := by
+    unfold unitSupNorm
+    congr 1
+    exact Set.image_congr fun s hs ↦ congrArg norm (heq hs)
+  simp only [hamiltonianEnergy, heq (show (0 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num),
+    heq (show (1 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num), hsup]
+
 /-- Equation (4.6) (`eq:products`): the comparison with the
 entrywise multiplier and closed constants of Definition 4.1. -/
 theorem unit_steps_endpoint_bounds [NeZero d] {T : ℕ} (hT : 0 < T)
@@ -149,10 +179,9 @@ theorem unit_steps_endpoint_bounds [NeZero d] {T : ℕ} (hT : 0 < T)
         (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ w)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     (hV : IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T) :
-    let c₀ := cellConstant w
-    let c₁ := c₀ / 4 + 1 / 64
-    ‖V T - U T‖ ≤ (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
-      (1 / 24 + frameMult w) * L + (c₁ + (2 * deriv frameMult w)) * unitSupNorm Hd ^ 2) := by
+    ‖V T - U T‖ ≤ hamiltonianEnergy w L H / T := by
+  rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w L H Hd hd,
+    div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))]
   have hw0 : 0 ≤ w := by
     simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) 0
   rw [cellConstant_eq_frameBound hw0 hw, paperFrameMult_eq_series hw0 hw,
@@ -193,6 +222,8 @@ theorem thm_unit_steps_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
   have hcell := unit_steps_endpoint_bounds hT H Hd U V hH
     (fun s hs ↦ (hdiff s hs).hasDerivWithinAt) hlip hw hwidth hU hV
+  rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w L H Hd (fun s hs ↦ (hdiff s hs).hasDerivWithinAt),
+    div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))] at hcell
   rw [cellConstant_eq_frameBound hw₀ hw, paperFrameMult_eq_series hw₀ hw,
     paperFrameMult_deriv_eq_series hw₀ hw] at hcell
   obtain ⟨hN, _⟩ := paper_series_eq hw₀ hw
@@ -725,6 +756,8 @@ theorem bit_transfer_series_bound [NeZero d] (w : ℝ)
   have hclock := unit_steps_endpoint_bounds hT1 H Hd U V hH
     (fun s hs ↦ (hc s hs).hasDerivWithinAt) hlip hw hdiff hU hV
   have hw₀ : 0 ≤ w := by simpa using hdiff 0 (Nat.zero_le T) (0 : Fin d) (0 : Fin d)
+  rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w h H Hd (fun s hs ↦ (hc s hs).hasDerivWithinAt),
+    div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))] at hclock
   rw [cellConstant_eq_frameBound hw₀ hw, paperFrameMult_eq_series hw₀ hw,
     paperFrameMult_deriv_eq_series hw₀ hw] at hclock
   obtain ⟨hN, _⟩ := paper_series_eq hw₀ hw
@@ -788,35 +821,32 @@ theorem ex_unit_transfer_chain [NeZero d] (w : ℝ)
     (C : NNReal) (δ : ℝ)
    (hδ : 0 < δ)
    (hcont : ‖(1 - Q) * U T * P‖ ≤ (C : ℝ) / T) :
-    let Nf : ℝ → ℝ := frameMult
-    let c₀ := cellConstant w
-    let c₁ := c₀ / 4 + 1 / 64
-    let Hd := derivWithin H (Icc (0 : ℝ) 1)
-    let M := (C : ℝ) + T * ((1 / T) *
-      (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * h +
-        (c₁ + (2 * deriv frameMult w)) * unitSupNorm Hd ^ 2))
     let σ := ⨆ s : Icc (0 : ℝ) 1, ⨆ i : Fin d,
       (Finset.univ.filter fun j ↦ truncHerm k (H s) i j ≠ H s i j).card
     let W := (unitProduct (fun s ↦ scalarEntryMap (truncBits k) (H s)) T).1
     let Z := evol (H 1) (1 / 2) * W * evol (H 0) (-(1 / 2))
     let V_T := evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2))
-    2 * M / δ ≤ T → Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) →
+    2 * ((C : ℝ) + hamiltonianEnergy w h H) / δ ≤ T →
+      Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) →
       (‖(1 - Q) * W * P‖ ≤ (C : ℝ) / T + ‖Z - U T‖) ∧
       ((C : ℝ) / T + ‖Z - U T‖ ≤
         (C : ℝ) / T + ‖W - (unitProduct H T).1‖ + ‖V_T - U T‖) ∧
       ((C : ℝ) / T + ‖W - (unitProduct H T).1‖ + ‖V_T - U T‖ ≤
-        M / T + T * (Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹)) ∧
-      (M / T + T * (Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹) ≤ δ / 2 + δ / 2) ∧
+        ((C : ℝ) + hamiltonianEnergy w h H) / T + T * (Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹)) ∧
+      (((C : ℝ) + hamiltonianEnergy w h H) / T +
+        T * (Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹) ≤ δ / 2 + δ / 2) ∧
       δ / 2 + δ / 2 = δ := by
   have hw0 : 0 ≤ w := by
     simpa using hdiff 0 (Nat.zero_le T) (0 : Fin d) 0
   dsimp only
+  unfold hamiltonianEnergy
   rw [paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw]
   have h := bit_transfer_series_bound w hw H U T k hT1 hH hc h hlip hdiff hU
     P Q hP hQ hPc hQc C δ hδ hcont
   dsimp only at h
   rw [(paper_series_eq hw0 hw).1] at h
-  exact h
+  have ht : (T : ℝ) ≠ 0 := (Nat.cast_pos.mpr hT1).ne'
+  simpa only [← mul_assoc, mul_one_div_cancel ht, one_mul] using h
 
 /-- **Example 4.6** (`ex:unit-transfer`): the bit budget with the closed
 scalar constants in Definition 4.1 and Theorem 4.2. -/
@@ -842,18 +872,12 @@ theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ)
     (C : NNReal) (δ : ℝ)
    (hδ : 0 < δ)
    (hcont : ‖(1 - Q) * U T * P‖ ≤ (C : ℝ) / T) :
-    let Nf : ℝ → ℝ := frameMult
-    let c₀ := cellConstant w
-    let c₁ := c₀ / 4 + 1 / 64
-    let Hd := derivWithin H (Icc (0 : ℝ) 1)
-    let M := (C : ℝ) + T * ((1 / T) *
-      (c₀ * (‖Hd 0‖ + ‖Hd 1‖) + (1 / 24 + Nf w) * L +
-        (c₁ + (2 * deriv frameMult w)) * unitSupNorm Hd ^ 2))
     let σ := ⨆ s : Icc (0 : ℝ) 1, ⨆ i : Fin d,
       (Finset.univ.filter fun j ↦ truncHerm k (H s) i j ≠ H s i j).card
-    2 * M / δ ≤ T → Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) →
+    2 * ((C : ℝ) + hamiltonianEnergy w L H) / δ ≤ T →
+      Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) →
       ‖(1 - Q) * (unitProduct (fun s ↦ scalarEntryMap (truncBits k) (H s)) T).1 * P‖ ≤ δ := by
-  intro Nf c₀ c₁ Hd M σ hbudget hbits
+  intro σ hbudget hbits
   have hchain := ex_unit_transfer_chain w hw H U T k hT1 hH hc L hlip hdiff hU
     P Q hP hQ hPc hQc C δ hδ hcont hbudget hbits
   exact (hchain.1.trans (hchain.2.1.trans

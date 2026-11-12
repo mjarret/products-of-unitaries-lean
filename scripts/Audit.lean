@@ -532,8 +532,7 @@ open Lean Elab Command in
     `UnitaryProducts.Corrector.frameBound_center_pi,
     `UnitaryProducts.Corrector.frameBound_frameLip_pi,
     `UnitaryProducts.PaperProof.uniform_pi_coefficients,
-    `UnitaryProducts.PaperProof.products_pi_supremum,
-    `UnitaryProducts.PaperProof.products_pi_decimal_coefficients,
+    `UnitaryProducts.PaperProof.hamiltonianEnergy_pi_le,
     `UnitaryProducts.PaperProof.left_held_generator_error,
     `UnitaryProducts.PaperProof.left_held_error_integral,
     `UnitaryProducts.PaperProof.left_held_duhamel_bound,
@@ -547,6 +546,7 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.burgarth_rounded_integral_linear_limit,
     `UnitaryProducts.PaperProof.burgarth_bound_scaling,
     `UnitaryProducts.PaperProof.burgarth_bound_bigO,
+    `UnitaryProducts.PaperProof.products_pi_decimal_coefficients,
     `UnitaryProducts.PaperProof.commuting_family_derivative,
     `UnitaryProducts.PaperProof.commuting_diagonal_offdiagonal_zero,
     `UnitaryProducts.PaperProof.eigenbasis_derivative_entry,
@@ -580,7 +580,7 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.gap_projection_probability,
     `UnitaryProducts.PaperProof.gap_probability_to_operator,
     `UnitaryProducts.PaperProof.gap_probability_to_matrix,
-    `UnitaryProducts.PaperProof.gap_correction_bound,
+    `UnitaryProducts.PaperProof.gap_energy_isBigO,
     `UnitaryProducts.PaperProof.gap_correction_isBigO,
     `UnitaryProducts.PaperProof.gap_truncated_factor_count,
     `UnitaryProducts.PaperProof.Spin.family,
@@ -629,7 +629,10 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.diagonal_crossing_witness,
     `UnitaryProducts.PaperProof.crossing_projectors_extend,
     `UnitaryProducts.PaperProof.commuting_endpoint_transfer,
-    `UnitaryProducts.PaperProof.crossing_comparison_bound]
+    `UnitaryProducts.PaperProof.crossing_comparison_bound,
+    `UnitaryProducts.Paper.hamiltonianEnergy,
+    `UnitaryProducts.PaperProof.hamiltonianEnergy_eq_of_hasDerivWithinAt,
+    `UnitaryProducts.Paper.walkEnergy]
   let mut missingDocs : List Name := []
   for name in heads do
     unless (env.find? name).isSome do

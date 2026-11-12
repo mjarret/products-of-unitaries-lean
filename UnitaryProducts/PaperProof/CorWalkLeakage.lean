@@ -115,16 +115,8 @@ theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
     (hwidth : ∀ s (hs : s ∈ K) p q,
       |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w)
     (U : ℝ → 𝕄) (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) :
-    let Wd := derivWithin W K
-    let Wdd := derivWithin Wd K
-    let c₀ := cellConstant w
-    let κ := if w = 0 then 1 else (w / 2) / Real.sin (w / 2)
-    let c₂ := (1 / 24 + frameMult w) / Real.cos (w / 4) ^ 2 +
-      (c₀ / 4 + 1 / 64) * κ ^ 2 + 2 * deriv frameMult w * κ +
-      (frameMult w - frameMult 0) * κ ^ 2
     ‖evol (H 1) (1 / 2) * (walk W T).2 * evol (H 0) (-(1 / 2)) - U T‖ ≤
-      (1 / T) * (c₀ * κ * (‖Wd 0‖ + ‖Wd 1‖) +
-        (1 / 24 + frameMult w) * κ * unitSupNorm Wdd + c₂ * unitSupNorm Wd ^ 2) := by
+      walkEnergy w W / T := by
   have hb := (thm_unitary_products T hT H hH hw hcH hwidth).1 U hU
   have hw0 : 0 ≤ w := (abs_nonneg _).trans
     (hwidth 0 (by norm_num) (0 : Fin d) (0 : Fin d))
@@ -146,7 +138,7 @@ theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
       (fun (_j : ℕ) (_hj : _j < T) ↦ rfl :
         ∀ j : ℕ, j < T → evol (H (j / T)) 1 = evol (H (j / T)) 1) T le_rfl
     exact hb.trans ha.symm
-  simpa only [hprod, hfirst (show (0 : ℝ) ∈ K by norm_num),
+  simpa only [walkEnergy, paperWalkSquare, hprod, hfirst (show (0 : ℝ) ∈ K by norm_num),
     hfirst (show (1 : ℝ) ∈ K by norm_num), hsup hfirst, hsup hsecond,
     paperFrameMult_eq_series hw0 hw,
     paperFrameMult_eq_series (w := 0) le_rfl (by positivity),
@@ -169,13 +161,6 @@ theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
     (hgc : ContinuousOn (fun s ↦ spectralWindowGap true (W s) (α s) (β s)) K) :
     let ϑ := sInf ((fun s ↦ spectralWindowGap true (W s) (α s) (β s)) '' K)
     let w := 2 * π - ϑ
-    let Wd := derivWithin W K
-    let Wdd := derivWithin Wd K
-    let c₀ := cellConstant w
-    let κ := if w = 0 then 1 else (w / 2) / Real.sin (w / 2)
-    let c₂ := (1 / 24 + frameMult w) / Real.cos (w / 4) ^ 2 +
-      (c₀ / 4 + 1 / 64) * κ ^ 2 + 2 * deriv frameMult w * κ +
-      (frameMult w - frameMult 0) * κ ^ 2
     let P := spectralWindowProjector true (W 0) (α 0) (β 0)
     let Q := spectralWindowProjector true (W 1) (α 1) (β 1)
     ∃ H : ℝ → 𝕄, ∃ hH : ∀ s ∈ K, (H s).IsHermitian,
@@ -189,11 +174,8 @@ theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
         |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) ∧
       ∀ (T : ℕ), 1 ≤ T → ∀ (U : ℝ → 𝕄), IsEvolution (fun t ↦ H (t / T)) U 0 T →
       ∀ C : ℝ, 0 ≤ C → ‖(1 - Q) * U T * P‖ ≤ C / T →
-        ‖(1 - Q) * (walk W T).2 * P‖ ≤ C / T +
-          (1 / T) * (c₀ * κ * (‖Wd 0‖ + ‖Wd 1‖) +
-            (1 / 24 + frameMult w) * κ * unitSupNorm Wdd +
-            c₂ * unitSupNorm Wd ^ 2) := by
-  intro ϑ w Wd Wdd c₀ κ c₂
+        ‖(1 - Q) * (walk W T).2 * P‖ ≤ (C + walkEnergy w W) / T := by
+  intro ϑ w
   have hband' : circularBand W α β := (walk_band_family_iff W α β hu horder).2 hband
   obtain ⟨hϑ, hϑg⟩ := walk_band_gap_minimum W α β hband' hu hgc
   obtain ⟨H, hH, hcH, hlog, hopen, hwidth, _⟩ :=
@@ -232,7 +214,7 @@ theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
     (hQ.2.2 (1 / 2)).symm (hP.2.2 (-(1 / 2))).symm
   simp only [sub_self, norm_zero, add_zero, mul_zero] at htransfer
   have hdiff := (le_abs_self _).trans (htransfer.trans hcomparison)
-  dsimp only [Wd, Wdd, c₀, κ, c₂] at hdiff ⊢
+  rw [add_div]
   linarith
 
 end UnitaryProducts.PaperProof

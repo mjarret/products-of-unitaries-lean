@@ -525,8 +525,7 @@ set_option format.width 100
 #check @UnitaryProducts.Corrector.frameBound_center_pi
 #check @UnitaryProducts.Corrector.frameBound_frameLip_pi
 #check @UnitaryProducts.PaperProof.uniform_pi_coefficients
-#check @UnitaryProducts.PaperProof.products_pi_supremum
-#check @UnitaryProducts.PaperProof.products_pi_decimal_coefficients
+#check @UnitaryProducts.PaperProof.hamiltonianEnergy_pi_le
 #check @UnitaryProducts.PaperProof.left_held_generator_error
 #check @UnitaryProducts.PaperProof.left_held_error_integral
 #check @UnitaryProducts.PaperProof.left_held_duhamel_bound
@@ -540,6 +539,7 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.burgarth_rounded_integral_linear_limit
 #check @UnitaryProducts.PaperProof.burgarth_bound_scaling
 #check @UnitaryProducts.PaperProof.burgarth_bound_bigO
+#check @UnitaryProducts.PaperProof.products_pi_decimal_coefficients
 #check @UnitaryProducts.PaperProof.commuting_family_derivative
 #check @UnitaryProducts.PaperProof.commuting_diagonal_offdiagonal_zero
 #check @UnitaryProducts.PaperProof.eigenbasis_derivative_entry
@@ -573,7 +573,7 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.gap_projection_probability
 #check @UnitaryProducts.PaperProof.gap_probability_to_operator
 #check @UnitaryProducts.PaperProof.gap_probability_to_matrix
-#check @UnitaryProducts.PaperProof.gap_correction_bound
+#check @UnitaryProducts.PaperProof.gap_energy_isBigO
 #check @UnitaryProducts.PaperProof.gap_correction_isBigO
 #check @UnitaryProducts.PaperProof.gap_truncated_factor_count
 #check @UnitaryProducts.PaperProof.Spin.family
@@ -623,3 +623,6 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.crossing_projectors_extend
 #check @UnitaryProducts.PaperProof.commuting_endpoint_transfer
 #check @UnitaryProducts.PaperProof.crossing_comparison_bound
+#check @UnitaryProducts.Paper.hamiltonianEnergy
+#check @UnitaryProducts.PaperProof.hamiltonianEnergy_eq_of_hasDerivWithinAt
+#check @UnitaryProducts.Paper.walkEnergy

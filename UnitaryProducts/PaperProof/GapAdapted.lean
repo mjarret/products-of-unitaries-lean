@@ -674,7 +674,7 @@ theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
   simpa only [div_mul_eq_mul_div, mul_div_assoc] using gap_added_term_bound hp hC (hg i).1
     (hg i).2 (hcp0 i) (hcp i) (hD i).1 (hD i).2 (he₀ i).2 (he₁ i).2 (he₀ i).1 (he₁ i).1 (hT i)
 
-/-- The exact width-two correction `M-C` from Example 4.6, bounded using
+/-- The exact width-two correction `𝓔₂(H)` from Example 4.6, bounded using
 Example 5.1's endpoint, supremum, and Lipschitz estimates. -/
 theorem gap_correction_bound {p C g cp D e₀ e₁ E S L : ℝ}
     (hp : 1 < p) (hC : 0 ≤ C) (hg : 0 < g) (hg2 : g ≤ 2)
@@ -709,7 +709,7 @@ theorem gap_correction_bound {p C g cp D e₀ e₁ E S L : ℝ}
         4 ^ p * (p / 24 + p * frameMult 2 + b) * cp * D) := by rw [hfour]; ring
     _ ≤ _ := hscalar
 
-/-- The sentence `M-C = O(Γstar^(2-2p))` following Example 5.1, for the
+/-- The sentence `𝓔₂(H) = O(Γstar^(2-2p))` following Example 5.1, for the
 actual width-two coefficient of Example 4.6. The bounds are uniform over paths
 with fixed `p,C`; `E,S,L` denote their endpoint sum, derivative norm, and
 Lipschitz constant. -/
@@ -740,6 +740,31 @@ theorem gap_correction_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
   exact gap_correction_bound hp hC (hg i).1 (hg i).2 (hcp0 i) (hcp i)
     (hD i).1 (hD i).2 (he₀ i).2 (he₁ i).2 (he₀ i).1 (he₁ i).1
     (hE i).2 (hS i).1 (hS i).2 (hL i).2
+
+/-- The commentary after Example 5.1, expressed directly for the paper's
+Hamiltonian coefficient `𝓔₂(H)`. The endpoint, supremum, and Lipschitz bounds
+are exactly the three estimates of that example. -/
+theorem gap_energy_isBigO {ι : Type*} (l : Filter ι) {p C : ℝ}
+    (hp : 1 < p) (hC : 0 ≤ C) (H : ι → ℝ → 𝕄)
+    (g cp D e₀ e₁ L : ι → ℝ)
+    (hg : ∀ i, 0 < g i ∧ g i ≤ 2)
+    (hcp0 : ∀ i, 0 ≤ cp i)
+    (hcp : ∀ i, cp i ≤ p * C * g i ^ (1 - p) / (p - 1))
+    (hD : ∀ i, 0 ≤ D i ∧ D i ≤ 2)
+    (he₀ : ∀ i, 0 ≤ e₀ i ∧ e₀ i ≤ 2 ^ p)
+    (he₁ : ∀ i, 0 ≤ e₁ i ∧ e₁ i ≤ 2 ^ p)
+    (hE : ∀ i, ‖derivWithin (H i) (Icc (0 : ℝ) 1) 0‖ +
+      ‖derivWithin (H i) (Icc (0 : ℝ) 1) 1‖ ≤ cp i * D i * (e₀ i + e₁ i))
+    (hS : ∀ i, 0 ≤ unitSupNorm (derivWithin (H i) (Icc (0 : ℝ) 1)) ∧
+      unitSupNorm (derivWithin (H i) (Icc (0 : ℝ) 1)) ≤ 2 ^ p * cp i * D i)
+    (hL : ∀ i, 0 ≤ L i ∧ L i ≤ p * 4 ^ p * cp i ^ 2 * D i ^ 2) :
+    (fun i ↦ hamiltonianEnergy 2 (L i) (H i)) =O[l]
+      (fun i ↦ g i ^ (2 - 2 * p)) := by
+  exact gap_correction_isBigO l hp hC g cp D e₀ e₁
+    (fun i ↦ ‖derivWithin (H i) (Icc (0 : ℝ) 1) 0‖ +
+      ‖derivWithin (H i) (Icc (0 : ℝ) 1) 1‖)
+    (fun i ↦ unitSupNorm (derivWithin (H i) (Icc (0 : ℝ) 1))) L
+    hg hcp0 hcp hD he₀ he₁ (fun i ↦ ⟨by positivity, hE i⟩) hS hL
 
 /-- At `p=3/2`, the gap power in the added term is exactly the inverse gap. -/
 theorem gap_three_halves_order {g T : ℝ} :
@@ -843,10 +868,8 @@ theorem gap_truncated_factor_count (H : ℝ → 𝕄) (U : ℕ → ℝ → 𝕄)
     fun j hj i q ↦ hwidth _ (walkCubic_sample hj) i q
   have htransfer := ex_unit_transfer_bounds 2 (by linarith [pi_gt_three]) H (U T)
     T k hT hH hc L hlip hdiff (hU T hT) P Q hP hQ hPc hQc C δ hδ (hcont T hT)
-  have hcancel : (T : ℝ) * ((1 / T) * A) = A := by field_simp [hTr.ne']
-  change 2 * ((C : ℝ) + (T : ℝ) * ((1 / T) * A)) / δ ≤ T →
+  change 2 * ((C : ℝ) + A) / δ ≤ T →
     Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) → _ at htransfer
-  rw [hcancel] at htransfer
   exact htransfer hbudget hbits
 
 end UnitaryProducts.PaperProof

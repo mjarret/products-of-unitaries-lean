@@ -58,27 +58,10 @@ theorem introthm_unit
     rw [hsup]
     positivity
   letI : NeZero d := ⟨hdpos.ne'⟩
-  have hc : ContinuousOn Hd (Icc (0 : ℝ) 1) := continuousOn_of_norm_sub_le hlip
-  have hzero := norm_le_unitSupNorm hc (show (0 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num)
-  have hone := norm_le_unitSupNorm hc (show (1 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num)
-  have hD : 0 ≤ unitSupNorm Hd := (norm_nonneg _).trans hzero
   have hb := products_pi (by omega) H Hd U hH
     (fun s hs ↦ (hdiff s hs).hasDerivWithinAt) hlip hwidth hU
-  have hc₀ : 0 ≤ 1 / (2 * π) - 1 / π ^ 2 := by
-    rw [← frameBound_center_pi]
-    exact UnitStepsProse.center_bound_nonneg pi_pos.le (by linarith [pi_pos])
-  obtain ⟨hc0, hcL, hcb⟩ := products_pi_decimal_coefficients
-  have hends :
-      (1 / (2 * π) - 1 / π ^ 2) * (‖Hd 0‖ + ‖Hd 1‖) ≤
-        (116 / 1000 : ℝ) * unitSupNorm Hd := by
-    calc
-      _ ≤ (1 / (2 * π) - 1 / π ^ 2) * (unitSupNorm Hd + unitSupNorm Hd) :=
-        mul_le_mul_of_nonneg_left (add_le_add hzero hone) hc₀
-      _ = (2 * (1 / (2 * π) - 1 / π ^ 2)) * unitSupNorm Hd := by ring
-      _ ≤ _ := mul_le_mul_of_nonneg_right hc0.le hD
-  have hcoeff := add_le_add (add_le_add hends (mul_le_mul_of_nonneg_right hcL.le hL))
-    (mul_le_mul_of_nonneg_right hcb.le (sq_nonneg (unitSupNorm Hd)))
-  exact hb.trans ((mul_le_mul_of_nonneg_left hcoeff (by positivity : (0 : ℝ) ≤ 1 / T)).trans_eq
-    (by dsimp only [Hd]; ring))
+  have hcoeff := hamiltonianEnergy_pi_le H Hd
+    (fun s hs ↦ (hdiff s hs).hasDerivWithinAt) hlip
+  exact hb.trans (div_le_div_of_nonneg_right hcoeff (by positivity))
 
 end UnitaryProducts.PaperProof

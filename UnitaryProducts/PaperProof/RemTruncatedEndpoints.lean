@@ -65,7 +65,7 @@ theorem bandProj_finrank {A : 𝕄} (hA : A.IsHermitian) (S : Finset (Fin d)) :
     (hA.eigenvectorBasis.orthonormal.comp _ Subtype.val_injective).linearIndependent
   simpa only [Fintype.card_coe] using finrank_span_eq_card hi
 
-/-- Remark 3.9: Weyl preserves the ordered indices in the actual error collar.
+/-- Remark 3.8: Weyl preserves the ordered indices in the actual error collar.
 Both hull projectors therefore have rank `S.card`. -/
 theorem truncated_endpoint_equal_rank {A D : 𝕄} (hA : A.IsHermitian) (hD : D.IsHermitian)
     {S : Finset (Fin d)} (hS : IsBand hA S) (he : ‖A - D‖ < bandGap hA hS / 2) :
@@ -85,7 +85,7 @@ theorem truncated_endpoint_equal_rank {A D : 𝕄} (hA : A.IsHermitian) (hD : D.
   rw [hp, hq]
   exact ⟨bandProj_finrank hA S, bandProj_finrank hD S⟩
 
-/-- Remark 3.9: every eigenvalue outside the band is separated from its entire
+/-- Remark 3.8: every eigenvalue outside the band is separated from its entire
 hull by `Γ`; Weyl leaves the other perturbed eigenvalues at distance at least
 `Γ-ε > ε`, while precisely the original indices lie in the `ε` collar. -/
 theorem truncated_endpoint_weyl_separation {A D : 𝕄}
@@ -133,7 +133,7 @@ theorem truncated_endpoint_weyl_separation {A D : 𝕄}
     have ht := abs_sub_le (hA.eigenvalues i) (hD.eigenvalues i) x
     linarith [hw i, hdist i hi x hx]
 
-/-- Remark 3.9, Exercise VII.1.11 and Davis–Kahan in the stated endpoint setting:
+/-- Remark 3.8, Exercise VII.1.11 and Davis–Kahan in the stated endpoint setting:
 the full projector difference equals the directed difference, followed by its
 `ε/(Γ-ε)` bound. The companion rank theorem verifies the equal-rank premise. -/
 theorem truncated_endpoint_norm_identity {A D : 𝕄}
@@ -152,7 +152,7 @@ theorem truncated_endpoint_norm_identity {A D : 𝕄}
   rw [hp, hq]
   exact UnitaryProducts.Prose.endpoint_projector_eq_directed_and_le hA hD hS he
 
-/-- Remark 3.9: at both endpoints, Weyl gives the spectral collar, separation
+/-- Remark 3.8: at both endpoints, Weyl gives the spectral collar, separation
 from the band hull, and equal projector ranks. The full and directed projector
 distances agree and satisfy Davis–Kahan; the leakage difference is bounded by
 the evolution error plus both endpoint bounds. -/

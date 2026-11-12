@@ -42,7 +42,6 @@ public import UnitaryProducts.PaperProof.ThmComparison
 - `oscillation_inverse_time_tolerance`
 - `oscillation_jrs_allocations`
 - `rem_oscillation_count_lipschitz`
-- `rem_oscillation_counts`
 - `thm_fine_steps_sup`
 - `uniform_cell_midpoint_distance`
 -/
@@ -338,14 +337,14 @@ theorem exists_fine_bits_balanced {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
     (show 0 < Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ by positivity) k σ hsp
   exact ⟨n, s, hs, hb.trans_eq (by ring)⟩
 
-/-- The three exact scalar budgets in the Example 3.8. -/
+/-- The three exact scalar budgets in the Example 3.7. -/
 theorem oscillation_jrs_allocations {C δ : ℝ} (hC : 0 < C) (hδ : 0 < δ) :
     C / (2 * C / δ) = δ / 2 ∧
     (2 * C / δ) * (δ ^ 2 / (8 * C)) = δ / 4 ∧
     δ / 2 + δ / 4 + δ / 4 = δ :=
   ⟨by field_simp, by field_simp; ring, by ring⟩
 
-/-- Example 3.8 (`cor:jrs`): the continuous bound plus two equal budgets,
+/-- Example 3.7 (`cor:jrs`): the continuous bound plus two equal budgets,
 without a variation hypothesis or an a priori number of cells.
 Any uniform sparsity upper bound is allowed; the paper uses the exact maximum. -/
 theorem cor_jrs_oscillation {H U : ℝ → 𝕄}
@@ -393,7 +392,8 @@ theorem uniform_cell_midpoint_distance (n j : ℕ) {x : ℝ}
   rw [show 1 / (2 * (n : ℝ)) = (1 / n) / 2 by ring, abs_sub_le_iff]
   constructor <;> linarith [hx.1, hx.2]
 
-/-- Remark 3.7, Lipschitz case: every integer above the stated threshold works. -/
+/-- Equal-cell estimate used by the factor-count comparison after Theorem B:
+every integer above the Lipschitz threshold meets the midpoint tolerance. -/
 theorem rem_oscillation_count_lipschitz {H : ℝ → 𝕄}
    {L ε : ℝ}
     (hε : 0 < ε)
@@ -429,25 +429,6 @@ theorem rem_oscillation_count_lipschitz {H : ℝ → 𝕄}
     -- Clear the positive denominator 2n; the chosen threshold gives the error budget.
     apply (div_le_iff₀ (mul_pos two_pos hn0)).mpr
     linarith
-
-/-- **Remark 3.7** (`rem:oscillation-counts`): the Lipschitz count,
-including every-point midpoint geometry and the error bound.
-The paper's `ℓ ≥ 0` follows from the Lipschitz hypothesis at 1 and 0. -/
-theorem rem_oscillation_counts :
-    ∀ (H : ℝ → 𝕄) (ℓ ε : ℝ), 0 < ε →
-      (∀ x ∈ Icc (0 : ℝ) 1, ∀ y ∈ Icc (0 : ℝ) 1, ‖H x - H y‖ ≤ ℓ * |x - y|) →
-      ∀ n : ℕ, max 1 (ℓ / (2 * ε)) ≤ (n : ℝ) →
-      let s := fun j : ℕ ↦ (j : ℝ) / n
-      IsCheckpointPartition n s ∧
-        (∀ j < n, ∀ x ∈ Ioo (s j) (s (j + 1)),
-          |x - (s j + s (j + 1)) / 2| ≤ 1 / (2 * n)) ∧
-        (∀ j < n, ∀ x ∈ Ioo (s j) (s (j + 1)),
-          ‖H x - H ((s j + s (j + 1)) / 2)‖ ≤ ℓ / (2 * n)) ∧
-        ℓ / (2 * n) ≤ ε ∧ HasMidpointOscillation H n s ε := by
-  intro H ℓ ε hε hLip n hn s
-  have h := rem_oscillation_count_lipschitz hε hLip n hn
-  exact ⟨h.1, fun j _ x hx ↦ uniform_cell_midpoint_distance n j hx,
-    h.2.1, h.2.2, fun j hj x hx ↦ (h.2.1 j hj x hx).trans h.2.2⟩
 
 /-- After Theorem B: the cell contribution is at most c/T exactly at tolerance c/T². -/
 theorem oscillation_inverse_time_tolerance {T ε c : ℝ} (hT : 0 < T) :

@@ -1,10 +1,10 @@
 # Paper statement and proof index
 
-Each numbered row gives the declaration for that statement. Unnumbered rows give mathematical support for the paper’s equations and arguments.
+Numbered rows correspond to the paper’s statements; unnumbered rows support its equations and mathematical prose.
 
 | Paper number | Label | Declaration | File:line |
 | --- | --- | --- | --- |
-| A | `introthm:fine-count` | `UnitaryProducts.PaperProof.introthm_fine_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:298](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L298) |
+| A | `introthm:fine-count` | `UnitaryProducts.PaperProof.introthm_fine_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:297](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L297) |
 | B | `introthm:unit` | `UnitaryProducts.PaperProof.introthm_unit` | [UnitaryProducts/PaperProof/IntroTheorems.lean:34](UnitaryProducts/PaperProof/IntroTheorems.lean#L34) |
 | 2.1 | `def:regulated` | `UnitaryProducts.Paper.IsRegulated` | [UnitaryProducts/Paper/Preliminaries.lean:155](UnitaryProducts/Paper/Preliminaries.lean#L155) |
 | 2.2 | `thm:comparison` | `UnitaryProducts.PaperProof.thm_comparison` | [UnitaryProducts/PaperProof/ThmComparison.lean:43](UnitaryProducts/PaperProof/ThmComparison.lean#L43) |
@@ -12,13 +12,12 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | 2.5 | `def:spectral-window` | `UnitaryProducts.Paper.spectralWindowData` | [UnitaryProducts/Paper/SpectralWindow.lean:74](UnitaryProducts/Paper/SpectralWindow.lean#L74) |
 | 3.1 | `def:level-function` | `UnitaryProducts.Paper.levelFunctionData` | [UnitaryProducts/Paper/FineStepBounds.lean:63](UnitaryProducts/Paper/FineStepBounds.lean#L63) |
 | 3.2 | `ex:truncation-bits` | `UnitaryProducts.PaperProof.ex_truncation_bits` | [UnitaryProducts/PaperProof/ExTruncationBits.lean:217](UnitaryProducts/PaperProof/ExTruncationBits.lean#L217) |
-| 3.3 | `def:oscillation-checkpoints` | `UnitaryProducts.PaperProof.HasMidpointOscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:77](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L77) |
-| 3.4 | `lem:oscillation-partition` | `UnitaryProducts.PaperProof.exists_oscillation_partition` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:239](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L239) |
+| 3.3 | `def:oscillation-checkpoints` | `UnitaryProducts.PaperProof.HasMidpointOscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:76](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L76) |
+| 3.4 | `lem:oscillation-partition` | `UnitaryProducts.PaperProof.exists_oscillation_partition` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:238](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L238) |
 | 3.5 | `def:midpoint-product` | `UnitaryProducts.Paper.midpointProductOver` | [UnitaryProducts/Paper/OneVariable.lean:65](UnitaryProducts/Paper/OneVariable.lean#L65) |
-| 3.6 | `thm:fine-steps` | `UnitaryProducts.PaperProof.thm_fine_steps_sup` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:211](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L211) |
-| 3.8 | `cor:jrs` | `UnitaryProducts.PaperProof.cor_jrs_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:351](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L351) |
-| 3.9 | `rem:truncated-endpoints` | `UnitaryProducts.PaperProof.rem_truncated_endpoints` | [UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean:159](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L159) |
-| 3.7 | `rem:oscillation-counts` | `UnitaryProducts.PaperProof.rem_oscillation_counts` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:436](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L436) |
+| 3.6 | `thm:fine-steps` | `UnitaryProducts.PaperProof.thm_fine_steps_sup` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:210](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L210) |
+| 3.7 | `cor:jrs` | `UnitaryProducts.PaperProof.cor_jrs_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:350](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L350) |
+| 3.8 | `rem:truncated-endpoints` | `UnitaryProducts.PaperProof.rem_truncated_endpoints` | [UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean:159](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L159) |
 | 4.3 | `ex:unit-sharp` | `UnitaryProducts.PaperProof.ex_unit_sharp` | [UnitaryProducts/PaperProof/UnitExamples.lean:188](UnitaryProducts/PaperProof/UnitExamples.lean#L188) |
 | 4.6 | `ex:unit-transfer` | `UnitaryProducts.PaperProof.ex_unit_transfer_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:853](UnitaryProducts/PaperProof/UniformConsequences.lean#L853) |
 | A.2 | `lem:walk-log` | `UnitaryProducts.PaperProof.lem_walk_log` | [UnitaryProducts/PaperProof/LemWalkLog.lean:552](UnitaryProducts/PaperProof/LemWalkLog.lean#L552) |
@@ -33,18 +32,27 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | 5.1 | `ex:gap-adapted` | `UnitaryProducts.PaperProof.ex_gap_adapted` | [UnitaryProducts/PaperProof/GapAdapted.lean:469](UnitaryProducts/PaperProof/GapAdapted.lean#L469) |
 | 5.3 | `ex:crossings` | `UnitaryProducts.PaperProof.ex_crossings` | [UnitaryProducts/PaperProof/Crossings.lean:131](UnitaryProducts/PaperProof/Crossings.lean#L131) |
 | 5.2 | `ex:precessing-spin` | `UnitaryProducts.PaperProof.Spin.ex_precessing_spin` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:1247](UnitaryProducts/PaperProof/PrecessingSpin.lean#L1247) |
-| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.thm_unit_steps_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:198](UnitaryProducts/PaperProof/UniformConsequences.lean#L198) |
 | unnumbered | `eq:products` | `UnitaryProducts.PaperProof.unit_steps_endpoint_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:170](UnitaryProducts/PaperProof/UniformConsequences.lean#L170) |
-| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.cor_unit_transfer_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:250](UnitaryProducts/PaperProof/UniformConsequences.lean#L250) |
-| unnumbered | `claim:0` | `UnitaryProducts.Prose.exists_midpointProductOver_truncation_close` | [UnitaryProducts/Prose/FineSteps.lean:171](UnitaryProducts/Prose/FineSteps.lean#L171) |
-| unnumbered | `claim:0` | `UnitaryProducts.Paper.unitary_product_evolution` | [UnitaryProducts/Evolution/RoundedClockEvolution.lean:344](UnitaryProducts/Evolution/RoundedClockEvolution.lean#L344) |
-| unnumbered | `claim:0` | `UnitaryProducts.Prose.pieceProduct_eq_evolution_of_pieces` | [UnitaryProducts/Prose/FineSteps.lean:256](UnitaryProducts/Prose/FineSteps.lean#L256) |
-| unnumbered | `claim:0` | `UnitaryProducts.Prose.exists_piecewise_recursive_evolution` | [UnitaryProducts/Prose/LocalSteps.lean:105](UnitaryProducts/Prose/LocalSteps.lean#L105) |
-| unnumbered | `claim:0` | `UnitaryProducts.Paper.bounded_path_rescale_width` | [UnitaryProducts/Prose/Introduction.lean:93](UnitaryProducts/Prose/Introduction.lean#L93) |
 | unnumbered | `claim:0` | `UnitaryProducts.Paper.regulated_evolution_rounded` | [UnitaryProducts/Evolution/RoundedClockEvolution.lean:255](UnitaryProducts/Evolution/RoundedClockEvolution.lean#L255) |
+| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.exists_rounded_evolution` | [UnitaryProducts/PaperProof/UniformTruncation.lean:36](UnitaryProducts/PaperProof/UniformTruncation.lean#L36) |
+| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.paper_walk_coefficients_isBigO` | [UnitaryProducts/PaperProof/CorProducts.lean:255](UnitaryProducts/PaperProof/CorProducts.lean#L255) |
+| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.cor_unit_transfer_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:250](UnitaryProducts/PaperProof/UniformConsequences.lean#L250) |
+| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.transfer_phase_norm` | [UnitaryProducts/PaperProof/PropTransfer.lean:37](UnitaryProducts/PaperProof/PropTransfer.lean#L37) |
+| unnumbered | `claim:0` | `UnitaryProducts.commute_specProj` | [UnitaryProducts/Evolution/RoundedTransfer.lean:34](UnitaryProducts/Evolution/RoundedTransfer.lean#L34) |
+| unnumbered | `claim:0` | `UnitaryProducts.commute_evol_right` | [UnitaryProducts/Evolution/RoundedTransfer.lean:44](UnitaryProducts/Evolution/RoundedTransfer.lean#L44) |
+| unnumbered | `claim:0` | `UnitaryProducts.isStarProjection_specProj` | [UnitaryProducts/Spectral/SinTheta.lean:342](UnitaryProducts/Spectral/SinTheta.lean#L342) |
+| unnumbered | `claim:0` | `UnitaryProducts.Paper.rounded_duhamel_quarter` | [UnitaryProducts/Prose/RoundedClockQuarter.lean:60](UnitaryProducts/Prose/RoundedClockQuarter.lean#L60) |
+| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.rounded_duhamel_display_chain` | [UnitaryProducts/PaperProof/CellEquations.lean:51](UnitaryProducts/PaperProof/CellEquations.lean#L51) |
+| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.thm_unit_steps_bounds` | [UnitaryProducts/PaperProof/UniformConsequences.lean:198](UnitaryProducts/PaperProof/UniformConsequences.lean#L198) |
 | unnumbered | `claim:0` | `UnitaryProducts.Paper.corrector_cancels_taylor` | [UnitaryProducts/Corrector/PeriodicFrameDecomposition.lean:30](UnitaryProducts/Corrector/PeriodicFrameDecomposition.lean#L30) |
+| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.truncBits_odd_from_sign` | [UnitaryProducts/PaperProof/ExTruncationBits.lean:94](UnitaryProducts/PaperProof/ExTruncationBits.lean#L94) |
+| unnumbered | `claim:0` | `UnitaryProducts.PaperProof.maxCellError` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:96](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L96) |
+| unnumbered | `claim:0` | `UnitaryProducts.Prose.exists_midpointProductOver_truncation_close` | [UnitaryProducts/Prose/FineSteps.lean:171](UnitaryProducts/Prose/FineSteps.lean#L171) |
 | unnumbered | `claim:0` | `UnitaryProducts.Paper.path_midpoint_product_error_and_infimum` | [UnitaryProducts/Paper/OneVariable.lean:188](UnitaryProducts/Paper/OneVariable.lean#L188) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.IsEvolution` | [UnitaryProducts/Paper/Preliminaries.lean:208](UnitaryProducts/Paper/Preliminaries.lean#L208) |
+| unnumbered | `claim:1` | `UnitaryProducts.Paper.unitary_product_evolution` | [UnitaryProducts/Evolution/RoundedClockEvolution.lean:344](UnitaryProducts/Evolution/RoundedClockEvolution.lean#L344) |
+| unnumbered | `claim:1` | `UnitaryProducts.Prose.pieceProduct_eq_evolution_of_pieces` | [UnitaryProducts/Prose/FineSteps.lean:256](UnitaryProducts/Prose/FineSteps.lean#L256) |
+| unnumbered | `claim:1` | `UnitaryProducts.Prose.exists_piecewise_recursive_evolution` | [UnitaryProducts/Prose/LocalSteps.lean:105](UnitaryProducts/Prose/LocalSteps.lean#L105) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.midpoint_bit_truncation_finite_precision` | [UnitaryProducts/Prose/Introduction.lean:307](UnitaryProducts/Prose/Introduction.lean#L307) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.midpoint_bit_truncation_piecewise` | [UnitaryProducts/Prose/Fidelity.lean:32](UnitaryProducts/Prose/Fidelity.lean#L32) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.duhamel` | [UnitaryProducts/Paper/Preliminaries.lean:229](UnitaryProducts/Paper/Preliminaries.lean#L229) |
@@ -62,8 +70,6 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.UnitStepsProse.path_sample_eq` | [UnitaryProducts/Prose/UnitStepsCorrector.lean:162](UnitaryProducts/Prose/UnitStepsCorrector.lean#L162) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.rounded_clock_mean_quarter` | [UnitaryProducts/Prose/ChainSteps.lean:40](UnitaryProducts/Prose/ChainSteps.lean#L40) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.rounded_hamiltonian_error_chain` | [UnitaryProducts/Prose/RoundedClockQuarter.lean:36](UnitaryProducts/Prose/RoundedClockQuarter.lean#L36) |
-| unnumbered | `claim:1` | `UnitaryProducts.Paper.rounded_duhamel_quarter` | [UnitaryProducts/Prose/RoundedClockQuarter.lean:60](UnitaryProducts/Prose/RoundedClockQuarter.lean#L60) |
-| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.rounded_duhamel_display_chain` | [UnitaryProducts/PaperProof/CellEquations.lean:51](UnitaryProducts/PaperProof/CellEquations.lean#L51) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.allSampleCorrectorFamily_ode` | [UnitaryProducts/PaperProof/UniformCells.lean:92](UnitaryProducts/PaperProof/UniformCells.lean#L92) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.allSampleCorrectorFamily_end_values` | [UnitaryProducts/PaperProof/UniformCells.lean:116](UnitaryProducts/PaperProof/UniformCells.lean#L116) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.UnitStepsProse.rounded_residual_identity` | [UnitaryProducts/Prose/UnitStepsCorrector.lean:478](UnitaryProducts/Prose/UnitStepsCorrector.lean#L478) |
@@ -79,20 +85,18 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.uniform_bit_sample_error_sigma` | [UnitaryProducts/PaperProof/UniformTruncation.lean:110](UnitaryProducts/PaperProof/UniformTruncation.lean#L110) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.truncation_path_rowSparse` | [UnitaryProducts/Prose/FineSteps.lean:75](UnitaryProducts/Prose/FineSteps.lean#L75) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.truncation_bits` | [UnitaryProducts/Paper/FineStepBounds.lean:145](UnitaryProducts/Paper/FineStepBounds.lean#L145) |
-| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.fine_bits_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:273](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L273) |
-| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.rem_oscillation_count_lipschitz` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:397](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L397) |
+| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.fine_bits_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:272](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L272) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.AllSampleWidth` | [UnitaryProducts/PaperProof/UniformCells.lean:65](UnitaryProducts/PaperProof/UniformCells.lean#L65) |
-| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_tolerance` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:453](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L453) |
-| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_count` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:459](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L459) |
-| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_count_rounding` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:465](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L465) |
-| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_budget` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:481](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L481) |
-| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_product` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:490](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L490) |
+| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_tolerance` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:434](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L434) |
+| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_count` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:440](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L440) |
+| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_count_rounding` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:446](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L446) |
+| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_budget` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:462](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L462) |
+| unnumbered | `claim:1` | `UnitaryProducts.PaperProof.oscillation_inverse_time_product` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:471](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L471) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.cor_unit_transfer` | [UnitaryProducts/PaperProof/UniformConsequences.lean:620](UnitaryProducts/PaperProof/UniformConsequences.lean#L620) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.sharp_corrected_error_asymptotic` | [UnitaryProducts/PaperProof/UnitExamples.lean:148](UnitaryProducts/PaperProof/UnitExamples.lean#L148) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.matrix_norm_eq_operator_norm` | [UnitaryProducts/Prose/FinalSteps.lean:30](UnitaryProducts/Prose/FinalSteps.lean#L30) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.norm_orthogonal_projector_le` | [UnitaryProducts/Approximation/SimulationError.lean:29](UnitaryProducts/Approximation/SimulationError.lean#L29) |
 | unnumbered | `claim:1` | `UnitaryProducts.half_step_leakage_comparison` | [UnitaryProducts/Evolution/UnitaryGenerators.lean:30](UnitaryProducts/Evolution/UnitaryGenerators.lean#L30) |
-| unnumbered | `claim:1` | `UnitaryProducts.commute_evol_right` | [UnitaryProducts/Evolution/RoundedTransfer.lean:44](UnitaryProducts/Evolution/RoundedTransfer.lean#L44) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.bounded_truncation_error_tendsto` | [UnitaryProducts/Prose/FineSteps.lean:140](UnitaryProducts/Prose/FineSteps.lean#L140) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.walk_coefficient_equivalents` | [UnitaryProducts/PaperProof/WalkCoefficients.lean:134](UnitaryProducts/PaperProof/WalkCoefficients.lean#L134) |
 | unnumbered | `claim:1` | `UnitaryProducts.stepProduct_eq_pieceProduct` | [UnitaryProducts/Walks/Logarithm.lean:43](UnitaryProducts/Walks/Logarithm.lean#L43) |
@@ -108,6 +112,7 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.hermitian_band_exponential_image` | [UnitaryProducts/PaperProof/PeriodicSpectrum.lean:200](UnitaryProducts/PaperProof/PeriodicSpectrum.lean#L200) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.unit_step_leakage_isBigO` | [UnitaryProducts/Prose/Fidelity.lean:224](UnitaryProducts/Prose/Fidelity.lean#L224) |
 | unnumbered | `claim:1` | `UnitaryProducts.Paper.band_gap_does_not_ensure_width` | [UnitaryProducts/Prose/Introduction.lean:342](UnitaryProducts/Prose/Introduction.lean#L342) |
+| unnumbered | `claim:1` | `UnitaryProducts.Paper.bounded_path_rescale_width` | [UnitaryProducts/Prose/Introduction.lean:93](UnitaryProducts/Prose/Introduction.lean#L93) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.closedCellMultiplier` | [UnitaryProducts/PaperProof/ClosedCellCorrector.lean:24](UnitaryProducts/PaperProof/ClosedCellCorrector.lean#L24) |
 | unnumbered | `claim:1` | `UnitaryProducts.PaperProof.periodicCorrector_eq_closedCell` | [UnitaryProducts/PaperProof/ClosedCellCorrector.lean:160](UnitaryProducts/PaperProof/ClosedCellCorrector.lean#L160) |
 | unnumbered | `claim:1` | `UnitaryProducts.Prose.width_resonance_distance` | [UnitaryProducts/Prose/Fidelity.lean:99](UnitaryProducts/Prose/Fidelity.lean#L99) |
@@ -163,7 +168,6 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:3` | `UnitaryProducts.PaperProof.truncBits_eq_sign_floor` | [UnitaryProducts/PaperProof/ExTruncationBits.lean:82](UnitaryProducts/PaperProof/ExTruncationBits.lean#L82) |
 | unnumbered | `claim:3` | `UnitaryProducts.Prose.bit_fraction_lt_one` | [UnitaryProducts/Prose/ChainSteps.lean:59](UnitaryProducts/Prose/ChainSteps.lean#L59) |
 | unnumbered | `claim:3` | `UnitaryProducts.Prose.truncBits_mem_uIcc` | [UnitaryProducts/Prose/FineSteps.lean:54](UnitaryProducts/Prose/FineSteps.lean#L54) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.truncBits_odd_from_sign` | [UnitaryProducts/PaperProof/ExTruncationBits.lean:94](UnitaryProducts/PaperProof/ExTruncationBits.lean#L94) |
 | unnumbered | `claim:3` | `UnitaryProducts.PaperProof.truncBits_error_chain` | [UnitaryProducts/PaperProof/ExTruncationBits.lean:158](UnitaryProducts/PaperProof/ExTruncationBits.lean#L158) |
 | unnumbered | `claim:3` | `UnitaryProducts.PaperProof.truncBits_entry_sqrt_chain` | [UnitaryProducts/PaperProof/ExTruncationBits.lean:100](UnitaryProducts/PaperProof/ExTruncationBits.lean#L100) |
 | unnumbered | `claim:3` | `UnitaryProducts.norm_le_maxRowSum` | [UnitaryProducts/Approximation/Sparse.lean:106](UnitaryProducts/Approximation/Sparse.lean#L106) |
@@ -174,18 +178,16 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:3` | `UnitaryProducts.Prose.truncHerm_entry_zero` | [UnitaryProducts/Prose/FineSteps.lean:95](UnitaryProducts/Prose/FineSteps.lean#L95) |
 | unnumbered | `claim:3` | `UnitaryProducts.Prose.truncation_error_sparsity_eq_zero` | [UnitaryProducts/Prose/FineSteps.lean:129](UnitaryProducts/Prose/FineSteps.lean#L129) |
 | unnumbered | `claim:3` | `UnitaryProducts.Prose.midpointProductOver_eq_evolution_of_pieces` | [UnitaryProducts/Prose/FineSteps.lean:282](UnitaryProducts/Prose/FineSteps.lean#L282) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.IsCheckpointPartition` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:61](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L61) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.checkpointPartition_constant_extension` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:66](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L66) |
+| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.IsCheckpointPartition` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:60](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L60) |
+| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.checkpointPartition_constant_extension` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:65](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L65) |
 | unnumbered | `claim:3` | `UnitaryProducts.exists_pieces_of_regulated` | [UnitaryProducts/Evolution/Regulated.lean:81](UnitaryProducts/Evolution/Regulated.lean#L81) |
 | unnumbered | `claim:3` | `UnitaryProducts.Paper.midpointProductOver_eq` | [UnitaryProducts/Paper/OneVariable.lean:71](UnitaryProducts/Paper/OneVariable.lean#L71) |
 | unnumbered | `claim:3` | `UnitaryProducts.Paper.midpointProduct_succ` | [UnitaryProducts/Paper/FineStepBounds.lean:349](UnitaryProducts/Paper/FineStepBounds.lean#L349) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.maxCellError` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:97](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L97) |
 | unnumbered | `claim:3` | `UnitaryProducts.evol_zero` | [UnitaryProducts/Evolution/Simulation.lean:395](UnitaryProducts/Evolution/Simulation.lean#L395) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.midpoint_duhamel_integral` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:134](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L134) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.maxCellError_le` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:123](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L123) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.exists_fine_bits_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:316](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L316) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.exists_fine_bits_balanced` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:330](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L330) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.uniform_cell_midpoint_distance` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:389](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L389) |
+| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.midpoint_duhamel_integral` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:133](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L133) |
+| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.maxCellError_le` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:122](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L122) |
+| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.exists_fine_bits_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:315](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L315) |
+| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.exists_fine_bits_balanced` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:329](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L329) |
 | unnumbered | `claim:3` | `UnitaryProducts.PaperProof.transfer_same_projectors` | [UnitaryProducts/PaperProof/PropTransfer.lean:87](UnitaryProducts/PaperProof/PropTransfer.lean#L87) |
 | unnumbered | `claim:3` | `UnitaryProducts.Prose.jrs_bound_of_distinct_band_count` | [UnitaryProducts/Prose/FineSteps.lean:334](UnitaryProducts/Prose/FineSteps.lean#L334) |
 | unnumbered | `claim:3` | `UnitaryProducts.Paper.jrsCoefficient` | [UnitaryProducts/Paper/FineStepBounds.lean:471](UnitaryProducts/Paper/FineStepBounds.lean#L471) |
@@ -193,7 +195,7 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:3` | `UnitaryProducts.Prose.jrsFunctional_mono_band_size` | [UnitaryProducts/Prose/FineSteps.lean:220](UnitaryProducts/Prose/FineSteps.lean#L220) |
 | unnumbered | `claim:3` | `UnitaryProducts.jrsFunctional` | [UnitaryProducts/Approximation/JRSComparison.lean:31](UnitaryProducts/Approximation/JRSComparison.lean#L31) |
 | unnumbered | `claim:3` | `UnitaryProducts.Paper.jrs_coefficient_tracked_exactGap` | [UnitaryProducts/Spectral/TrackedBandGap.lean:114](UnitaryProducts/Spectral/TrackedBandGap.lean#L114) |
-| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.oscillation_jrs_allocations` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:342](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L342) |
+| unnumbered | `claim:3` | `UnitaryProducts.PaperProof.oscillation_jrs_allocations` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:341](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L341) |
 | unnumbered | `claim:3` | `UnitaryProducts.Prose.endpoint_projector_eq_directed_and_le` | [UnitaryProducts/Prose/FineSteps.lean:307](UnitaryProducts/Prose/FineSteps.lean#L307) |
 | unnumbered | `claim:3` | `UnitaryProducts.endpoint_projector_bound` | [UnitaryProducts/Comparison/EndpointGap.lean:66](UnitaryProducts/Comparison/EndpointGap.lean#L66) |
 | unnumbered | `claim:3` | `UnitaryProducts.PaperProof.truncated_endpoint_equal_rank` | [UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean:70](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L70) |
@@ -249,7 +251,7 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:5` | `UnitaryProducts.Prose.unit_rhs_uniform_step_limit` | [UnitaryProducts/Prose/UnitStepsWalks.lean:245](UnitaryProducts/Prose/UnitStepsWalks.lean#L245) |
 | unnumbered | `claim:5` | `UnitaryProducts.Paper.entry_rounding_obstruction_two` | [UnitaryProducts/Approximation/EntryRounding.lean:108](UnitaryProducts/Approximation/EntryRounding.lean#L108) |
 | unnumbered | `claim:5` | `UnitaryProducts.Paper.entry_rounding_obstruction` | [UnitaryProducts/Approximation/EntryRounding.lean:66](UnitaryProducts/Approximation/EntryRounding.lean#L66) |
-| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.oscillation_exponential_tolerance` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:519](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L519) |
+| unnumbered | `claim:5` | `UnitaryProducts.PaperProof.oscillation_exponential_tolerance` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:500](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L500) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.cor_unit_transfer_min` | [UnitaryProducts/PaperProof/UniformConsequences.lean:575](UnitaryProducts/PaperProof/UniformConsequences.lean#L575) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.allSampleCorrectorFamily_center_norm_le` | [UnitaryProducts/PaperProof/UniformCells.lean:158](UnitaryProducts/PaperProof/UniformCells.lean#L158) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.lem_boundary_uniform` | [UnitaryProducts/PaperProof/UniformComparison.lean:116](UnitaryProducts/PaperProof/UniformComparison.lean#L116) |
@@ -261,7 +263,6 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.global_residual_split` | [UnitaryProducts/PaperProof/LocalCell.lean:28](UnitaryProducts/PaperProof/LocalCell.lean#L28) |
 | unnumbered | `claim:4` | `UnitaryProducts.continuousOn_of_norm_sub_le` | [UnitaryProducts/Corrector/PowerSeries.lean:70](UnitaryProducts/Corrector/PowerSeries.lean#L70) |
 | unnumbered | `claim:2` | `UnitaryProducts.PaperProof.transfer_identity` | [UnitaryProducts/PaperProof/PropTransfer.lean:29](UnitaryProducts/PaperProof/PropTransfer.lean#L29) |
-| unnumbered | `claim:2` | `UnitaryProducts.PaperProof.transfer_phase_norm` | [UnitaryProducts/PaperProof/PropTransfer.lean:37](UnitaryProducts/PaperProof/PropTransfer.lean#L37) |
 | unnumbered | `claim:2` | `UnitaryProducts.norm_le_one_of_isStarProjection` | [UnitaryProducts/Approximation/Adiabatic.lean:32](UnitaryProducts/Approximation/Adiabatic.lean#L32) |
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.rounded_cell_iff` | [UnitaryProducts/PaperProof/UniformCellGeometry.lean:30](UnitaryProducts/PaperProof/UniformCellGeometry.lean#L30) |
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.rounded_cell_description` | [UnitaryProducts/PaperProof/UniformCellGeometry.lean:41](UnitaryProducts/PaperProof/UniformCellGeometry.lean#L41) |
@@ -329,7 +330,6 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.jump_increment_eq_integral` | [UnitaryProducts/PaperProof/AffineJumps.lean:28](UnitaryProducts/PaperProof/AffineJumps.lean#L28) |
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.jumpSegment_sample_derivative` | [UnitaryProducts/PaperProof/UnifiedJumpsSupport.lean:46](UnitaryProducts/PaperProof/UnifiedJumpsSupport.lean#L46) |
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.jump_average_endpoint_errors` | [UnitaryProducts/PaperProof/AffineJumps.lean:44](UnitaryProducts/PaperProof/AffineJumps.lean#L44) |
-| unnumbered | `claim:4` | `UnitaryProducts.PaperProof.exists_rounded_evolution` | [UnitaryProducts/PaperProof/UniformTruncation.lean:36](UnitaryProducts/PaperProof/UniformTruncation.lean#L36) |
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.walk_square` | [UnitaryProducts/PaperProof/WalkCoefficients.lean:19](UnitaryProducts/PaperProof/WalkCoefficients.lean#L19) |
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.jump_average_norm_le` | [UnitaryProducts/PaperProof/AffineJumps.lean:93](UnitaryProducts/PaperProof/AffineJumps.lean#L93) |
 | unnumbered | `claim:6` | `UnitaryProducts.Corrector.frameMult_eq_frameCoeff_series` | [UnitaryProducts/Corrector/PartialFractionMultiplier.lean:16](UnitaryProducts/Corrector/PartialFractionMultiplier.lean#L16) |
@@ -399,7 +399,6 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.unified_jump_sum_bound` | [UnitaryProducts/PaperProof/PropJumps.lean:137](UnitaryProducts/PaperProof/PropJumps.lean#L137) |
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.canonical_cell_series_bounds` | [UnitaryProducts/PaperProof/LocalCell.lean:242](UnitaryProducts/PaperProof/LocalCell.lean#L242) |
 | unnumbered | `claim:4` | `UnitaryProducts.PaperProof.hamiltonianEnergy_pi_le` | [UnitaryProducts/PaperProof/ExamplesPi.lean:67](UnitaryProducts/PaperProof/ExamplesPi.lean#L67) |
-| unnumbered | `claim:4` | `UnitaryProducts.PaperProof.paper_walk_coefficients_isBigO` | [UnitaryProducts/PaperProof/CorProducts.lean:255](UnitaryProducts/PaperProof/CorProducts.lean#L255) |
 | unnumbered | `claim:app:constants` | `UnitaryProducts.PaperProof.paperWalkSquare` | [UnitaryProducts/PaperProof/CorProducts.lean:204](UnitaryProducts/PaperProof/CorProducts.lean#L204) |
 | unnumbered | `claim:app:constants` | `UnitaryProducts.PaperProof.paperWalkSquare_eq_series` | [UnitaryProducts/PaperProof/CorProducts.lean:212](UnitaryProducts/PaperProof/CorProducts.lean#L212) |
 | unnumbered | `claim:app:constants` | `UnitaryProducts.PaperProof.uniform_c1` | [UnitaryProducts/PaperProof/UniformConstants.lean:46](UnitaryProducts/PaperProof/UniformConstants.lean#L46) |
@@ -534,8 +533,6 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:6` | `UnitaryProducts.PaperProof.qaoa_smooth_unitary_family` | [UnitaryProducts/PaperProof/ExamplesProse.lean:22](UnitaryProducts/PaperProof/ExamplesProse.lean#L22) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.X` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:25](UnitaryProducts/PaperProof/PrecessingSpin.lean#L25) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.Spin.Z` | [UnitaryProducts/PaperProof/PrecessingSpin.lean:29](UnitaryProducts/PaperProof/PrecessingSpin.lean#L29) |
-| unnumbered | `claim:5` | `UnitaryProducts.isStarProjection_specProj` | [UnitaryProducts/Spectral/SinTheta.lean:342](UnitaryProducts/Spectral/SinTheta.lean#L342) |
-| unnumbered | `claim:5` | `UnitaryProducts.commute_specProj` | [UnitaryProducts/Evolution/RoundedTransfer.lean:34](UnitaryProducts/Evolution/RoundedTransfer.lean#L34) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.gapEigen_lipschitz` | [UnitaryProducts/PaperProof/GapAdapted.lean:65](UnitaryProducts/PaperProof/GapAdapted.lean#L65) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.gapInterp_norm_le` | [UnitaryProducts/PaperProof/GapAdapted.lean:47](UnitaryProducts/PaperProof/GapAdapted.lean#L47) |
 | unnumbered | `claim:5` | `UnitaryProducts.PaperProof.gapInterp_eigenvalue_bounds` | [UnitaryProducts/PaperProof/GapAdapted.lean:218](UnitaryProducts/PaperProof/GapAdapted.lean#L218) |
@@ -628,11 +625,3 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 | unnumbered | `claim:app:constants` | `UnitaryProducts.walkLogSlope_zero` | [UnitaryProducts/Walks/LogHessian.lean:74](UnitaryProducts/Walks/LogHessian.lean#L74) |
 | unnumbered | `claim:app:constants` | `UnitaryProducts.PaperProof.constants_zero_limits` | [UnitaryProducts/PaperProof/CorProducts.lean:222](UnitaryProducts/PaperProof/CorProducts.lean#L222) |
 | unnumbered | `claim:5` | `UnitaryProducts.Paper.walkCubic_sample` | [UnitaryProducts/Comparison/UnitSteps.lean:110](UnitaryProducts/Comparison/UnitSteps.lean#L110) |
-
-The statement labeled `cor:walks` is Theorem 4.5; `cor:walk-leakage` is Theorem 4.7.
-
-Remark 3.9 also uses the following declarations for equal rank, separation, and the projector norm identity:
-
-- [`UnitaryProducts.PaperProof.truncated_endpoint_equal_rank`](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L70)
-- [`UnitaryProducts.PaperProof.truncated_endpoint_weyl_separation`](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L91)
-- [`UnitaryProducts.PaperProof.truncated_endpoint_norm_identity`](UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L139)

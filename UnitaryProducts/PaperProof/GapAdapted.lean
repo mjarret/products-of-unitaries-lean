@@ -9,6 +9,7 @@ public import Mathlib.MeasureTheory.Integral.Layercake
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 public import UnitaryProducts.Spectral.Weyl
 public import UnitaryProducts.PaperProof.ExamplesPi
+public import UnitaryProducts.PaperProof.Crossings
 
 /-! # Gap-adapted schedules
 
@@ -462,7 +463,7 @@ theorem gap_derivative_endpoints (D : 𝕄) {Γ u : ℝ → ℝ} {p cp : ℝ}
 /-- **Example 5.1** (`ex:gap-adapted`): the affine gap-adapted schedule transfers
 its continuous leakage bound to the sampled product. The ground projectors may
 be replaced by any commuting orthogonal endpoint projectors. The proof follows
-the paper: Weyl regularity, ODE normalization, derivative bounds, Proposition 2.4,
+the paper: Weyl regularity, ODE normalization, derivative bounds, equation (5.2),
 and the width-pi specialization (5.1). -/
 theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁.IsHermitian)
     (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1)
@@ -512,12 +513,10 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
     exact (gapInterp_width h₀ h₁ hn₀ hn₁ (hurange (walkCubic_sample hj)) i k).trans
       (by linarith [Real.pi_gt_three])
   have hcomparison := products_pi hT H Hd U hH hd hlip hwidth hU
-  have htransfer := prop_transfer (U := U T) (W := (unitProduct H T).1)
-    hP hQ hP hQ (evol_mem_unitary (hH 1 (by norm_num)) (1 / 2))
-    (evol_mem_unitary (hH 0 (by norm_num)) (-(1 / 2)))
-    (commute_evol_right (show Commute Q (H 1) by rw [hH1]; exact hQc) (1 / 2)).symm
-    (commute_evol_right (show Commute P (H 0) by rw [hH0]; exact hPc) (-(1 / 2))).symm
-  simp only [sub_self, norm_zero, add_zero, mul_zero] at htransfer
+  have htransfer := leak_transfer H T (U T) P Q
+    (hH 0 (by norm_num)) (hH 1 (by norm_num)) hP hQ
+    (show Commute P (H 0) by rw [hH0]; exact hPc)
+    (show Commute Q (H 1) by rw [hH1]; exact hQc)
   have hends : ‖Hd 0‖ + ‖Hd 1‖ = cp * ‖D‖ * (Γ 0 ^ p + Γ 1 ^ p) :=
     gap_derivative_endpoints D hcp (hpos 0 (by norm_num)).le (hpos 1 (by norm_num)).le hu0 hu1
   have hsup : unitSupNorm Hd ≤ 2 ^ p * cp * ‖D‖ :=
@@ -540,8 +539,7 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
         b * (2 ^ p * cp * ‖D‖) ^ 2) := mul_le_mul_of_nonneg_left
           (add_le_add_right (mul_le_mul_of_nonneg_left hsq hb) _) (by positivity)
       _ = _ := by rw [hfour]; ring
-  have hle := (le_abs_self _).trans (htransfer.trans hcoarse)
-  linarith
+  linarith only [htransfer, hcoarse]
 
 /-- The inverse-power threshold used in the layer-cake calculation following
 Example 5.1. -/

@@ -31,6 +31,18 @@ theorem commuting_endpoint_transfer (H : ℝ → 𝕄) (T : ℕ) (U P Q : 𝕄)
     (commute_evol_right hPc (-(1 / 2))).symm
   simpa only [sub_self, norm_zero, add_zero, mul_zero] using htransfer
 
+/-- Equation (5.2), `eq:leak-transfer`: commuting endpoint projectors remove
+the half-step phases, and the comparison error bounds the added leakage. -/
+theorem leak_transfer (H : ℝ → 𝕄) (T : ℕ) (U P Q : 𝕄)
+    (hH0 : (H 0).IsHermitian) (hH1 : (H 1).IsHermitian)
+    (hP : IsStarProjection P) (hQ : IsStarProjection Q)
+    (hPc : Commute P (H 0)) (hQc : Commute Q (H 1)) :
+    ‖(1 - Q) * (unitProduct H T).1 * P‖ ≤ ‖(1 - Q) * U * P‖ +
+      ‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) - U‖ := by
+  have htransfer := commuting_endpoint_transfer H T U P Q hH0 hH1 hP hQ hPc hQc
+  have hdifference := (le_abs_self _).trans htransfer
+  linarith
+
 /-- The crossing proof: the endpoint transfer and the explicit `1/T`
 comparison from (4.6), with a coefficient independent of the step count. -/
 theorem crossing_comparison_bound [NeZero d] {T : ℕ} (hT : 0 < T)
@@ -47,13 +59,13 @@ theorem crossing_comparison_bound [NeZero d] {T : ℕ} (hT : 0 < T)
     let V := evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2))
     let c₀ := cellConstant w
     let c₁ := c₀ / 4 + 1 / 64
-    |‖(1 - P 1) * (unitProduct H T).1 * P 0‖ - ‖(1 - P 1) * U T * P 0‖| ≤
-      ‖V - U T‖ ∧
+    ‖(1 - P 1) * (unitProduct H T).1 * P 0‖ ≤
+      ‖(1 - P 1) * U T * P 0‖ + ‖V - U T‖ ∧
     ‖V - U T‖ ≤ (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
       (1 / 24 + frameMult w) * L + (c₁ + 2 * deriv frameMult w) * unitSupNorm Hd ^ 2) := by
   have hzero : (0 : ℝ) ∈ Icc (0 : ℝ) 1 := by norm_num
   have hone : (1 : ℝ) ∈ Icc (0 : ℝ) 1 := by norm_num
-  refine ⟨commuting_endpoint_transfer H T (U T) (P 0) (P 1)
+  refine ⟨leak_transfer H T (U T) (P 0) (P 1)
     (hH 0 hzero) (hH 1 hone) (hP 0 hzero) (hP 1 hone) (hPc 0 hzero) (hPc 1 hone), ?_⟩
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
@@ -65,13 +77,12 @@ theorem crossing_comparison_bound [NeZero d] {T : ℕ} (hT : 0 < T)
 transfers through an operator comparison tending to zero. The cited
 Avron--Elgart theorem supplies the continuous limit, not a new project axiom. -/
 theorem crossing_leakage_tendsto_zero {a b e : ℕ → ℝ}
-    (hbound : ∀ᶠ T in atTop, |a T - b T| ≤ e T)
+    (ha : ∀ T, 0 ≤ a T) (hbound : ∀ᶠ T in atTop, a T ≤ b T + e T)
     (hb : Tendsto b atTop (𝓝 0)) (he : Tendsto e atTop (𝓝 0)) :
     Tendsto a atTop (𝓝 0) := by
-  have hdiff : Tendsto (fun T ↦ a T - b T) atTop (𝓝 0) :=
-    (tendsto_zero_iff_abs_tendsto_zero _).mpr
-      (squeeze_zero' (Filter.Eventually.of_forall (fun _ ↦ abs_nonneg _)) hbound he)
-  simpa only [sub_add_cancel, zero_add] using hdiff.add hb
+  have hsum : Tendsto (fun T ↦ b T + e T) atTop (𝓝 0) := by
+    simpa only [zero_add] using hb.add he
+  exact squeeze_zero' (Eventually.of_forall ha) hbound hsum
 
 /-- Removing one point from the unit interval leaves a set dense in that
 interval; this is the continuity step at a possibly exceptional endpoint. -/
@@ -119,7 +130,7 @@ theorem crossing_projectors_extend (H P : ℝ → 𝕄)
 /-- **Example 5.3** (`ex:crossings`): a continuous spectral projector through
 one crossing transfers the assumed continuous leakage limit to the discrete
 product. The proof derives endpoint commutation by continuity, applies
-Proposition 2.4 with the half-step phases, and uses (4.6) with one coefficient
+equation (5.2), and uses (4.6) with one coefficient
 independent of `T`. -/
 theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
     (U : ℕ → ℝ → 𝕄)
@@ -145,17 +156,21 @@ theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
     (1 / 24 + frameMult w) * L +
     (cellConstant w / 4 + 1 / 64 + 2 * deriv frameMult w) * unitSupNorm Hd ^ 2
   have hcomparison : ∀ᶠ T : ℕ in atTop,
-      |‖(1 - P 1) * (unitProduct H T).1 * P 0‖ -
-        ‖(1 - P 1) * U T T * P 0‖| ≤ (1 / T : ℝ) * C := by
+      ‖(1 - P 1) * (unitProduct H T).1 * P 0‖ ≤
+        ‖(1 - P 1) * U T T * P 0‖ + (1 / T : ℝ) * C := by
     filter_upwards [eventually_gt_atTop (0 : ℕ)] with T hT
     have hbound := crossing_comparison_bound hT H Hd (U T) P hH hd hlip hw
       (hwidth T hT) (hU T hT)
       (fun s hs ↦ (hprojectors s hs).1) (fun s hs ↦ (hprojectors s hs).2)
-    exact hbound.1.trans hbound.2
+    have hleak := hbound.1
+    have herror := hbound.2
+    change _ ≤ (1 / T : ℝ) * C at herror
+    linarith only [hleak, herror]
   have hvanishing : Tendsto (fun T : ℕ ↦ (1 / T : ℝ) * C) atTop (𝓝 0) := by
     simpa only [zero_mul] using
       (tendsto_const_div_atTop_nhds_zero_nat (1 : ℝ)).mul_const C
-  exact crossing_leakage_tendsto_zero hcomparison hcontinuous hvanishing
+  exact crossing_leakage_tendsto_zero (fun _ ↦ norm_nonneg _)
+    hcomparison hcontinuous hvanishing
 
 /-- Section 5's opening to the crossing example: two diagonal eigenvalues cross
 while their rank-one coordinate projectors extend continuously through the crossing. -/

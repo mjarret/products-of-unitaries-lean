@@ -1324,8 +1324,33 @@ theorem odd_frozen_rotation (β δ : ℝ) (k : ℕ) :
     evol_involution (xz_angle_relations _).1 (xz_angle_relations _).2,
     mul_sub, mul_smul_comm, mul_smul_comm, mul_one, (xz_angle_relations _).2]
 
-/-- The geometric norm display in Example 5.2(i), with the common unit
-complex phase removed. -/
+/-- The first line of the norm display in Example 5.2(i): after removing
+the common rotating frame, both factors are powers of their Pauli axes. -/
+theorem odd_error_powered (θ : ℝ) (k : ℕ) :
+    let T : ℕ := 2 * k + 1
+    let δ := Real.sqrt (π ^ 2 * (T : ℝ) ^ 2 + θ ^ 2) / 2 - π * T / 2
+    let N := xz (Real.cos (θ / (2 * T))) (-Real.sin (θ / (2 * T)))
+    let M := xz (Real.cos (Real.arctan (θ / (π * T))))
+      (-Real.sin (Real.arctan (θ / (π * T))))
+    ‖frameError π θ T‖ = ‖((-I) • N) ^ T - ((-I) • M) ^ T * evol M δ‖ := by
+  intro T δ N M
+  have ht : 0 < (T : ℝ) := by dsimp [T]; positivity
+  have hr : Real.sqrt ((π * (T : ℝ)) ^ 2 + θ ^ 2) / 2 = π * T / 2 + δ := by
+    dsimp [δ]
+    rw [mul_pow]
+    ring
+  have hhalf : evol M (π / 2) = (-I) • M := by
+    dsimp [M]
+    rw [← half_turn_step, half_turn_step_scalar]
+  apply congrArg norm
+  unfold frameError
+  rw [half_turn_step_scalar, frozen_axis_angle (mul_pos pi_pos ht), hr, evol_add]
+  change ((-I) • N) ^ T - evol M (π * T / 2) * evol M δ = _
+  rw [show π * (T : ℝ) / 2 = (T : ℝ) * (π / 2) by ring, evol_nat_mul, hhalf]
+
+/-- The three-line norm calculation in Example 5.2(i): first expose the
+powered axes, then remove their common unit phase and expand the residual
+rotation, and finally take the square root of the adjoint square. -/
 theorem odd_error_geometric (θ : ℝ) (k : ℕ) :
     let T : ℕ := 2 * k + 1
     let δ := Real.sqrt (π ^ 2 * (T : ℝ) ^ 2 + θ ^ 2) / 2 - π * T / 2
@@ -1336,23 +1361,30 @@ theorem odd_error_geometric (θ : ℝ) (k : ℕ) :
     ‖frameError π θ T‖ = ‖A + (I * Real.sin δ) • 1‖ ∧
       ‖frameError π θ T‖ = Real.sqrt (‖A‖ ^ 2 + Real.sin δ ^ 2) := by
   intro T δ α β A
-  have ht : 0 < (T : ℝ) := by dsimp [T]; positivity
-  have hr : Real.sqrt ((π * (T : ℝ)) ^ 2 + θ ^ 2) / 2 = π * T / 2 + δ := by
-    dsimp [δ]
-    rw [mul_pow]
-    ring
-  have he : frameError π θ T = (-I) ^ T • (A + (I * Real.sin δ) • 1) := by
-    unfold frameError
-    rw [odd_step_power, frozen_axis_angle (mul_pos pi_pos ht), hr]
-    have htcast : (T : ℝ) = 2 * (k : ℝ) + 1 := by dsimp [T]; push_cast; rfl
-    rw [htcast, odd_frozen_rotation]
-    dsimp [A, α, β, T]
-    push_cast
+  let N := xz (Real.cos α) (-Real.sin α)
+  let M := xz (Real.cos β) (-Real.sin β)
+  have hN : ((-I) • N) ^ T = (-I) ^ T • N := by
+    simpa only [half_turn_step_scalar] using odd_step_power α k
+  have hM : ((-I) • M) ^ T = (-I) ^ T • M := by
+    simpa only [half_turn_step_scalar] using odd_step_power β k
+  have hresidual : (-I) ^ T • (M * evol M δ) =
+      (-I) ^ T • ((Real.cos δ : ℂ) • M - (I * Real.sin δ) • 1) := by
+    have hrotation := odd_frozen_rotation β δ k
+    rw [odd_frozen_rotation_factor] at hrotation
+    exact hrotation
+  have hsecond : ((-I) • N) ^ T - ((-I) • M) ^ T * evol M δ =
+      (-I) ^ T • (A + (I * Real.sin δ) • 1) := by
+    rw [hN, hM, smul_mul_assoc, hresidual]
+    dsimp [N, M, A]
     simp only [smul_add, smul_sub]
     abel
   have hn : ‖frameError π θ T‖ = ‖A + (I * Real.sin δ) • 1‖ := by
-    rw [he, norm_smul, norm_pow]
-    simp
+    calc
+      ‖frameError π θ T‖ = ‖((-I) • N) ^ T - ((-I) • M) ^ T * evol M δ‖ :=
+        odd_error_powered θ k
+      _ = ‖A + (I * Real.sin δ) • 1‖ := by
+        rw [hsecond, norm_smul, norm_pow]
+        simp
   refine ⟨hn, hn.trans ?_⟩
   have ha : A = xz (Real.cos α - Real.cos δ * Real.cos β)
       (-Real.sin α + Real.cos δ * Real.sin β) := by

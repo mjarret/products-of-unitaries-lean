@@ -70,7 +70,7 @@ The entries pair the paper’s equations and mathematical prose with their suppo
 
 10. **LEAN** — Section 1
 
-    A finite product is the exact evolution of a piecewise-constant Hamiltonian.
+    When we describe evolution by a finite product, we describe the exact evolution of a piecewise-constant Hamiltonian.
 
     UnitaryProducts.Paper.unitary_product_evolution; UnitaryProducts.Prose.pieceProduct_eq_evolution_of_pieces; UnitaryProducts.Prose.exists_piecewise_recursive_evolution
 

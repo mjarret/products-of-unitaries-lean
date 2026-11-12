@@ -17,7 +17,7 @@ namespace UnitaryProducts.PaperProof
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- The last paragraph of Theorem 4.5: the reflected sine equals
+/-- Appendix B: the reflected sine equals
 `sin (θ/2)`, which is asymptotic to `θ/2` as the empty arc shrinks. -/
 theorem free_arc_sine_equivalent :
     (∀ θ : ℝ, Real.sin ((2 * π - θ) / 2) = Real.sin (θ / 2)) ∧
@@ -30,7 +30,7 @@ theorem free_arc_sine_equivalent :
   simpa only [Function.comp_def, id_eq] using
     Real.isEquivalent_sin.comp_tendsto hhalf
 
-/-- The endpoint coefficient in Theorem 4.5, in its stated sine form.
+/-- Appendix B: the endpoint coefficient in its stated sine form.
 The sine equivalent gives the leading term, and the remaining term vanishes. -/
 theorem cellConstant_walk_endpoint_equivalent :
     Asymptotics.IsEquivalent (𝓝[>] 0)
@@ -78,7 +78,7 @@ set_option maxHeartbeats 1200000 in
 -- Collecting the logarithm comparison expands the three scalar coefficient formulas.
 /-- The arc-coordinate auxiliary for **Theorem 4.5** (`cor:walks`): use the logarithm of Lemma A.2,
 Theorem 4.4(ii), and Theorem 4.2. Collect the three
-coefficients and prove their stated equivalents as the empty arc shrinks. -/
+coefficients and retain their Appendix B equivalents as the empty arc shrinks. -/
 theorem unitary_products_of_arc [NeZero d] (T : ℕ) (hT : 0 < T) :
     ∀ (a : ℝ → ℝ) (θ : ℝ)
     (_hθ : 0 < θ) (_hθmax : θ ≤ 2 * π) (W : ℝ → 𝕄)
@@ -200,11 +200,12 @@ theorem unitary_products_series_bound [NeZero d] (T : ℕ) (hT : 0 < T)
   simpa only [hwidthId] using result
 
 
-/-- The coefficient `c₂` of Theorem 4.5, with Definition 4.1's closed function. -/
+/-- Appendix B: the coefficient `c₂`, with Definition 4.1's closed function. -/
 def paperWalkSquare (w : ℝ) : ℝ :=
+  let c₁ := cellConstant w / 4 + 1 / 64
   let κ := if w = 0 then 1 else (w / 2) / Real.sin (w / 2)
   (1 / 24 + frameMult w) / Real.cos (w / 4) ^ 2 +
-    (cellConstant w / 4 + 1 / 64) * κ ^ 2 + 2 * deriv frameMult w * κ +
+    c₁ * κ ^ 2 + 2 * deriv frameMult w * κ +
     (frameMult w - frameMult 0) * κ ^ 2
 
 /-- The closed coefficient agrees with its convergent-series calculation. -/
@@ -215,11 +216,94 @@ theorem paperWalkSquare_eq_series {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) :
     paperFrameMult_eq_series (le_refl 0) (by positivity : (0 : ℝ) < 2 * π),
     cellConstant_eq_frameBound hw0 hw, ← walkLogSlope_closed hw0 hw]
 
+/-- Appendix B: the assigned values of `c₀` and `κ` at width zero are
+limits of their closed formulas. The first follows from the analytic frame
+multiplier, and the second from continuity of the sinc function. -/
+theorem constants_zero_limits :
+    Tendsto cellConstant (𝓝 (0 : ℝ)) (𝓝 (1 / 24)) ∧
+    Tendsto (fun w : ℝ ↦ if w = 0 then 1 else (w / 2) / Real.sin (w / 2))
+      (𝓝 0) (𝓝 1) := by
+  have hframe := UnitaryProducts.Separation.analyticAt_frameMult_zero.continuousAt
+  have hhalf : ContinuousAt (fun w : ℝ ↦ w / 2) 0 :=
+    continuousAt_id.div_const 2
+  have hframe_half : ContinuousAt (fun w : ℝ ↦ frameMult (w / 2)) 0 :=
+    hframe.comp_of_eq hhalf (by simp)
+  have hcell : ContinuousAt (fun w : ℝ ↦ frameMult w - frameMult (w / 2) / 2) 0 :=
+    hframe.sub (hframe_half.div_const 2)
+  have hcell_eq : cellConstant =ᶠ[𝓝 (0 : ℝ)]
+      (fun w ↦ frameMult w - frameMult (w / 2) / 2) := by
+    filter_upwards [eventually_abs_sub_lt (0 : ℝ) (by positivity : 0 < 2 * π)] with w hw
+    exact cellConstant_eq_frameMult (by simpa only [sub_zero] using hw)
+  have hsinc : ContinuousAt (fun w : ℝ ↦ Real.sinc (w / 2)) 0 :=
+    Real.continuous_sinc.continuousAt.comp (by simpa only [zero_div] using hhalf)
+  have hsinc_ne : Real.sinc ((0 : ℝ) / 2) ≠ 0 := by simp
+  have hkappa := (hsinc.inv₀ hsinc_ne).tendsto
+  refine ⟨?_, ?_⟩
+  · simpa only [cellConstant, if_pos rfl] using
+      (hcell.congr_of_eventuallyEq hcell_eq).tendsto
+  · have hkappa_eq (w : ℝ) : (Real.sinc (w / 2))⁻¹ =
+        if w = 0 then 1 else (w / 2) / Real.sin (w / 2) := by
+      by_cases hw : w = 0
+      · simp [hw]
+      · rw [if_neg hw, Real.sinc_of_ne_zero (div_ne_zero hw (by norm_num)), inv_div]
+    simpa only [zero_div, Real.sinc_zero, inv_one, hkappa_eq] using hkappa
+
+/-- Appendix B and Theorem 4.5: each of the three coefficients of
+`𝓔̃_w(W)` is bounded by a constant times the inverse cube of the free arc.
+The first two exact equivalents are inverse squares, hence give the weaker
+common bound after multiplying their scaled limits by the free arc. -/
+theorem paper_walk_coefficients_isBigO :
+    let κ : ℝ → ℝ := fun w ↦ if w = 0 then 1 else (w / 2) / Real.sin (w / 2)
+    Asymptotics.IsBigO (𝓝[>] 0)
+      (fun θ ↦ cellConstant (2 * π - θ) * κ (2 * π - θ))
+      (fun θ : ℝ ↦ 1 / θ ^ 3) ∧
+    Asymptotics.IsBigO (𝓝[>] 0)
+      (fun θ ↦ (1 / 24 + frameMult (2 * π - θ)) * κ (2 * π - θ))
+      (fun θ : ℝ ↦ 1 / θ ^ 3) ∧
+    Asymptotics.IsBigO (𝓝[>] 0) (fun θ ↦ paperWalkSquare (2 * π - θ))
+      (fun θ : ℝ ↦ 1 / θ ^ 3) := by
+  intro κ
+  have of_scaled_limit (f : ℝ → ℝ) (c : ℝ)
+      (h : Tendsto (fun θ ↦ f θ * θ ^ 3) (𝓝[>] 0) (𝓝 c)) :
+      Asymptotics.IsBigO (𝓝[>] 0) f (fun θ : ℝ ↦ 1 / θ ^ 3) := by
+    refine Asymptotics.isBigO_of_div_tendsto_nhds ?_ c ?_
+    · filter_upwards [self_mem_nhdsWithin] with θ hθ
+      exact fun hzero ↦ False.elim ((one_div_ne_zero (pow_ne_zero _ (ne_of_gt hθ))) hzero)
+    · simpa only [Pi.div_def, div_div_eq_mul_div, div_one] using h
+  obtain ⟨hend, hsecond, hsquare⟩ := walk_coefficient_limits
+  have hid : Tendsto (fun θ : ℝ ↦ θ) (𝓝[>] 0) (𝓝 0) := nhdsWithin_le_nhds
+  have hev : ∀ᶠ θ in 𝓝[>] (0 : ℝ), θ ∈ Ioo 0 π := Ioo_mem_nhdsGT pi_pos
+  refine ⟨of_scaled_limit _ 0 ?_, of_scaled_limit _ 0 ?_,
+    of_scaled_limit _ (8 / π + 5 * π / 2 + 2) ?_⟩
+  · have h := hend.mul hid
+    rw [mul_zero] at h
+    apply h.congr'
+    filter_upwards [hev] with θ hθ
+    have hw0 : 0 ≤ 2 * π - θ := by linarith [hθ.2, pi_pos]
+    have hw : 2 * π - θ < 2 * π := by linarith [hθ.1]
+    dsimp only [κ]
+    rw [walkLogSlope_closed hw0 hw, cellConstant_eq_frameBound hw0 hw]
+    dsimp only [uniform_c0]
+    ring
+  · have h := hsecond.mul hid
+    rw [mul_zero] at h
+    apply h.congr'
+    filter_upwards [hev] with θ hθ
+    have hw0 : 0 ≤ 2 * π - θ := by linarith [hθ.2, pi_pos]
+    have hw : 2 * π - θ < 2 * π := by linarith [hθ.1]
+    dsimp only [κ]
+    rw [walkLogSlope_closed hw0 hw, paperFrameMult_eq_series hw0 hw]
+    dsimp only [walkUniformSecond]
+    ring
+  · apply hsquare.congr'
+    filter_upwards [hev] with θ hθ
+    rw [paperWalkSquare_eq_series (by linarith [hθ.2, pi_pos]) (by linarith [hθ.1])]
+
 end UnitaryProducts.PaperProof
 
 namespace UnitaryProducts.Paper
 
-/-- The coefficient `𝓔̃_w(W)` in Theorem 4.5, equation (4.7), including the
+/-- Appendix B: the coefficient `𝓔̃_w(W)` used in Theorem 4.5, including the
 continuous value `κ = 1` at width zero. -/
 def walkEnergy {d : ℕ} (w : ℝ) (W : ℝ → Matrix (Fin d) (Fin d) ℂ) : ℝ :=
   let Wd := derivWithin W (Icc (0 : ℝ) 1)
@@ -236,9 +320,9 @@ variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
 /-- **Theorem 4.5** (`cor:walks`): the unitary-family comparison with the
-closed constants of Definition 4.1. The phased product is the endpoint of the
-rounded Hamiltonian evolution. The unused Lipschitz premise is omitted, and the rounded evolution
-is also constructed. -/
+constants of Appendix B and multiplier of Definition 4.1. The phased product is the
+rounded evolution's endpoint. The unused Lipschitz premise is omitted, and the rounded
+evolution is also constructed. -/
 theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
     (H : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     {w : ℝ} (hw : w < 2 * π) (hcH : ContDiffOn ℝ 2 H (Icc (0 : ℝ) 1))
@@ -255,6 +339,14 @@ theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
       (fun δ ↦ 1 / δ ^ 2) ∧
     Asymptotics.IsEquivalent (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
       (fun δ ↦ (8 / π + 5 * π / 2 + 2) / δ ^ 3) ∧
+    (let κ : ℝ → ℝ := fun x ↦ if x = 0 then 1 else (x / 2) / Real.sin (x / 2);
+      Asymptotics.IsBigO (𝓝[>] 0)
+        (fun δ ↦ cellConstant (2 * π - δ) * κ (2 * π - δ)) (fun δ : ℝ ↦ 1 / δ ^ 3) ∧
+      Asymptotics.IsBigO (𝓝[>] 0)
+        (fun δ ↦ (1 / 24 + frameMult (2 * π - δ)) * κ (2 * π - δ))
+        (fun δ : ℝ ↦ 1 / δ ^ 3) ∧
+      Asymptotics.IsBigO (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
+        (fun δ : ℝ ↦ 1 / δ ^ 3)) ∧
     (∃ V : ℝ → 𝕄,
       IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T ∧
       V T = evol (H 1) (1 / 2) * (walk W T).2 * evol (H 0) (-(1 / 2))) := by
@@ -264,7 +356,7 @@ theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
   have hseries := unitary_products_series_bound T hT H hH hw hcH hwidth
   dsimp only at hseries
   have hev : ∀ᶠ δ in 𝓝[>] (0 : ℝ), δ ∈ Ioo 0 π := Ioo_mem_nhdsGT pi_pos
-  refine ⟨?_, hseries.2.1, ?_, ?_, ?_⟩
+  refine ⟨?_, hseries.2.1, ?_, ?_, paper_walk_coefficients_isBigO, ?_⟩
   · intro U hU
     rw [div_eq_mul_one_div (walkEnergy w _) (T : ℝ),
       mul_comm (walkEnergy w _) (1 / (T : ℝ))]

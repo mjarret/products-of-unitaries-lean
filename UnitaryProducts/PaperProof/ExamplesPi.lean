@@ -62,7 +62,7 @@ theorem products_pi_decimal_coefficients :
         5 / 8 * (1 / π) - 1 / 4 * (1 / π) ^ 2 - 4 * (1 / π) ^ 3 + 1 / 64 by ring]
     linarith
 
-/-- The display after (4.6): `𝓔_π(H)` is bounded by the three decimal
+/-- The width-pi display in Appendix B: `𝓔_π(H)` is bounded by the three decimal
 coefficients of Theorem B. Bound the endpoint norms, then each coefficient. -/
 theorem hamiltonianEnergy_pi_le (H Hd : ℝ → 𝕄)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)

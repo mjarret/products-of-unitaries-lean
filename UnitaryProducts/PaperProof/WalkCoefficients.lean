@@ -15,28 +15,11 @@ open scoped Topology
 open UnitaryProducts.Corrector UnitaryProducts.Paper UnitaryProducts.Prose
 namespace UnitaryProducts.PaperProof
 
-/-- The squared unitary-derivative coefficient in Theorem 4.5. -/
+/-- Appendix B: the squared unitary-derivative coefficient used in Theorem 4.5. -/
 def walk_square (w : ℝ) : ℝ :=
   (1 / 24 + frameBound w) / Real.cos (w / 4) ^ 2 +
     uniform_c1 w * walkLogSlope w ^ 2 + 2 * frameLip w * walkLogSlope w +
     (frameBound w - frameBound 0) * walkLogSlope w ^ 2
-
-/-- The displayed definition of `c₂`, expressed in the paper's series and
-continuous sine quotient. -/
-theorem walk_square_eq_paper {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) :
-    let N : ℝ → ℝ := fun x ↦ ∑' n : ℕ+, 2 / (4 * π ^ 2 * (n : ℝ) ^ 2 - x ^ 2)
-    let κ : ℝ → ℝ := fun x ↦ if x = 0 then 1 else (x / 2) / Real.sin (x / 2)
-    walk_square w = (1 / 24 + N w) / Real.cos (w / 4) ^ 2 +
-      ((N w - N (w / 2) / 2) / 4 + 1 / 64) * κ w ^ 2 +
-      2 * deriv N w * κ w + (N w - N 0) * κ w ^ 2 := by
-  intro N κ
-  rw [show κ w = walkLogSlope w from walkLogSlope_closed hw0 hw]
-  dsimp only [N]
-  rw [(paper_series_eq hw0 hw).1, (paper_series_eq hw0 hw).2,
-    (paper_series_eq (show 0 ≤ w / 2 by positivity)
-      (show w / 2 < 2 * π by linarith)).1,
-    (paper_series_eq (le_refl 0) (by positivity : (0 : ℝ) < 2 * π)).1]
-  rfl
 
 /-- Substitution of the logarithm derivative bounds collects precisely `c₂`.
 This is the last algebraic step of the proof of Theorem 4.5. -/
@@ -89,7 +72,7 @@ theorem scalar_edge_limits :
         (by linarith : (2 * π - θ) / 2 < 2 * π)).1]
     rfl
 
-/-- The four summands in the proof of Theorem 4.5 contribute respectively
+/-- The four summands in Appendix B's asymptotic proof contribute respectively
 `8/π`, `π/2`, `2`, and `2π` after multiplication by the cubed free arc. -/
 theorem walk_square_leading_terms :
     Tendsto (fun θ ↦ θ ^ 3 * ((1 / 24 + frameBound (2 * π - θ)) /
@@ -122,7 +105,7 @@ theorem walk_square_leading_terms :
     convert h using 1
     exact funext fun θ ↦ by ring
 
-/-- Theorem 4.5's two inverse-square coefficients and inverse-cube coefficient. -/
+/-- Appendix B: the two inverse-square coefficients and inverse-cube coefficient. -/
 theorem walk_coefficient_limits :
     Tendsto (fun θ ↦ uniform_c0 (2 * π - θ) * walkLogSlope (2 * π - θ) * θ ^ 2)
       (𝓝[>] 0) (𝓝 1) ∧
@@ -147,7 +130,7 @@ theorem walk_coefficient_limits :
     convert h using 1
     exact funext fun θ ↦ by dsimp [walk_square]; ring
 
-/-- The asymptotic equivalents displayed in Theorem 4.5. -/
+/-- The asymptotic equivalents displayed in Appendix B. -/
 theorem walk_coefficient_equivalents :
     Asymptotics.IsEquivalent (𝓝[>] 0)
       (fun θ ↦ uniform_c0 (2 * π - θ) * walkLogSlope (2 * π - θ))
@@ -168,7 +151,7 @@ theorem walk_coefficient_equivalents :
     convert_limit _ 2 1 one_ne_zero h2,
     convert_limit _ 3 _ (by positivity) h3⟩
 
-/-- The leading expression displayed in the last line of Theorem 4.5's proof. -/
+/-- The leading expression in the final display of Appendix B. -/
 def walk_leading (w : ℝ) : ℝ :=
   frameBound w / Real.cos (w / 4) ^ 2 +
     frameBound w / 4 * walkLogSlope w ^ 2 +
@@ -191,7 +174,7 @@ theorem walk_leading_limit :
   convert h using 1
   exact funext fun θ ↦ by dsimp [walk_leading]; ring
 
-/-- Both asymptotic equivalences in the final display of Theorem 4.5. -/
+/-- Both asymptotic equivalences in the final display of Appendix B. -/
 theorem walk_leading_equivalents :
     Asymptotics.IsEquivalent (𝓝[>] 0) (fun θ ↦ walk_square (2 * π - θ))
       (fun θ ↦ walk_leading (2 * π - θ)) ∧

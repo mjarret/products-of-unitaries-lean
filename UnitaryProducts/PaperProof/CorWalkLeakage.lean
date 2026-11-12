@@ -79,7 +79,7 @@ theorem walk_band_gap_minimum (W : ℝ → 𝕄) (α β : ℝ → ℝ)
   exact circular_band_gap_pos W α β hband hs₀
 
 omit [NeZero d] in
-/-- In the open turn supplied by Corollary 4.7, selecting eigenvectors by membership
+/-- In the open turn supplied by Theorem 4.7, selecting eigenvectors by membership
 of their exponential phases in the walk band is exactly the interval projector.
 It is orthogonal and commutes with every half-step phase of the logarithm. -/
 theorem open_turn_band_projector {A : 𝕄} (hA : A.IsHermitian) {α β : ℝ}
@@ -144,7 +144,7 @@ theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
     paperFrameMult_eq_series (w := 0) le_rfl (by positivity),
     paperFrameMult_deriv_eq_series hw0 hw] using hb
 
-/-- **Corollary 4.7** (`cor:walk-leakage`). The shifted principal-log formula supplies
+/-- **Theorem 4.7** (`cor:walk-leakage`). The shifted principal-log formula supplies
  the unique Hermitian logarithm in the prescribed open turn. The extreme-pair gap
  estimate and Lemma A.2 give its width and C² regularity. Its endpoint projectors
  select precisely those eigenvectors whose walk phases lie in the specified arcs.

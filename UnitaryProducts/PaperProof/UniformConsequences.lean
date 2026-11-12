@@ -44,7 +44,7 @@ open UnitaryProducts.Paper.UnitStepsProse
 noncomputable section
 namespace UnitaryProducts.Paper
 
-/-- The coefficient `𝓔_w(H)` defined before (4.6). The parameter `L` is the
+/-- The coefficient `𝓔_w(H)` defined in Appendix B. The parameter `L` is the
 Lipschitz constant of the derivative on the unit interval. -/
 def hamiltonianEnergy {d : ℕ} (w L : ℝ)
     (H : ℝ → Matrix (Fin d) (Fin d) ℂ) : ℝ :=
@@ -98,7 +98,7 @@ theorem clock_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
   exact hcomparison.trans_eq (by ring)
 
 /-- **Theorem 4.2** (`thm:clocks`): the comparison with the
-entrywise multiplier and closed constants of Definition 4.1. -/
+entrywise multiplier of Definition 4.1 and constants of Appendix B. -/
 theorem thm_clocks [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
@@ -166,7 +166,7 @@ theorem hamiltonianEnergy_eq_of_hasDerivWithinAt (w L : ℝ) (H Hd : ℝ → �
     heq (show (1 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num), hsup]
 
 /-- Equation (4.6) (`eq:products`): the comparison with the
-entrywise multiplier and closed constants of Definition 4.1. -/
+entrywise multiplier of Definition 4.1 and constants of Appendix B. -/
 theorem unit_steps_endpoint_bounds [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
@@ -849,7 +849,7 @@ theorem ex_unit_transfer_chain [NeZero d] (w : ℝ)
   simpa only [← mul_assoc, mul_one_div_cancel ht, one_mul] using h
 
 /-- **Example 4.6** (`ex:unit-transfer`): the bit budget with the closed
-scalar constants in Definition 4.1 and Theorem 4.2. -/
+scalar constants in Appendix B. -/
 theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ)
    (hw : w < 2 * π)
    (H U : ℝ → 𝕄)

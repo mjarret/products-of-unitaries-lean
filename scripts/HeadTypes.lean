@@ -414,8 +414,12 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.unified_increment_norm_integral_chain
 #check @UnitaryProducts.PaperProof.unified_jump_sum_bound
 #check @UnitaryProducts.PaperProof.canonical_cell_series_bounds
-#check @UnitaryProducts.PaperProof.walk_square_eq_paper
+#check @UnitaryProducts.PaperProof.hamiltonianEnergy_pi_le
+#check @UnitaryProducts.PaperProof.paper_walk_coefficients_isBigO
+#check @UnitaryProducts.PaperProof.paperWalkSquare
+#check @UnitaryProducts.PaperProof.paperWalkSquare_eq_series
 #check @UnitaryProducts.PaperProof.uniform_c1
+#check @UnitaryProducts.PaperProof.cellConstant_eq_frameBound
 #check @UnitaryProducts.PaperProof.walk_collect
 #check @UnitaryProducts.PaperProof.scalar_edge_limits
 #check @UnitaryProducts.PaperProof.cos_gap_identity
@@ -424,7 +428,6 @@ set_option format.width 100
 #check @UnitaryProducts.PaperProof.uniform_c0_c1_div_frame_limits
 #check @UnitaryProducts.PaperProof.free_arc_sine_equivalent
 #check @UnitaryProducts.PaperProof.cellConstant_walk_endpoint_equivalent
-#check @UnitaryProducts.PaperProof.cellConstant_eq_frameBound
 #check @UnitaryProducts.PaperProof.walk_leading
 #check @UnitaryProducts.PaperProof.walk_leading_equivalents
 #check @UnitaryProducts.PaperProof.walk_square_leading_terms
@@ -525,7 +528,6 @@ set_option format.width 100
 #check @UnitaryProducts.Corrector.frameBound_center_pi
 #check @UnitaryProducts.Corrector.frameBound_frameLip_pi
 #check @UnitaryProducts.PaperProof.uniform_pi_coefficients
-#check @UnitaryProducts.PaperProof.hamiltonianEnergy_pi_le
 #check @UnitaryProducts.PaperProof.left_held_generator_error
 #check @UnitaryProducts.PaperProof.left_held_error_integral
 #check @UnitaryProducts.PaperProof.left_held_duhamel_bound
@@ -626,3 +628,6 @@ set_option format.width 100
 #check @UnitaryProducts.Paper.hamiltonianEnergy
 #check @UnitaryProducts.PaperProof.hamiltonianEnergy_eq_of_hasDerivWithinAt
 #check @UnitaryProducts.Paper.walkEnergy
+#check @UnitaryProducts.walkLogSlope_closed
+#check @UnitaryProducts.walkLogSlope_zero
+#check @UnitaryProducts.PaperProof.constants_zero_limits

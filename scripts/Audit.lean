@@ -421,8 +421,12 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.unified_increment_norm_integral_chain,
     `UnitaryProducts.PaperProof.unified_jump_sum_bound,
     `UnitaryProducts.PaperProof.canonical_cell_series_bounds,
-    `UnitaryProducts.PaperProof.walk_square_eq_paper,
+    `UnitaryProducts.PaperProof.hamiltonianEnergy_pi_le,
+    `UnitaryProducts.PaperProof.paper_walk_coefficients_isBigO,
+    `UnitaryProducts.PaperProof.paperWalkSquare,
+    `UnitaryProducts.PaperProof.paperWalkSquare_eq_series,
     `UnitaryProducts.PaperProof.uniform_c1,
+    `UnitaryProducts.PaperProof.cellConstant_eq_frameBound,
     `UnitaryProducts.PaperProof.walk_collect,
     `UnitaryProducts.PaperProof.scalar_edge_limits,
     `UnitaryProducts.PaperProof.cos_gap_identity,
@@ -431,7 +435,6 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.uniform_c0_c1_div_frame_limits,
     `UnitaryProducts.PaperProof.free_arc_sine_equivalent,
     `UnitaryProducts.PaperProof.cellConstant_walk_endpoint_equivalent,
-    `UnitaryProducts.PaperProof.cellConstant_eq_frameBound,
     `UnitaryProducts.PaperProof.walk_leading,
     `UnitaryProducts.PaperProof.walk_leading_equivalents,
     `UnitaryProducts.PaperProof.walk_square_leading_terms,
@@ -532,7 +535,6 @@ open Lean Elab Command in
     `UnitaryProducts.Corrector.frameBound_center_pi,
     `UnitaryProducts.Corrector.frameBound_frameLip_pi,
     `UnitaryProducts.PaperProof.uniform_pi_coefficients,
-    `UnitaryProducts.PaperProof.hamiltonianEnergy_pi_le,
     `UnitaryProducts.PaperProof.left_held_generator_error,
     `UnitaryProducts.PaperProof.left_held_error_integral,
     `UnitaryProducts.PaperProof.left_held_duhamel_bound,
@@ -632,7 +634,10 @@ open Lean Elab Command in
     `UnitaryProducts.PaperProof.crossing_comparison_bound,
     `UnitaryProducts.Paper.hamiltonianEnergy,
     `UnitaryProducts.PaperProof.hamiltonianEnergy_eq_of_hasDerivWithinAt,
-    `UnitaryProducts.Paper.walkEnergy]
+    `UnitaryProducts.Paper.walkEnergy,
+    `UnitaryProducts.walkLogSlope_closed,
+    `UnitaryProducts.walkLogSlope_zero,
+    `UnitaryProducts.PaperProof.constants_zero_limits]
   let mut missingDocs : List Name := []
   for name in heads do
     unless (env.find? name).isSome do

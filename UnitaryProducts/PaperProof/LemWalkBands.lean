@@ -14,7 +14,7 @@ public import UnitaryProducts.PaperProof.WalkBandGap
 /-!
 # The band-to-arc lemma
 
-Corollary 4.7 belongs downstream of `LemWalkLog`:
+Theorem 4.7 belongs downstream of `LemWalkLog`:
 importing that module into `Walks.BandMultiplicity` would create a cycle.
 -/
 
@@ -31,7 +31,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 local notation "K" => Icc (0 : ℝ) 1
 
 
-/-- Corollary 4.7: the shifted principal logarithm has exactly the Hermitian
+/-- Theorem 4.7: the shifted principal logarithm has exactly the Hermitian
 spectrum in the selected open turn and exponentiates to the given unitary. -/
 theorem walk_bands_principal_logarithm (W : 𝕄) (α : ℝ)
     (hu : star W * W = 1)
@@ -51,7 +51,7 @@ theorem walk_bands_principal_logarithm (W : 𝕄) (α : ℝ)
   rw [← hformula]
   exact ⟨hA, hwin, he⟩
 
-/-- Corollary 4.7: continuity follows directly from the moving-cut principal-log
+/-- Theorem 4.7: continuity follows directly from the moving-cut principal-log
 formula and Mathlib's continuity of continuous functional calculus on the slit plane. -/
 theorem cut_log_continuous_principal (W G : ℝ → 𝕄) (α : ℝ → ℝ)
     (hW : ContinuousOn W K) (ha : ContinuousOn α K)
@@ -82,7 +82,7 @@ theorem cut_log_continuous_principal (W G : ℝ → 𝕄) (α : ℝ → ℝ)
 omit [NeZero d] in
 /-- In a single open turn, membership in the real interval is exactly membership in
 the walk's arc, and the circular gap is a lower bound for the real separation: the first
-term of the display in the proof of Corollary 4.7 (`band_pair_gap_display`). -/
+term of the display in the proof of Theorem 4.7 (`band_pair_gap_display`). -/
 theorem cut_log_band {A U : 𝕄} (hA : A.IsHermitian) {α β : ℝ}
     (he : evol A 1 = U)
     (hopen : ∀ x ∈ spectrum ℝ A, x ∈ Ioo α (α + 2 * π))
@@ -121,7 +121,7 @@ theorem cut_log_band {A U : 𝕄} (hA : A.IsHermitian) {α β : ℝ}
         (hopen _ (hA.eigenvalues_mem_spectrum_real i)) hphase
       exact heq ▸ hθ
 
-/-- Arc-construction auxiliary for Corollary 4.7: a walk band supplies the closed arc and,
+/-- Arc-construction auxiliary for Theorem 4.7: a walk band supplies the closed arc and,
 for its Hermitian logarithm, the same band with at least the circular gap. -/
 theorem walk_band_arc (W : ℝ → 𝕄) (α β : ℝ → ℝ) (ϑ : ℝ)
     (hu : (walk W 1).1) (hc : ContDiffOn ℝ 2 W K)
@@ -200,7 +200,7 @@ theorem walk_band_arc (W : ℝ → 𝕄) (α β : ℝ → ℝ) (ϑ : ℝ)
   -- Uniqueness transfers the already established band correspondence and gap.
   simpa only [hHG] using And.intro (hopen s hs) (hGband s hs)
 
-/-- Unnumbered band-log support for **Corollary 4.7** (`cor:walk-leakage`): the logarithm cut at
+/-- Unnumbered band-log support for **Theorem 4.7** (`cor:walk-leakage`): the logarithm cut at
 the band's
 left edge has spectrum in that open turn, width at most `2π - ϑ`, and
 separation between its interval band and its complement at least the circular gap.

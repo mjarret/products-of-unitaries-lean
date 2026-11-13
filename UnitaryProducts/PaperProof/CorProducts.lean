@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.UnifiedProducts
 public import UnitaryProducts.Spectral.TrackedCircularBand
 
@@ -86,7 +88,7 @@ theorem unitary_products_of_arc [NeZero d] (T : ℕ) (hT : 0 < T) :
     (_harc : ∀ s ∈ Icc (0 : ℝ) 1, ∀ z ∈ spectrum ℂ (W s),
       ∃ α ∈ Icc (a s) (a s + (2 * π - θ)), z = Complex.exp (-I * (α : ℂ)))
     (_hc : ContDiffOn ℝ 2 W (Icc (0 : ℝ) 1))
-    (H : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (_hlog : ∀ s ∈ Icc (0 : ℝ) 1, evol (H s) 1 = W s)
     (_hwindow : ∀ s (hs : s ∈ Icc (0 : ℝ) 1),
       ∀ i, (hH s hs).eigenvalues i ∈ Icc (a s) (a s + (2 * π - θ))),
@@ -127,7 +129,7 @@ theorem unitary_products_of_arc [NeZero d] (T : ℕ) (hT : 0 < T) :
 The width hypothesis places every eigenvalue in that window, and spectral mapping
 places the exponential in its image arc. -/
 theorem hamiltonian_window_arc [NeZero d] (H : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hc : ContinuousOn H (Icc (0 : ℝ) 1)) {w : ℝ}
     (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1) p q,
       |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) :
@@ -158,7 +160,7 @@ Use its least eigenvalue to obtain the arc, then the unique logarithm of Lemma A
 is the given Hamiltonian. The arc-coordinate proof uses the stated jump integral,
 the C² jump bound in Theorem 4.6, and Theorem 4.2. -/
 theorem unitary_products_series_bound [NeZero d] (T : ℕ) (hT : 0 < T)
-    (H : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     {w : ℝ} (hw : w < 2 * π) (hcH : ContDiffOn ℝ 2 H (Icc (0 : ℝ) 1))
     (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1) p q,
       |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) :
@@ -310,13 +312,9 @@ theorem fact_arc :
     Asymptotics.IsEquivalent (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
       (fun δ ↦ (8 / π + 5 * π / 2 + 2) / δ ^ 3) ∧
     (let κ : ℝ → ℝ := fun x ↦ if x = 0 then 1 else (x / 2) / Real.sin (x / 2);
-      Asymptotics.IsBigO (𝓝[>] 0)
-        (fun δ ↦ cellConstant (2 * π - δ) * κ (2 * π - δ)) (fun δ : ℝ ↦ 1 / δ ^ 3) ∧
-      Asymptotics.IsBigO (𝓝[>] 0)
-        (fun δ ↦ (1 / 24 + frameMult (2 * π - δ)) * κ (2 * π - δ))
-        (fun δ : ℝ ↦ 1 / δ ^ 3) ∧
-      Asymptotics.IsBigO (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
-        (fun δ : ℝ ↦ 1 / δ ^ 3)) := by
+      HasInverseCubeGrowth (fun w ↦ cellConstant w * κ w) ∧
+      HasInverseCubeGrowth (fun w ↦ (1 / 24 + frameMult w) * κ w) ∧
+      HasInverseCubeGrowth paperWalkSquare) := by
   have hev : ∀ᶠ δ in 𝓝[>] (0 : ℝ), δ ∈ Ioo 0 π := Ioo_mem_nhdsGT pi_pos
   refine ⟨cellConstant_walk_endpoint_equivalent, ?_, ?_, paper_walk_coefficients_isBigO⟩
   · apply walk_coefficient_equivalents.2.1.congr_left
@@ -352,52 +350,33 @@ constants of Appendix B and multiplier of Definition 4.1. The phased product is 
 rounded evolution's endpoint. The unused Lipschitz premise is omitted, and the rounded
 evolution is also constructed. -/
 theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
-    (H : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    {w : ℝ} (hw : w < 2 * π) (hcH : ContDiffOn ℝ 2 H (Icc (0 : ℝ) 1))
-    (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1) p q,
-      |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) :
+    (H : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H) {w : ℝ}
+    (hw : w < 2 * π) (hcH : ContDiffOn ℝ 2 H (Icc (0 : ℝ) 1))
+    (hwidth : HasWidth H w) :
     let W := fun s ↦ evol (H s) 1
-    (∀ U : ℝ → 𝕄, IsEvolution (fun t ↦ H (t / T)) U 0 T →
-        let V := evol (H 1) (1 / 2) * (walk W T).2 * evol (H 0) (-(1 / 2))
-        ‖V - U T‖ ≤ walkEnergy w W / T) ∧
-    Asymptotics.IsEquivalent (𝓝[>] 0)
-      (fun δ ↦ cellConstant (2 * π - δ) * walkLogSlope (2 * π - δ)) (fun δ ↦ 1 / δ ^ 2) ∧
-    Asymptotics.IsEquivalent (𝓝[>] 0)
-      (fun δ ↦ (1 / 24 + frameMult (2 * π - δ)) * walkLogSlope (2 * π - δ))
-      (fun δ ↦ 1 / δ ^ 2) ∧
-    Asymptotics.IsEquivalent (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
-      (fun δ ↦ (8 / π + 5 * π / 2 + 2) / δ ^ 3) ∧
-    (let κ : ℝ → ℝ := fun x ↦ if x = 0 then 1 else (x / 2) / Real.sin (x / 2);
-      Asymptotics.IsBigO (𝓝[>] 0)
-        (fun δ ↦ cellConstant (2 * π - δ) * κ (2 * π - δ)) (fun δ : ℝ ↦ 1 / δ ^ 3) ∧
-      Asymptotics.IsBigO (𝓝[>] 0)
-        (fun δ ↦ (1 / 24 + frameMult (2 * π - δ)) * κ (2 * π - δ))
-        (fun δ : ℝ ↦ 1 / δ ^ 3) ∧
-      Asymptotics.IsBigO (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
-        (fun δ : ℝ ↦ 1 / δ ^ 3)) ∧
-    (∃ V : ℝ → 𝕄,
-      IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T ∧
-      V T = evol (H 1) (1 / 2) * (walk W T).2 * evol (H 0) (-(1 / 2))) := by
+    let κ : ℝ → ℝ := fun w ↦ if w = 0 then 1 else (w / 2) / Real.sin (w / 2)
+    ‖roundedEvolution H T T - evolution H T T‖ ≤ walkEnergy w W / T ∧
+    HasInverseCubeGrowth (fun w ↦ cellConstant w * κ w) ∧
+    HasInverseCubeGrowth (fun w ↦ (1 / 24 + frameMult w) * κ w) ∧
+    HasInverseCubeGrowth paperWalkSquare := by
+  have hwidth := (hasWidth_iff hH).1 hwidth
   dsimp only
   have hw0 : 0 ≤ w := by
     simpa using hwidth 0 (by norm_num) (0 : Fin d) 0
   have hseries := unitary_products_series_bound T hT H hH hw hcH hwidth
   dsimp only at hseries
-  have harc := fact_arc
-  refine ⟨?_, harc.1, harc.2.1, harc.2.2.1, harc.2.2.2, ?_⟩
-  · intro U hU
-    rw [div_eq_mul_one_div (walkEnergy w _) (T : ℝ),
+  have harc := fact_arc.2.2.2
+  refine ⟨?_, harc.1, harc.2.1, harc.2.2⟩
+  · rw [roundedEvolution_endpoint hT hH,
+      div_eq_mul_one_div (walkEnergy w _) (T : ℝ),
       mul_comm (walkEnergy w _) (1 / (T : ℝ))]
     simp only [walkEnergy, paperWalkSquare]
     rw [paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw,
-      paperFrameMult_eq_series (le_refl 0) (by positivity)]
-    exact hseries.1 U hU
-  · have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
-    obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
-    refine ⟨V, hV, ?_⟩
-    have hhalf : (T : ℝ) / (2 * T) = 1 / 2 := by field_simp
+      paperFrameMult_eq_series (w := 0) le_rfl (by positivity)]
     have hprod : (walk (fun s ↦ evol (H s) 1) T).2 = (unitProduct H T).1 :=
       UnitaryProducts.stepProduct_eq_pieceProduct (fun _ _ ↦ rfl) T le_rfl
-    simpa only [div_self ht.ne', one_smul, hhalf, ← hprod] using heV
+    rw [← hprod]
+    exact hseries.1 _ (evolution_spec (Nat.cast_pos.mpr hT) hH
+      (UnitaryProducts.Prose.regulated_of_continuousOn hcH.continuousOn))
 
 end UnitaryProducts.PaperProof

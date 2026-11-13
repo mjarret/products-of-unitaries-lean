@@ -2162,7 +2162,7 @@ Each quotation is accompanied by its mathematical declarations or cited source. 
 
 332. **EXPOSITION — Section 8**
 
-    \item[Code availability.] The Lean~4 code is available at \leanrepolink{} \cite{jarret2026lean}, and the statement headers link to its release v1.0.0.
+    \item[Code availability.] The Lean~4 code is available at \leanrepolink{} \cite{jarret2026lean}, and the statement headers link to its release v1.1.0.
 
     Interpretation, organization, or author-approved nonmathematical declaration.
 
@@ -2720,7 +2720,7 @@ Each quotation is accompanied by its mathematical declarations or cited source. 
 
 423. **EXTERNAL — Section 1**
 
-    Floquet expansions in the inverse frequency \cite{rahav2003,bukov2015}, rigorous effective Hamiltonians at high frequency \cite{kuwahara2016,abanin2017}, and the modified equations of backward error analysis \cite[Chapter~IX]{hairer2006} concern periodic Hamiltonians or short steps
+    Floquet expansions in the inverse frequency \cite{rahav2003,bukov2015}, rigorous effective Hamiltonians at high frequency \cite{kuwahara2016,abanin2017}, and the modified equations of backward error analysis \cite{hairer2006} concern periodic Hamiltonians or short steps
 
     Rahav–Gilary–Fishman [rahav2003], high-frequency expansion; Bukov et al. [bukov2015], high-frequency Floquet review; Kuwahara–Mori–Saito [kuwahara2016] and Abanin et al. [abanin2017], rigorous high-frequency effective Hamiltonians; Hairer–Lubich–Wanner [hairer2006], Chapter IX
 

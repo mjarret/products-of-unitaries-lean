@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.UniformConsequences
 public import UnitaryProducts.PaperProof.WalkCoefficients
 
@@ -20,7 +22,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 /-- Theorem A uses the exact width-pi specialization of (4.6),
 with the rounded evolution identified by (2.5). -/
 theorem products_pi [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd U : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L : ℝ} (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
       ‖Hd t - Hd s‖ ≤ L * |t - s|)
@@ -33,7 +35,12 @@ theorem products_pi [NeZero d] {T : ℕ} (hT : 0 < T)
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   have hw : π < 2 * π := by linarith [pi_pos]
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
-  have hbound := thm_jumps hT H Hd U V hH hd hlip hw hwidth hU hV
+  have hbound := thm_jumps hT H Hd hH ⟨hd, hlip⟩ hw ((hasSampleWidth_iff hH).2 hwidth)
+  have hreg := UnitaryProducts.Prose.regulated_of_continuousOn
+    (HasLipschitzDerivative.continuousOn (show HasLipschitzDerivative H Hd L from ⟨hd, hlip⟩))
+  rw [← roundedEvolution_eqOn hT hH hV (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩),
+    ← evolution_eqOn ht hH hreg hU
+      (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩)] at hbound
   have hhalf : (T : ℝ) / (2 * T) = 1 / 2 := by field_simp
   simp only [heV, div_self ht.ne', one_smul, hhalf] at hbound
   exact hbound
@@ -102,15 +109,14 @@ theorem hamiltonianEnergy_pi_bound (H Hd : ℝ → 𝕄)
 
 /-- **Fact B.1** (`fact:pi`): the three exact width-pi values and the
 Hamiltonian energy bound with the stated decimal coefficients. -/
-theorem hamiltonianEnergy_pi_le (H Hd : ℝ → 𝕄)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L : ℝ} (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ L * |t - s|) :
+theorem hamiltonianEnergy_pi_le (H Hd : ℝ → 𝕄) {L : ℝ}
+    (hder : HasLipschitzDerivative H Hd L) :
     cellConstant π = 1 / (2 * π) - 1 / π ^ 2 ∧
     frameMult π = 1 / π ^ 2 ∧
     deriv frameMult π = 1 / (4 * π) - 2 / π ^ 3 ∧
     hamiltonianEnergy π L H ≤ (116 / 1000 : ℝ) * unitSupNorm Hd +
       (143 / 1000 : ℝ) * L + (61 / 1000 : ℝ) * unitSupNorm Hd ^ 2 := by
+  obtain ⟨hd, hlip⟩ := hder
   have hw : π < 2 * π := by linarith [pi_pos]
   refine ⟨?_, ?_, ?_, hamiltonianEnergy_pi_bound H Hd hd hlip⟩
   · rw [cellConstant_eq_frameBound pi_pos.le hw, frameBound_center_pi]

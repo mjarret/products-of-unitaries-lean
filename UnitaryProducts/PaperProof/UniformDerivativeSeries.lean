@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.CommutatorTelescope
 
 /-! # The general derivative-series estimate specialized to the cotangent multiplier -/
@@ -36,7 +38,7 @@ theorem frame_series_derivative_bound [NeZero d]
 with the `C¹` paths `Ω` and `Ω'`. -/
 theorem self_frame_series_contDiffOn [NeZero d] {Ω : ℝ → 𝕄} {w : ℝ}
     (hw : w < 2 * π)
-    (hΩ : ∀ s ∈ Icc (0 : ℝ) 1, (Ω s).IsHermitian)
+    (hΩ : IsTimeDepHamiltonian Ω)
     (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1), ∀ p q,
       |(hΩ s hs).eigenvalues p - (hΩ s hs).eigenvalues q| ≤ w)
     (hcΩ : ContDiffOn ℝ 2 Ω (Icc (0 : ℝ) 1)) :

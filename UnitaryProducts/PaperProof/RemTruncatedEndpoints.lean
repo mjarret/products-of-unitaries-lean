@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.PaperProof.PropTransfer
 
 public import UnitaryProducts.PaperProof.ThmTransfer
@@ -157,7 +159,7 @@ from the band hull, and equal projector ranks. The full and directed projector
 distances agree and satisfy Davis–Kahan; the leakage difference is bounded by
 the evolution error plus both endpoint bounds. -/
 theorem rem_truncated_endpoints {H U : ℝ → 𝕄} {T : ℝ}
-    (hT : 0 < T) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hT : 0 < T) (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     {S₀ S₁ : Finset (Fin d)}
     (hS₀ : IsBand (hH 0 ⟨le_rfl, zero_le_one⟩) S₀)

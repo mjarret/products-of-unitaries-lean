@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.PropTransfer
 public import UnitaryProducts.PaperProof.UnitRounded
 
@@ -66,7 +68,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
  The proof applies Theorem 2.2, retains the jump sum, and bounds the
  endpoints and residual integral using Lemma A.1(ii) and Theorem 4.2 residual computation. -/
 theorem clock_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd U V : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L w : ℝ}
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -100,31 +102,28 @@ theorem clock_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
 /-- **Theorem 4.2** (`thm:clocks`): the comparison with the
 entrywise multiplier of Definition 4.1 and constants of Appendix B. -/
 theorem thm_clocks [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L w : ℝ}
-    (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ L * |t - s|)
-    (hw : w < 2 * π)
-    (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
-      |(hH _ (walkCubic_sample hj)).eigenvalues p -
-        (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ w)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
-    (hV : IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T) :
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H) {L w : ℝ}
+    (hder : HasLipschitzDerivative H Hd L) (hw : w < 2 * π)
+    (hwidth : HasSampleWidth H T w) :
     let c₀ := cellConstant w
     let c₁ := c₀ / 4 + 1 / 64
     let Δ := paperClockJump H Hd T
-    ‖V T - U T‖ ≤ (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
-      L / 24 + c₁ * unitSupNorm Hd ^ 2) + ∑ j ∈ Finset.Icc 1 T, ‖Δ j‖ := by
+    ‖roundedEvolution H T T - evolution H T T‖ ≤
+      (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
+        L / 24 + c₁ * unitSupNorm Hd ^ 2) + ∑ j ∈ Finset.Icc 1 T, ‖Δ j‖ := by
+  have hwidth := (hasSampleWidth_iff hH).1 hwidth
   dsimp only
   rw [paperClockJump_sum_eq H Hd hH hw hwidth]
-  exact clock_series_bound hT H Hd U V hH hd hlip hw hwidth hU hV
+  exact clock_series_bound hT H Hd _ _ hH hder.1 hder.2 hw hwidth
+    (evolution_spec (Nat.cast_pos.mpr hT) hH
+      (UnitaryProducts.Prose.regulated_of_continuousOn hder.continuousOn))
+    (roundedEvolution_spec hT hH)
 
 /-- The operator-series endpoint bound: insert the affine jump bound in Theorem 4.4
 into Theorem 4.2 (`thm:clocks`).
 The derivative uses its compact-interval supremum, and the endpoint norms remain exact. -/
 theorem endpoint_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd U V : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L w : ℝ}
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -139,7 +138,12 @@ theorem endpoint_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
     let c₁ := c₀ / 4 + 1 / 64
     ‖V T - U T‖ ≤ (1 / T : ℝ) * (c₀ * (‖Hd 0‖ + ‖Hd 1‖) +
       (1 / 24 + frameBound w) * L + (c₁ + (2 * frameLip w)) * unitSupNorm Hd ^ 2) := by
-  have hclock := thm_clocks hT H Hd U V hH hd hlip hw hwidth hU hV
+  have hreg := UnitaryProducts.Prose.regulated_of_continuousOn
+    (HasLipschitzDerivative.continuousOn (show HasLipschitzDerivative H Hd L from ⟨hd, hlip⟩))
+  have hclock := thm_clocks hT H Hd hH ⟨hd, hlip⟩ hw ((hasSampleWidth_iff hH).2 hwidth)
+  rw [← roundedEvolution_eqOn hT hH hV (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩),
+    ← evolution_eqOn (Nat.cast_pos.mpr hT) hH hreg hU
+      (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩)] at hclock
   have hw0 : 0 ≤ w := by
     simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) (0 : Fin d)
   dsimp only at hclock
@@ -166,25 +170,21 @@ theorem hamiltonianEnergy_eq_of_hasDerivWithinAt (w L : ℝ) (H Hd : ℝ → �
 /-- **Theorem 4.4** (`thm:jumps`), equation (4.6) (`eq:products`): the comparison with the
 entrywise multiplier of Definition 4.1 and constants of Appendix B. -/
 theorem thm_jumps [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L w : ℝ}
-    (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ L * |t - s|)
-    (hw : w < 2 * π)
-    (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
-      |(hH _ (walkCubic_sample hj)).eigenvalues p -
-        (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ w)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
-    (hV : IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T) :
-    ‖V T - U T‖ ≤ hamiltonianEnergy w L H / T := by
-  rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w L H Hd hd,
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H) {L w : ℝ}
+    (hder : HasLipschitzDerivative H Hd L) (hw : w < 2 * π)
+    (hwidth : HasSampleWidth H T w) :
+    ‖roundedEvolution H T T - evolution H T T‖ ≤ hamiltonianEnergy w L H / T := by
+  have hwidth := (hasSampleWidth_iff hH).1 hwidth
+  rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w L H Hd hder.1,
     div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))]
   have hw0 : 0 ≤ w := by
     simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) 0
   rw [cellConstant_eq_frameBound hw0 hw, paperFrameMult_eq_series hw0 hw,
     paperFrameMult_deriv_eq_series hw0 hw]
-  exact endpoint_series_bound hT H Hd U V hH hd hlip hw hwidth hU hV
+  exact endpoint_series_bound hT H Hd _ _ hH hder.1 hder.2 hw hwidth
+    (evolution_spec (Nat.cast_pos.mpr hT) hH
+      (UnitaryProducts.Prose.regulated_of_continuousOn hder.continuousOn))
+    (roundedEvolution_spec hT hH)
 
 set_option maxHeartbeats 800000 in
 -- The comparison combines rounded evolution, endpoint constants, and entrywise truncation.
@@ -194,7 +194,7 @@ cell proof retains the
 endpoint derivative norms and uses the derivative supremum and Lipschitz bound.
 Duhamel adds precisely the sample truncation sum. -/
 theorem thm_unit_steps_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hdiff : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))
     (L w : ℝ)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -218,8 +218,11 @@ theorem thm_unit_steps_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   have hw₀ : 0 ≤ w := by simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) (0 : Fin d)
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
-  have hcell := thm_jumps hT H Hd U V hH
-    (fun s hs ↦ (hdiff s hs).hasDerivWithinAt) hlip hw hwidth hU hV
+  have hcell := thm_jumps hT H Hd hH
+    ⟨fun s hs ↦ (hdiff s hs).hasDerivWithinAt, hlip⟩ hw ((hasSampleWidth_iff hH).2 hwidth)
+  rw [← roundedEvolution_eqOn hT hH hV (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩),
+    ← evolution_eqOn ht hH (UnitaryProducts.Prose.regulated_of_continuousOn hdiff.continuousOn) hU
+      (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩)] at hcell
   rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w L H Hd (fun s hs ↦ (hdiff s hs).hasDerivWithinAt),
     div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))] at hcell
   rw [cellConstant_eq_frameBound hw₀ hw, paperFrameMult_eq_series hw₀ hw,
@@ -246,7 +249,7 @@ theorem thm_unit_steps_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 
 /-- The transfer paragraph in Section 4.3: Proposition 2.4 transports the
 endpoint-norm comparison (4.6) to the two leakage norms. -/
 theorem cor_unit_transfer_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hdiff : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))
     (L w : ℝ)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -302,7 +305,7 @@ theorem thm_unit_steps_endpoint_max (w : ℝ) (hw : w < 2 * π) :
     ∃ c₀ c₁ : ℝ,
     (c₀ = Nf w - Nf (w / 2) / 2 ∧ c₁ = c₀ / 4 + 1 / 64) ∧
     ∀ (H U : ℝ → 𝕄) (T : ℕ) (_ : 0 < T)
-      (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+      (hH : IsTimeDepHamiltonian H)
       (_ : ContDiffOn ℝ 1 H (Icc (0 : ℝ) 1))
       (_ : ∃ M : ℝ, ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
         ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ M * |t - s|)
@@ -348,7 +351,7 @@ theorem thm_unit_steps_endpoint_max (w : ℝ) (hw : w < 2 * π) :
   have hhalf : (T : ℝ) / (2 * T) = 1 / 2 := by field_simp
   let K : ℝ → 𝕄 := fun s ↦ H s - (b * s) • (1 : 𝕄)
   let D : ℝ → 𝕄 := fun s ↦ Hd s - b • (1 : 𝕄)
-  have hK : ∀ s ∈ Icc (0 : ℝ) 1, (K s).IsHermitian := fun s hs ↦
+  have hK : IsTimeDepHamiltonian K := fun s hs ↦
     (hH s hs).sub (Separation.isHermitian_real_smul Matrix.isHermitian_one (b * s))
   have hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s :=
     fun s hs ↦ (hc.differentiableOn (by norm_num) s hs).hasDerivWithinAt
@@ -429,7 +432,7 @@ and the canonical-cell bound, then by the explicit upper bound.
 The quantities are those defined before the theorem in Section 4.1;
 `unitCenteredNorm_attained` separately justifies the minimum defining `L`. -/
 theorem thm_unit_steps (H U V : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     (hV : IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T) :
     ∀ (w : ℝ) (_ : w < 2 * π)
@@ -493,7 +496,7 @@ theorem thm_unit_steps (H U V : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
 /-- Centered bound: replace the endpoint average by the centered maximum.
 This monotonicity specialization preserves the transfer and bits bounds. -/
 theorem thm_unit_steps_coarse (H U V : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     (hV : IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T) :
     ∀ (w : ℝ) (_ : w < 2 * π)
@@ -571,7 +574,7 @@ theorem thm_unit_steps_coarse (H U V : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
 centered minimum, for every scalar center and with the exact sample
 truncation sum. The endpoint projectors commute with the original Hamiltonians. -/
 theorem cor_unit_transfer_min (H U V : ℝ → 𝕄) (T : ℕ) (hT : 0 < T)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hc : ContDiffOn ℝ 1 H (Icc (0 : ℝ) 1))
     (hlip : ∃ M : ℝ, ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
       ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ M * |t - s|)
@@ -620,7 +623,7 @@ theorem cor_unit_transfer (w : ℝ) (hw : w < 2 * π) :
     ∃ c₀ c₁ : ℝ,
     (c₀ = Nf w - Nf (w / 2) / 2 ∧ c₁ = c₀ / 4 + 1 / 64) ∧
     ∀ (H U : ℝ → 𝕄) (T : ℕ) (_ : 0 < T)
-      (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+      (hH : IsTimeDepHamiltonian H)
       (_ : ContDiffOn ℝ 1 H (Icc (0 : ℝ) 1))
       (_ : ∃ M : ℝ, ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
         ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ M * |t - s|)
@@ -675,7 +678,7 @@ theorem bit_transfer_series_bound [NeZero d] (w : ℝ)
    (H U : ℝ → 𝕄)
    (T k : ℕ)
    (hT1 : 0 < T)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
    (hc : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))
     (h : ℝ)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -751,8 +754,11 @@ theorem bit_transfer_series_bound [NeZero d] (w : ℝ)
     (unitProduct_sample_error T hH
       (fun s hs ↦ scalarEntryMap_isHermitian (truncBits k) (truncBits_neg k) (hH s hs))).trans he
   -- Equation (4.6) bounds the untruncated evolution error.
-  have hclock := thm_jumps hT1 H Hd U V hH
-    (fun s hs ↦ (hc s hs).hasDerivWithinAt) hlip hw hdiff hU hV
+  have hclock := thm_jumps hT1 H Hd hH
+    ⟨fun s hs ↦ (hc s hs).hasDerivWithinAt, hlip⟩ hw ((hasSampleWidth_iff hH).2 hdiff)
+  rw [← roundedEvolution_eqOn hT1 hH hV (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩),
+    ← evolution_eqOn hT hH (UnitaryProducts.Prose.regulated_of_continuousOn hc.continuousOn) hU
+      (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩)] at hclock
   have hw₀ : 0 ≤ w := by simpa using hdiff 0 (Nat.zero_le T) (0 : Fin d) (0 : Fin d)
   rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w h H Hd (fun s hs ↦ (hc s hs).hasDerivWithinAt),
     div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))] at hclock
@@ -802,7 +808,7 @@ theorem ex_unit_transfer_chain [NeZero d] (w : ℝ)
    (H U : ℝ → 𝕄)
    (T k : ℕ)
    (hT1 : 0 < T)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
    (hc : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))
     (h : ℝ)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -848,33 +854,24 @@ theorem ex_unit_transfer_chain [NeZero d] (w : ℝ)
 
 /-- **Example 4.5** (`ex:unit-transfer`): the bit budget with the closed
 scalar constants in Appendix B. -/
-theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ)
-   (hw : w < 2 * π)
-   (H U : ℝ → 𝕄)
-   (T k : ℕ)
-   (hT1 : 0 < T)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-   (hc : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))
-    (L : ℝ)
-    (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ L * |t - s|)
-    (hdiff : ∀ j : ℕ, ∀ hjT : j ≤ T, ∀ p q,
-      |(hH _ (walkCubic_sample hjT)).eigenvalues p -
-        (hH _ (walkCubic_sample hjT)).eigenvalues q| ≤ w)
+theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ) (hw : w < 2 * π)
+    (H U : ℝ → 𝕄) (T k : ℕ) (hT1 : 0 < T) (hH : IsTimeDepHamiltonian H)
+    (L : ℝ) (hder : HasLipschitzDerivative H (derivWithin H (Icc (0 : ℝ) 1)) L)
+    (hdiff : HasSampleWidth H T w)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
-    (P Q : 𝕄)
-   (hP : IsStarProjection P)
-   (hQ : IsStarProjection Q)
-    (hPc : Commute P (H 0))
-   (hQc : Commute Q (H 1))
-    (C : NNReal) (δ : ℝ)
-   (hδ : 0 < δ)
-   (hcont : ‖(1 - Q) * U T * P‖ ≤ (C : ℝ) / T) :
+    (P Q : 𝕄) (hP : IsStarProjection P) (hQ : IsStarProjection Q)
+    (hPc : Commute P (H 0)) (hQc : Commute Q (H 1))
+    (C : NNReal) (δ : ℝ) (hδ : 0 < δ)
+    (hcont : ‖(1 - Q) * U T * P‖ ≤ (C : ℝ) / T) :
     let σ := ⨆ s : Icc (0 : ℝ) 1, ⨆ i : Fin d,
       (Finset.univ.filter fun j ↦ truncHerm k (H s) i j ≠ H s i j).card
     2 * ((C : ℝ) + hamiltonianEnergy w L H) / δ ≤ T →
       Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) →
       ‖(1 - Q) * (unitProduct (fun s ↦ scalarEntryMap (truncBits k) (H s)) T).1 * P‖ ≤ δ := by
+  have hc : DifferentiableOn ℝ H (Icc (0 : ℝ) 1) :=
+    fun s hs ↦ (hder.1 s hs).differentiableWithinAt
+  have hlip := hder.2
+  have hdiff := (hasSampleWidth_iff hH).1 hdiff
   intro σ hbudget hbits
   have hchain := ex_unit_transfer_chain w hw H U T k hT1 hH hc L hlip hdiff hU
     P Q hP hQ hPc hQc C δ hδ hcont hbudget hbits

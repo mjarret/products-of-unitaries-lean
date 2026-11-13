@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.Evolution.RoundedClockEvolution
 
 /-!
@@ -24,7 +26,7 @@ namespace UnitaryProducts.PaperProof
 /-- Equation (2.5), `eq:rounded`, at the paper's unit steps on `[0,T]`.
 The general-duration identity is an internal ingredient of this specialization. -/
 theorem unit_rounded_clock_endpoint {d : ℕ} (H : ℝ → Matrix (Fin d) (Fin d) ℂ)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : UnitaryProducts.Paper.IsTimeDepHamiltonian H)
     (T : ℕ) (hT : 1 ≤ T) (V : ℝ → Matrix (Fin d) (Fin d) ℂ)
     (hV : UnitaryProducts.Paper.IsEvolution
       (fun t ↦ H ((⌊t + 1 / 2⌋ : ℝ) / T)) V 0 T) :

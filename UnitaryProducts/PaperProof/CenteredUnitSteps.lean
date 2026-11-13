@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.PaperProof.UniformTruncation
 public import UnitaryProducts.PaperProof.ThmUnitStepsMax
 public import UnitaryProducts.PaperProof.WalkCutFormula
@@ -28,8 +30,8 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 by equation `eq:piecewise-product`. Duhamel's bound on `[0,T]`, split into
 its `T` unit intervals, counts precisely the sampled generators in the product. -/
 theorem unitProduct_sample_error_chain {H A : ℝ → 𝕄} (T : ℕ)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hA : ∀ s ∈ Icc (0 : ℝ) 1, (A s).IsHermitian) :
+    (hH : IsTimeDepHamiltonian H)
+    (hA : IsTimeDepHamiltonian A) :
     ‖(unitProduct A T).1 - (unitProduct H T).1‖ ≤
         (∫ t in (0 : ℝ)..T, ‖H ((⌊t⌋ : ℝ) / T) - A ((⌊t⌋ : ℝ) / T)‖) ∧
       (∫ t in (0 : ℝ)..T, ‖H ((⌊t⌋ : ℝ) / T) - A ((⌊t⌋ : ℝ) / T)‖) =
@@ -65,7 +67,7 @@ theorem unitProduct_sample_error_chain {H A : ℝ → 𝕄} (T : ℕ)
         simp only [pieceProduct, scheduleDuration, if_pos (show n < T by omega),
           Nat.cast_add, Nat.cast_one, add_sub_cancel_left, ih (by omega)]
     exact hacc T le_rfl
-  have hexists (B : ℝ → 𝕄) (hB : ∀ s ∈ Icc (0 : ℝ) 1, (B s).IsHermitian) :
+  have hexists (B : ℝ → 𝕄) (hB : IsTimeDepHamiltonian B) :
       ∃ U, IsEvolution (K B) U 0 T ∧ (unitProduct B T).1 = U T := by
     have hKB : ∀ t ∈ Icc (0 : ℝ) T, (K B t).IsHermitian := by
       intro t htmem
@@ -108,8 +110,8 @@ theorem unitProduct_sample_error_chain {H A : ℝ → 𝕄} (T : ℕ)
 /-- The sample sum bound is the last line of the Duhamel chain in the proof
 of Theorem 4.2. Both the integral inequality and its cell sum appear above. -/
 theorem unitProduct_sample_error {H A : ℝ → 𝕄} (T : ℕ)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hA : ∀ s ∈ Icc (0 : ℝ) 1, (A s).IsHermitian) :
+    (hH : IsTimeDepHamiltonian H)
+    (hA : IsTimeDepHamiltonian A) :
     ‖(unitProduct A T).1 - (unitProduct H T).1‖ ≤
       ∑ j ∈ Finset.range T, ‖H ((j : ℝ) / T) - A ((j : ℝ) / T)‖ := by
   obtain ⟨hduhamel, hsum⟩ := unitProduct_sample_error_chain T hH hA
@@ -117,7 +119,7 @@ theorem unitProduct_sample_error {H A : ℝ → 𝕄} (T : ℕ)
 
 /-- The single triangle-inequality display in the unit-step comparison, after unitary invariance. -/
 theorem unitProduct_truncation_split {H A : ℝ → 𝕄} (T : ℕ)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) (X : 𝕄) :
+    (hH : IsTimeDepHamiltonian H) (X : 𝕄) :
     ‖evol (H 1) (1 / 2) * (unitProduct A T).1 * evol (H 0) (-(1 / 2)) - X‖ ≤
       ‖(unitProduct A T).1 - (unitProduct H T).1‖ +
         ‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) - X‖ := by
@@ -128,8 +130,8 @@ theorem unitProduct_truncation_split {H A : ℝ → 𝕄} (T : ℕ)
 /-- Insert the exact unit-step product while leaving its two endpoint phases
 fixed; the additional error is the sum over `j < T`. -/
 theorem unitProduct_truncation_comparison {H A : ℝ → 𝕄} (T : ℕ)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hA : ∀ s ∈ Icc (0 : ℝ) 1, (A s).IsHermitian) (X : 𝕄) {B : ℝ}
+    (hH : IsTimeDepHamiltonian H)
+    (hA : IsTimeDepHamiltonian A) (X : 𝕄) {B : ℝ}
     (hB : ‖(unitProduct H T).1 - evol (H 1) (-(1 / 2)) * X * evol (H 0) (1 / 2)‖ ≤ B) :
     ‖evol (H 1) (1 / 2) * (unitProduct A T).1 * evol (H 0) (-(1 / 2)) - X‖ ≤
       B + ∑ j ∈ Finset.range T, ‖H ((j : ℝ) / T) - A ((j : ℝ) / T)‖ := by
@@ -285,7 +287,7 @@ theorem frameOp_centered {H D : 𝕄} (hH : H.IsHermitian) {w : ℝ}
 in the proof of Theorem 4.2. -/
 theorem centered_sigma (H D : ℝ → 𝕄) (T : ℕ) (b : ℝ) {w : ℝ}
     (hw : w < 2 * π)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
       |(hH _ (walkCubic_sample hj)).eigenvalues p -
         (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ w) :

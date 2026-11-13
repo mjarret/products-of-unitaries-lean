@@ -109,7 +109,7 @@ theorem open_turn_band_projector {A : 𝕄} (hA : A.IsHermitian) {α β : ℝ}
 /-- Theorem 4.6 applied to an explicitly given logarithm. Agreement on `[0,1]`
 identifies both walk derivatives and all sampled factors. -/
 theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
-    (W H : ℝ → 𝕄) (hH : ∀ s ∈ K, (H s).IsHermitian)
+    (W H : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     {w : ℝ} (hw : w < 2 * π) (hcH : ContDiffOn ℝ 2 H K)
     (hlog : ∀ s ∈ K, evol (H s) 1 = W s)
     (hwidth : ∀ s (hs : s ∈ K) p q,
@@ -117,7 +117,14 @@ theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
     (U : ℝ → 𝕄) (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) :
     ‖evol (H 1) (1 / 2) * (walk W T).2 * evol (H 0) (-(1 / 2)) - U T‖ ≤
       walkEnergy w W / T := by
-  have hb := (thm_unitary_products T hT H hH hw hcH hwidth).1 U hU
+  have hb := (thm_unitary_products T hT H hH hw hcH ((hasWidth_iff hH).2 hwidth)).1
+  rw [roundedEvolution_endpoint hT hH,
+    ← evolution_eqOn (Nat.cast_pos.mpr hT) hH
+      (UnitaryProducts.Prose.regulated_of_continuousOn hcH.continuousOn)
+      hU (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩)] at hb
+  have hprod0 : (walk (fun s ↦ evol (H s) 1) T).2 = (unitProduct H T).1 :=
+    UnitaryProducts.stepProduct_eq_pieceProduct (fun _ _ ↦ rfl) T le_rfl
+  rw [← hprod0] at hb
   have hw0 : 0 ≤ w := (abs_nonneg _).trans
     (hwidth 0 (by norm_num) (0 : Fin d) (0 : Fin d))
   have hfirst : EqOn (derivWithin (fun s ↦ evol (H s) 1) K) (derivWithin W K) K :=
@@ -155,26 +162,16 @@ theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
  uniqueness, regularity, and width of the logarithm named in the paper. The fixed band rank is not
 needed for this comparison. -/
 theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
-    (hu : (walk W 1).1) (hc : ContDiffOn ℝ 2 W K)
-    (horder : ∀ s ∈ K, α s < β s ∧ β s < α s + 2 * π)
-    (hband : spectralWindowFamily true W α β)
-    (hgc : ContinuousOn (fun s ↦ spectralWindowGap true (W s) (α s) (β s)) K) :
+    (hband : HasUnitaryBand W α β) (hc : ContDiffOn ℝ 2 W K) :
     let ϑ := sInf ((fun s ↦ spectralWindowGap true (W s) (α s) (β s)) '' K)
     let w := 2 * π - ϑ
     let P := spectralWindowProjector true (W 0) (α 0) (β 0)
     let Q := spectralWindowProjector true (W 1) (α 1) (β 1)
-    ∃ H : ℝ → 𝕄, ∃ hH : ∀ s ∈ K, (H s).IsHermitian,
-      (∀ s ∈ K, evol (H s) 1 = W s) ∧
-      (∀ s ∈ K, ∀ x ∈ spectrum ℝ (H s), x ∈ Ioo (α s) (α s + 2 * π)) ∧
-      (∀ s ∈ K, ∀ (B : 𝕄), B.IsHermitian →
-        (∀ x ∈ spectrum ℝ B, x ∈ Ioo (α s) (α s + 2 * π)) →
-        evol B 1 = W s → B = H s) ∧
-      ContDiffOn ℝ 2 H K ∧
-      (∀ s (hs : s ∈ K) p q,
-        |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) ∧
-      ∀ (T : ℕ), 1 ≤ T → ∀ (U : ℝ → 𝕄), IsEvolution (fun t ↦ H (t / T)) U 0 T →
+    ∃ H : ℝ → 𝕄, IsBandLogarithm W α H ∧ ContDiffOn ℝ 2 H K ∧ HasWidth H w ∧
+      ∀ (T : ℕ), 1 ≤ T →
         ‖(1 - Q) * (walk W T).2 * P‖ ≤
-          ‖(1 - Q) * U T * P‖ + walkEnergy w W / T := by
+          ‖(1 - Q) * evolution H T T * P‖ + walkEnergy w W / T := by
+  obtain ⟨hu, horder, hband, hgc⟩ := hband
   intro ϑ w
   have hband' : circularBand W α β := (walk_band_family_iff W α β hu horder).2 hband
   obtain ⟨hϑ, hϑg⟩ := walk_band_gap_minimum W α β hband' hu hgc
@@ -189,8 +186,12 @@ theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
       (fun i ↦ hopen s hs _ ((hH s hs).eigenvalues_mem_spectrum_real i))
       (hBlog.trans (hlog s hs).symm)
   intro P Q
-  refine ⟨H, hH, hlog, hopen, hunique, hcH, hwidth, ?_⟩
-  intro T hT U hU
+  refine ⟨H, ⟨hH, hlog, hopen, hunique⟩, hcH, (hasWidth_iff hH).2 hwidth, ?_⟩
+  intro T hT
+  let U := evolution H T
+  have hU := evolution_spec (Nat.cast_pos.mpr (show 0 < T by omega))
+    hH
+      (UnitaryProducts.Prose.regulated_of_continuousOn hcH.continuousOn)
   have hP := open_turn_band_projector (hH 0 (by norm_num))
     (hopen 0 (by norm_num)) (horder 0 (by norm_num)).2
   have hQ := open_turn_band_projector (hH 1 (by norm_num))

@@ -1249,7 +1249,7 @@ theorem ex_precessing_spin (ω θ : ℝ) :
       (evol Z (θ * s / 2) * X * evol Z (-(θ * s / 2)))
     let V := fun T : ℕ ↦ evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2))
     let Uend := fun T : ℕ ↦ evol Z (θ / 2) * evol ((ω * T) • X - θ • Z) (1 / 2)
-    (∀ T : ℕ, 0 < T → ∀ U, IsEvolution (fun t ↦ H (t / T)) U 0 T → U T = Uend T) ∧
+    (∀ T : ℕ, 0 < T → evolution H T T = Uend T) ∧
     (∀ T : ℕ, 0 < T → V T = evol Z (θ / 2) * step ω (θ / (2 * T)) ^ T) ∧
     (ω = π → Tendsto (fun k : ℕ ↦ ((2 * k + 1 : ℕ) : ℝ) *
       ‖V (2 * k + 1) - Uend (2 * k + 1)‖) atTop
@@ -1265,7 +1265,11 @@ theorem ex_precessing_spin (ω θ : ℝ) :
   rw [hfamily]
   dsimp only
   refine ⟨?_, ?_, ?_, ?_⟩
-  · intro T hT U hU
+  · intro T hT
+    have hU := evolution_spec (Nat.cast_pos.mpr hT)
+      (fun s _ ↦ family_hermitian ω θ s)
+      (UnitaryProducts.Prose.regulated_of_continuousOn
+        fun s _ ↦ (family_derivative ω θ s).continuousAt.continuousWithinAt)
     exact evolution_closed ω θ hT hU
   · intro T hT
     exact rounded_product_closed ω θ hT

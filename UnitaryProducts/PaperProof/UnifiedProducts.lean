@@ -110,7 +110,10 @@ theorem unified_products_walk [NeZero d] {T : ℕ} (hT : 0 < T)
     simpa only [add_sub_cancel_left] using abs_sub_le_of_le_of_le hp.1 hp.2 hq.1 hq.2
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
-  have hclock := thm_clocks hT H Hd U V hH hderH hlip hw hwidth hU hV
+  have hclock := thm_clocks hT H Hd hH ⟨hderH, hlip⟩ hw ((hasSampleWidth_iff hH).2 hwidth)
+  rw [← roundedEvolution_eqOn hT hH hV (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩),
+    ← evolution_eqOn ht hH (UnitaryProducts.Prose.regulated_of_continuousOn hcH.continuousOn) hU
+      (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩)] at hclock
   dsimp only at hclock
   rw [cellConstant_eq_frameBound hw0 hw, paperClockJump_sum_eq H Hd hH hw hwidth] at hclock
   have hgap : ∀ s (hs : s ∈ K) p q,

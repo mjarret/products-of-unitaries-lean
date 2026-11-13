@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.PaperProof.UniformCells
 public import UnitaryProducts.PaperProof.ThmUnitStepsMax
 public import UnitaryProducts.PaperProof.UniformTruncation
@@ -35,7 +37,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 /-- Lemma A.3 bounds each of the N adjacent sample increments. -/
 theorem uniform_step_sigma_LM [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N : ℕ}
     (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ} (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
     (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
@@ -84,7 +86,7 @@ theorem uniform_step_sigma_LM [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N : ℕ}
 /-- Sum the auxiliary two-point estimate over all N adjacent sample pairs. -/
 theorem uniform_steps_sigma_LM [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N : ℕ}
     (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ} (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
     (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
@@ -115,7 +117,7 @@ maximum and least Lipschitz constant of Theorem 4.2.
 The continuous within derivative Hd represents the C¹ path on the closed interval. -/
 theorem lem_boundary_uniform [NeZero d] {T : ℝ} (hT : 0 < T) {N : ℕ}
     (hN : 0 < N) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ} (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -162,7 +164,7 @@ theorem lem_boundary_uniform [NeZero d] {T : ℝ} (hT : 0 < T) {N : ℕ}
 /-- The boundary estimate retaining the actual derivatives at the two endpoints. -/
 theorem uniform_boundary_endpoints [NeZero d] {T : ℝ} (hT : 0 < T) {N : ℕ}
     (hN : 0 < N) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     {w : ℝ} (hw : w < 2 * π) (hwidth : AllSampleWidth T N H hH w) :
     let Yr := allSampleCorrectorFamily T N H Hd hH
     let Δ := fun j : ℕ ↦ Yr j (-(1 / 2)) - Yr (j - 1) (1 / 2)

@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.PaperProof.CenteredUnitSteps
 public import UnitaryProducts.Prose.SyncSteps
 public import UnitaryProducts.Prose.LocalSteps
@@ -69,7 +71,7 @@ Hamiltonian has the stated hypotheses, exponential phases, and exact errors. -/
 theorem sharp_example_computation (T : ℕ) (hT : 1 ≤ T) :
     let H := sharpFamily
     let Z := Matrix.diagonal ![(1 : ℂ), -1]
-    (∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) ∧
+    (IsTimeDepHamiltonian H) ∧
     ContDiffOn ℝ 1 H (Icc (0 : ℝ) 1) ∧
     unitSupNorm (derivWithin H (Icc (0 : ℝ) 1)) = 2 ∧
     (∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -187,44 +189,28 @@ The rounded evolution is constructed with its half-step endpoint identity. The c
 supplies the existence of both evolutions. -/
 theorem ex_unit_sharp (T : ℕ) (hT : 2 ≤ T) :
     let H := sharpFamily
-    (∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) ∧
-    ContDiffOn ℝ 1 H (Icc (0 : ℝ) 1) ∧
-    (∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤
-        2 * |t - s|) ∧
-    (∀ j : ℕ, j ≤ T → ∀ hj : (H (j / T)).IsHermitian, ∀ p q,
-      |hj.eigenvalues p - hj.eigenvalues q| ≤ 2) ∧
-    (∃ U : ℝ → Matrix (Fin 2) (Fin 2) ℂ, IsEvolution (fun t ↦ H (t / T)) U 0 T) ∧
-    (∀ U : ℝ → Matrix (Fin 2) (Fin 2) ℂ,
-      IsEvolution (fun t ↦ H (t / T)) U 0 T →
-      ∃ V : ℝ → Matrix (Fin 2) (Fin 2) ℂ,
-      IsEvolution (fun t ↦ H ((⌊t + 1 / 2⌋ : ℝ) / T)) V 0 T ∧
-      V T = evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) ∧
-      ‖V T - U T‖ = 2 * Real.sin (1 / (12 * T)) ∧
-      ‖(unitProduct H T).1 - U T‖ = 2 * Real.sin (1 / 4 - 1 / (12 * T))) ∧
+    IsTimeDepHamiltonian H ∧
+    HasLipschitzDerivative H (derivWithin H (Icc (0 : ℝ) 1)) 2 ∧
+    HasSampleWidth H T 2 ∧
+    ‖roundedEvolution H T T - evolution H T T‖ = 2 * Real.sin (1 / (12 * T)) ∧
+    ‖(unitProduct H T).1 - evolution H T T‖ = 2 * Real.sin (1 / 4 - 1 / (12 * T)) ∧
     Asymptotics.IsEquivalent atTop
       (fun N : ℕ ↦ 2 * Real.sin (1 / (12 * (N : ℝ))))
       (fun N : ℕ ↦ 1 / (6 * (N : ℝ))) ∧
     Tendsto (fun N : ℕ ↦ 2 * Real.sin (1 / 4 - 1 / (12 * (N : ℝ))))
       atTop (𝓝 (2 * Real.sin (1 / 4))) := by
   intro H
-  obtain ⟨hh, hc, hd, hl, hw, hex, herr⟩ := sharp_example_computation T (by omega)
-  refine ⟨hh, hc, hl, hw, hex, ?_, sharp_corrected_error_asymptotic,
-    sharp_uncorrected_error_limit⟩
-  · intro U hU
-    have ht : 0 < T := by omega
-    have htr : 0 < (T : ℝ) := Nat.cast_pos.mpr ht
-    obtain ⟨V, hV, heV⟩ := exists_rounded_evolution htr ht H hh
-    have hclock (t : ℝ) : UnitStepsProse.sample T (t / T) = (⌊t + 1 / 2⌋ : ℝ) / T := by
-      simp only [UnitStepsProse.sample, UnitStepsProse.clock, mul_div_cancel₀ t htr.ne']
-    have hrounded : IsEvolution (fun t ↦ H ((⌊t + 1 / 2⌋ : ℝ) / T)) V 0 T := by
-      simpa only [hclock] using hV
-    have hend : V T = evol (H 1) (1 / 2) * (unitProduct H T).1 *
-        evol (H 0) (-(1 / 2)) := by
-      simpa only [div_self htr.ne', one_smul,
-        show (T : ℝ) / (2 * T) = 1 / 2 by field_simp] using heV
-    refine ⟨V, hrounded, hend, ?_, (herr U hU).2.2.2.2.2⟩
-    rw [hend]
-    exact (herr U hU).2.2.2.2.1
+  obtain ⟨hh, hc, _, hl, hw, _, herr⟩ := sharp_example_computation T (by omega)
+  have ht : 0 < T := by omega
+  have hU := evolution_spec (Nat.cast_pos.mpr ht) hh
+    (UnitaryProducts.Prose.regulated_of_continuousOn hc.continuousOn)
+  have he := herr _ hU
+  refine ⟨hh, ⟨fun s hs ↦ (hc.differentiableOn (by norm_num) s hs).hasDerivWithinAt, hl⟩,
+    ?_, ?_, he.2.2.2.2.2, sharp_corrected_error_asymptotic, sharp_uncorrected_error_limit⟩
+  · intro j hj
+    exact (hasSpectralWidth_iff (hh _ (walkCubic_sample hj))).2
+      (hw j hj (hh _ (walkCubic_sample hj)))
+  · rw [roundedEvolution_endpoint ht hh]
+    exact he.2.2.2.2.1
 
 end UnitaryProducts.PaperProof

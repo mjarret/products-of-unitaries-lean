@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.PaperProof.PropTransfer
 
 public import UnitaryProducts.Prose.FineSteps
@@ -130,7 +132,7 @@ theorem maxCellError_le {H : ℝ → 𝕄} {n : ℕ} {s : ℕ → ℝ}
 
 /-- Duhamel for the held midpoint path on the full parameter interval. -/
 theorem midpoint_duhamel_integral {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
-    (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
+    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     (F : ℝ → ℝ) (hodd : ∀ x, F (-x) = -F x) (n : ℕ) (s : ℕ → ℝ)
     (hs : IsCheckpointPartition n s) :
@@ -206,15 +208,15 @@ theorem midpoint_duhamel_integral {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
 
 /-- Theorem 3.6 (`thm:fine-steps`): Duhamel,
 in supremum form for arbitrary nondecreasing checkpoints. -/
-theorem thm_fine_steps_sup {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
-    (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
+theorem thm_fine_steps_sup {H : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
+    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
     (F : ℝ → ℝ) (hodd : ∀ x, F (-x) = -F x) (n : ℕ) (s : ℕ → ℝ)
     (hs : IsCheckpointPartition n s) :
     let M := fun j ↦ H ((s j + s (j + 1)) / 2)
     let G := fun j ↦ (levelFunctionData F).1 (M j)
-    ‖midpointProductOver ((levelFunctionData F).2 H) T n s - U T‖ ≤
+    ‖midpointProductOver ((levelFunctionData F).2 H) T n s - evolution H T T‖ ≤
       T * maxCellError H G n s := by
+  have hU := evolution_spec hT hH hreg
   classical
   intro M G
   apply (midpoint_duhamel_integral hT hreg hH hU F hodd n s hs).trans
@@ -269,7 +271,7 @@ theorem exists_oscillation_partition {H : ℝ → 𝕄} (hreg : IsRegulated H 0 
 
 /-- equation (3.1): bit error on any cells of midpoint error at most ε. -/
 theorem fine_bits_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
-    (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
+    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     (n : ℕ) (s : ℕ → ℝ) (hs : IsCheckpointPartition n s) (hε : 0 ≤ ε)
     (hosc : ∀ j < n, ∀ x ∈ Ioo (s j) (s (j + 1)),
@@ -279,7 +281,8 @@ theorem fine_bits_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
     ‖midpointProductOver ((truncation k).2.2.2 H) T n s - U T‖ ≤
       T * (ε + Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹) := by
   have hbits := ex_truncation_bits (d := d) k
-  have hduhamel := thm_fine_steps_sup hT hreg hH hU (truncation k).1 hbits.1 n s hs
+  have hduhamel := thm_fine_steps_sup hT hreg hH (truncation k).1 hbits.1 n s hs
+  rw [← evolution_eqOn hT hH hreg hU (show T ∈ Icc 0 T from ⟨hT.le, le_rfl⟩)] at hduhamel
   apply hduhamel.trans
   apply mul_le_mul_of_nonneg_left _ hT.le
   apply maxCellError_le hs _ (add_nonneg hε (by positivity))
@@ -293,9 +296,9 @@ theorem fine_bits_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
 small midpoint oscillation, and the explicit product with its bit-error bound.
 Any uniform sparsity upper bound is allowed; the paper uses the exact maximum.
 Checkpoint existence and the factor identity are also supplied. -/
-theorem introthm_fine_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
-    (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) (hε : 0 < ε)
+theorem introthm_fine_oscillation {H : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
+    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
+    (hε : 0 < ε)
     (k σ : ℕ)
     (hsp : ∀ x ∈ Icc (0 : ℝ) 1, RowSparse σ (H x - (truncation k).2.2.1 (H x))) :
     (∃ (n : ℕ) (s : ℕ → ℝ), IsCheckpointPartition n s ∧
@@ -305,14 +308,15 @@ theorem introthm_fine_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
       let W := midpointProductOver ((truncation k).2.2.2 H) T n s
       W = pieceProduct (scheduleDuration (fun j ↦ T * s j) n)
         (fun j ↦ (truncation k).2.2.2 H ((s j + s (j + 1)) / 2)) n ∧
-      ‖W - U T‖ ≤ T * (ε + Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹) := by
+      ‖W - evolution H T T‖ ≤ T * (ε + Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹) := by
+  have hU := evolution_spec hT hH hreg
   obtain ⟨n, s, hs, _, _, ho⟩ := exists_oscillation_partition hreg hε
   exact ⟨⟨n, s, hs, ho⟩, fun m t ht hosc ↦ ⟨midpointProductOver_eq _ T m t,
     fine_bits_oscillation hT hreg hH hU m t ht hε.le hosc k σ hsp⟩⟩
 
 /-- Equation (3.1), existence form: every positive cell tolerance is available. -/
 theorem exists_fine_bits_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
-    (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
+    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) (hε : 0 < ε)
     (k σ : ℕ)
     (hsp : ∀ x ∈ Icc (0 : ℝ) 1, RowSparse σ (H x - (truncation k).2.2.1 (H x))) :
@@ -326,7 +330,7 @@ theorem exists_fine_bits_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 <
 
 /-- Balancing the two errors gives the stated doubled bit bound when σ is positive. -/
 theorem exists_fine_bits_balanced {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
-    (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
+    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) (k σ : ℕ) (hσ : 0 < σ)
     (hsp : ∀ x ∈ Icc (0 : ℝ) 1, RowSparse σ (H x - (truncation k).2.2.1 (H x))) :
     ∃ (n : ℕ) (s : ℕ → ℝ), IsCheckpointPartition n s ∧
@@ -347,7 +351,7 @@ theorem oscillation_jrs_allocations {C δ : ℝ} (hC : 0 < C) (hδ : 0 < δ) :
 without a variation hypothesis or an a priori number of cells.
 Any uniform sparsity upper bound is allowed; the paper uses the exact maximum. -/
 theorem cor_jrs_oscillation {H U : ℝ → 𝕄}
-    (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
+    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
     (P Q : 𝕄) (hP : IsStarProjection P) (hQ : IsStarProjection Q)
     {C δ : ℝ} (hC : 0 < C) (hδ : 0 < δ)
     (hU : IsEvolution (fun t ↦ H (t / (2 * C / δ))) U 0 (2 * C / δ))
@@ -471,7 +475,7 @@ theorem oscillation_inverse_time_product {H U : ℝ → 𝕄}
    {T c L : ℝ}
    (hT : 0 < T)
    (hc : 0 < c)
-    (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
    (hLip : ∀ x ∈ Icc (0 : ℝ) 1, ∀ y ∈ Icc (0 : ℝ) 1,
       ‖H x - H y‖ ≤ L * |x - y|)
@@ -484,7 +488,7 @@ theorem oscillation_inverse_time_product {H U : ℝ → 𝕄}
       ‖midpointProductOver ((truncation k).2.2.2 H) T n s - U T‖ ≤ 2 * c / T := by
   -- At x = 1 and y = 0, the Lipschitz hypothesis bounds a nonnegative norm by L.
   have hL : 0 ≤ L := by simpa using (norm_nonneg _).trans (hLip 1 (by norm_num) 0 (by norm_num))
-  have hreg := regulated_of_continuousOn
+  have hreg := UnitaryProducts.Prose.regulated_of_continuousOn
     (continuousOn_of_norm_sub_le (fun s hs t ht ↦ hLip t ht s hs))
   intro n s
   have hn := oscillation_inverse_time_count_rounding hT hc hL

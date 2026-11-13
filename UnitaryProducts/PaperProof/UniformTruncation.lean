@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.PaperProof.ThmComparison
 public import UnitaryProducts.Prose.Introduction
 public import UnitaryProducts.Prose.FinalSteps
@@ -34,7 +36,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
 /-- A rounded Hermitian path has an evolution whose final value is the phased unit product. -/
 theorem exists_rounded_evolution {T : ℝ} {N : ℕ} (hT : 0 < T) (hN : 0 < N)
-    (K : ℝ → 𝕄) (hK : ∀ s ∈ Icc (0 : ℝ) 1, (K s).IsHermitian) :
+    (K : ℝ → 𝕄) (hK : IsTimeDepHamiltonian K) :
     ∃ V, IsEvolution (fun t ↦ K (sample N (t / T))) V 0 T ∧
       V T = evol (K 1) (T / (2 * N)) *
         (unitProduct (fun s ↦ (T / N) • K s) N).1 * evol (K 0) (-(T / (2 * N))) := by
@@ -54,7 +56,7 @@ theorem exists_rounded_evolution {T : ℝ} {N : ℕ} (hT : 0 < T) (hN : 0 < N)
 /-- Example 3.2 on the complete sample grid. The sparsity bound is on the error
 matrix at each sample; it is exactly the parameter `σ_k` in the bit estimate. -/
 theorem uniform_bit_sample_error {H : ℝ → 𝕄} {N : ℕ}
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) (k σ : ℕ)
+    (hH : IsTimeDepHamiltonian H) (k σ : ℕ)
     (hs : ∀ j : Fin (N + 1), RowSparse σ
       (H ((j : ℝ) / N) - scalarEntryMap (truncBits k) (H ((j : ℝ) / N)))) :
     (⨆ j : Fin (N + 1),
@@ -69,7 +71,7 @@ theorem uniform_bit_sample_error {H : ℝ → 𝕄} {N : ℕ}
 /-- A global spectral-width bound gives the width hypothesis at every sample,
 including the final sample, whenever `T Δ ≤ N w`. -/
 theorem all_sample_width_of_le (H : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (Δ w T : ℝ) (N : ℕ) (hN : 0 < N)
     (hΔ : ∀ s (hs : s ∈ Icc (0 : ℝ) 1) (p q : Fin d),
       |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ Δ)
@@ -86,7 +88,7 @@ theorem all_sample_width_of_le (H : ℝ → 𝕄)
 /-- For fixed positive width and duration, a bounded Hermitian path satisfies
 all sample-width conditions for every sufficiently large step count. -/
 theorem all_sample_width_eventually (H : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     {T B w : ℝ} (hT : 0 ≤ T) (hw : 0 < w)
     (hB : ∀ s ∈ Icc (0 : ℝ) 1, ‖H s‖ ≤ B) :
     ∃ N₀ : ℕ, ∀ N : ℕ, N₀ ≤ N →
@@ -108,7 +110,7 @@ theorem all_sample_width_eventually (H : ℝ → 𝕄)
 supremum over all path times and all rows, rather than a supplied sparsity bound.
 The error maximum includes both endpoints of the complete sample grid. -/
 theorem uniform_bit_sample_error_sigma {H : ℝ → 𝕄} {N : ℕ}
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) (k : ℕ) :
+    (hH : IsTimeDepHamiltonian H) (k : ℕ) :
     let σ := ⨆ s : Icc (0 : ℝ) 1, ⨆ i : Fin d,
       (Finset.univ.filter fun j ↦ truncHerm k (H s) i j ≠ H s i j).card
     (⨆ j : Fin (N + 1),

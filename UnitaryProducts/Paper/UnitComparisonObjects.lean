@@ -68,15 +68,5 @@ theorem paperFrameOp_eq_series {Ω : 𝕄} (hΩ : Ω.IsHermitian) {w : ℝ}
   simp only [UnitStepsProse.complexSpectralMultiplier, LinearMap.coe_toContinuousLinearMap',
     LinearMap.coe_mk, AddHom.coe_mk, WalkCut.complexFrameMult_ofReal]
 
-/-- The domain-restricted object has the same convergent series. -/
-theorem unitComparisonObjects_eq_series {Ω : 𝕄} (hΩ : Ω.IsHermitian) {w : ℝ}
-    (hw : w < 2 * Real.pi)
-    (hwidth : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w) (E : 𝕄) :
-    unitComparisonObjects.2 Ω hΩ (fun p q ↦ (hwidth p q).trans_lt hw) E =
-      frameOp Ω E :=
-  by
-    have heq := paperFrameOp_eq_series hΩ hw hwidth E
-    simpa only [paperFrameOp, dif_pos hΩ,
-      dif_pos (fun p q ↦ (hwidth p q).trans_lt hw)] using heq
 
 end UnitaryProducts.Paper

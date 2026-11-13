@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.Prose.WalkLogLocal
 public import UnitaryProducts.Prose.FinalSteps
 public import UnitaryProducts.PaperProof.SpectralProofSteps
@@ -557,7 +559,7 @@ theorem lem_walk_log [NeZero d] (a : ℝ → ℝ) (w : ℝ)
       ∃ θ ∈ Icc (a s) (a s + w), z = Complex.exp (-I * (θ : ℂ)))
     (hc : ContDiffOn ℝ 2 W (Icc (0 : ℝ) 1)) :
     let S : ℝ → ℝ := fun x ↦ if x=0 then 1 else (x/2)/Real.sin (x/2)
-    ∃ H : ℝ → 𝕄, ∃ hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian,
+    ∃ H : ℝ → 𝕄, ∃ hH : IsTimeDepHamiltonian H,
       (∀ s (hs : s ∈ Icc (0 : ℝ) 1),
         (∀ i, (hH s hs).eigenvalues i ∈ Icc (a s) (a s+w)) ∧ evol (H s) 1=W s) ∧
       (∀ s ∈ Icc (0 : ℝ) 1, ∀ (B : 𝕄) (hB : B.IsHermitian),
@@ -580,7 +582,7 @@ theorem lem_walk_log [NeZero d] (a : ℝ → ℝ) (w : ℝ)
       exact ⟨H, hH, fun _ ↦ ⟨hwin, he⟩⟩
     · exact ⟨0, Matrix.isHermitian_zero, fun h ↦ (hs h).elim⟩
   choose H hH he using hex
-  have hherm : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian := fun s _ ↦ hH s
+  have hherm : IsTimeDepHamiltonian H := fun s _ ↦ hH s
   have hevol := fun s hs ↦ (he s hs).2
   have hwindow := fun s hs ↦ (he s hs).1
   have hcenter := fun s hs ↦ norm_sub_smul_one_le_of_eigenvalues (hH s) hw0 (hwindow s hs)

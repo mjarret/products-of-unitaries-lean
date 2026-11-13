@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.UniformComparison
 public import UnitaryProducts.PaperProof.LocalCell
 public import UnitaryProducts.PaperProof.ExponentialDefinitions
@@ -23,7 +25,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 The cell boundary terms and the residual integral are kept separate. -/
 theorem canonical_cell_comparison_assembly {T : ℝ} (hT : 0 < T) {N : ℕ}
     (hN1 : 0 < N) (H Hd U Vt : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     (hVt : IsEvolution (fun t ↦ H (sample N (t / T))) Vt 0 T) (B E : ℝ)
     (hboundary : let Yr := allSampleCorrectorFamily T N H Hd hH
@@ -111,7 +113,7 @@ theorem canonical_cell_comparison_assembly {T : ℝ} (hT : 0 < T) {N : ℕ}
 
 /-- The closed residual and boundary estimates give the comparison on unit cells. -/
 theorem canonical_cell_bound_LM [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd U V : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M w : ℝ} (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
     (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
@@ -135,7 +137,7 @@ theorem canonical_cell_bound_LM [NeZero d] {T : ℕ} (hT : 0 < T)
 
 /-- Pointwise multiplier variation, by the series split and the mean value theorem. -/
 theorem canonical_cell_variation (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π)
     (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
@@ -171,7 +173,7 @@ theorem canonical_cell_variation (H Hd : ℝ → 𝕄)
 /-- Theorem 4.2: apply the comparison identity, bound the boundary terms,
 then integrate the residual profile by its three even cell moments. -/
 theorem unit_steps_uncentred [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd U V : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M w : ℝ} (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
     (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)

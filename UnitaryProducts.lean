@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.GapAdapted
 public import UnitaryProducts.PaperProof.PrecessingSpin
 public import UnitaryProducts.PaperProof.SpinProse
@@ -154,4 +155,5 @@ See `UnitaryProducts.PaperProof.IntroTheorems` for Theorem B and
 
 Michael Jarret, *Products of unitaries as continuous evolutions at finite precision*.
 -/
+
 

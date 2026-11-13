@@ -37,6 +37,11 @@ unnumbered steps under `Prose`. Supporting mathematics is organized under `Matri
 `Evolution`, `Spectral`, `Approximation`, `Corrector`, `Comparison`, and `Walks`.
 Follow each index link for the full hypotheses, statement, and proof.
 
+The [paper vocabulary](UnitaryProducts/Paper/Vocabulary.lean) names time-dependent
+Hamiltonians, Lipschitz derivatives, spectral widths, bands, and the two evolutions.
+Its unfolding and uniqueness lemmas connect these names to the underlying hypotheses.
+The evolution names determine their values on the paper's time interval `[0,T]`.
+
 ## Checking the build
 
 After `lake exe cache get && lake build`, three scripts print what the build establishes:

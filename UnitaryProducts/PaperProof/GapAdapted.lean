@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 public import UnitaryProducts.Spectral.Weyl
 public import UnitaryProducts.PaperProof.UniformConsequences
@@ -478,7 +480,7 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
     let H := fun s ↦ gapInterp H₀ H₁ (u s)
     let Hd := fun s ↦ (cp * Γ (u s) ^ p) • (H₁ - H₀)
     u 1 = 1 ∧ H 0 = H₀ ∧ H 1 = H₁ ∧
-    (∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) ∧
+    (IsTimeDepHamiltonian H) ∧
     (∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s) ∧
     DifferentiableOn ℝ H (Icc (0 : ℝ) 1) ∧
     ContinuousOn Hd (Icc (0 : ℝ) 1) ∧
@@ -517,7 +519,7 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
   have hu1 : u 1 = 1 := gap_schedule_endpoint hΓcont hpos hu0 hurange hu
   have hH0 : H 0 = H₀ := by simp [H, gapInterp, hu0]
   have hH1 : H 1 = H₁ := by simp [H, gapInterp, hu1]
-  have hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian :=
+  have hH : IsTimeDepHamiltonian H :=
     fun s _ ↦ gapInterp_hermitian h₀ h₁ (u s)
   have hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s :=
     fun s hs ↦ gap_schedule_derivative H₀ H₁ (hu s hs)
@@ -558,8 +560,10 @@ theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁
       |(hH _ (walkCubic_sample hj)).eigenvalues i -
         (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ 2 :=
     fun j hj i q ↦ hwidth _ (walkCubic_sample hj) i q
-  exact ex_unit_transfer_bounds 2 hnonresonant H U T k hT hH hc
-    (p * 4 ^ p * cp ^ 2 * ‖H₁ - H₀‖ ^ 2) hderivLip hsampleWidth hU
+  exact ex_unit_transfer_bounds 2 hnonresonant H U T k hT hH
+    (p * 4 ^ p * cp ^ 2 * ‖H₁ - H₀‖ ^ 2)
+    ⟨fun s hs ↦ (hc s hs).hasDerivWithinAt, hderivLip⟩
+    ((hasSampleWidth_iff hH).2 hsampleWidth) hU
     P Q hP hQ hPc hQc C δ hδ hcont
 
 
@@ -906,7 +910,7 @@ The cited continuous estimate and the preceding correction estimate give
 `M ≤ K/g`. Example 4.5 then supplies the stated accuracy for every truncation
 meeting its bit budget, with at most `(2K+2)/(δg)` factors. -/
 theorem gap_truncated_factor_count (H : ℝ → 𝕄) (U : ℕ → ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hc : DifferentiableOn ℝ H (Icc (0 : ℝ) 1)) (L : ℝ)
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
       ‖derivWithin H (Icc (0 : ℝ) 1) t - derivWithin H (Icc (0 : ℝ) 1) s‖ ≤ L * |t - s|)
@@ -951,7 +955,8 @@ theorem gap_truncated_factor_count (H : ℝ → 𝕄) (U : ℕ → ℝ → 𝕄)
         (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ 2 :=
     fun j hj i q ↦ hwidth _ (walkCubic_sample hj) i q
   have htransfer := ex_unit_transfer_bounds 2 (by linarith [pi_gt_three]) H (U T)
-    T k hT hH hc L hlip hdiff (hU T hT) P Q hP hQ hPc hQc C δ hδ (hcont T hT)
+    T k hT hH L ⟨fun s hs ↦ (hc s hs).hasDerivWithinAt, hlip⟩
+    ((hasSampleWidth_iff hH).2 hdiff) (hU T hT) P Q hP hQ hPc hQc C δ hδ (hcont T hT)
   change 2 * ((C : ℝ) + A) / δ ≤ T →
     Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ δ / (2 * T) → _ at htransfer
   exact htransfer hbudget hbits

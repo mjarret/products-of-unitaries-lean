@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.LocalCell
 public import UnitaryProducts.PaperProof.ThmComparison
 public import UnitaryProducts.PaperProof.ThmUnitStepsMax
@@ -63,14 +65,14 @@ local instance uniformBorelSpace : BorelSpace 𝕄 := ⟨rfl⟩
 
 /-- Width of every sample, including indices 0 and N. -/
 def AllSampleWidth (T : ℝ) (N : ℕ) (H : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) (w : ℝ) : Prop :=
+    (hH : IsTimeDepHamiltonian H) (w : ℝ) : Prop :=
   ∀ (r : ℤ) (hr : 0 ≤ r ∧ r ≤ (N : ℤ)), ∀ p q,
     let hΩ := Separation.isHermitian_real_smul (hH _ (all_grid_mem hr)) (T / N)
     |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w
 
 /-- The periodic corrector at each inclusive sample. -/
 def allSampleCorrectorFamily (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) (r : ℤ) : ℝ → 𝕄 :=
+    (hH : IsTimeDepHamiltonian H) (r : ℤ) : ℝ → 𝕄 :=
   if hr : 0 ≤ r ∧ r ≤ (N : ℤ) then
     (periodicCorrectorData ((T / N) • H ((r : ℝ) / N))
       (Separation.isHermitian_real_smul (hH _ (all_grid_mem hr)) (T / N))
@@ -79,7 +81,7 @@ def allSampleCorrectorFamily (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄)
 
 /-- The correction on the closed cell of sample j; no global correction is glued. -/
 def uniformCorrectionPiece (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) (j : ℤ) (s : ℝ) : 𝕄 :=
+    (hH : IsTimeDepHamiltonian H) (j : ℤ) (s : ℝ) : 𝕄 :=
   allSampleCorrectorFamily T N H Hd hH j ((N : ℝ) * s - j)
 
 /-- The residual selects the derivative of the current piece, including at switches.
@@ -90,7 +92,7 @@ def uniformPieceResidual (T : ℝ) (N : ℕ) (H : ℝ → 𝕄) (Y : ℤ → ℝ
 
 /-- Supporting identity for uniform sample cells. -/
 theorem allSampleCorrectorFamily_ode (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) {r : ℤ}
+    (hH : IsTimeDepHamiltonian H) {r : ℤ}
     (hr : 0 ≤ r ∧ r ≤ (N : ℤ)) (t : ℝ) :
     HasDerivAt (allSampleCorrectorFamily T N H Hd hH r)
       (t • ((T / (N : ℝ) ^ 2) • Hd ((r : ℝ) / N)) -
@@ -101,7 +103,7 @@ theorem allSampleCorrectorFamily_ode (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄)
 
 /-- Every closed correction piece is continuously differentiable. -/
 theorem contDiff_uniformCorrectionPiece (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) (j : ℤ) :
+    (hH : IsTimeDepHamiltonian H) (j : ℤ) :
     ContDiff ℝ 1 (uniformCorrectionPiece T N H Hd hH j) := by
   refine ContDiff.comp ?_ ((contDiff_const.mul contDiff_id).sub contDiff_const)
   by_cases hj : 0 ≤ j ∧ j ≤ (N : ℤ)
@@ -114,7 +116,7 @@ theorem contDiff_uniformCorrectionPiece (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄
 
 /-- Supporting identity for uniform sample cells. -/
 theorem allSampleCorrectorFamily_end_values (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) {w : ℝ} (hw : w < 2 * π)
+    (hH : IsTimeDepHamiltonian H) {w : ℝ} (hw : w < 2 * π)
     (hwidth : AllSampleWidth T N H hH w) {r : ℤ} (hr : 0 ≤ r ∧ r ≤ (N : ℤ)) :
     let hΩ := Separation.isHermitian_real_smul (hH _ (all_grid_mem hr)) (T / N)
     let E := (periodicCorrectorData ((T / N) • H ((r : ℝ) / N)) hΩ
@@ -135,7 +137,7 @@ theorem allSampleCorrectorFamily_end_values (T : ℝ) (N : ℕ) (H Hd : ℝ → 
 /-- The quadratic corrector profile at every sample cell. -/
 theorem uniform_corrector_norm_LM [NeZero d] {T : ℝ} (hT : 0 ≤ T)
     (N : ℕ) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     {L : ℝ}
     {w : ℝ} (hw : w < 2 * π)
     (hwidth : AllSampleWidth T N H hH w) {j : ℤ} (hr : 0 ≤ j ∧ j ≤ (N : ℤ))
@@ -156,7 +158,7 @@ theorem uniform_corrector_norm_LM [NeZero d] {T : ℝ} (hT : 0 ≤ T)
 
 /-- Supporting identity for uniform sample cells. -/
 theorem allSampleCorrectorFamily_center_norm_le {T : ℝ} (hT : 0 ≤ T)
-    (N : ℕ) (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (N : ℕ) (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     {w : ℝ} (hw : w < 2 * π) (hwidth : AllSampleWidth T N H hH w)
     {r : ℤ} (hr : 0 ≤ r ∧ r ≤ (N : ℤ)) :
     ‖allSampleCorrectorFamily T N H Hd hH r 0‖ ≤
@@ -172,7 +174,7 @@ theorem allSampleCorrectorFamily_center_norm_le {T : ℝ} (hT : 0 ≤ T)
 
 /-- The residual of the pieces is measurable; no derivative crosses a jump. -/
 theorem uniform_aestronglyMeasurable_pieceResidual (T : ℝ) (N : ℕ) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hcH : ContinuousOn H (Icc (0 : ℝ) 1)) :
     AEStronglyMeasurable
       (uniformPieceResidual T N H (uniformCorrectionPiece T N H Hd hH))
@@ -193,7 +195,7 @@ theorem uniform_aestronglyMeasurable_pieceResidual (T : ℝ) (N : ℕ) (H Hd : �
 
 /-- The ODE differentiated along a fixed correction piece, including its endpoints. -/
 theorem uniformCorrectionPiece_derivative (T : ℝ) {N : ℕ}
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     {j : ℤ} (hj : 0 ≤ j ∧ j ≤ (N : ℤ)) (s : ℝ) :
     HasDerivAt (uniformCorrectionPiece T N H Hd hH j)
       (((N : ℝ) * s - j) • ((T / N) • Hd ((j : ℝ) / N)) -
@@ -213,7 +215,7 @@ theorem uniformCorrectionPiece_derivative (T : ℝ) {N : ℕ}
 /-- The cell residual used in the global bound is the Section 4 residual identity,
 with the local-time interval restricted to the physical Hamiltonian domain. -/
 theorem uniformPieceResidual_local_cell (T : ℝ) {N : ℕ} (hN : 0 < N)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     (hc : ContinuousOn Hd (Icc (0 : ℝ) 1)) {s : ℝ} (hs : s ∈ Icc (0 : ℝ) 1)
     :
@@ -290,7 +292,7 @@ theorem uniform_local_bounds {T : ℝ} (hT : 0 ≤ T) {N : ℕ}
 
 /-- The residual pointwise bound, using only the current sample. -/
 theorem uniformResidual_norm_le {T : ℝ} (hT : 0 ≤ T) {N : ℕ} (hN : 0 < N)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ}
     (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
@@ -333,7 +335,7 @@ theorem uniformResidual_norm_le {T : ℝ} (hT : 0 ≤ T) {N : ℕ} (hN : 0 < N)
 
 /-- the proof of Theorem 4.2: the integral-term bound and its exact even residual profile. -/
 theorem uniformResidual_profile_bound [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N : ℕ} (hN : 0 < N)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ}
     (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
@@ -486,7 +488,7 @@ theorem uniform_residual_step_of_profile {T : ℝ} {N j : ℕ} (hj : j < N)
 /-- Every mesh interval has the same sharp residual integral, including the first and last. -/
 theorem uniform_residual_step [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N j : ℕ}
     (hj : j < N) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ}
     (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
@@ -562,7 +564,7 @@ theorem uniform_residual_integral_of_profile {T : ℝ} {N : ℕ} (hN : 0 < N)
 /-- Uniform-cell the proof of Theorem 4.2, with sharp constants and no endpoint correction. -/
 theorem uniform_residual_integral [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N : ℕ}
     (hN : 0 < N) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ}
     (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
@@ -583,13 +585,13 @@ theorem uniform_residual_integral [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N : ℕ}
 
 /-- The residual of the assembled correction in physical time at unit steps. -/
 def unitPhysicalResidual (T : ℕ) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) (t : ℝ) : 𝕄 :=
+    (hH : IsTimeDepHamiltonian H) (t : ℝ) : 𝕄 :=
   (1 / T : ℝ) • uniformPieceResidual T T H
     (uniformCorrectionPiece T T H Hd hH) (t / T)
 
 /-- Equation (4.2) in physical time, for the periodic piece at the rounded sample. -/
 theorem unitPhysicalResidual_local {T : ℕ} (hT : 0 < T) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     (hc : ContinuousOn Hd (Icc (0 : ℝ) 1)) {t : ℝ} (ht : t ∈ Icc (0 : ℝ) T) :
     let j : ℤ := clock t
@@ -609,7 +611,7 @@ theorem unitPhysicalResidual_local {T : ℕ} (hT : 0 < T) (H Hd : ℝ → 𝕄)
 /-- Theorem 4.2's third line, before taking norms: the derivative-difference
 integral starts at the actual rounded sample in physical time. -/
 theorem unitPhysicalResidual_integral_formula {T : ℕ} (hT : 0 < T) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     (hc : ContinuousOn Hd (Icc (0 : ℝ) 1)) {t : ℝ} (ht : t ∈ Icc (0 : ℝ) T) :
     unitPhysicalResidual T H Hd hH t =
@@ -630,7 +632,7 @@ theorem unitPhysicalResidual_integral_formula {T : ℕ} (hT : 0 < T) (H Hd : ℝ
 /-- Theorem 4.2's third-line integrand: triangle inequality and the product norm
 bound applied to the explicit physical-time residual integral. -/
 theorem unitPhysicalResidual_integral_product_bound {T : ℕ} (hT : 0 < T)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     (hc : ContinuousOn Hd (Icc (0 : ℝ) 1)) {t : ℝ} (ht : t ∈ Icc (0 : ℝ) T) :
     ‖unitPhysicalResidual T H Hd hH t‖ ≤
@@ -644,7 +646,7 @@ theorem unitPhysicalResidual_integral_product_bound {T : ℕ} (hT : 0 < T)
 
 /-- The physical residual profile in the proof of Theorem 4.2, including rounded switches. -/
 theorem unitPhysicalResidual_profile_bound [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ} (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
     (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ u ∈ Icc (0 : ℝ) 1, ‖Hd u - Hd s‖ ≤ M * |u - s|)
@@ -702,7 +704,7 @@ theorem uniform_physical_residual_integral {N : ℕ}
 
 /-- Changing from normalized time to physical time preserves the residual integral. -/
 theorem unitPhysicalResidual_integral {T : ℕ} (hT : 0 < T) (H Hd : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) :
+    (hH : IsTimeDepHamiltonian H) :
     (∫ t in (0 : ℝ)..T, ‖unitPhysicalResidual T H Hd hH t‖) =
       ∫ s in (0 : ℝ)..1,
         ‖uniformPieceResidual T T H (uniformCorrectionPiece T T H Hd hH) s‖ := by
@@ -717,7 +719,7 @@ cell split and then evaluate the three moments. The norm integral remains in phy
 accompanying normalized
 integrability statements feed the already established comparison identity. -/
 theorem unit_residual_integral [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L M : ℝ} (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
     (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ u ∈ Icc (0 : ℝ) 1, ‖Hd u - Hd s‖ ≤ M * |u - s|)
@@ -751,7 +753,7 @@ on `[0,1]`; the only derivative hypothesis is the Lipschitz bound `h`.
 The proof uses the explicit residual integrand, the rounded half-interval split,
 and the three moments from Lemma A.1(ii). -/
 theorem cor_residual [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {h w : ℝ}
     (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
@@ -771,7 +773,7 @@ theorem cor_residual [NeZero d] {T : ℕ} (hT : 0 < T)
 /-- At every switch the jump is the difference of the spectral endpoint values,
 with the common scale extracted exactly. -/
 theorem uniformCorrectionPiece_jump_frame (T : ℝ) (N : ℕ)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     {w : ℝ} (hw : w < 2 * π) (hwidth : AllSampleWidth T N H hH w)
     {j : ℤ} (hj : 1 ≤ j) (hjN : j ≤ (N : ℤ)) :
     let Yr := allSampleCorrectorFamily T N H Hd hH

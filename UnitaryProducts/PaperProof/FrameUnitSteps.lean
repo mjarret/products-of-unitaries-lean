@@ -5,6 +5,8 @@ Authors: Michael Jarret
 -/
 module
 
+public import UnitaryProducts.Paper.Vocabulary
+
 public import UnitaryProducts.PaperProof.CenteredUnitSteps
 
 /-! # The centered rotating-frame bound for unit-step products -/
@@ -52,7 +54,7 @@ phase-corrected unit-step product, for every real centering scalar. No smoothnes
 or width hypothesis is needed. -/
 theorem frame_unit {H U V : ℝ → 𝕄} {T : ℕ} (hT : 0 < T)
     (hHr : IsRegulated H 0 1)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     (hV : IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T) (b : ℝ) :
     |‖evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2)) - U T‖ -

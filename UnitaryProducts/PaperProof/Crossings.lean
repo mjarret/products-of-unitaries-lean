@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.UniformConsequences
 
 /-! # Transfer through eigenvalue crossings -/
@@ -34,7 +36,7 @@ theorem commuting_endpoint_transfer (H : ℝ → 𝕄) (T : ℕ) (U P Q : 𝕄)
 /-- The crossing proof: the endpoint transfer and the explicit `1/T`
 comparison from (4.6), with a coefficient independent of the step count. -/
 theorem crossing_comparison_bound [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U P : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (H Hd U P : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L w : ℝ} (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
       ‖Hd t - Hd s‖ ≤ L * |t - s|) (hw : w < 2 * π)
@@ -63,7 +65,12 @@ theorem crossing_comparison_bound [NeZero d] {T : ℕ} (hT : 0 < T)
   refine ⟨hleak, ?_⟩
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
-  have hbound := thm_jumps hT H Hd U V hH hd hlip hw hwidth hU hV
+  have hbound := thm_jumps hT H Hd hH ⟨hd, hlip⟩ hw ((hasSampleWidth_iff hH).2 hwidth)
+  have hreg := UnitaryProducts.Prose.regulated_of_continuousOn
+    (HasLipschitzDerivative.continuousOn (show HasLipschitzDerivative H Hd L from ⟨hd, hlip⟩))
+  rw [← roundedEvolution_eqOn hT hH hV (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩),
+    ← evolution_eqOn ht hH hreg hU
+      (show (T : ℝ) ∈ Icc (0 : ℝ) T from ⟨by positivity, le_rfl⟩)] at hbound
   rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w L H Hd hd,
     div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))] at hbound
   have hhalf : (T : ℝ) / (2 * T) = 1 / 2 := by field_simp
@@ -96,7 +103,7 @@ theorem crossing_interval_dense (s₀ : ℝ) :
 is an orthogonal projector commuting with the Hamiltonian at the crossing too.
 In particular this justifies both endpoint commutations in Example 5.3. -/
 theorem crossing_projectors_extend (H P : ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
+    (hH : IsTimeDepHamiltonian H)
     (hcH : ContinuousOn H (Icc (0 : ℝ) 1))
     (hcP : ContinuousOn P (Icc (0 : ℝ) 1)) (s₀ : ℝ)
     (hP : ∀ s, ∀ hs : s ∈ Icc (0 : ℝ) 1, s ≠ s₀ →
@@ -128,15 +135,10 @@ one crossing transfers the assumed continuous leakage limit to the discrete
 product. The proof derives endpoint commutation by continuity, applies
 Proposition 2.4 with endpoint half-step phases, then (4.6) with one coefficient
 independent of `T`. -/
-theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
-    (U : ℕ → ℝ → 𝕄)
-    (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L w : ℝ} (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖Hd t - Hd s‖ ≤ L * |t - s|) (hw : w < 2 * π)
-    (hwidth : ∀ T : ℕ, 0 < T → ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
-      |(hH _ (walkCubic_sample hj)).eigenvalues p -
-        (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ w)
+theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄) (U : ℕ → ℝ → 𝕄)
+    (hH : IsTimeDepHamiltonian H) {L w : ℝ}
+    (hder : HasLipschitzDerivative H Hd L) (hw : w < 2 * π)
+    (hwidth : ∀ T : ℕ, 0 < T → HasSampleWidth H T w)
     (hU : ∀ T : ℕ, 0 < T → IsEvolution (fun t ↦ H (t / T)) (U T) 0 T)
     (hcP : ContinuousOn P (Icc (0 : ℝ) 1)) (s₀ : ℝ)
     (hP : ∀ s, ∀ hs : s ∈ Icc (0 : ℝ) 1, s ≠ s₀ →
@@ -145,6 +147,8 @@ theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
       atTop (𝓝 0)) :
     Tendsto (fun T : ℕ ↦ ‖(1 - P 1) * (unitProduct H T).1 * P 0‖)
       atTop (𝓝 0) := by
+  obtain ⟨hd, hlip⟩ := hder
+  have hwidth := fun T hT ↦ (hasSampleWidth_iff hH).1 (hwidth T hT)
   have hcH : ContinuousOn H (Icc (0 : ℝ) 1) :=
     fun s hs ↦ (hd s hs).continuousWithinAt
   have hprojectors := crossing_projectors_extend H P hH hcH hcP s₀ hP

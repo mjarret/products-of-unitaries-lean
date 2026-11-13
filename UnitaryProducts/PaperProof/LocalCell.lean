@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Michael Jarret
 -/
 module
+
+public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.ClosedCellConstruction
 public import UnitaryProducts.Prose.ResidualAlgebra
 public import UnitaryProducts.Prose.ChainSteps
@@ -116,8 +118,8 @@ and the closed cosecant center bound, including its value at width zero. The cho
 differentiable also at the two cell endpoints. -/
 theorem lem_cell {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π) {Ω : 𝕄}
     (hΩ : Ω.IsHermitian)
-    (hwidth : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w) (D : 𝕄) :
-    let Φ := unitComparisonObjects.2 Ω hΩ (fun p q ↦ (hwidth p q).trans_lt hw) D
+    (hwidth : HasSpectralWidth Ω w) (D : 𝕄) :
+    let Φ := paperFrameOp Ω D
     let c₀ := cellConstant w
     ∃ Y : ℝ → 𝕄,
       ContDiffOn ℝ 1 Y (Icc (-1 / 2 : ℝ) (1 / 2)) ∧
@@ -126,7 +128,8 @@ theorem lem_cell {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π) {Ω : 𝕄}
       Y (-1 / 2) = Φ ∧ Y (1 / 2) = Φ ∧
       ‖Y 0‖ ≤ c₀ * ‖D‖ ∧
       (∀ τ ∈ Icc (-1 / 2 : ℝ) (1 / 2), ‖Y τ‖ ≤ ‖Y 0‖ + τ ^ 2 * ‖D‖ / 2) := by
-  rw [unitComparisonObjects_eq_series hΩ hw hwidth D]
+  have hwidth := (hasSpectralWidth_iff hΩ).1 hwidth
+  rw [paperFrameOp_eq_series hΩ hw hwidth D]
   exact cell_series_solution hw₀ hw hΩ hwidth D
 
 /-- The derivative-series estimate: the self-input multiplier is continuously
@@ -135,7 +138,7 @@ theorem lem_cell {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π) {Ω : 𝕄}
  the second uses the centered Duhamel decomposition and Jacobi telescope. -/
 theorem self_frame_series_curve {Ω : ℝ → 𝕄} {w : ℝ}
     (hw0 : 0 ≤ w) (hw : w < 2 * π)
-    (hΩ : ∀ s ∈ Icc (0 : ℝ) 1, (Ω s).IsHermitian)
+    (hΩ : IsTimeDepHamiltonian Ω)
     (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1), ∀ p q,
       |(hΩ s hs).eigenvalues p - (hΩ s hs).eigenvalues q| ≤ w)
     (hcΩ : ContDiffOn ℝ 2 Ω (Icc (0 : ℝ) 1)) :
@@ -207,9 +210,8 @@ theorem self_frame_series_curve {Ω : ℝ → 𝕄} {w : ℝ}
 entrywise multiplier of Definition 4.1, with its closed scalar constants. -/
 theorem canonical_cell_curve {Ω : ℝ → 𝕄} {w : ℝ}
     (hw0 : 0 ≤ w) (hw : w < 2 * π)
-    (hΩ : ∀ s ∈ Icc (0 : ℝ) 1, (Ω s).IsHermitian)
-    (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1), ∀ p q,
-      |(hΩ s hs).eigenvalues p - (hΩ s hs).eigenvalues q| ≤ w)
+    (hΩ : IsTimeDepHamiltonian Ω)
+    (hwidth : HasWidth Ω w)
     (hcΩ : ContDiffOn ℝ 2 Ω (Icc (0 : ℝ) 1)) :
     ContDiffOn ℝ 1 (fun s ↦ paperFrameOp (Ω s) (derivWithin Ω (Icc (0 : ℝ) 1) s))
       (Icc (0 : ℝ) 1) ∧
@@ -224,6 +226,7 @@ theorem canonical_cell_curve {Ω : ℝ → 𝕄} {w : ℝ}
           2 * deriv frameMult w * ‖derivWithin (fun t ↦ evol (Ω t) 1) (Icc (0 : ℝ) 1) s‖ *
             ‖derivWithin Ω (Icc (0 : ℝ) 1) s‖ +
           (frameMult w - frameMult 0) * ‖derivWithin Ω (Icc (0 : ℝ) 1) s‖ ^ 2) := by
+  have hwidth := (hasWidth_iff hΩ).1 hwidth
   let K := Icc (0 : ℝ) 1
   have heq : EqOn (fun s ↦ paperFrameOp (Ω s) (derivWithin Ω K s))
       (fun s ↦ frameOp (Ω s) (derivWithin Ω K s)) K := by
@@ -241,7 +244,7 @@ theorem canonical_cell_curve {Ω : ℝ → 𝕄} {w : ℝ}
 /-- Lemma A.3 expressed through its convergent series for integration along a mesh. -/
 theorem canonical_cell_series_bounds {Ω : ℝ → 𝕄} {w : ℝ}
     (hw0 : 0 ≤ w) (hw : w < 2 * π)
-    (hΩ : ∀ s ∈ Icc (0 : ℝ) 1, (Ω s).IsHermitian)
+    (hΩ : IsTimeDepHamiltonian Ω)
     (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1), ∀ p q,
       |(hΩ s hs).eigenvalues p - (hΩ s hs).eigenvalues q| ≤ w)
     (hcΩ : ContDiffOn ℝ 2 Ω (Icc (0 : ℝ) 1)) :
@@ -263,7 +266,7 @@ theorem canonical_cell_series_bounds {Ω : ℝ → 𝕄} {w : ℝ}
       (fun s ↦ frameOp (Ω s) (derivWithin Ω K s)) K := by
     intro s hs
     exact paperFrameOp_eq_series (hΩ s hs) hw (hwidth s hs) _
-  have hpaper := canonical_cell_curve hw0 hw hΩ hwidth hcΩ
+  have hpaper := canonical_cell_curve hw0 hw hΩ ((hasWidth_iff hΩ).2 hwidth) hcΩ
   refine ⟨hpaper.1.congr heq.symm, ?_⟩
   intro s hs
   have hb := hpaper.2 s hs
@@ -300,8 +303,9 @@ theorem canonical_cell_endpoints {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π)
     (hwidth : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w) (D : 𝕄) :
     (periodicCorrectorData Ω hΩ D).2.2 (-1 / 2) = (exponentialOperators Ω hΩ D).2.2.1 ∧
     (periodicCorrectorData Ω hΩ D).2.2 (1 / 2) = (exponentialOperators Ω hΩ D).2.2.1 := by
-  obtain ⟨Y, hc, hd, hl, hr, _⟩ := lem_cell hw₀ hw hΩ hwidth D
-  rw [unitComparisonObjects_eq_series hΩ hw hwidth D] at hl hr
+  obtain ⟨Y, hc, hd, hl, hr, _⟩ :=
+    lem_cell hw₀ hw hΩ ((hasSpectralWidth_iff hΩ).2 hwidth) D
+  rw [paperFrameOp_eq_series hΩ hw hwidth D] at hl hr
   rw [frameOp_eq_paper_value hΩ hw hwidth D] at hl
   have he := cell_solution_eq_canonical hΩ hc.continuousOn hd hl
   exact ⟨(he (by constructor <;> norm_num)).symm.trans hl,
@@ -315,8 +319,9 @@ theorem canonical_cell_norm {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π)
     (hwidth : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w) (D : 𝕄) (τ : ℝ) :
     ‖(periodicCorrectorData Ω hΩ D).2.2 τ‖ ≤
       (frameBound w - frameBound (w / 2) / 2 + τ ^ 2 / 2) * ‖D‖ := by
-  obtain ⟨Y, hc, hd, hl, _, hcenter, hgrowth⟩ := lem_cell hw₀ hw hΩ hwidth D
-  rw [unitComparisonObjects_eq_series hΩ hw hwidth D] at hl
+  obtain ⟨Y, hc, hd, hl, _, hcenter, hgrowth⟩ :=
+    lem_cell hw₀ hw hΩ ((hasSpectralWidth_iff hΩ).2 hwidth) D
+  rw [paperFrameOp_eq_series hΩ hw hwidth D] at hl
   rw [frameOp_eq_paper_value hΩ hw hwidth D] at hl
   have he := cell_solution_eq_canonical hΩ hc.continuousOn hd hl
   have h0 : (0 : ℝ) ∈ Icc (-1 / 2 : ℝ) (1 / 2) := by constructor <;> norm_num

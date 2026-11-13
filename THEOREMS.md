@@ -4,8 +4,8 @@ Each numbered row gives the declaration for that statement. Unnumbered rows give
 
 | Paper number | Label | Declaration | File:line |
 | --- | --- | --- | --- |
-| B | `introthm:fine-count` | `UnitaryProducts.PaperProof.introthm_fine_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:296](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L296) |
 | A | `introthm:unit` | `UnitaryProducts.PaperProof.introthm_unit` | [UnitaryProducts/PaperProof/IntroTheorems.lean:34](UnitaryProducts/PaperProof/IntroTheorems.lean#L34) |
+| B | `introthm:fine-count` | `UnitaryProducts.PaperProof.introthm_fine_oscillation` | [UnitaryProducts/PaperProof/OscillationFineSteps.lean:296](UnitaryProducts/PaperProof/OscillationFineSteps.lean#L296) |
 | 2.1 | `def:regulated` | `UnitaryProducts.Paper.IsRegulated` | [UnitaryProducts/Paper/Preliminaries.lean:155](UnitaryProducts/Paper/Preliminaries.lean#L155) |
 | 2.2 | `thm:comparison` | `UnitaryProducts.PaperProof.thm_comparison` | [UnitaryProducts/PaperProof/ThmComparison.lean:43](UnitaryProducts/PaperProof/ThmComparison.lean#L43) |
 | 2.3 | `def:unit-product` | `UnitaryProducts.Paper.unitProduct` | [UnitaryProducts/Comparison/UnitSteps.lean:86](UnitaryProducts/Comparison/UnitSteps.lean#L86) |

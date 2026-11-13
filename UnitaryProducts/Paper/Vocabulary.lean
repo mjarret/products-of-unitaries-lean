@@ -51,7 +51,7 @@ def HasSampleWidth (H : ℝ → 𝕄) (T : ℕ) (w : ℝ) : Prop :=
 def HasWidth (H : ℝ → 𝕄) (w : ℝ) : Prop :=
   ∀ s ∈ Icc (0 : ℝ) 1, HasSpectralWidth (H s) w
 
-/-- The sample-width vocabulary unfolds to the former eigenvalue hypotheses. -/
+/-- Sample spectral width is equivalent to the eigenvalue-difference bound at every sample. -/
 theorem hasSampleWidth_iff {H : ℝ → 𝕄} (hH : IsTimeDepHamiltonian H)
     {T : ℕ} {w : ℝ} : HasSampleWidth H T w ↔
       ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
@@ -63,7 +63,7 @@ theorem hasSampleWidth_iff {H : ℝ → 𝕄} (hH : IsTimeDepHamiltonian H)
   · intro h j hj
     exact (hasSpectralWidth_iff (hH _ (walkCubic_sample hj))).2 (h j hj)
 
-/-- The all-time width vocabulary unfolds to the former eigenvalue hypotheses. -/
+/-- Spectral width on `[0,1]` is equivalent to the eigenvalue-difference bound at every time. -/
 theorem hasWidth_iff {H : ℝ → 𝕄} (hH : IsTimeDepHamiltonian H) {w : ℝ} :
     HasWidth H w ↔ ∀ s (hs : s ∈ Icc (0 : ℝ) 1) p q,
       |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w := by

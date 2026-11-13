@@ -312,8 +312,8 @@ theorem fact_arc :
     Asymptotics.IsEquivalent (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
       (fun δ ↦ (8 / π + 5 * π / 2 + 2) / δ ^ 3) ∧
     (let κ : ℝ → ℝ := fun x ↦ if x = 0 then 1 else (x / 2) / Real.sin (x / 2);
-      HasInverseCubeGrowth (fun w ↦ cellConstant w * κ w) ∧
-      HasInverseCubeGrowth (fun w ↦ (1 / 24 + frameMult w) * κ w) ∧
+      HasInverseCubeGrowth (fun x ↦ cellConstant x * κ x) ∧
+      HasInverseCubeGrowth (fun x ↦ (1 / 24 + frameMult x) * κ x) ∧
       HasInverseCubeGrowth paperWalkSquare) := by
   have hev : ∀ᶠ δ in 𝓝[>] (0 : ℝ), δ ∈ Ioo 0 π := Ioo_mem_nhdsGT pi_pos
   refine ⟨cellConstant_walk_endpoint_equivalent, ?_, ?_, paper_walk_coefficients_isBigO⟩
@@ -346,19 +346,21 @@ variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
 /-- **Theorem 4.6** (`cor:walks`): the unitary-family comparison with the
-constants of Appendix B and multiplier of Definition 4.1. The phased product is the
-rounded evolution's endpoint. The unused Lipschitz premise is omitted, and the rounded
-evolution is also constructed. -/
+constants of Appendix B and multiplier of Definition 4.1. The bound compares the
+rounded and continuous evolutions, identifies the rounded endpoint with the phased
+unitary product, and gives inverse-cube growth for all three coefficients. -/
 theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
     (H : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H) {w : ℝ}
     (hw : w < 2 * π) (hcH : ContDiffOn ℝ 2 H (Icc (0 : ℝ) 1))
     (hwidth : HasWidth H w) :
     let W := fun s ↦ evol (H s) 1
-    let κ : ℝ → ℝ := fun w ↦ if w = 0 then 1 else (w / 2) / Real.sin (w / 2)
+    let κ : ℝ → ℝ := fun x ↦ if x = 0 then 1 else (x / 2) / Real.sin (x / 2)
     ‖roundedEvolution H T T - evolution H T T‖ ≤ walkEnergy w W / T ∧
-    HasInverseCubeGrowth (fun w ↦ cellConstant w * κ w) ∧
-    HasInverseCubeGrowth (fun w ↦ (1 / 24 + frameMult w) * κ w) ∧
-    HasInverseCubeGrowth paperWalkSquare := by
+    HasInverseCubeGrowth (fun x ↦ cellConstant x * κ x) ∧
+    HasInverseCubeGrowth (fun x ↦ (1 / 24 + frameMult x) * κ x) ∧
+    HasInverseCubeGrowth paperWalkSquare ∧
+    roundedEvolution H T T =
+      evol (H 1) (1 / 2) * (walk W T).2 * evol (H 0) (-(1 / 2)) := by
   have hwidth := (hasWidth_iff hH).1 hwidth
   dsimp only
   have hw0 : 0 ≤ w := by
@@ -366,7 +368,7 @@ theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
   have hseries := unitary_products_series_bound T hT H hH hw hcH hwidth
   dsimp only at hseries
   have harc := fact_arc.2.2.2
-  refine ⟨?_, harc.1, harc.2.1, harc.2.2⟩
+  refine ⟨?_, harc.1, harc.2.1, harc.2.2, ?_⟩
   · rw [roundedEvolution_endpoint hT hH,
       div_eq_mul_one_div (walkEnergy w _) (T : ℝ),
       mul_comm (walkEnergy w _) (1 / (T : ℝ))]
@@ -378,5 +380,9 @@ theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
     rw [← hprod]
     exact hseries.1 _ (evolution_spec (Nat.cast_pos.mpr hT) hH
       (UnitaryProducts.Prose.regulated_of_continuousOn hcH.continuousOn))
+  · have hprod : (walk (fun s ↦ evol (H s) 1) T).2 = (unitProduct H T).1 :=
+      UnitaryProducts.stepProduct_eq_pieceProduct (fun _ _ ↦ rfl) T le_rfl
+    rw [hprod]
+    exact roundedEvolution_endpoint hT hH
 
 end UnitaryProducts.PaperProof

@@ -185,8 +185,8 @@ theorem sharp_uncorrected_error_limit :
 /-- **Example 4.3** (`ex:unit-sharp`): the quadratic diagonal Hamiltonian
 satisfies the unit-step hypotheses with `h = w = 2`. The two errors are the
 paper's displayed sine expressions, with their asymptotic equivalent and limit.
-The rounded evolution is constructed with its half-step endpoint identity. The conclusion also
-supplies the existence of both evolutions. -/
+The errors compare the canonical continuous evolution with the rounded evolution
+and with the unphased unit-step product, respectively. -/
 theorem ex_unit_sharp (T : ℕ) (hT : 2 ≤ T) :
     let H := sharpFamily
     IsTimeDepHamiltonian H ∧

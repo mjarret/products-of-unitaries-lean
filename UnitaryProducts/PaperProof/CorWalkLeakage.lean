@@ -106,7 +106,7 @@ theorem open_turn_band_projector {A : 𝕄} (hA : A.IsHermitian) {α β : ℝ}
     fun t ↦ commute_evol_right (commute_specProj hA B) t⟩
   simp only [specProj, proj, hidx]
 
-/-- Theorem 4.5 applied to an explicitly given logarithm. Agreement on `[0,1]`
+/-- Theorem 4.6 applied to an explicitly given logarithm. Agreement on `[0,1]`
 identifies both walk derivatives and all sampled factors. -/
 theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
     (W H : ℝ → 𝕄) (hH : ∀ s ∈ K, (H s).IsHermitian)
@@ -148,8 +148,8 @@ theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
  the unique Hermitian logarithm in the prescribed open turn. The extreme-pair gap
  estimate and Lemma A.2 give its width and C² regularity. Its endpoint projectors
  select precisely those eigenvectors whose walk phases lie in the specified arcs.
- For its evolution, any continuous leakage bound `C/T` transfers to the sampled
- walk product, with exactly the right side of (4.8). The proof applies Theorem 4.5
+ The sampled walk leakage is bounded by its continuous evolution leakage plus
+ `𝓔̃_w(W)/T`. The proof applies Theorem 4.6
  and Proposition 2.4 with the two half-step phases, whose product is the
  rounded-clock evolution. The conclusion explicitly supplies existence, pointwise
  uniqueness, regularity, and width of the logarithm named in the paper. The fixed band rank is not
@@ -173,8 +173,8 @@ theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
       (∀ s (hs : s ∈ K) p q,
         |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) ∧
       ∀ (T : ℕ), 1 ≤ T → ∀ (U : ℝ → 𝕄), IsEvolution (fun t ↦ H (t / T)) U 0 T →
-      ∀ C : ℝ, 0 ≤ C → ‖(1 - Q) * U T * P‖ ≤ C / T →
-        ‖(1 - Q) * (walk W T).2 * P‖ ≤ (C + walkEnergy w W) / T := by
+        ‖(1 - Q) * (walk W T).2 * P‖ ≤
+          ‖(1 - Q) * U T * P‖ + walkEnergy w W / T := by
   intro ϑ w
   have hband' : circularBand W α β := (walk_band_family_iff W α β hu horder).2 hband
   obtain ⟨hϑ, hϑg⟩ := walk_band_gap_minimum W α β hband' hu hgc
@@ -190,7 +190,7 @@ theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
       (hBlog.trans (hlog s hs).symm)
   intro P Q
   refine ⟨H, hH, hlog, hopen, hunique, hcH, hwidth, ?_⟩
-  intro T hT U hU C _hC hleak
+  intro T hT U hU
   have hP := open_turn_band_projector (hH 0 (by norm_num))
     (hopen 0 (by norm_num)) (horder 0 (by norm_num)).2
   have hQ := open_turn_band_projector (hH 1 (by norm_num))
@@ -205,7 +205,7 @@ theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
     dsimp only [Q]
     rw [← hlog 1 (by norm_num)]
     exact spectralWindowProjector_evol (hH 1 (by norm_num)) (α 1) (β 1)
-  rw [heP, heQ] at hleak ⊢
+  rw [heP, heQ]
   have hcomparison := walk_comparison_of_log T (by omega) W H hH
     (by linarith) hcH hlog hwidth U hU
   have htransfer := prop_transfer (U := U T) (W := (walk W T).2) hP.2.1 hQ.2.1 hP.2.1 hQ.2.1
@@ -214,7 +214,6 @@ theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
     (hQ.2.2 (1 / 2)).symm (hP.2.2 (-(1 / 2))).symm
   simp only [sub_self, norm_zero, add_zero, mul_zero] at htransfer
   have hdiff := (le_abs_self _).trans (htransfer.trans hcomparison)
-  rw [add_div]
   linarith
 
 end UnitaryProducts.PaperProof

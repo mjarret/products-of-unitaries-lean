@@ -10,7 +10,7 @@ public import UnitaryProducts.PaperProof.WalkCoefficients
 /-! # The cost of using the first endpoint derivative bound
 
 The lead-in to Lemma A.3 compares the coefficient obtained from (i) with the
-coefficient supplied by (ii) in Theorem 4.5.
+coefficient supplied by (ii) in Theorem 4.6.
 -/
 @[expose] public section
 open Real Filter

@@ -18,7 +18,7 @@ variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 local notation "K" => Icc (0 : ℝ) 1
 
-/-- Theorem 4.5: apply the clock theorem and the direct logarithm jump
+/-- Theorem 4.6: apply the clock theorem and the direct logarithm jump
 bound first, then substitute the logarithm's first and second derivative bounds. -/
 theorem unified_products_walk [NeZero d] {T : ℕ} (hT : 0 < T)
     (a : ℝ → ℝ) {w : ℝ} (hw : w < 2 * π) (W : ℝ → 𝕄)
@@ -119,20 +119,9 @@ theorem unified_products_walk [NeZero d] {T : ℕ} (hT : 0 < T)
     have hp := hwindow s hs p
     have hq := hwindow s hs q
     simpa only [add_sub_cancel_left] using abs_sub_le_of_le_of_le hp.1 hp.2 hq.1 hq.2
-  have hjump := (thm_jumps hT H Hd hH hderH hlip hw hwidth).2 hcH hgap
-  have hWdEq : EqOn (derivWithin (fun s ↦ evol (H s) 1) K) Wd K :=
-    fun s hs ↦ derivWithin_congr hlog (hlog s hs)
-  have hsupWd : unitSupNorm (derivWithin (fun s ↦ evol (H s) 1) K) = unitSupNorm Wd := by
-    unfold unitSupNorm
-    congr 1
-    apply Set.image_congr
-    intro s hs
-    exact congrArg norm (hWdEq hs)
-  dsimp only at hjump
-  rw [paperClockJump_sum_eq H Hd hH hw hwidth, paperFrameMult_eq_series hw0 hw,
-    paperFrameMult_deriv_eq_series hw0 hw,
-    paperFrameMult_eq_series (le_refl 0) (by positivity)] at hjump
-  rw [hsupWd] at hjump
+  have hchain := unified_jump_sum_bound hT H Hd W hw0 hw hH hgap hderH hcH
+    (hc.of_le (by norm_num)) hlog
+  have hjump := hchain.1.trans hchain.2
   have hcombined : ‖V T - U T‖ ≤ (1 / T : ℝ) *
       ((frameBound w - frameBound (w / 2) / 2) * (‖Hd 0‖ + ‖Hd 1‖) +
         (1 / 24 + frameBound w) * unitSupNorm Hdd +

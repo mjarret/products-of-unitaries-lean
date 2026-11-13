@@ -258,7 +258,7 @@ theorem affine_jump_integral_chain [NeZero d] {Ω D : ℝ → 𝕄} {Da Db : �
 
 set_option maxHeartbeats 800000 in
 -- The cell estimate combines spectral bounds, derivatives, and interval integrals.
-/-- One affine cell in Theorem 4.4(i): the mean-slope endpoint errors and
+/-- One affine cell in the affine jump bound in Theorem 4.4: the mean-slope endpoint errors and
 the self-curve middle term give the coefficient `N(w)*h + eta*L²`. -/
 theorem affine_hamiltonian_cell_bound [NeZero d] {H Hd : ℝ → 𝕄}
     (hH : ∀ s ∈ J, (H s).IsHermitian)

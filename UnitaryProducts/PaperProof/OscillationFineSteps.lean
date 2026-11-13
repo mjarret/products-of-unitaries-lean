@@ -34,7 +34,6 @@ public import UnitaryProducts.PaperProof.ThmComparison
 - `maxCellError_le`
 - `midpoint_duhamel_integral`
 - `norm_sub_le_maxCellError`
-- `oscillation_exponential_tolerance`
 - `oscillation_inverse_time_budget`
 - `oscillation_inverse_time_count`
 - `oscillation_inverse_time_count_rounding`
@@ -290,7 +289,7 @@ theorem fine_bits_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
   exact (norm_sub_le_norm_sub_add_norm_sub _ (H ((s j + s (j + 1)) / 2)) _).trans
     (add_le_add (hosc j hj x hx) htruncate)
 
-/-- Theorem A (`introthm:fine-count`): regulated paths, checkpoints of
+/-- Theorem B (`introthm:fine-count`): regulated paths, checkpoints of
 small midpoint oscillation, and the explicit product with its bit-error bound.
 Any uniform sparsity upper bound is allowed; the paper uses the exact maximum.
 Checkpoint existence and the factor identity are also supplied. -/
@@ -458,7 +457,7 @@ theorem oscillation_inverse_time_count_rounding {T c L : ℝ}
     rw [Nat.cast_max, Nat.cast_one]
     exact max_le (by linarith) (by linarith [Nat.ceil_lt_add_one ha])
 
-/-- Both error contributions of Theorem A can be budgeted to obtain 2c/T. -/
+/-- Both error contributions of Theorem B can be budgeted to obtain 2c/T. -/
 theorem oscillation_inverse_time_budget {T ε b c : ℝ} (hT : 0 < T)
     (hε : ε ≤ c / T ^ 2) (hb : b ≤ c / T ^ 2) :
     T * (ε + b) ≤ 2 * c / T := by
@@ -496,9 +495,5 @@ theorem oscillation_inverse_time_product {H U : ℝ → 𝕄}
     (fun j hj x hx ↦ (hs.2.1 j hj x hx).trans hs.2.2) k σ hsp
   exact hb.trans (oscillation_inverse_time_budget hT le_rfl hk)
 
-/-- Discussion: the exponentially small target in the new tolerance formulation. -/
-theorem oscillation_exponential_tolerance {T ε a b : ℝ} (hT : 0 < T) :
-    T * ε ≤ Real.exp (-b * T ^ a) ↔ ε ≤ Real.exp (-b * T ^ a) / T := by
-  rw [le_div_iff₀ hT, mul_comm]
 
 end UnitaryProducts.PaperProof

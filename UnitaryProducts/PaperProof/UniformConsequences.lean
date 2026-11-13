@@ -120,7 +120,7 @@ theorem thm_clocks [NeZero d] {T : ℕ} (hT : 0 < T)
   rw [paperClockJump_sum_eq H Hd hH hw hwidth]
   exact clock_series_bound hT H Hd U V hH hd hlip hw hwidth hU hV
 
-/-- The operator-series endpoint bound: insert Theorem 4.4(i)
+/-- The operator-series endpoint bound: insert the affine jump bound in Theorem 4.4
 into Theorem 4.2 (`thm:clocks`).
 The derivative uses its compact-interval supremum, and the endpoint norms remain exact. -/
 theorem endpoint_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
@@ -144,9 +144,7 @@ theorem endpoint_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
     simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) (0 : Fin d)
   dsimp only at hclock
   rw [cellConstant_eq_frameBound hw0 hw, paperClockJump_sum_eq H Hd hH hw hwidth] at hclock
-  have hsum := (thm_jumps hT H Hd hH hd hlip hw hwidth).1
-  rw [paperClockJump_sum_eq H Hd hH hw hwidth, paperFrameMult_eq_series hw0 hw,
-    paperFrameMult_deriv_eq_series hw0 hw] at hsum
+  have hsum := hamiltonian_jump_sum_integral hT H Hd hH hd hlip hw hwidth
   exact hclock.trans ((add_le_add_right hsum _).trans_eq (by ring))
 
 /-- Evaluate the coefficient in (4.6) using a prescribed derivative. Uniqueness
@@ -165,9 +163,9 @@ theorem hamiltonianEnergy_eq_of_hasDerivWithinAt (w L : ℝ) (H Hd : ℝ → �
   simp only [hamiltonianEnergy, heq (show (0 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num),
     heq (show (1 : ℝ) ∈ Icc (0 : ℝ) 1 by norm_num), hsup]
 
-/-- Equation (4.6) (`eq:products`): the comparison with the
+/-- **Theorem 4.4** (`thm:jumps`), equation (4.6) (`eq:products`): the comparison with the
 entrywise multiplier of Definition 4.1 and constants of Appendix B. -/
-theorem unit_steps_endpoint_bounds [NeZero d] {T : ℕ} (hT : 0 < T)
+theorem thm_jumps [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L w : ℝ}
@@ -220,7 +218,7 @@ theorem thm_unit_steps_bounds [NeZero d] (H U : ℝ → 𝕄) (T : ℕ) (hT : 0 
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   have hw₀ : 0 ≤ w := by simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) (0 : Fin d)
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
-  have hcell := unit_steps_endpoint_bounds hT H Hd U V hH
+  have hcell := thm_jumps hT H Hd U V hH
     (fun s hs ↦ (hdiff s hs).hasDerivWithinAt) hlip hw hwidth hU hV
   rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w L H Hd (fun s hs ↦ (hdiff s hs).hasDerivWithinAt),
     div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))] at hcell
@@ -753,7 +751,7 @@ theorem bit_transfer_series_bound [NeZero d] (w : ℝ)
     (unitProduct_sample_error T hH
       (fun s hs ↦ scalarEntryMap_isHermitian (truncBits k) (truncBits_neg k) (hH s hs))).trans he
   -- Equation (4.6) bounds the untruncated evolution error.
-  have hclock := unit_steps_endpoint_bounds hT1 H Hd U V hH
+  have hclock := thm_jumps hT1 H Hd U V hH
     (fun s hs ↦ (hc s hs).hasDerivWithinAt) hlip hw hdiff hU hV
   have hw₀ : 0 ≤ w := by simpa using hdiff 0 (Nat.zero_le T) (0 : Fin d) (0 : Fin d)
   rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w h H Hd (fun s hs ↦ (hc s hs).hasDerivWithinAt),
@@ -796,7 +794,7 @@ theorem bit_transfer_series_bound [NeZero d] (w : ℝ)
   · simpa only [heV] using hsecond
   · simpa only [heV] using hthird
 
-/-- The intermediate transfer chain in the proof of Example 4.6: commuting
+/-- The intermediate transfer chain in the proof of Example 4.5: commuting
 endpoint phases, the product-error split, and both half-budget estimates. The
 rounded evolution at the terminal time is written using its endpoint identity. -/
 theorem ex_unit_transfer_chain [NeZero d] (w : ℝ)
@@ -848,7 +846,7 @@ theorem ex_unit_transfer_chain [NeZero d] (w : ℝ)
   have ht : (T : ℝ) ≠ 0 := (Nat.cast_pos.mpr hT1).ne'
   simpa only [← mul_assoc, mul_one_div_cancel ht, one_mul] using h
 
-/-- **Example 4.6** (`ex:unit-transfer`): the bit budget with the closed
+/-- **Example 4.5** (`ex:unit-transfer`): the bit budget with the closed
 scalar constants in Appendix B. -/
 theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ)
    (hw : w < 2 * π)

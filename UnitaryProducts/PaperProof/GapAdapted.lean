@@ -465,7 +465,7 @@ theorem gap_derivative_endpoints (D : 𝕄) {Γ u : ℝ → ℝ} {p cp : ℝ}
 unit-step hypotheses at width two, with the three displayed derivative bounds.
 The proof checks Weyl regularity, ODE normalization, and the derivative bounds;
 The least-eigenvalue spectral projectors commute with the endpoint Hamiltonians;
-Example 4.6 gives the truncated-product bound for every continuous leakage bound. -/
+Example 4.5 gives the truncated-product bound for every continuous leakage bound. -/
 theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁.IsHermitian)
     (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1)
     (Γ : ℝ → ℝ) (hΓ : ∀ x ∈ Icc (0 : ℝ) 1, IsLeastGap H₀ H₁ h₀ h₁ x (Γ x))
@@ -709,7 +709,7 @@ theorem gap_added_term_isBigO {ι : Type*} (l : Filter ι) {p K : ℝ}
   simpa only [div_mul_eq_mul_div, mul_div_assoc] using gap_added_term_bound hp hK (hg i).1
     (hg i).2 (hcp0 i) (hcp i) (hD i).1 (hD i).2 (he₀ i).2 (he₁ i).2 (he₀ i).1 (he₁ i).1 (hT i)
 
-/-- The exact width-two correction `𝓔₂(H)` from Example 4.6, bounded using
+/-- The exact width-two correction `𝓔₂(H)` from Example 4.5, bounded using
 Example 5.1's endpoint, supremum, and Lipschitz estimates. -/
 theorem gap_correction_bound {p K g cp D e₀ e₁ E S L : ℝ}
     (hp : 1 < p) (hK : 0 ≤ K) (hg : 0 < g) (hg2 : g ≤ 2)
@@ -745,7 +745,7 @@ theorem gap_correction_bound {p K g cp D e₀ e₁ E S L : ℝ}
     _ ≤ _ := hscalar
 
 /-- The sentence `𝓔₂(H) = O(Γstar^(2-2p))` following Example 5.1, for the
-actual width-two coefficient of Example 4.6. The bounds are uniform over paths
+actual width-two coefficient of Example 4.5. The bounds are uniform over paths
 with fixed `p,K`; `E,S,L` denote their endpoint sum, derivative norm, and
 Lipschitz constant. -/
 theorem gap_correction_isBigO {ι : Type*} (l : Filter ι) {p K : ℝ}
@@ -903,7 +903,7 @@ theorem gap_factor_count_exists {error : ℕ → ℝ} {K ε g : ℝ}
 
 /-- The inverse-gap count after Example 5.1, including entry truncation.
 The cited continuous estimate and the preceding correction estimate give
-`M ≤ K/g`. Example 4.6 then supplies the stated accuracy for every truncation
+`M ≤ K/g`. Example 4.5 then supplies the stated accuracy for every truncation
 meeting its bit budget, with at most `(2K+2)/(δg)` factors. -/
 theorem gap_truncated_factor_count (H : ℝ → 𝕄) (U : ℕ → ℝ → 𝕄)
     (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)

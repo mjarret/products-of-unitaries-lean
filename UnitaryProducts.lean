@@ -35,7 +35,6 @@ public import Mathlib.MeasureTheory.Function.JacobianOneDim
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 public import Mathlib.Analysis.Complex.LocallyUniformLimit
 public import UnitaryProducts.PaperProof.SpectralProofSteps
-public import UnitaryProducts.PaperProof.AffineRescale
 public import UnitaryProducts.PaperProof.UniformDerivativeSeries
 public import UnitaryProducts.PaperProof.UniformConstants
 public import Mathlib.Analysis.SpecialFunctions.Artanh

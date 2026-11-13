@@ -31,7 +31,7 @@ noncomputable section
 namespace UnitaryProducts.Corrector
 variable {A : Type*} [NormedRing A] [NormedAlgebra ℂ A] [CompleteSpace A] [NormOneClass A]
 
-/-- The half-angle identity used to evaluate Theorem B's constant at width $\pi$:
+/-- The half-angle identity used to evaluate Theorem A's constant at width $\pi$:
 $\mathcal N(x)-\mathcal N(x/2)/2=1/(2x\sin(x/2))-1/x^2$ for $0<x<2\pi$, from
 $\cot\frac x4-\cot\frac x2=1/\sin\frac x2$. -/
 theorem frameMult_sub_half {x : ℝ} (hx : 0 < x) (hx' : x < 2 * π) :

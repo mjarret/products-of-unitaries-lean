@@ -92,7 +92,7 @@ theorem unitClockJump_norm_sum (H Hd : ℝ → 𝕄) (T : ℕ) :
   simp only [unitClockJump, Nat.cast_add, Nat.cast_one, add_sub_cancel_right,
     norm_smul_of_nonneg (by positivity : 0 ≤ (1 / T : ℝ))]
 
-/-- Theorem 4.4(i): the three-term jump decomposition on each affine
+/-- the affine jump bound in Theorem 4.4: the three-term jump decomposition on each affine
 cell, using its mean derivative at both ends and Lemma A.3 on the self-curve. -/
 theorem hamiltonian_jump_sum_integral [NeZero d] {T : ℕ} (hT : 0 < T)
     (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ K, (H s).IsHermitian)
@@ -133,7 +133,7 @@ theorem hamiltonian_jump_sum_integral [NeZero d] {T : ℕ} (hT : 0 < T)
   simpa only [norm_zero, mul_zero, zero_add] using hpoint
 
 /-- Integrate Lemma A.3 on each mesh interval and then sum. The two
-inequalities instantiate the common chain in Theorem 4.4(ii). -/
+inequalities instantiate the common chain in the C² jump bound in Theorem 4.6. -/
 theorem unified_jump_sum_bound {T : ℕ} (hT : 0 < T)
     (H Hd W : ℝ → 𝕄) {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π)
     (hH : ∀ s ∈ K, (H s).IsHermitian)
@@ -203,66 +203,5 @@ theorem unified_jump_sum_bound {T : ℕ} (hT : 0 < T)
       exact add_le_add (add_le_add hlinear hcross) hsquare
     simpa using intervalIntegral.integral_mono_on (μ := volume) zero_le_one hi
       intervalIntegrable_const hmajor
-
-/-- The two operator-series bounds on the same sum of
-corrector jumps. The common FTC computation is instantiated on affine sample
-interpolants in (i), and on the C² Hamiltonian and its derivative in (ii).
-The second derivative and exponential derivative use one-sided endpoint values. -/
-theorem jump_series_bounds [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ K, (H s).IsHermitian)
-    (hd : ∀ s ∈ K, HasDerivWithinAt H (Hd s) K s)
-    {h w : ℝ} (hlip : ∀ s ∈ K, ∀ t ∈ K, ‖Hd t - Hd s‖ ≤ h * |t - s|)
-    (hw : w < 2 * π)
-    (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
-      |(hH _ (walkCubic_sample hj)).eigenvalues p -
-        (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ w) :
-    ((∑ j ∈ Finset.Icc 1 T, ‖unitClockJump H Hd T j‖) ≤
-      (1 / T : ℝ) * (frameBound w * h + (2 * frameLip w) * unitSupNorm Hd ^ 2)) ∧
-    (ContDiffOn ℝ 2 H K →
-      (∀ s (hs : s ∈ K) p q,
-        |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) →
-      let W := fun s ↦ evol (H s) 1
-      (∑ j ∈ Finset.Icc 1 T, ‖unitClockJump H Hd T j‖) ≤
-        (1 / T : ℝ) * (frameBound w * unitSupNorm (derivWithin Hd K) +
-          (2 * frameLip w) * unitSupNorm (derivWithin W K) * unitSupNorm Hd +
-          (frameBound w - frameBound 0) * unitSupNorm Hd ^ 2)) := by
-  refine ⟨hamiltonian_jump_sum_integral hT H Hd hH hd hlip hw hwidth, ?_⟩
-  intro hcH hall
-  have hw0 : 0 ≤ w := by
-    simpa only [sub_self, abs_zero] using hall 0 (by norm_num) 0 0
-  have hcW : ContDiffOn ℝ 1 (fun s ↦ evol (H s) 1) K := by
-    intro s hs
-    exact ((contDiffAt_evol_one (H s)).restrict_scalars ℝ).comp_contDiffWithinAt s
-      ((hcH.of_le (by norm_num)) s hs)
-  have hchain := unified_jump_sum_bound hT H Hd (fun s ↦ evol (H s) 1) hw0 hw
-    hH hall hd hcH hcW (fun _ _ ↦ rfl)
-  exact hchain.1.trans hchain.2
-
-/-- **Theorem 4.4** (`thm:jumps`): both jump estimates with Definition 4.1's
-entrywise multiplier and the closed scalar function and its derivative. -/
-theorem thm_jumps [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd : ℝ → 𝕄) (hH : ∀ s ∈ K, (H s).IsHermitian)
-    (hd : ∀ s ∈ K, HasDerivWithinAt H (Hd s) K s)
-    {L w : ℝ} (hlip : ∀ s ∈ K, ∀ t ∈ K, ‖Hd t - Hd s‖ ≤ L * |t - s|)
-    (hw : w < 2 * π)
-    (hwidth : ∀ j : ℕ, ∀ hj : j ≤ T, ∀ p q,
-      |(hH _ (walkCubic_sample hj)).eigenvalues p -
-        (hH _ (walkCubic_sample hj)).eigenvalues q| ≤ w) :
-    ((∑ j ∈ Finset.Icc 1 T, ‖paperClockJump H Hd T j‖) ≤
-      (1 / T : ℝ) * (frameMult w * L + (2 * deriv frameMult w) * unitSupNorm Hd ^ 2)) ∧
-    (ContDiffOn ℝ 2 H K →
-      (∀ s (hs : s ∈ K) p q,
-        |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ w) →
-      let W := fun s ↦ evol (H s) 1
-      (∑ j ∈ Finset.Icc 1 T, ‖paperClockJump H Hd T j‖) ≤
-        (1 / T : ℝ) * (frameMult w * unitSupNorm (derivWithin Hd K) +
-          (2 * deriv frameMult w) * unitSupNorm (derivWithin W K) * unitSupNorm Hd +
-          (frameMult w - frameMult 0) * unitSupNorm Hd ^ 2)) := by
-  have hw0 : 0 ≤ w := by
-    simpa using hwidth 0 (Nat.zero_le T) (0 : Fin d) 0
-  rw [paperClockJump_sum_eq H Hd hH hw hwidth,
-    paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw,
-    paperFrameMult_eq_series (le_refl 0) (by positivity)]
-  exact jump_series_bounds hT H Hd hH hd hlip hw hwidth
 
 end UnitaryProducts.PaperProof

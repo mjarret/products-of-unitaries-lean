@@ -76,8 +76,8 @@ theorem cellConstant_walk_endpoint_equivalent :
 
 set_option maxHeartbeats 1200000 in
 -- Collecting the logarithm comparison expands the three scalar coefficient formulas.
-/-- The arc-coordinate auxiliary for **Theorem 4.5** (`cor:walks`): use the logarithm of Lemma A.2,
-Theorem 4.4(ii), and Theorem 4.2. Collect the three
+/-- The arc-coordinate auxiliary for **Theorem 4.6** (`cor:walks`): use the logarithm of Lemma A.2,
+the C² jump bound in Theorem 4.6, and Theorem 4.2. Collect the three
 coefficients and retain their Appendix B equivalents as the empty arc shrinks. -/
 theorem unitary_products_of_arc [NeZero d] (T : ℕ) (hT : 0 < T) :
     ∀ (a : ℝ → ℝ) (θ : ℝ)
@@ -156,7 +156,7 @@ theorem hamiltonian_window_arc [NeZero d] (H : ℝ → 𝕄)
 /-- The operator-series comparison with hypotheses on the Hamiltonian.
 Use its least eigenvalue to obtain the arc, then the unique logarithm of Lemma A.2
 is the given Hamiltonian. The arc-coordinate proof uses the stated jump integral,
-Theorem 4.4(ii), and Theorem 4.2. -/
+the C² jump bound in Theorem 4.6, and Theorem 4.2. -/
 theorem unitary_products_series_bound [NeZero d] (T : ℕ) (hT : 0 < T)
     (H : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     {w : ℝ} (hw : w < 2 * π) (hcH : ContDiffOn ℝ 2 H (Icc (0 : ℝ) 1))
@@ -248,7 +248,7 @@ theorem constants_zero_limits :
       · rw [if_neg hw, Real.sinc_of_ne_zero (div_ne_zero hw (by norm_num)), inv_div]
     simpa only [zero_div, Real.sinc_zero, inv_one, hkappa_eq] using hkappa
 
-/-- Appendix B and Theorem 4.5: each of the three coefficients of
+/-- Appendix B and Theorem 4.6: each of the three coefficients of
 `𝓔̃_w(W)` is bounded by a constant times the inverse cube of the free arc.
 The first two exact equivalents are inverse squares, hence give the weaker
 common bound after multiplying their scaled limits by the free arc. -/
@@ -299,11 +299,39 @@ theorem paper_walk_coefficients_isBigO :
     filter_upwards [hev] with θ hθ
     rw [paperWalkSquare_eq_series (by linarith [hθ.2, pi_pos]) (by linarith [hθ.1])]
 
+/-- **Fact B.2** (`fact:arc`): the three equivalents of Appendix B and
+the common inverse-cube bound for every walk-energy coefficient. -/
+theorem fact_arc :
+    Asymptotics.IsEquivalent (𝓝[>] 0)
+      (fun δ ↦ cellConstant (2 * π - δ) * walkLogSlope (2 * π - δ)) (fun δ ↦ 1 / δ ^ 2) ∧
+    Asymptotics.IsEquivalent (𝓝[>] 0)
+      (fun δ ↦ (1 / 24 + frameMult (2 * π - δ)) * walkLogSlope (2 * π - δ))
+      (fun δ ↦ 1 / δ ^ 2) ∧
+    Asymptotics.IsEquivalent (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
+      (fun δ ↦ (8 / π + 5 * π / 2 + 2) / δ ^ 3) ∧
+    (let κ : ℝ → ℝ := fun x ↦ if x = 0 then 1 else (x / 2) / Real.sin (x / 2);
+      Asymptotics.IsBigO (𝓝[>] 0)
+        (fun δ ↦ cellConstant (2 * π - δ) * κ (2 * π - δ)) (fun δ : ℝ ↦ 1 / δ ^ 3) ∧
+      Asymptotics.IsBigO (𝓝[>] 0)
+        (fun δ ↦ (1 / 24 + frameMult (2 * π - δ)) * κ (2 * π - δ))
+        (fun δ : ℝ ↦ 1 / δ ^ 3) ∧
+      Asymptotics.IsBigO (𝓝[>] 0) (fun δ ↦ paperWalkSquare (2 * π - δ))
+        (fun δ : ℝ ↦ 1 / δ ^ 3)) := by
+  have hev : ∀ᶠ δ in 𝓝[>] (0 : ℝ), δ ∈ Ioo 0 π := Ioo_mem_nhdsGT pi_pos
+  refine ⟨cellConstant_walk_endpoint_equivalent, ?_, ?_, paper_walk_coefficients_isBigO⟩
+  · apply walk_coefficient_equivalents.2.1.congr_left
+    filter_upwards [hev] with δ hδ
+    rw [paperFrameMult_eq_series (by linarith [hδ.2, pi_pos]) (by linarith [hδ.1])]
+    rfl
+  · apply (walk_leading_equivalents.1.trans walk_leading_equivalents.2).congr_left
+    filter_upwards [hev] with δ hδ
+    rw [paperWalkSquare_eq_series (by linarith [hδ.2, pi_pos]) (by linarith [hδ.1])]
+
 end UnitaryProducts.PaperProof
 
 namespace UnitaryProducts.Paper
 
-/-- Appendix B: the coefficient `𝓔̃_w(W)` used in Theorem 4.5, including the
+/-- Appendix B: the coefficient `𝓔̃_w(W)` used in Theorem 4.6, including the
 continuous value `κ = 1` at width zero. -/
 def walkEnergy {d : ℕ} (w : ℝ) (W : ℝ → Matrix (Fin d) (Fin d) ℂ) : ℝ :=
   let Wd := derivWithin W (Icc (0 : ℝ) 1)
@@ -319,7 +347,7 @@ namespace UnitaryProducts.PaperProof
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- **Theorem 4.5** (`cor:walks`): the unitary-family comparison with the
+/-- **Theorem 4.6** (`cor:walks`): the unitary-family comparison with the
 constants of Appendix B and multiplier of Definition 4.1. The phased product is the
 rounded evolution's endpoint. The unused Lipschitz premise is omitted, and the rounded
 evolution is also constructed. -/
@@ -355,8 +383,8 @@ theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
     simpa using hwidth 0 (by norm_num) (0 : Fin d) 0
   have hseries := unitary_products_series_bound T hT H hH hw hcH hwidth
   dsimp only at hseries
-  have hev : ∀ᶠ δ in 𝓝[>] (0 : ℝ), δ ∈ Ioo 0 π := Ioo_mem_nhdsGT pi_pos
-  refine ⟨?_, hseries.2.1, ?_, ?_, paper_walk_coefficients_isBigO, ?_⟩
+  have harc := fact_arc
+  refine ⟨?_, harc.1, harc.2.1, harc.2.2.1, harc.2.2.2, ?_⟩
   · intro U hU
     rw [div_eq_mul_one_div (walkEnergy w _) (T : ℝ),
       mul_comm (walkEnergy w _) (1 / (T : ℝ))]
@@ -364,12 +392,6 @@ theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
     rw [paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw,
       paperFrameMult_eq_series (le_refl 0) (by positivity)]
     exact hseries.1 U hU
-  · apply hseries.2.2.1.congr_left
-    filter_upwards [hev] with δ hδ
-    rw [paperFrameMult_eq_series (by linarith [hδ.2, pi_pos]) (by linarith [hδ.1])]
-  · apply hseries.2.2.2.congr_left
-    filter_upwards [hev] with δ hδ
-    rw [paperWalkSquare_eq_series (by linarith [hδ.2, pi_pos]) (by linarith [hδ.1])]
   · have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
     obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
     refine ⟨V, hV, ?_⟩

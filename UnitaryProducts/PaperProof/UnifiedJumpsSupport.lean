@@ -41,17 +41,6 @@ theorem hasDerivAt_jumpSegment (A B : 𝕄) (s : ℝ) :
   simp [sub_eq_add_neg, add_comm]
 
 
-/-- The physical affine derivative is `T*(B-A)`, so its operator norm is
-`T*norm(B-A)`, exactly the two derivative identities used in Theorem 4.4(i). -/
-theorem jumpSegment_sample_derivative (A B : 𝕄) (T j : ℕ) (s : ℝ) :
-    HasDerivAt (fun t ↦ jumpSegment A B ((T : ℝ) * t - j))
-      ((T : ℝ) • (B - A)) s ∧ ‖(T : ℝ) • (B - A)‖ = (T : ℝ) * ‖B - A‖ := by
-  have hparameter : HasDerivAt (fun t : ℝ ↦ (T : ℝ) * t - j) (T : ℝ) s := by
-    simpa using ((hasDerivAt_id s).const_mul (T : ℝ)).sub_const (j : ℝ)
-  have hcomp := HasDerivAt.scomp (𝕜 := ℝ) (𝕜' := ℝ)
-    (g₁ := jumpSegment A B) (g₁' := B - A) s
-    (hasDerivAt_jumpSegment A B ((T : ℝ) * s - j)) hparameter
-  exact ⟨hcomp, norm_smul_of_nonneg (Nat.cast_nonneg T) (B - A)⟩
 
 /-- The affine segment is smooth on the whole parameter line. -/
 theorem contDiff_jumpSegment (A B : 𝕄) : ContDiff ℝ ⊤ (jumpSegment A B) := by
@@ -130,7 +119,7 @@ theorem affine_eigenvalues_interval {A B : 𝕄}
       (mul_le_mul_of_nonneg_left hBx.2 hs.1)⟩
 
 /-- The largest eigenvalue is convex and the least eigenvalue is concave,
-as stated literally in the proof of Theorem 4.4(i). -/
+as stated literally in the proof of the affine jump bound in Theorem 4.4. -/
 theorem affine_spectral_extrema [NeZero d] {A B : 𝕄}
     (hA : A.IsHermitian) (hB : B.IsHermitian) {s : ℝ} (hs : s ∈ J) :
     sSup (range (isHermitian_jumpSegment hA hB s).eigenvalues) ≤
@@ -265,7 +254,8 @@ theorem unified_affine_variation_of_derivWithin [NeZero d] {A B Da Db : 𝕄}
   simpa only [hD, hE] using hpoint s hs
 
 /-- Mesh integration in the canonical derivative notation of Lemma A.3.
-For Theorem 4.4(ii), `F(s)=frameOp (H s) (H' s)` and the majorant is
+For the C² jump bound
+in Theorem 4.6, `F(s)=frameOp (H s) (H' s)` and the majorant is
 `N(w)||H''|| + eta(w)||W'|| ||H'||`. -/
 theorem unified_mesh_integral_of_derivWithin {F : ℝ → 𝕄} {g : ℝ → ℝ}
     (hF : ContDiffOn ℝ 1 F J)

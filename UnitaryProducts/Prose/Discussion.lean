@@ -109,28 +109,7 @@ theorem constant_truncation_error_positive :
   rw [htrunc]
   norm_num
 
-/-- Section 5: rounding a real component strictly below and strictly above its
-input gives errors of opposite signs, by `sub_pos` and `sub_neg`. -/
-theorem alternating_rounding_error_signs {x yBelow yAbove : ℝ}
-    (hBelow : yBelow < x) (hAbove : x < yAbove) :
-    0 < x - yBelow ∧ x - yAbove < 0 := by
-  have hPositive : 0 < x - yBelow := sub_pos.mpr hBelow
-  have hNegative : x - yAbove < 0 := sub_neg.mpr hAbove
-  exact ⟨hPositive, hNegative⟩
 
-/-- Section 5: choosing the lower rounding before each cell center and the upper rounding
-after it makes the entry error change sign at that center. -/
-theorem alternating_rounding_in_time {x yBelow yAbove : ℝ}
-    (hBelow : yBelow < x) (hAbove : x < yAbove) (j : ℝ) :
-    let y := fun t : ℝ ↦ if t < j then yBelow else yAbove
-    (∀ t < j, 0 < x - y t) ∧ (∀ t > j, x - y t < 0) := by
-  intro y
-  have hsigns := alternating_rounding_error_signs hBelow hAbove
-  constructor
-  · intro t ht
-    simpa only [y, if_pos ht] using hsigns.1
-  · intro t ht
-    simpa only [y, if_neg (not_lt.mpr ht.le)] using hsigns.2
 
 open UnitaryProducts.Paper in
 /-- Section 5: dividing the Hamiltonian by a positive integer and multiplying

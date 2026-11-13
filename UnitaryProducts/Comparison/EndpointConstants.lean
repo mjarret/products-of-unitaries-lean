@@ -24,7 +24,7 @@ noncomputable section
 namespace UnitaryProducts.Corrector
 
 /-- $\mathcal N(\pi)=1/\pi^2$ and $2\mathcal N'(\pi)=1/(2\pi)-4/\pi^3$, which enter the
-coefficients of Theorem B.
+coefficients of Theorem A.
 
 Reading the statement against the paper:
 * `frameBound` and `frameLip` are $\mathcal N$ and $\mathcal N'$ on $[0,2\pi)$
@@ -61,7 +61,7 @@ theorem frameBound_frameLip_pi :
 
 /-- The value $c_0=(\pi-2)/(2\pi^2)$ of the constant $c_0$ of Theorem 4.2 at width $\pi$ and, with
 `frameBound_frameLip_pi`, $\mathcal N(\pi/2)=(4-\pi)/\pi^2$; they enter the coefficients of
-Theorem B.
+Theorem A.
 
 Reading the statement against the paper:
 * `frameBound` is $\mathcal N$ on $[0,2\pi)$, and $1/(2\pi)-1/\pi^2=(\pi-2)/(2\pi^2)$.

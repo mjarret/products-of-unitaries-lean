@@ -63,7 +63,7 @@ theorem crossing_comparison_bound [NeZero d] {T : ℕ} (hT : 0 < T)
   refine ⟨hleak, ?_⟩
   have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
   obtain ⟨V, hV, heV⟩ := exists_rounded_evolution ht hT H hH
-  have hbound := unit_steps_endpoint_bounds hT H Hd U V hH hd hlip hw hwidth hU hV
+  have hbound := thm_jumps hT H Hd U V hH hd hlip hw hwidth hU hV
   rw [hamiltonianEnergy_eq_of_hasDerivWithinAt w L H Hd hd,
     div_eq_mul_one_div, mul_comm _ (1 / (T : ℝ))] at hbound
   have hhalf : (T : ℝ) / (2 * T) = 1 / 2 := by field_simp

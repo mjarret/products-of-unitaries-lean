@@ -6,7 +6,7 @@ Authors: Michael Jarret
 module
 public import Mathlib
 
-/-! # Exact integral identities in Theorem 4.4(i)
+/-! # Exact integral identities in the affine jump bound in Theorem 4.4
 
 These statements record the equalities before the norm inequalities in the
 paper. The fundamental theorem is Mathlib's Banach-valued interval-integral FTC.
@@ -19,7 +19,7 @@ namespace UnitaryProducts.PaperProof
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
 local notation "J" => Icc (0 : ℝ) 1
 
-/-- Theorem 4.4(i): an increment of a C1 curve is exactly the integral of its
+/-- the affine jump bound in Theorem 4.4: an increment of a C1 curve is exactly the integral of its
 within derivative, including subintervals meeting the endpoints of `[0,1]`. -/
 theorem unified_increment_eq_integral {F : ℝ → E}
     (hF : ContDiffOn ℝ 1 F J) {a b : ℝ}
@@ -41,7 +41,7 @@ theorem unified_increment_eq_integral {F : ℝ → E}
     (Ioo_subset_Icc_self hsJ)).hasDerivWithinAt).hasDerivAt
       (Icc_mem_nhds hsJ.1 hsJ.2)
 
-/-- Theorem 4.4(i): take norms after the exact fundamental-theorem identity,
+/-- the affine jump bound in Theorem 4.4: take norms after the exact fundamental-theorem identity,
 then move the norm inside the integral. -/
 theorem unified_increment_norm_integral_chain {F : ℝ → E}
     (hF : ContDiffOn ℝ 1 F J) {a b : ℝ}
@@ -69,7 +69,7 @@ theorem unified_finite_integral_chain (T : ℕ) (F : ℕ → ℝ → E) (a b : �
   exact ⟨Finset.sum_congr rfl (fun j hj ↦ (hcell j (Finset.mem_range.mp hj)).1),
     Finset.sum_le_sum (fun j hj ↦ (hcell j (Finset.mem_range.mp hj)).2)⟩
 
-/-- Theorem 4.4(ii): the sum of increment norms is exactly the sum of norms
+/-- the C² jump bound in Theorem 4.6: the sum of increment norms is exactly the sum of norms
 of the derivative integrals on the adjacent sampling intervals. -/
 theorem unified_mesh_norm_eq_integrals {F : ℝ → E}
     (hF : ContDiffOn ℝ 1 F J) {T : ℕ} (hT : 0 < T) :
@@ -85,7 +85,7 @@ theorem unified_mesh_norm_eq_integrals {F : ℝ → E}
     (fun j _ ↦ div_le_div_of_nonneg_right (by exact_mod_cast Nat.le_succ j) htr.le)
   simpa only [Nat.cast_add, Nat.cast_one] using hchain.1
 
-/-- Theorem 4.4(ii): move each norm inside its cell integral and join the
+/-- the C² jump bound in Theorem 4.6: move each norm inside its cell integral and join the
 adjacent cells, obtaining one integral of the derivative norm. -/
 theorem unified_mesh_norm_integrals_le {F : ℝ → E}
     (hF : ContDiffOn ℝ 1 F J) {T : ℕ} (hT : 0 < T) :
@@ -119,7 +119,7 @@ theorem unified_mesh_norm_integrals_le {F : ℝ → E}
     _ = _ := by simpa only [Nat.cast_zero, zero_div, div_self htr.ne'] using hsum
 
 /-- Integrate a continuous majorant after the exact increment identity and the
-norm-integral inequality. This is the route displayed in Theorem 4.4(i). -/
+norm-integral inequality. This is the route displayed in the affine jump bound in Theorem 4.4. -/
 theorem unified_increment_integral_via_ftc {F : ℝ → E} {g : ℝ → ℝ}
     (hF : ContDiffOn ℝ 1 F J)
     (hbound : ∀ s ∈ J, ‖derivWithin F J s‖ ≤ g s)
@@ -141,7 +141,7 @@ theorem unified_increment_integral_via_ftc {F : ℝ → E} {g : ℝ → ℝ}
   exact hnorm.trans (intervalIntegral.integral_mono_on (μ := volume)
     hab hiF hig (fun s hs ↦ hbound s (hsub hs)))
 
-/-- Theorem 4.4(ii)'s full mesh route: replace increments by exact derivative
+/-- the C² jump bound in Theorem 4.6's full mesh route: replace increments by exact derivative
 integrals, move norms inside, join cells, and insert the pointwise majorant. -/
 theorem unified_mesh_integral_via_ftc {F : ℝ → E} {g : ℝ → ℝ}
     (hF : ContDiffOn ℝ 1 F J)

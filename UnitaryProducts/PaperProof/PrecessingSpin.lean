@@ -1324,11 +1324,16 @@ theorem spin_jump_quadratic {ω w : ℝ} (hω : 0 ≤ ω) (hωw : ω ≤ w)
       (1 / T : ℝ) *
         (Corrector.frameMult w * ω / 2 +
           (2 * deriv Corrector.frameMult w) * ω ^ 2 / 4) * θ ^ 2 := by
-  have hj := (thm_jumps hT (family ω θ) (familySlope ω θ)
+  have hj := hamiltonian_jump_sum_integral hT (family ω θ) (familySlope ω θ)
     (fun s _ ↦ family_hermitian ω θ s)
     (fun s _ ↦ (family_derivative ω θ s).hasDerivWithinAt)
     (fun s _ t _ ↦ family_derivative_lipschitz hω θ s t) hw
-    (fun j _ i k ↦ (family_width hω θ (j / T) i k).trans hωw)).1
+    (fun j _ i k ↦ (family_width hω θ (j / T) i k).trans hωw)
+  have hw0 : 0 ≤ w := hω.trans hωw
+  rw [paperClockJump_sum_eq (family ω θ) (familySlope ω θ)
+    (fun s _ ↦ family_hermitian ω θ s) hw
+    (fun j _ i k ↦ (family_width hω θ (j / T) i k).trans hωw),
+    paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw]
   rw [familySlope_supNorm hω] at hj
   convert hj using 1
   simp only [div_pow, mul_pow, sq_abs]

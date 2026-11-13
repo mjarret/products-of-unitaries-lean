@@ -15,14 +15,14 @@ open scoped Topology
 open UnitaryProducts.Corrector UnitaryProducts.Paper UnitaryProducts.Prose
 namespace UnitaryProducts.PaperProof
 
-/-- Appendix B: the squared unitary-derivative coefficient used in Theorem 4.5. -/
+/-- Appendix B: the squared unitary-derivative coefficient used in Theorem 4.6. -/
 def walk_square (w : ℝ) : ℝ :=
   (1 / 24 + frameBound w) / Real.cos (w / 4) ^ 2 +
     uniform_c1 w * walkLogSlope w ^ 2 + 2 * frameLip w * walkLogSlope w +
     (frameBound w - frameBound 0) * walkLogSlope w ^ 2
 
 /-- Substitution of the logarithm derivative bounds collects precisely `c₂`.
-This is the last algebraic step of the proof of Theorem 4.5. -/
+This is the last algebraic step of the proof of Theorem 4.6. -/
 theorem walk_collect (w E L M : ℝ) :
     uniform_c0 w * (walkLogSlope w * E) +
       (1 / 24 + frameBound w) *

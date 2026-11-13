@@ -27,7 +27,7 @@ namespace UnitaryProducts.PaperProof
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- **Theorem B** (`introthm:unit`): for every integer `T ≥ 1`, the
+/-- **Theorem A** (`introthm:unit`): for every integer `T ≥ 1`, the
 width-pi comparison with the derivative supremum and its Lipschitz constant `L`.
 The proof specializes (4.6), bounds both endpoint derivatives by their supremum,
 and inserts the three decimal upper bounds. Dimension zero is included. -/
@@ -62,6 +62,6 @@ theorem introthm_unit
     (fun s hs ↦ (hdiff s hs).hasDerivWithinAt) hlip hwidth hU
   have hcoeff := hamiltonianEnergy_pi_le H Hd
     (fun s hs ↦ (hdiff s hs).hasDerivWithinAt) hlip
-  exact hb.trans (div_le_div_of_nonneg_right hcoeff (by positivity))
+  exact hb.trans (div_le_div_of_nonneg_right hcoeff.2.2.2 (by positivity))
 
 end UnitaryProducts.PaperProof

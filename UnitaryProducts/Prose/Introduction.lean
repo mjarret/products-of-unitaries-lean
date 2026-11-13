@@ -20,7 +20,6 @@ public import UnitaryProducts.Spectral.WidthAndGap
 
 - `unit_sample_mem_le`
 - `adjacent_corrector_jump_le`
-- `band_gap_does_not_ensure_width`
 - `bounded_path_rescale_width`
 - `comparison_integrated_difference`
 - `midpoint_bit_truncation_finite_precision`
@@ -336,14 +335,5 @@ theorem periodic_corrector_zero_limit (a : ℂ) :
     convert (((ht.pow 2).div_const 2).sub_const (1 / 24)).mul_const a using 1
     ring
 
-/-- Section 1, a band gap does not ensure width: diag(0,7) has a positively separated band of
-its exponential, but exceeds every width strictly below 2pi. The complementary rescaling claim
-is `bounded_path_rescale_width`. -/
-theorem band_gap_does_not_ensure_width :
-    ∃ (hh : (diagonal ![(0 : ℂ), 7]).IsHermitian),
-      (∀ w : ℝ, w < 2 * π → ∃ p q, w < |hh.eigenvalues p - hh.eigenvalues q|) ∧
-      ∃ (S : Finset (Fin 2)) (hS : S.Nonempty) (hR : Sᶜ.Nonempty),
-        0 < finiteEigenphaseGap hh.eigenvalues S hS hR :=
-  width_band_gap_incomparable.2
 
 end UnitaryProducts.Paper

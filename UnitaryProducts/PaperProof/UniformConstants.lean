@@ -20,8 +20,6 @@ public import UnitaryProducts.Prose.SyncSteps
 - `uniform_c0_c1_div_frame_limits`
 - `uniform_c1`
 - `uniform_linear_coefficient`
-- `uniform_pi_coefficients`
-- `uniform_quadratic_coefficient`
 - `walkUniformSecond`
 - `walkUniformSquare`
 - `walkEta`
@@ -49,18 +47,8 @@ def uniform_c1 (w : ℝ) : ℝ := uniform_c0 w / 4 + 1 / 64
 def uniform_linear_coefficient (w : ℝ) : ℝ :=
   2 * uniform_c0 w + 1 / 24 + frameBound w
 
-/-- The coefficient of the squared first derivative bound. -/
-def uniform_quadratic_coefficient (w : ℝ) : ℝ := uniform_c1 w + 2 * frameLip w
 
 
-/-- Exact coefficients at width pi, before any numerical relaxation. -/
-theorem uniform_pi_coefficients :
-    uniform_linear_coefficient π = 1 / π - 1 / π ^ 2 + 1 / 24 ∧
-    uniform_quadratic_coefficient π =
-      5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 := by
-  dsimp [uniform_linear_coefficient, uniform_quadratic_coefficient, uniform_c1, uniform_c0]
-  rw [frameBound_center_pi, frameBound_frameLip_pi.1, frameBound_frameLip_pi.2]
-  constructor <;> field_simp <;> ring
 
 /-- The new coefficient of the walk's second derivative bound. -/
 def walkUniformSecond (w : ℝ) : ℝ := (1 / 24 + frameBound w) * walkLogSlope w

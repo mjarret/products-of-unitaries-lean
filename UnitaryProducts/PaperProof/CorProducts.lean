@@ -301,7 +301,7 @@ theorem paper_walk_coefficients_isBigO :
 
 /-- **Fact B.2** (`fact:arc`): the three equivalents of Appendix B and
 the common inverse-cube bound for every walk-energy coefficient. -/
-theorem fact_arc :
+theorem fact_arc :  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/CorProducts.lean#L306
     Asymptotics.IsEquivalent (𝓝[>] 0)
       (fun δ ↦ cellConstant (2 * π - δ) * walkLogSlope (2 * π - δ)) (fun δ ↦ 1 / δ ^ 2) ∧
     Asymptotics.IsEquivalent (𝓝[>] 0)
@@ -351,7 +351,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 constants of Appendix B and multiplier of Definition 4.1. The phased product is the
 rounded evolution's endpoint. The unused Lipschitz premise is omitted, and the rounded
 evolution is also constructed. -/
-theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)
+theorem thm_unitary_products [NeZero d] (T : ℕ) (hT : 0 < T)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/CorProducts.lean#L352
     (H : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     {w : ℝ} (hw : w < 2 * π) (hcH : ContDiffOn ℝ 2 H (Icc (0 : ℝ) 1))
     (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1) p q,

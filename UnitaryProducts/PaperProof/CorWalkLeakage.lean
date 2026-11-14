@@ -154,7 +154,7 @@ theorem walk_comparison_of_log (T : ℕ) (hT : 0 < T)
  rounded-clock evolution. The conclusion explicitly supplies existence, pointwise
  uniqueness, regularity, and width of the logarithm named in the paper. The fixed band rank is not
 needed for this comparison. -/
-theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)
+theorem cor_walk_leakage (W : ℝ → 𝕄) (α β : ℝ → ℝ)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/CorWalkLeakage.lean#L164
     (hu : (walk W 1).1) (hc : ContDiffOn ℝ 2 W K)
     (horder : ∀ s ∈ K, α s < β s ∧ β s < α s + 2 * π)
     (hband : spectralWindowFamily true W α β)

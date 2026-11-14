@@ -549,7 +549,7 @@ omit [NeZero d] in
 pointwise and prove uniqueness. Local principal-log integral representatives give C²
 regularity; the first- and second-derivative bounds then extend to the closed interval.
 The width hypotheses are exactly `0 ≤ w < 2 * π`. -/
-theorem lem_walk_log [NeZero d] (a : ℝ → ℝ) (w : ℝ)
+theorem lem_walk_log [NeZero d] (a : ℝ → ℝ) (w : ℝ)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/LemWalkLog.lean#L554
     (hw0 : 0 ≤ w) (hw : w < 2 * π) (W : ℝ → 𝕄)
     (ha : ContinuousOn a (Icc (0 : ℝ) 1))
     (hunit : (walk W 1).1)

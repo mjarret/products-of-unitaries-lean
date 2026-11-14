@@ -83,7 +83,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 together with the rounded clock. The first component is
 $e^{-iH((T-1)/T)}\cdots e^{-iH(0)}$; the second is $q(t)=\lfloor t+1/2\rfloor$.
 The empty product at `T = 0` is an internal convention; the paper assumes `T ≥ 1`. -/
-def unitProduct (H : ℝ → 𝕄) (T : ℕ) : 𝕄 × (ℝ → ℝ) :=
+def unitProduct (H : ℝ → 𝕄) (T : ℕ) : 𝕄 × (ℝ → ℝ) :=  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/Comparison/UnitSteps.lean#L86
   (UnitaryProducts.pieceProduct (fun _ ↦ 1) (fun j ↦ H (j / T)) T,
    fun t ↦ (⌊t + 1 / 2⌋ : ℤ))
 

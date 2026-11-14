@@ -99,7 +99,7 @@ theorem clock_series_bound [NeZero d] {T : ℕ} (hT : 0 < T)
 
 /-- **Theorem 4.2** (`thm:clocks`): the comparison with the
 entrywise multiplier of Definition 4.1 and constants of Appendix B. -/
-theorem thm_clocks [NeZero d] {T : ℕ} (hT : 0 < T)
+theorem thm_clocks [NeZero d] {T : ℕ} (hT : 0 < T)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/UniformConsequences.lean#L104
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L w : ℝ}
@@ -165,7 +165,7 @@ theorem hamiltonianEnergy_eq_of_hasDerivWithinAt (w L : ℝ) (H Hd : ℝ → �
 
 /-- **Theorem 4.4** (`thm:jumps`), equation (4.6) (`eq:products`): the comparison with the
 entrywise multiplier of Definition 4.1 and constants of Appendix B. -/
-theorem thm_jumps [NeZero d] {T : ℕ} (hT : 0 < T)
+theorem thm_jumps [NeZero d] {T : ℕ} (hT : 0 < T)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/UniformConsequences.lean#L172
     (H Hd U V : ℝ → 𝕄) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L w : ℝ}
@@ -848,7 +848,7 @@ theorem ex_unit_transfer_chain [NeZero d] (w : ℝ)
 
 /-- **Example 4.5** (`ex:unit-transfer`): the bit budget with the closed
 scalar constants in Appendix B. -/
-theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ)
+theorem ex_unit_transfer_bounds [NeZero d] (w : ℝ)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/UniformConsequences.lean#L857
    (hw : w < 2 * π)
    (H U : ℝ → 𝕄)
    (T k : ℕ)

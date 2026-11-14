@@ -31,7 +31,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 width-pi comparison with the derivative supremum and its Lipschitz constant `L`.
 The proof specializes (4.6), bounds both endpoint derivatives by their supremum,
 and inserts the three decimal upper bounds. Dimension zero is included. -/
-theorem introthm_unit
+theorem introthm_unit  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/IntroTheorems.lean#L36
     (H U : ℝ → 𝕄) (T : ℕ) (hT : 1 ≤ T)
     (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hdiff : DifferentiableOn ℝ H (Icc (0 : ℝ) 1))

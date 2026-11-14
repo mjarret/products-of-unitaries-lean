@@ -185,7 +185,7 @@ satisfies the unit-step hypotheses with `h = w = 2`. The two errors are the
 paper's displayed sine expressions, with their asymptotic equivalent and limit.
 The rounded evolution is constructed with its half-step endpoint identity. The conclusion also
 supplies the existence of both evolutions. -/
-theorem ex_unit_sharp (T : ℕ) (hT : 2 ≤ T) :
+theorem ex_unit_sharp (T : ℕ) (hT : 2 ≤ T) :  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/UnitExamples.lean#L190
     let H := sharpFamily
     (∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian) ∧
     ContDiffOn ℝ 1 H (Icc (0 : ℝ) 1) ∧

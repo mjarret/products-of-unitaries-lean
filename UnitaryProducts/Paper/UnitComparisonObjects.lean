@@ -28,7 +28,7 @@ def unitMultiplierDomain (x : ℂ) : Prop :=
 
 /-- **Definition 4.1** (`def:unit-objects`): the complex closed-form multiplier
 on its stated domain, and its entrywise action for eigenvalue differences below `2π`. -/
-def unitComparisonObjects :
+def unitComparisonObjects :  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/Paper/UnitComparisonObjects.lean#L31
     ({x : ℂ // unitMultiplierDomain x} → ℂ) ×
       ((Ω : 𝕄) → (hΩ : Ω.IsHermitian) →
         (∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| < 2 * Real.pi) → 𝕄 → 𝕄) :=

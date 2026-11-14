@@ -214,7 +214,7 @@ private theorem truncation_proof_bounds (k : ℕ) :
 (ii) the Hermitian truncation error has the stated operator-norm bound.
 The norm estimate holds for every matrix and every certified row-sparsity bound.
 The paper applies it to each Hermitian path value with the global maximum. -/
-theorem ex_truncation_bits (k : ℕ) :
+theorem ex_truncation_bits (k : ℕ) :  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/ExTruncationBits.lean#L217
     Function.Odd (truncation (d := d) k).1 ∧
     (∀ (A : 𝕄) (s : ℕ), A.IsHermitian →
       UnitaryProducts.RowSparse s (A - (truncation k).2.2.1 A) →

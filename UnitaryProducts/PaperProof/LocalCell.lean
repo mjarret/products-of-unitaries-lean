@@ -114,7 +114,7 @@ theorem cell_series_solution {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π) {Ω :
 /-- **Lemma A.1** (`lem:cell`): the corrector has the end value of Definition 4.1
 and the closed cosecant center bound, including its value at width zero. The chosen extension is
 differentiable also at the two cell endpoints. -/
-theorem lem_cell {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π) {Ω : 𝕄}
+theorem lem_cell {w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π) {Ω : 𝕄}  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/LocalCell.lean#L119
     (hΩ : Ω.IsHermitian)
     (hwidth : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w) (D : 𝕄) :
     let Φ := unitComparisonObjects.2 Ω hΩ (fun p q ↦ (hwidth p q).trans_lt hw) D
@@ -205,7 +205,7 @@ theorem self_frame_series_curve {Ω : ℝ → 𝕄} {w : ℝ}
 
 /-- **Lemma A.3** (`lem:end-value`): both derivative estimates for the
 entrywise multiplier of Definition 4.1, with its closed scalar constants. -/
-theorem canonical_cell_curve {Ω : ℝ → 𝕄} {w : ℝ}
+theorem canonical_cell_curve {Ω : ℝ → 𝕄} {w : ℝ}  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/LocalCell.lean#L211
     (hw0 : 0 ≤ w) (hw : w < 2 * π)
     (hΩ : ∀ s ∈ Icc (0 : ℝ) 1, (Ω s).IsHermitian)
     (hwidth : ∀ s (hs : s ∈ Icc (0 : ℝ) 1), ∀ p q,

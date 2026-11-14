@@ -53,7 +53,7 @@ is the paper's commutation, three-term identity, contraction estimates, and
 reverse triangle inequality. The hypothesis that Q is an orthogonal projector
 expresses the paper’s setting; the three-term bound does not need it. -/
 @[nolint unusedArguments]
-theorem prop_transfer {P Q Pt Qt U W A B : 𝕄}
+theorem prop_transfer {P Q Pt Qt U W A B : 𝕄}  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/PropTransfer.lean#L56
     (hP : IsStarProjection P) (_hQ : IsStarProjection Q)
     (hPt : IsStarProjection Pt) (hQt : IsStarProjection Qt)
     (hA : A ∈ unitary 𝕄) (hB : B ∈ unitary 𝕄)

@@ -102,7 +102,7 @@ theorem hamiltonianEnergy_pi_bound (H Hd : ℝ → 𝕄)
 
 /-- **Fact B.1** (`fact:pi`): the three exact width-pi values and the
 Hamiltonian energy bound with the stated decimal coefficients. -/
-theorem hamiltonianEnergy_pi_le (H Hd : ℝ → 𝕄)
+theorem hamiltonianEnergy_pi_le (H Hd : ℝ → 𝕄)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/ExamplesPi.lean#L112
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
     {L : ℝ} (hlip : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
       ‖Hd t - Hd s‖ ≤ L * |t - s|) :

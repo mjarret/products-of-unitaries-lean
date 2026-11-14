@@ -60,7 +60,7 @@ def truncation (k : ℕ) :
 and pointwise action on families (`.2`). The matrix entries are
 $F(\operatorname{Re} A_{pq}) + i F(\operatorname{Im} A_{pq})$.
 Oddness is assumed separately where Hermitian matrices are required. -/
-def levelFunctionData (F : ℝ → ℝ) :
+def levelFunctionData (F : ℝ → ℝ) :  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/Paper/FineStepBounds.lean#L63
     (𝕄 → 𝕄) × ((ℝ → 𝕄) → ℝ → 𝕄) :=
   (UnitaryProducts.scalarEntryMap F,
    fun H t ↦ UnitaryProducts.scalarEntryMap F (H t))

@@ -156,7 +156,7 @@ theorem truncated_endpoint_norm_identity {A D : 𝕄}
 from the band hull, and equal projector ranks. The full and directed projector
 distances agree and satisfy Davis–Kahan; the leakage difference is bounded by
 the evolution error plus both endpoint bounds. -/
-theorem rem_truncated_endpoints {H U : ℝ → 𝕄} {T : ℝ}
+theorem rem_truncated_endpoints {H U : ℝ → 𝕄} {T : ℝ}  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/RemTruncatedEndpoints.lean#L161
     (hT : 0 < T) (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     {S₀ S₁ : Finset (Fin d)}

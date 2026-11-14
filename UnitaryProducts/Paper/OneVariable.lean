@@ -62,7 +62,7 @@ Reading the statement against the paper:
   (`midpointProductOver_eq` writes it out).
 * The family argument `A` is the paper's $A$, and `n` is the paper's $N$.
 * As for `midpointProduct`, the product is total, and coinciding checkpoints give the factor $1$. -/
-def midpointProductOver (A : ℝ → 𝕄) (T : ℝ) (n : ℕ) (s : ℕ → ℝ) : 𝕄 :=
+def midpointProductOver (A : ℝ → 𝕄) (T : ℝ) (n : ℕ) (s : ℕ → ℝ) : 𝕄 :=  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/Paper/OneVariable.lean#L65
   midpointProduct (fun x ↦ T • A x) n s
 
 omit [NeZero d] in

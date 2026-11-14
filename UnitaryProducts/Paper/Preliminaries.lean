@@ -152,7 +152,7 @@ Reading the statement against the paper:
   gives this topology, so the choice of norm does not matter.
 * This definition applies to every matrix-valued function, without a Hermitian hypothesis.
   Consumers that require Hermitian values assume them separately. -/
-def IsRegulated (H : ℝ → 𝕄) (a b : ℝ) : Prop := UnitaryProducts.Regulated H a b
+def IsRegulated (H : ℝ → 𝕄) (a b : ℝ) : Prop := UnitaryProducts.Regulated H a b  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/Paper/Preliminaries.lean#L155
 
 omit [NeZero d] in
 /-- A family constant on the open pieces of a finite partition is regulated (Definition 2.1);

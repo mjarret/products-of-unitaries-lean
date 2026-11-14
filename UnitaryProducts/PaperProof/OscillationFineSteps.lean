@@ -72,7 +72,7 @@ theorem checkpointPartition_constant_extension (n : ℕ) (s : ℕ → ℝ)
     rw [min_eq_left hj]
 
 /-- Definition 3.3: midpoint error at most ε on every open cell. -/
-def HasMidpointOscillation (H : ℝ → 𝕄) (n : ℕ) (s : ℕ → ℝ) (ε : ℝ) : Prop :=
+def HasMidpointOscillation (H : ℝ → 𝕄) (n : ℕ) (s : ℕ → ℝ) (ε : ℝ) : Prop :=  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/OscillationFineSteps.lean#L77
   ∀ j < n, ∀ x ∈ Ioo (s j) (s (j + 1)),
     ‖H x - H ((s j + s (j + 1)) / 2)‖ ≤ ε
 
@@ -206,7 +206,7 @@ theorem midpoint_duhamel_integral {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
 
 /-- Theorem 3.6 (`thm:fine-steps`): Duhamel,
 in supremum form for arbitrary nondecreasing checkpoints. -/
-theorem thm_fine_steps_sup {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
+theorem thm_fine_steps_sup {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/OscillationFineSteps.lean#L211
     (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
     (F : ℝ → ℝ) (hodd : ∀ x, F (-x) = -F x) (n : ℕ) (s : ℕ → ℝ)
@@ -234,7 +234,7 @@ theorem thm_fine_steps_sup {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
 strict cells with pairwise oscillation, and hence midpoint error, at most ε.
 Hermiticity is unnecessary for this partition result. Pairwise cell oscillation
 is bounded as well as the midpoint error. -/
-theorem exists_oscillation_partition {H : ℝ → 𝕄} (hreg : IsRegulated H 0 1)
+theorem exists_oscillation_partition {H : ℝ → 𝕄} (hreg : IsRegulated H 0 1)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/OscillationFineSteps.lean#L239
     {ε : ℝ} (hε : 0 < ε) :
     ∃ (n : ℕ) (s : ℕ → ℝ), IsCheckpointPartition n s ∧
       (∀ j < n, s j < s (j + 1)) ∧
@@ -293,7 +293,7 @@ theorem fine_bits_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
 small midpoint oscillation, and the explicit product with its bit-error bound.
 Any uniform sparsity upper bound is allowed; the paper uses the exact maximum.
 Checkpoint existence and the factor identity are also supplied. -/
-theorem introthm_fine_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
+theorem introthm_fine_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/OscillationFineSteps.lean#L299
     (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
     (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) (hε : 0 < ε)
     (k σ : ℕ)
@@ -346,7 +346,7 @@ theorem oscillation_jrs_allocations {C δ : ℝ} (hC : 0 < C) (hδ : 0 < δ) :
 /-- Example 3.7 (`cor:jrs`): the continuous bound plus two equal budgets,
 without a variation hypothesis or an a priori number of cells.
 Any uniform sparsity upper bound is allowed; the paper uses the exact maximum. -/
-theorem cor_jrs_oscillation {H U : ℝ → 𝕄}
+theorem cor_jrs_oscillation {H U : ℝ → 𝕄}  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/OscillationFineSteps.lean#L353
     (hreg : IsRegulated H 0 1) (hH : ∀ x ∈ Icc (0 : ℝ) 1, (H x).IsHermitian)
     (P Q : 𝕄) (hP : IsStarProjection P) (hQ : IsStarProjection Q)
     {C δ : ℝ} (hC : 0 < C) (hδ : 0 < δ)

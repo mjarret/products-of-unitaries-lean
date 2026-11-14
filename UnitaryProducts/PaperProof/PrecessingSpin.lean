@@ -1244,7 +1244,7 @@ theorem odd_error_limit (θ : ℝ) :
 /-- Example 5.2: the two limiting comparisons, retaining their closed forms as
 extra conclusions. The endpoint
 norms are those of the actual derivative of the Hamiltonian in the statement. -/
-theorem ex_precessing_spin (ω θ : ℝ) :
+theorem ex_precessing_spin (ω θ : ℝ) :  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/PrecessingSpin.lean#L1247
     let H := fun s : ℝ ↦ (ω / 2 : ℝ) •
       (evol Z (θ * s / 2) * X * evol Z (-(θ * s / 2)))
     let V := fun T : ℕ ↦ evol (H 1) (1 / 2) * (unitProduct H T).1 * evol (H 0) (-(1 / 2))

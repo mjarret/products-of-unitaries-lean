@@ -466,7 +466,7 @@ unit-step hypotheses at width two, with the three displayed derivative bounds.
 The proof checks Weyl regularity, ODE normalization, and the derivative bounds;
 The least-eigenvalue spectral projectors commute with the endpoint Hamiltonians;
 Example 4.5 gives the truncated-product bound for every continuous leakage bound. -/
-theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁.IsHermitian)
+theorem ex_gap_adapted (H₀ H₁ : 𝕄) (h₀ : H₀.IsHermitian) (h₁ : H₁.IsHermitian)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/GapAdapted.lean#L471
     (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1)
     (Γ : ℝ → ℝ) (hΓ : ∀ x ∈ Icc (0 : ℝ) 1, IsLeastGap H₀ H₁ h₀ h₁ x (Γ x))
     (Γstar : ℝ) (hΓstar : 0 < Γstar) (hΓlow : ∀ x ∈ Icc (0 : ℝ) 1, Γstar ≤ Γ x)

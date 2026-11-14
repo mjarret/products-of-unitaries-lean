@@ -40,7 +40,7 @@ its interval integrability follows inside the proof from those hypotheses.
 The integration and telescoping argument is `comparison_with_jumps` in
 `Evolution/RegulatedComparison.lean`; this head only regroups the correction terms.
 Separate Hermiticity hypotheses are unnecessary once unitary evolutions are given. -/
-theorem thm_comparison {a b : ℝ}
+theorem thm_comparison {a b : ℝ}  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/ThmComparison.lean#L43
     (m : ℕ) (p : ℕ → ℝ) (hp : Monotone p) (ha : p 0 = a) (hb : p (m + 1) = b)
     (K G U V R : ℝ → 𝕄) (Y : ℕ → ℝ → 𝕄) (S : Set ℝ) (hS : S.Countable)
     (hU : IsEvolution K U a b) (hV : IsEvolution G V a b)

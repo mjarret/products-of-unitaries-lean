@@ -71,7 +71,7 @@ spectral projector, spectral gap (Hermitian) or eigenphase gap (unitary),
 family-band predicate, predicate of having
 `m` eigenvalues counted with multiplicity, and the two endpoint projectors.
 The Boolean selects Hermitian (`false`) or unitary (`true`) matrices. -/
-def spectralWindowData (circular : Bool) :
+def spectralWindowData (circular : Bool) :  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/Paper/SpectralWindow.lean#L74
     (𝕄 → ℝ → ℝ → Prop) × (𝕄 → ℝ → ℝ → 𝕄) × (𝕄 → ℝ → ℝ → ℝ) ×
     ((ℝ → 𝕄) → (ℝ → ℝ) → (ℝ → ℝ) → Prop) ×
     ((ℝ → 𝕄) → (ℝ → ℝ) → (ℝ → ℝ) → ℕ → Prop) ×

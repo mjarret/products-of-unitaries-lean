@@ -128,7 +128,7 @@ one crossing transfers the assumed continuous leakage limit to the discrete
 product. The proof derives endpoint commutation by continuity, applies
 Proposition 2.4 with endpoint half-step phases, then (4.6) with one coefficient
 independent of `T`. -/
-theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)
+theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄)  -- Easier-to-read statement (v1.1.0): https://github.com/mjarret/products-of-unitaries-lean/blob/v1.1.0/UnitaryProducts/PaperProof/Crossings.lean#L138
     (U : ℕ → ℝ → 𝕄)
     (hH : ∀ s ∈ Icc (0 : ℝ) 1, (H s).IsHermitian)
     (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)

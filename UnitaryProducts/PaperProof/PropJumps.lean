@@ -11,7 +11,6 @@ public import UnitaryProducts.PaperProof.LemWalkLog
 public import UnitaryProducts.PaperProof.FactAdjoint
 public import UnitaryProducts.Prose.UnitStepsWalks
 public import UnitaryProducts.Prose.ChainSteps
-public import UnitaryProducts.PaperProof.WalkCutFormula
 public import Mathlib.Analysis.Complex.CauchyIntegral
 public import Mathlib.Analysis.Complex.RemovableSingularity
 public import UnitaryProducts.Corrector.FrameMultiplier

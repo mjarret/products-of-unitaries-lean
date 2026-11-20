@@ -57,7 +57,4 @@ theorem transfer_hull (ev : Fin d → ℝ) {S : Finset (Fin d)} (hS : S.Nonempty
     rw [hmem i, abs_le]
     constructor <;> linarith
 
-
-
-
 end UnitaryProducts.PaperProof

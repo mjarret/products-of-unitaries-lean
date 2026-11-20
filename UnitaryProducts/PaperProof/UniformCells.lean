@@ -8,11 +8,19 @@ module
 public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.LocalCell
 public import UnitaryProducts.PaperProof.ThmComparison
-public import UnitaryProducts.PaperProof.ThmUnitStepsMax
+public import UnitaryProducts.Comparison.UnitSteps
+public import UnitaryProducts.Prose.Introduction
 public import UnitaryProducts.PaperProof.UniformCellGeometry
 public import UnitaryProducts.PaperProof.UniformCellIntegrals
-public import UnitaryProducts.Prose.ResidualPointwise
-public import UnitaryProducts.Prose.FinalSteps
+public import UnitaryProducts.Prose.UnitStepsCorrector
+public import UnitaryProducts.Prose.ChainSteps
+public import Mathlib.Algebra.Order.Round
+public import UnitaryProducts.Evolution.RegulatedComparison
+public import UnitaryProducts.Evolution.RoundedClockEvolution
+public import UnitaryProducts.Spectral.SinTheta
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import Mathlib.LinearAlgebra.Eigenspace.Matrix
+public import Mathlib.Analysis.Real.Pi.Bounds
 /-!
 # Uniform correctors on all rounded cells
 
@@ -28,21 +36,17 @@ public import UnitaryProducts.Prose.FinalSteps
 - `uniformCorrectionPiece_derivative`
 - `uniformCorrectionPiece_jump_frame`
 - `uniformPieceResidual`
-- `uniformResidual_norm_le`
-- `uniformResidual_profile_bound`
 - `uniform_aestronglyMeasurable_pieceResidual`
 - `uniform_clock_integral_continuous`
 - `uniform_corrector_norm_LM`
 - `uniform_even_integral`
 - `uniform_local_bounds`
-- `uniform_residual_integral`
 - `uniform_clock_profile_integral`
 - `unit_residual_integral`
 - `unitPhysicalResidual_integral_formula`
 - `unitPhysicalResidual_integral_product_bound`
 - `uniform_residual_moments`
 - `uniform_residual_profile_integral`
-- `uniform_residual_step`
 - `unitPhysicalResidual`
 - `uniform_physical_residual_integral`
 - `unitPhysicalResidual_integral`
@@ -290,92 +294,6 @@ theorem uniform_local_bounds {T : ℝ} (hT : 0 ≤ T) {N : ℕ}
   · convert mul_le_mul_of_nonneg_left (hl a ha b hb)
       (div_nonneg hT (sq_nonneg _)) using 1; field_simp
 
-/-- The residual pointwise bound, using only the current sample. -/
-theorem uniformResidual_norm_le {T : ℝ} (hT : 0 ≤ T) {N : ℕ} (hN : 0 < N)
-    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L M : ℝ}
-    (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
-    (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
-    {s : ℝ} (hs : s ∈ Icc (0 : ℝ) 1)
-    :
-    let Y := uniformCorrectionPiece T N H Hd hH
-    ‖uniformPieceResidual T N H Y s‖ ≤
-      T / (N : ℝ) ^ 2 * |((N : ℝ) * s - clock (N * s))| *
-        (M * |((N : ℝ) * s - clock (N * s))| / 2 + N * L * ‖Y (clock (N * s)) s‖) := by
-  intro Y
-  have hc := continuousOn_of_norm_sub_le hl
-  have hn : (0 : ℝ) < N := Nat.cast_pos.mpr hN
-  let r : ℝ := clock (N * s)
-  -- The local clock τ = Ns - q(Ns) measures time from the rounded sample.
-  let τ := ((N : ℝ) * s - clock (N * s))
-  let K := fun u : ℝ ↦ (T / N) • H ((r + u) / N)
-  let Kd := fun u : ℝ ↦ (T / (N : ℝ)^2) • Hd ((r + u) / N)
-  have hq := sample_mem (N := N) hs
-  change r/N ∈ Icc (0 : ℝ) 1 at hq
-  have he : (r + τ)/N = s := by
-    dsimp only [r, τ]
-    field_simp
-    ring
-  have hi : ‖∫ u in (0 : ℝ)..τ, Kd u-Kd 0‖ ≤ (T/(N:ℝ)^3)*M*(τ^2/2) := by
-    have hb := local_taylor_chain hT hn hd hl hq (he.symm ▸ hs)
-    simp only [Kd, add_zero]
-    exact (hb.1.symm.trans_le (hb.2.1.trans_eq hb.2.2)).trans_eq (by ring)
-  have hK : ‖K τ-K 0‖ ≤ (T/(N:ℝ)^2)*L*|τ| := by
-    have hb := (uniform_local_bounds (N := N) hT H Hd hd hbd hl hq hs).2.1
-    simpa only [K, he, add_zero, mul_sub, mul_div_cancel₀ _ hn.ne', τ] using hb
-  rw [uniformPieceResidual_local_cell T hN H Hd hH hd hc hs,
-    norm_smul_of_nonneg hn.le]
-  have hprod := norm_mul_le_of_le hK (le_refl ‖Y (clock (N * s)) s‖)
-  refine (mul_le_mul_of_nonneg_left (norm_sub_le_of_le hi
-    (by simpa only [norm_smul, Complex.norm_I, one_mul] using hprod)) hn.le).trans_eq ?_
-  dsimp [τ]
-  rw [← sq_abs (((N : ℝ) * s - clock (N * s)))]
-  field_simp
-
-/-- the proof of Theorem 4.2: the integral-term bound and its exact even residual profile. -/
-theorem uniformResidual_profile_bound [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N : ℕ} (hN : 0 < N)
-    (H Hd : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L M : ℝ}
-    (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
-    (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
-    {s : ℝ} (hs : s ∈ Icc (0 : ℝ) 1)
-    {w : ℝ} (hw : w < 2 * π) (hwidth : AllSampleWidth T N H hH w) :
-    let Y := uniformCorrectionPiece T N H Hd hH
-    let τ := ((N : ℝ) * s - clock (N * s))
-    let c₀ := frameBound w-frameBound (w/2)/2
-    ‖uniformPieceResidual T N H Y s‖ ≤
-      N*(T*M/(N:ℝ)^3)*|(∫ u in (0 : ℝ)..τ, |u|)| +
-        N*(T*L/(N:ℝ)^2)*|τ| *(c₀+τ^2/2)*(T*L/(N:ℝ)^2) ∧
-    N*(T*M/(N:ℝ)^3)*|(∫ u in (0 : ℝ)..τ, |u|)| +
-        N*(T*L/(N:ℝ)^2)*|τ| *(c₀+τ^2/2)*(T*L/(N:ℝ)^2) =
-      T/(N:ℝ)^2 * (M*τ^2/2+|τ| *(c₀+τ^2/2)*(T/N)*L^2) := by
-  intro Y τ c₀
-  have hn : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hN.ne'
-  have habs : |(∫ u in (0 : ℝ)..τ, |u|)| = τ ^ 2 / 2 := abs_integral_abs_zero τ
-  rw [habs]
-  -- Clear only the mesh denominators; the even profile and its coefficients stay explicit.
-  have hprofile :
-      N * (T * M / (N : ℝ) ^ 3) * (τ ^ 2 / 2) +
-        N * (T * L / (N : ℝ) ^ 2) * |τ| * (c₀ + τ ^ 2 / 2) *
-          (T * L / (N : ℝ) ^ 2) =
-      T / (N : ℝ) ^ 2 * (M * τ ^ 2 / 2 + |τ| * (c₀ + τ ^ 2 / 2) * (T / N) * L ^ 2) := by
-    field_simp
-  refine ⟨?_, hprofile⟩
-  have hL : 0 ≤ L := (norm_nonneg _).trans (hbd 0 ⟨le_rfl, zero_le_one⟩)
-  have hp := uniformResidual_norm_le hT hN H Hd hH hd hbd hl hs
-  have hy := uniform_corrector_norm_LM hT N H Hd hH hw hwidth (clock_bounds (N := N) hs)
-    (hbd _ (sample_mem (N := N) hs)) (t := (N : ℝ) * s - clock (N * s))
-  have hscaled := scaled_corrector_bound_LM hL hy
-  apply hp.trans
-  have hb := mul_le_mul_of_nonneg_left
-    (add_le_add (le_refl (M*|((N : ℝ) * s - clock (N * s))|/2)) (hscaled.1.trans_eq hscaled.2))
-    (show 0 ≤ T/(N:ℝ)^2*|((N : ℝ) * s - clock (N * s))| by positivity)
-  -- Replace τ² by |τ|² to identify the Taylor and corrector-product contributions.
-  exact hb.trans_eq (by
-    dsimp [τ, c₀]; rw [← sq_abs (((N : ℝ) * s - clock (N * s)))]; field_simp)
-
 /-- The integral of a continuous even function over a symmetric cell. -/
 theorem uniform_even_integral {f : ℝ → ℝ} (hc : Continuous f)
     (he : ∀ t, f (-t) = f t) :
@@ -485,27 +403,6 @@ theorem uniform_residual_step_of_profile {T : ℝ} {N j : ℕ} (hj : j < N)
     (fun t ↦ by simp only [neg_sq, abs_neg])] at hp
   convert congrArg (fun x ↦ T/(N:ℝ)^3 * x) hp using 1 <;> ring
 
-/-- Every mesh interval has the same sharp residual integral, including the first and last. -/
-theorem uniform_residual_step [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N j : ℕ}
-    (hj : j < N) (H Hd : ℝ → 𝕄)
-    (hH : IsTimeDepHamiltonian H)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L M : ℝ}
-    (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
-    (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
-    {w : ℝ} (hw : w < 2 * π) (hwidth : AllSampleWidth T N H hH w) :
-    let R := uniformPieceResidual T N H (uniformCorrectionPiece T N H Hd hH)
-    let c₀ := frameBound w-frameBound (w/2)/2
-    IntervalIntegrable R volume ((j : ℝ)/N) (((j : ℝ)+1)/N) ∧
-    (∫ s in (j : ℝ)/N..((j : ℝ)+1)/N, ‖R s‖) ≤
-      T/(N:ℝ)^3 * (M/24+(c₀/4+1/64)*(T/N)*L^2) := by
-  intro R c₀
-  exact uniform_residual_step_of_profile hj R
-    (uniform_aestronglyMeasurable_pieceResidual T N H Hd hH (HasDerivWithinAt.continuousOn hd)) L
-      M c₀
-    (fun s hs _hr ↦ (uniformResidual_profile_bound hT (Nat.zero_lt_of_lt hj)
-      H Hd hH hd hbd hl hs hw hwidth).elim fun hb he ↦ hb.trans_eq he)
-
 /-- Normalize Theorem 4.2's explicit two-half-cell and `N-1`-full-cell split.
 Adding the two endpoint integrals gives exactly one full centered cell. -/
 theorem uniform_clock_profile_integral {N : ℕ} (hN : 0 < N) {f : ℝ → ℝ}
@@ -523,7 +420,6 @@ theorem uniform_clock_profile_integral {N : ℕ} (hN : 0 < N) {f : ℝ → ℝ}
   simp only [mul_zero, mul_one, smul_eq_mul]
   rw [hcells.2.2]
   field_simp
-
 
 /-- Sum a supplied residual profile, pairing the two endpoint half cells. -/
 theorem uniform_residual_integral_of_profile {T : ℝ} {N : ℕ} (hN : 0 < N)
@@ -560,28 +456,6 @@ theorem uniform_residual_integral_of_profile {T : ℝ} {N : ℕ} (hN : 0 < N)
   rw [intervalIntegral.integral_const_mul, hcells.2,
     uniform_residual_profile_integral M c₀ ((T/N)*L^2)] at hmono
   simpa only [mul_assoc] using hmono
-
-/-- Uniform-cell the proof of Theorem 4.2, with sharp constants and no endpoint correction. -/
-theorem uniform_residual_integral [NeZero d] {T : ℝ} (hT : 0 ≤ T) {N : ℕ}
-    (hN : 0 < N) (H Hd : ℝ → 𝕄)
-    (hH : IsTimeDepHamiltonian H)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L M : ℝ}
-    (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
-    (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
-    {w : ℝ} (hw : w < 2 * π) (hwidth : AllSampleWidth T N H hH w) :
-    let R := uniformPieceResidual T N H (uniformCorrectionPiece T N H Hd hH)
-    let c₀ := frameBound w-frameBound (w/2)/2
-    IntervalIntegrable R volume 0 1 ∧
-    IntervalIntegrable (fun s ↦ ‖R s‖) volume 0 1 ∧
-    (∫ s in (0:ℝ)..1, ‖R s‖) ≤
-      T/(N:ℝ)^2 * (M/24+(c₀/4+1/64)*(T/N)*L^2) := by
-  intro R c₀
-  exact uniform_residual_integral_of_profile hN R
-    (uniform_aestronglyMeasurable_pieceResidual T N H Hd hH (HasDerivWithinAt.continuousOn hd)) L
-      M c₀
-    (fun s hs _hr ↦ (uniformResidual_profile_bound hT hN H Hd hH hd hbd hl hs hw hwidth).1.trans_eq
-      (uniformResidual_profile_bound hT hN H Hd hH hd hbd hl hs hw hwidth).2)
 
 /-- The residual of the assembled correction in physical time at unit steps. -/
 def unitPhysicalResidual (T : ℕ) (H Hd : ℝ → 𝕄)
@@ -712,7 +586,6 @@ theorem unitPhysicalResidual_integral {T : ℕ} (hT : 0 < T) (H Hd : ℝ → �
   simpa only [unitPhysicalResidual, zero_div, div_self ht] using
     uniform_physical_residual_integral (N := T)
       (uniformPieceResidual T T H (uniformCorrectionPiece T T H Hd hH)) 0 T
-
 
 /-- Theorem 4.2: integrate the physical residual bound through the explicit
 cell split and then evaluate the three moments. The norm integral remains in physical time; the

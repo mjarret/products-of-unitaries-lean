@@ -25,7 +25,6 @@ public import UnitaryProducts.Corrector.PartialFractions
 - `summable_frameLip_majorant`
 - `frameOp`
 - `norm_frameOp_le`
-- `norm_frameOp_sub_le`
 -/
 
 @[expose] public section
@@ -153,25 +152,6 @@ theorem norm_positiveFrameSeries_le {a : A} {w : ℝ} (ha : ‖a‖ ≤ w) (hw :
   exact mul_le_mul_of_nonneg_left ((norm_pow_le a n).trans
     (pow_le_pow_left₀ (norm_nonneg a) ha n)) (frameCoeff_nonneg n)
 
-/-- The positive algebra series is Lipschitz on each smaller convergence ball. -/
-theorem norm_positiveFrameSeries_sub_le {a b : A} {r : ℝ} (ha : ‖a‖ ≤ r) (hb : ‖b‖ ≤ r)
-    (hr : r < 2 * π) :
-    ‖positiveFrameSeries a - positiveFrameSeries b‖ ≤ frameLip r * ‖a - b‖ := by
-  have hr0 : 0 ≤ r := (norm_nonneg a).trans ha
-  have hsa := (summable_norm_positiveFrameSeries a (ha.trans_lt hr)).of_norm
-  have hsb := (summable_norm_positiveFrameSeries b (hb.trans_lt hr)).of_norm
-  have hdiff : positiveFrameSeries a - positiveFrameSeries b =
-      ∑' n : ℕ, (frameCoeff n : ℂ) • (a ^ n - b ^ n) := by
-    rw [positiveFrameSeries, positiveFrameSeries, ← hsa.tsum_sub hsb]
-    exact tsum_congr fun n ↦ (smul_sub _ _ _).symm
-  have hmaj (n : ℕ) : ‖(frameCoeff n : ℂ) • (a ^ n - b ^ n)‖ ≤
-      (frameCoeff n * n * r ^ (n - 1)) * ‖a - b‖ := by
-    rw [norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (frameCoeff_nonneg n)]
-    exact (mul_le_mul_of_nonneg_left (norm_pow_sub_pow_le ha hb n)
-      (frameCoeff_nonneg n)).trans_eq (by ring)
-  rw [hdiff, frameLip, ← tsum_mul_right]
-  exact tsum_of_norm_bounded ((summable_frameLip_majorant hr0 hr).mul_right _).hasSum hmaj
-
 end UnitaryProducts.Corrector
 
 namespace UnitaryProducts
@@ -200,46 +180,5 @@ theorem norm_frameOp_le [NeZero d] {h D : 𝕄} {c w : ℝ} (hw : w < 2 * π)
       (mul_le_mul_of_nonneg_right (by linarith) (norm_nonneg E))
   exact ((positiveFrameSeries (adL h)).le_opNorm D).trans
     (mul_le_mul_of_nonneg_right (norm_positiveFrameSeries_le hA hw) (norm_nonneg D))
-
-/-- The multiplier changes by the input difference plus the commutator-series variation. -/
-theorem norm_frameOp_sub_le [NeZero d] {h h' D D' : 𝕄} {c c' w : ℝ}
-    (hw : w < 2 * π) (hwidth : ‖h - (c : ℂ) • 1‖ ≤ w / 2)
-    (hwidth' : ‖h' - (c' : ℂ) • 1‖ ≤ w / 2) :
-    ‖frameOp h D - frameOp h' D'‖ ≤
-      frameBound w * ‖D - D'‖ + 2 * frameLip w * ‖D'‖ * ‖h - h'‖ := by
-  have haw : ‖adL h‖ ≤ w := by
-    apply ContinuousLinearMap.opNorm_le_bound _ (by linarith [(norm_nonneg _).trans hwidth])
-    intro E
-    exact (norm_adL_apply_le h E (c : ℂ)).trans
-      (mul_le_mul_of_nonneg_right (by linarith) (norm_nonneg E))
-  have ha'w : ‖adL h'‖ ≤ w := by
-    apply ContinuousLinearMap.opNorm_le_bound _ (by linarith [(norm_nonneg _).trans hwidth'])
-    intro E
-    exact (norm_adL_apply_le h' E (c' : ℂ)).trans
-      (mul_le_mul_of_nonneg_right (by linarith) (norm_nonneg E))
-  have key : frameOp h D - frameOp h' D' = positiveFrameSeries (adL h) (D - D') +
-      (positiveFrameSeries (adL h) - positiveFrameSeries (adL h')) D' := by
-    simp only [frameOp, map_sub, ContinuousLinearMap.sub_apply]
-    abel
-  rw [key]
-  apply (norm_add_le _ _).trans
-  apply add_le_add
-  · exact ((positiveFrameSeries (adL h)).le_opNorm (D - D')).trans
-      (mul_le_mul_of_nonneg_right (norm_positiveFrameSeries_le haw hw) (norm_nonneg _))
-  · have hd : ‖adL h - adL h'‖ ≤ 2 * ‖h - h'‖ := by
-      apply ContinuousLinearMap.opNorm_le_bound _ (by positivity)
-      intro E
-      have he : (adL h - adL h') E = adL (h - h') E := by
-        simp only [ContinuousLinearMap.sub_apply, adL_apply, sub_mul, mul_sub]
-        abel
-      rw [he]
-      simpa only [zero_smul, sub_zero] using norm_adL_apply_le (h - h') E 0
-    have hL : ‖positiveFrameSeries (adL h) - positiveFrameSeries (adL h')‖ ≤
-        frameLip w * (2 * ‖h - h'‖) :=
-      (norm_positiveFrameSeries_sub_le (a := adL h) (b := adL h') haw ha'w hw).trans
-        (mul_le_mul_of_nonneg_left hd
-          (frameLip_nonneg (by linarith [(norm_nonneg _).trans hwidth])))
-    rw [show 2 * frameLip w * ‖D'‖ * ‖h - h'‖ = frameLip w * (2 * ‖h - h'‖) * ‖D'‖ by ring]
-    exact (ContinuousLinearMap.le_opNorm _ _).trans (mul_le_mul_of_nonneg_right hL (norm_nonneg _))
 
 end UnitaryProducts

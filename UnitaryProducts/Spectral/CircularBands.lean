@@ -6,7 +6,8 @@ Authors: Michael Jarret
 module
 
 public import UnitaryProducts.Spectral.BandTransfer
-public import UnitaryProducts.Spectral.SampledWidth
+public import UnitaryProducts.Spectral.ExactGap
+public import UnitaryProducts.Walks.LogarithmBranch
 public import UnitaryProducts.Walks.BandMultiplicity
 
 /-!
@@ -87,14 +88,6 @@ theorem angularDistance_isLeast (θ φ : ℝ) :
       exact hu.trans (hb.trans (le_abs_self _))
 
 local notation "𝔼" => EuclideanSpace ℂ (Fin d)
-
-/-- Number of eigenvalues, counted with multiplicity (as roots of the characteristic polynomial),
-of a unitary matrix on the open arc $\{e^{-i\theta} : \alpha < \theta < \beta\}$: the paper's
-"band of $m$ eigenvalues ... counted with multiplicity" (paragraph after Definition 2.5). -/
-def arcEigenvalueCount (U : 𝕄) (α β : ℝ) : ℕ := by
-  classical
-  exact (U.charpoly.roots.filter (fun z ↦ ∃ θ ∈ Ioo α β, z = Complex.exp (-I*(θ:ℂ)))).card
-
 
 /-- For phases in one turn, the integer minimum is the smaller of the two circular routes. -/
 theorem angularDistance_eq_min {x y : ℝ} (hxy : x ≤ y) (hyx : y - x ≤ 2 * π) :

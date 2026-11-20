@@ -27,7 +27,6 @@ public import Mathlib.Topology.MetricSpace.Thickening
 - `walkLogSecondIntegral`
 -/
 
-
 @[expose] public section
 
 open Real Complex Set Filter MeasureTheory UnitaryProducts.Corrector
@@ -407,7 +406,6 @@ theorem exists_local_walkLogIntegral_contDiffOn {H W : ℝ → 𝕄} {a : ℝ �
     exact ((hd s hs).const_smul I).const_add _
   · intro s hs
     exact (hdd s hs).const_smul I
-
 
 end LocalBranch
 

@@ -7,7 +7,8 @@ module
 
 public import Mathlib.MeasureTheory.Integral.Bochner.Set
 public import UnitaryProducts.Approximation.MaxEntryError
-public import UnitaryProducts.Approximation.VariationMain
+public import UnitaryProducts.Evolution.ExplicitSchedule
+public import Mathlib.Topology.EMetricSpace.BoundedVariation
 public import UnitaryProducts.Corrector.PeriodicFrameDecomposition
 public import Mathlib
 public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Commute
@@ -25,7 +26,6 @@ public import Mathlib.LinearAlgebra.Eigenspace.Matrix
 public import Mathlib.LinearAlgebra.Matrix.Hermitian
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 public import Mathlib.Tactic.FinCases
-public import UnitaryProducts.Approximation.JRSComparison
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.CommutatorRegularity
 public import UnitaryProducts.Corrector.IntegratedComparison

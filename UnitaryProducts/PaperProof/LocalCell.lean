@@ -74,7 +74,6 @@ theorem cell_corrected_residual {J : Set ℝ} (hJ : J.OrdConnected) (h0 : 0 ∈ 
   rw [cell_residual_split hJ h0 hd hc hK hKd hτ, hY.deriv]
   simp only [sub_sub_cancel, sub_self, zero_add]
 
-
 /-- The operator-series construction gives a continuously differentiable local corrector,
 its equation, equal end values, center bound, and growth from its actual center. The residual
 identity is stated separately in Section 4.
@@ -349,6 +348,5 @@ theorem canonical_cell_residual {Ω : 𝕄} (hΩ : Ω.IsHermitian) (D : 𝕄)
       (∫ s in (0 : ℝ)..τ, Kd s - D) - I • ((K τ - Ω) * Y τ) := by
   exact cell_corrected_residual hJ h0 hd hc hK0 hKd0 hτ
     (hasDerivAt_periodic_corrector Ω hΩ D τ)
-
 
 end UnitaryProducts.PaperProof

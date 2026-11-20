@@ -22,7 +22,6 @@ public import UnitaryProducts.Spectral.CircularBands
 - `eventually_window_in_principal_turn`
 - `exists_uniform_walkLogResolvent_bound`
 - `exp_neg_I_mem_slitPlane`
-- `frameOp_eq_positive_series`
 - `hasDerivAt_log_denominator`
 - `isGreatest_inv_chord_phase`
 - `isGreatest_inv_chord_phase_radius`
@@ -35,13 +34,9 @@ public import UnitaryProducts.Spectral.CircularBands
 - `norm_center_lt_pi_of_open_turn`
 - `norm_chord_endpoint_eq_sqrt`
 - `norm_log_sandwich_integral_le`
-- `rounded_clock_half_distance`
-- `rounded_clock_nearest`
 - `sin_sq_half_le_sin_sq_half`
 - `tendsto_frameBound_half_width`
 - `tendsto_scaled_cot_half_width`
-- `unit_rhs_le_step_polynomial`
-- `unit_rhs_uniform_step_limit`
 -/
 
 @[expose] public section
@@ -128,14 +123,6 @@ theorem tendsto_frameBound_half_width :
   have hw : Tendsto (fun θ : ℝ ↦ 2 * π - θ) (𝓝[>] 0) (𝓝 (2 * π - 0)) :=
     tendsto_const_nhds.sub nhdsWithin_le_nhds
   simpa only [he] using hw.div_const 2
-
-/-- Section 5, rounding the clock: distance to the chosen integer is at most one half. -/
-theorem rounded_clock_half_distance (x : ℝ) :
-    |x - (⌊x + 1 / 2⌋ : ℤ)| ≤ 1 / 2 := by
-  have hl := Int.floor_le (x + 1 / 2)
-  have hr := Int.lt_floor_add_one (x + 1 / 2)
-  rw [abs_le]
-  constructor <;> linarith
 
 section Blocks
 
@@ -228,41 +215,6 @@ theorem isGreatest_inv_chord_phase {w u : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π)
     simpa only [Real.cos_abs] using Real.cos_le_cos_of_nonneg_of_le_pi
       (abs_nonneg φ) (by linarith : w / 2 ≤ π) ha
 
-
-/-- Section 5, the one-size scalar comparison bound is uniformly bounded in total time
-by a polynomial in the step length, using `N ≥ 2`. -/
-theorem unit_rhs_le_step_polynomial {T N A B h : ℝ} (hT : 0 < T) (hN : 2 ≤ N)
-    (hA : 0 ≤ A) (hB : 0 ≤ B) (hh : 0 ≤ h) :
-    T / N ^ 2 * (A * h + B * T * h ^ 2 / N) ≤
-      (A * h * (T / N) + B * h ^ 2 * (T / N) ^ 2) / 2 := by
-  have hNp : 0 < N := by linarith
-  have he : T / N ^ 2 * (A * h + B * T * h ^ 2 / N) =
-      (A * h * (T / N) + B * h ^ 2 * (T / N) ^ 2) / N := by field_simp
-  rw [he]
-  apply div_le_div_of_nonneg_left (by positivity) (by norm_num) hN
-
-/-- Section 5, uniform-in-time vanishing of the scalar comparison bound with step length. -/
-theorem unit_rhs_uniform_step_limit {A B h : ℝ} (hA : 0 ≤ A) (hB : 0 ≤ B) (hh : 0 ≤ h) :
-    ∀ ε > 0, ∃ δ > 0, ∀ T N : ℝ, 0 < T → 2 ≤ N → T / N < δ →
-      T / N ^ 2 * (A * h + B * T * h ^ 2 / N) < ε := by
-  intro ε hε
-  let K := A * h + B * h ^ 2 + 1
-  have hK : 0 < K := by dsimp [K]; positivity
-  refine ⟨min 1 (ε / K), lt_min one_pos (div_pos hε hK), ?_⟩
-  intro T N hT hN hδ
-  have hNp : 0 < N := by linarith
-  have hd0 : 0 < T / N := div_pos hT hNp
-  have hd1 : T / N < 1 := lt_of_lt_of_le hδ (min_le_left _ _)
-  have hdε : T / N < ε / K := lt_of_lt_of_le hδ (min_le_right _ _)
-  have hdε' : K * (T / N) < ε := by
-    simpa only [mul_comm] using (lt_div_iff₀ hK).mp hdε
-  have hs : (T / N) ^ 2 ≤ T / N := by
-    simpa only [pow_two, mul_one] using mul_le_mul_of_nonneg_left hd1.le hd0.le
-  have hpow := mul_le_mul_of_nonneg_left hs (mul_nonneg hB (sq_nonneg h))
-  have he := unit_rhs_le_step_polynomial hT hN hA hB hh
-  dsimp [K] at hdε'
-  linarith
-
 /-- Section 4, the principal open turn maps into the slit plane. -/
 theorem exp_neg_I_mem_slitPlane {φ : ℝ} (hφ : φ ∈ Ioo (-π) π) :
     Complex.exp (-I * (φ : ℂ)) ∈ Complex.slitPlane := by
@@ -305,11 +257,6 @@ theorem tendsto_scaled_cot_half_width :
   rw [cot_half_width_reflect, Real.cot_eq_cos_div_sin,
     Real.sinc_of_ne_zero (div_ne_zero hn two_ne_zero)]
   field_simp
-
-/-- Section 5, nearest-sample characterization of the rounded clock, including ties. -/
-theorem rounded_clock_nearest (x : ℝ) (j : ℤ) :
-    |x - (⌊x + 1 / 2⌋ : ℤ)| ≤ |x - j| := by
-  simpa only [round_eq] using round_le x j
 
 section OpenTurn
 
@@ -365,7 +312,6 @@ theorem eigenvalues_mem_open_turn_of_norm {H : 𝕄} (hH : H.IsHermitian) {α : 
 
 end OpenTurnExistence
 
-
 /-- Section 4, the endpoint chord has exactly the scalar radius used in the maximum display. -/
 theorem norm_chord_endpoint_eq_sqrt (w u : ℝ) :
     ‖1 + u • (Complex.exp (((w / 2 : ℝ) : ℂ) * I) - 1)‖ =
@@ -386,17 +332,6 @@ theorem isGreatest_inv_chord_phase_radius {w u : ℝ} (hw0 : 0 ≤ w) (hw : w < 
       (1 / ‖1 + u • (Complex.exp (((w / 2 : ℝ) : ℂ) * I) - 1)‖) := by
   rw [norm_chord_endpoint_eq_sqrt, one_div]
   exact isGreatest_inv_chord_phase hw0 hw hu
-
-/-- Appendix A, the operator identity `N(ad Ω)(D) = ∑ νₙ ad_Ωⁿ(D)`,
-with coefficients obtained from the cotangent partial fractions. -/
-theorem frameOp_eq_positive_series {d : ℕ} [NeZero d]
-    (H D : Matrix (Fin d) (Fin d) ℂ) (hw : ‖adL H‖ < 2 * π) :
-    frameOp H D = ∑' n : ℕ, (frameCoeff n : ℂ) • (adL H ^ n) D := by
-  unfold frameOp positiveFrameSeries
-  have hs := (summable_norm_positiveFrameSeries (adL H) hw).of_norm
-  rw [tsum_apply_of_summable hs]
-  simp only [ContinuousLinearMap.smul_apply]
-
 
 section LocalOpenTurn
 
@@ -553,7 +488,6 @@ theorem circular_phase_inf_le_min {θ φ : ℝ} (hθφ : θ ≤ φ) (hφθ : φ 
     rw [Int.cast_one, mul_one, abs_of_nonneg (by linarith)] at h
     linarith
 
-
 /-- Section 4, the logarithm in an open turn is unique under precisely the open-turn
 spectral hypotheses, with no preassigned closed-window margin. -/
 theorem eq_of_evol_eq_open_turn {H K : 𝕄} (hH : H.IsHermitian) (hK : K.IsHermitian)
@@ -570,7 +504,6 @@ theorem eq_of_evol_eq_open_turn {H K : 𝕄} (hH : H.IsHermitian) (hK : K.IsHerm
   · simpa only [neg_neg] using le_max_right
       ‖H - ((α + π : ℝ) : ℂ) • 1‖ ‖K - ((α + π : ℝ) : ℂ) • 1‖
 
-
 /-- Section 4, a nonspectral lower endpoint determines exactly one Hermitian logarithm
 with spectrum in the open turn. -/
 theorem existsUnique_log_open_turn (W : unitary 𝕄) (α : ℝ)
@@ -584,7 +517,6 @@ theorem existsUnique_log_open_turn (W : unitary 𝕄) (α : ℝ)
   rintro K ⟨hK, hev, he⟩
   exact eq_of_evol_eq_open_turn hK (hG ()) hev
     (eigenvalues_mem_open_turn_of_norm (hG ()) (hlog ()).2) (he.trans (hlog ()).1.symm)
-
 
 /-- Section 4, transfer paragraph: nonempty band and complementary arc imply
 `l < β < r`, for the logarithm whose spectrum lies in the open turn. -/

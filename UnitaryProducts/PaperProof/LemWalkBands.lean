@@ -6,7 +6,16 @@ Authors: Michael Jarret
 module
 
 public import UnitaryProducts.PaperProof.LemWalkLog
-public import UnitaryProducts.PaperProof.SpectralProofSteps
+public import UnitaryProducts.PaperProof.ClosedCellConstruction
+public import UnitaryProducts.Prose.ChainSteps
+public import Mathlib.Analysis.Complex.CauchyIntegral
+public import Mathlib.Analysis.Complex.RemovableSingularity
+public import UnitaryProducts.Corrector.FrameMultiplier
+public import UnitaryProducts.Walks.LogHessian
+public import UnitaryProducts.Walks.WalkScalarCut
+public import Mathlib.Analysis.Convex.Deriv
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
+public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 public import UnitaryProducts.PaperProof.PrincipalLog
 public import UnitaryProducts.Prose.WalkBandTransfer
 public import UnitaryProducts.PaperProof.WalkBandGap
@@ -29,7 +38,6 @@ attribute [local instance] matrixCStarAlgebra
 variable {d : ℕ} [NeZero d]
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 local notation "K" => Icc (0 : ℝ) 1
-
 
 /-- Theorem 4.7: the shifted principal logarithm has exactly the Hermitian
 spectrum in the selected open turn and exponentiates to the given unitary. -/
@@ -246,78 +254,5 @@ theorem walk_band_log_support (W : ℝ → 𝕄) (α β : ℝ → ℝ) (ϑ : ℝ
   · intro s hs i j hi hj
     rw [walk_band_gap_eq W α β hband' hu hs]
     exact (hbandH s hs).2.2.2.1 i j hi hj
-
-set_option maxHeartbeats 1600000 in
--- The proof combines finite eigenvalue minima with locally constant spectral selections.
-omit [NeZero d] in
-/-- Section 4.3: a continuous Hermitian path and continuous interval endpoints
-which are never eigenvalues have a continuous exact band gap. Weyl's inequality
-makes each ordered eigenvalue continuous; the selected indices are locally constant.
-The minimum of their finitely many pairwise distances is therefore continuous. -/
-theorem continuous_exactGap_intervals (H : ℝ → 𝕄)
-    (hH : ∀ s ∈ K, (H s).IsHermitian) (hc : ContinuousOn H K)
-    (α β : ℝ → ℝ) (hα : ContinuousOn α K) (hβ : ContinuousOn β K)
-    (hoff : ∀ s ∈ K, α s ∉ spectrum ℝ (H s) ∧ β s ∉ spectrum ℝ (H s)) :
-    ContinuousOn (exactGap H hH (fun s ↦ Ioo (α s) (β s))) K := by
-  classical
-  let ev (s : K) (i : Fin d) := (hH s s.2).eigenvalues i
-  have he (i : Fin d) : Continuous (fun s : K ↦ ev s i) := by
-    have hl : LipschitzWith 1
-        (fun A : {A : 𝕄 // A.IsHermitian} ↦ A.2.eigenvalues i) := by
-      apply LipschitzWith.of_dist_le_mul
-      intro A B
-      simpa only [NNReal.coe_one, one_mul, Real.dist_eq, Subtype.dist_eq, dist_eq_norm] using
-        abs_eigenvalues_sub_le A.2 B.2 i
-    exact hl.continuous.comp (hc.restrict.subtype_mk fun s ↦ hH s s.2)
-  have horder {f g : K → ℝ} (hf : Continuous f) (hg : Continuous g)
-      (s : K) (hne : f s ≠ g s) :
-      ∀ᶠ t in 𝓝 s, (f t < g t ↔ f s < g s) := by
-    rcases lt_or_gt_of_ne hne with h | h
-    · filter_upwards [hf.continuousAt.eventually_lt hg.continuousAt h] with t ht
-      exact iff_of_true ht h
-    · filter_upwards [hg.continuousAt.eventually_lt hf.continuousAt h] with t ht
-      exact iff_of_false (not_lt_of_gt ht) (not_lt_of_gt h)
-  let S (s : K) := @Finset.filter (Fin d) (fun i ↦ ev s i ∈ Ioo (α s) (β s))
-    (fun _ ↦ Classical.propDecidable _) Finset.univ
-  let R (s : K) := @Finset.filter (Fin d) (fun i ↦ ev s i ∉ Ioo (α s) (β s))
-    (fun _ ↦ @instDecidableNot _ (Classical.propDecidable _)) Finset.univ
-  apply continuousOn_iff_continuous_restrict.mpr
-  apply continuous_iff_continuousAt.mpr
-  intro s
-  have hidx : ∀ᶠ (t : K) in 𝓝 s, ∀ i, ev t i ∈ Ioo (α t) (β t) ↔
-      ev s i ∈ Ioo (α s) (β s) := by
-    apply Filter.eventually_all.mpr
-    intro i
-    have ha : α s ≠ ev s i := fun h ↦ (hoff s s.2).1
-      (h.symm ▸ (hH s s.2).eigenvalues_mem_spectrum_real i)
-    have hb : ev s i ≠ β s := fun h ↦ (hoff s s.2).2
-      (h ▸ (hH s s.2).eigenvalues_mem_spectrum_real i)
-    filter_upwards [horder hα.restrict (he i) s ha,
-      horder (he i) hβ.restrict s hb] with t ha hb
-    exact and_congr ha hb
-  have hsets : ∀ᶠ (t : K) in 𝓝 s, S t = S s ∧ R t = R s := by
-    filter_upwards [hidx] with t ht
-    constructor
-    · ext i
-      simpa only [S, Finset.mem_filter, Finset.mem_univ, true_and] using ht i
-    · ext i
-      simpa only [R, Finset.mem_filter, Finset.mem_univ, true_and] using not_congr (ht i)
-  by_cases hn : (S s).Nonempty ∧ (R s).Nonempty
-  · have hfinite : Continuous (fun t : K ↦
-        (S s).inf' hn.1 (fun i ↦ (R s).inf' hn.2 (fun j ↦ |ev t i - ev t j|))) :=
-      Continuous.finset_inf'_apply hn.1 fun i _ ↦
-        Continuous.finset_inf'_apply hn.2 fun j _ ↦ ((he i).sub (he j)).abs
-    apply hfinite.continuousAt.congr_of_eventuallyEq
-    filter_upwards [hsets] with t ht
-    change exactGap H hH (fun s ↦ Ioo (α s) (β s)) t = _
-    simp only [exactGap, dif_pos t.2]
-    dsimp only [S, R, ev] at ht hn ⊢
-    simp only [ht.1, ht.2, dif_pos hn, finiteSpectralDistance]
-  · apply (continuousAt_const (y := (0 : ℝ))).congr_of_eventuallyEq
-    filter_upwards [hsets] with t ht
-    change exactGap H hH (fun s ↦ Ioo (α s) (β s)) t = 0
-    simp only [exactGap, dif_pos t.2]
-    dsimp only [S, R, ev] at ht hn
-    simp only [ht.1, ht.2, dif_neg hn]
 
 end UnitaryProducts.PaperProof

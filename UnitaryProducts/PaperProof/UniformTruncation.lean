@@ -9,7 +9,14 @@ public import UnitaryProducts.Paper.Vocabulary
 
 public import UnitaryProducts.PaperProof.ThmComparison
 public import UnitaryProducts.Prose.Introduction
-public import UnitaryProducts.Prose.FinalSteps
+public import UnitaryProducts.Prose.ChainSteps
+public import Mathlib.Algebra.Order.Round
+public import UnitaryProducts.Evolution.RegulatedComparison
+public import UnitaryProducts.Evolution.RoundedClockEvolution
+public import UnitaryProducts.Spectral.SinTheta
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import Mathlib.LinearAlgebra.Eigenspace.Matrix
+public import Mathlib.Analysis.Real.Pi.Bounds
 public import UnitaryProducts.PaperProof.ExTruncationBits
 
 /-!
@@ -17,8 +24,6 @@ public import UnitaryProducts.PaperProof.ExTruncationBits
 
 ## Declarations
 
-- `all_sample_width_eventually`
-- `all_sample_width_of_le`
 - `exists_rounded_evolution`
 - `uniform_bit_sample_error`
 - `uniform_bit_sample_error_sigma`
@@ -32,7 +37,6 @@ noncomputable section
 namespace UnitaryProducts.PaperProof
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
 
 /-- A rounded Hermitian path has an evolution whose final value is the phased unit product. -/
 theorem exists_rounded_evolution {T : ℝ} {N : ℕ} (hT : 0 < T) (hN : 0 < N)
@@ -52,7 +56,6 @@ theorem exists_rounded_evolution {T : ℝ} {N : ℕ} (hT : 0 < T) (hN : 0 < N)
   refine ⟨V, hV, regulated_evolution_rounded.2 K hK T N hT hN V ?_⟩
   simpa only [sample, clock, mul_div_assoc] using hV
 
-
 /-- Example 3.2 on the complete sample grid. The sparsity bound is on the error
 matrix at each sample; it is exactly the parameter `σ_k` in the bit estimate. -/
 theorem uniform_bit_sample_error {H : ℝ → 𝕄} {N : ℕ}
@@ -66,45 +69,6 @@ theorem uniform_bit_sample_error {H : ℝ → 𝕄} {N : ℕ}
   intro j
   exact (ex_truncation_bits (d := d) k).2 _ σ
     (hH _ (walkCubic_sample (by omega))) (hs j)
-
-
-/-- A global spectral-width bound gives the width hypothesis at every sample,
-including the final sample, whenever `T Δ ≤ N w`. -/
-theorem all_sample_width_of_le (H : ℝ → 𝕄)
-    (hH : IsTimeDepHamiltonian H)
-    (Δ w T : ℝ) (N : ℕ) (hN : 0 < N)
-    (hΔ : ∀ s (hs : s ∈ Icc (0 : ℝ) 1) (p q : Fin d),
-      |(hH s hs).eigenvalues p - (hH s hs).eigenvalues q| ≤ Δ)
-    (hT : 0 ≤ T) (hTN : T * Δ ≤ N * w) :
-    ∀ j : ℕ, ∀ hjN : j ≤ N, ∀ p q,
-      T / N * |(hH _ (walkCubic_sample hjN)).eigenvalues p -
-        (hH _ (walkCubic_sample hjN)).eigenvalues q| ≤ w := by
-  intro j hjN p q
-  have hn : (0 : ℝ) < N := Nat.cast_pos.mpr hN
-  rw [div_mul_eq_mul_div, div_le_iff₀ hn]
-  exact (mul_le_mul_of_nonneg_left (hΔ _ (walkCubic_sample hjN) p q) hT).trans
-    (by simpa only [mul_comm] using hTN)
-
-/-- For fixed positive width and duration, a bounded Hermitian path satisfies
-all sample-width conditions for every sufficiently large step count. -/
-theorem all_sample_width_eventually (H : ℝ → 𝕄)
-    (hH : IsTimeDepHamiltonian H)
-    {T B w : ℝ} (hT : 0 ≤ T) (hw : 0 < w)
-    (hB : ∀ s ∈ Icc (0 : ℝ) 1, ‖H s‖ ≤ B) :
-    ∃ N₀ : ℕ, ∀ N : ℕ, N₀ ≤ N →
-      ∀ j : ℕ, ∀ hjN : j ≤ N, ∀ p q,
-        T / N * |(hH _ (walkCubic_sample hjN)).eigenvalues p -
-          (hH _ (walkCubic_sample hjN)).eigenvalues q| ≤ w := by
-  obtain ⟨N₀, h₀⟩ := exists_nat_gt (T * (2 * B) / w)
-  refine ⟨N₀ + 1, fun N hN₀ ↦ ?_⟩
-  have hwidth : T * (2 * B) ≤ (N : ℝ) * w :=
-    (div_le_iff₀ hw).mp (h₀.le.trans (Nat.cast_le.mpr (show N₀ ≤ N by omega)))
-  apply all_sample_width_of_le H hH (2 * B) w T N (by omega) _ hT hwidth
-  intro s hs p q
-  letI : NeZero d := ⟨p.pos.ne'⟩
-  have he (i : Fin d) :=
-    (spectrum.norm_le_norm_of_mem ((hH s hs).eigenvalues_mem_spectrum_real i)).trans (hB s hs)
-  simpa only [Real.norm_eq_abs, two_mul] using norm_sub_le_of_le (he p) (he q)
 
 /-- Example 3.2 with the paper's literal changed-entry sparsity `σ_k`: the
 supremum over all path times and all rows, rather than a supplied sparsity bound.

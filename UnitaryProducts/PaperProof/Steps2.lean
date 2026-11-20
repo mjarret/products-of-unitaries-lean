@@ -5,7 +5,14 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Prose.FinalSteps
+public import UnitaryProducts.Prose.ChainSteps
+public import Mathlib.Algebra.Order.Round
+public import UnitaryProducts.Evolution.RegulatedComparison
+public import UnitaryProducts.Evolution.RoundedClockEvolution
+public import UnitaryProducts.Spectral.SinTheta
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import Mathlib.LinearAlgebra.Eigenspace.Matrix
+public import Mathlib.Analysis.Real.Pi.Bounds
 
 /-!
 # Norm steps for the comparison of evolutions

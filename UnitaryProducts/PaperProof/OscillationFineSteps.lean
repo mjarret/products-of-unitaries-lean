@@ -27,8 +27,6 @@ public import UnitaryProducts.PaperProof.ThmComparison
 - `checkpointPartition_pos`
 - `checkpoint_midpoint_mem`
 - `cor_jrs_oscillation`
-- `exists_fine_bits_balanced`
-- `exists_fine_bits_oscillation`
 - `exists_oscillation_partition`
 - `fine_bits_oscillation`
 - `introthm_fine_oscillation`
@@ -36,15 +34,8 @@ public import UnitaryProducts.PaperProof.ThmComparison
 - `maxCellError_le`
 - `midpoint_duhamel_integral`
 - `norm_sub_le_maxCellError`
-- `oscillation_inverse_time_budget`
-- `oscillation_inverse_time_count`
-- `oscillation_inverse_time_count_rounding`
-- `oscillation_inverse_time_product`
-- `oscillation_inverse_time_tolerance`
 - `oscillation_jrs_allocations`
-- `rem_oscillation_count_lipschitz`
 - `thm_fine_steps_sup`
-- `uniform_cell_midpoint_distance`
 -/
 
 @[expose] public section
@@ -60,18 +51,6 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 /-- Checkpoints with prescribed endpoints, independently of any path's variation. -/
 def IsCheckpointPartition (n : ℕ) (s : ℕ → ℝ) : Prop :=
   Monotone s ∧ s 0 = 0 ∧ s n = 1
-
-/-- Definition 3.3: any finite ordered checkpoint list extends constantly after its last
-point, preserving all checkpoints and satisfying the infinite-sequence encoding. -/
-theorem checkpointPartition_constant_extension (n : ℕ) (s : ℕ → ℝ)
-    (hs : ∀ i ≤ n, ∀ j ≤ n, i ≤ j → s i ≤ s j) (h0 : s 0 = 0) (hn : s n = 1) :
-    IsCheckpointPartition n (fun j ↦ s (min j n)) ∧
-      ∀ j ≤ n, s (min j n) = s j := by
-  refine ⟨⟨?_, by simpa using h0, by simpa using hn⟩, ?_⟩
-  · intro i j hij
-    exact hs _ (min_le_right _ _) _ (min_le_right _ _) (min_le_min_right _ hij)
-  · intro j hj
-    rw [min_eq_left hj]
 
 /-- Definition 3.3: midpoint error at most ε on every open cell. -/
 def HasMidpointOscillation (H : ℝ → 𝕄) (n : ℕ) (s : ℕ → ℝ) (ε : ℝ) : Prop :=
@@ -314,32 +293,6 @@ theorem introthm_fine_oscillation {H : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
   exact ⟨⟨n, s, hs, ho⟩, fun m t ht hosc ↦ ⟨midpointProductOver_eq _ T m t,
     fine_bits_oscillation hT hreg hH hU m t ht hε.le hosc k σ hsp⟩⟩
 
-/-- Equation (3.1), existence form: every positive cell tolerance is available. -/
-theorem exists_fine_bits_oscillation {H U : ℝ → 𝕄} {T ε : ℝ} (hT : 0 < T)
-    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) (hε : 0 < ε)
-    (k σ : ℕ)
-    (hsp : ∀ x ∈ Icc (0 : ℝ) 1, RowSparse σ (H x - (truncation k).2.2.1 (H x))) :
-    ∃ (n : ℕ) (s : ℕ → ℝ), IsCheckpointPartition n s ∧
-      (∀ j < n, ∀ x ∈ Ioo (s j) (s (j + 1)),
-        ‖H x - H ((s j + s (j + 1)) / 2)‖ ≤ ε) ∧
-      ‖midpointProductOver ((truncation k).2.2.2 H) T n s - U T‖ ≤
-        T * (ε + Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹) := by
-  obtain ⟨n, s, hs, _, _, ho⟩ := exists_oscillation_partition hreg hε
-  exact ⟨n, s, hs, ho, fine_bits_oscillation hT hreg hH hU n s hs hε.le ho k σ hsp⟩
-
-/-- Balancing the two errors gives the stated doubled bit bound when σ is positive. -/
-theorem exists_fine_bits_balanced {H U : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
-    (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T) (k σ : ℕ) (hσ : 0 < σ)
-    (hsp : ∀ x ∈ Icc (0 : ℝ) 1, RowSparse σ (H x - (truncation k).2.2.1 (H x))) :
-    ∃ (n : ℕ) (s : ℕ → ℝ), IsCheckpointPartition n s ∧
-      ‖midpointProductOver ((truncation k).2.2.2 H) T n s - U T‖ ≤
-        2 * Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ * T := by
-  obtain ⟨n, s, hs, _, hb⟩ := exists_fine_bits_oscillation hT hreg hH hU
-    (show 0 < Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ by positivity) k σ hsp
-  exact ⟨n, s, hs, hb.trans_eq (by ring)⟩
-
 /-- The three exact scalar budgets in the Example 3.7. -/
 theorem oscillation_jrs_allocations {C δ : ℝ} (hC : 0 < C) (hδ : 0 < δ) :
     C / (2 * C / δ) = δ / 2 ∧
@@ -386,118 +339,5 @@ theorem cor_jrs_oscillation {H U : ℝ → 𝕄}
       _ ≤ C / T + T * (δ ^ 2 / (8 * C) + δ ^ 2 / (8 * C)) := by gcongr
       _ = _ := by rw [mul_add, ha.1, ha.2.1]; ring
   exact ⟨hfirst, hsecond, (hfirst.trans hsecond).trans_eq ha.2.2⟩
-
-/-- Uniform-cell geometry: distance to the midpoint is at most 1/(2N). -/
-theorem uniform_cell_midpoint_distance (n j : ℕ) {x : ℝ}
-    (hx : x ∈ Ioo ((j : ℝ) / n) (((j + 1 : ℕ) : ℝ) / n)) :
-    |x - ((j : ℝ) / n + ((j + 1 : ℕ) : ℝ) / n) / 2| ≤ 1 / (2 * n) := by
-  have he : ((j + 1 : ℕ) : ℝ) / n - (j : ℝ) / n = 1 / n := by push_cast; ring
-  rw [show 1 / (2 * (n : ℝ)) = (1 / n) / 2 by ring, abs_sub_le_iff]
-  constructor <;> linarith [hx.1, hx.2]
-
-/-- Equal-cell estimate used by the factor-count comparison after Theorem B:
-every integer above the Lipschitz threshold meets the midpoint tolerance. -/
-theorem rem_oscillation_count_lipschitz {H : ℝ → 𝕄}
-   {L ε : ℝ}
-    (hε : 0 < ε)
-   (hLip : ∀ x ∈ Icc (0 : ℝ) 1, ∀ y ∈ Icc (0 : ℝ) 1,
-      ‖H x - H y‖ ≤ L * |x - y|)
-   (n : ℕ)
-   (hn : max 1 (L / (2 * ε)) ≤ (n : ℝ)) :
-    let s := fun j : ℕ ↦ (j : ℝ) / n
-    IsCheckpointPartition n s ∧
-      (∀ j < n, ∀ x ∈ Ioo (s j) (s (j + 1)),
-        ‖H x - H ((s j + s (j + 1)) / 2)‖ ≤ L / (2 * n)) ∧
-      L / (2 * n) ≤ ε := by
-  -- At x = 1 and y = 0, the Lipschitz hypothesis bounds a nonnegative norm by L.
-  have hL : 0 ≤ L := by simpa using (norm_nonneg _).trans (hLip 1 (by norm_num) 0 (by norm_num))
-  intro s
-  have hn0 : (0 : ℝ) < n := lt_of_lt_of_le zero_lt_one ((le_max_left _ _).trans hn)
-  have hs : IsCheckpointPartition n s := by
-    refine ⟨fun i j hij ↦ ?_, by simp [s], by simp [s, ne_of_gt hn0]⟩
-    exact div_le_div_of_nonneg_right (by exact_mod_cast hij) hn0.le
-  refine ⟨hs, ?_, ?_⟩
-  · intro j hj x hx
-    have hx0 := hs.2.1 ▸ hs.1 (Nat.zero_le j)
-    have hx1 := hs.2.2 ▸ hs.1 (Nat.succ_le_of_lt hj)
-    calc
-      _ ≤ L * |x - (s j + s (j + 1)) / 2| :=
-        hLip x ⟨hx0.trans hx.1.le, hx.2.le.trans hx1⟩ _ (checkpoint_midpoint_mem hs hj)
-      _ ≤ L * (1 / (2 * n)) :=
-        mul_le_mul_of_nonneg_left (uniform_cell_midpoint_distance n j hx) hL
-      _ = _ := by ring
-  · have hcount : L / (2 * ε) ≤ (n : ℝ) := (le_max_right _ _).trans hn
-    have hscaled : L ≤ (n : ℝ) * (2 * ε) :=
-      (div_le_iff₀ (mul_pos two_pos hε)).mp hcount
-    -- Clear the positive denominator 2n; the chosen threshold gives the error budget.
-    apply (div_le_iff₀ (mul_pos two_pos hn0)).mpr
-    linarith
-
-/-- After Theorem B: the cell contribution is at most c/T exactly at tolerance c/T². -/
-theorem oscillation_inverse_time_tolerance {T ε c : ℝ} (hT : 0 < T) :
-    T * ε ≤ c / T ↔ ε ≤ c / T ^ 2 := by
-  -- T ε ≤ c/T iff (T ε)T ≤ c iff ε T² ≤ c iff ε ≤ c/T².
-  rw [le_div_iff₀ hT, le_div_iff₀ (sq_pos_of_pos hT), mul_right_comm, ← sq, mul_comm]
-
-/-- After Theorem B: the Lipschitz count at tolerance c/T² is LT²/(2c). -/
-theorem oscillation_inverse_time_count {T c L : ℝ} (hT : 0 < T) (hc : 0 < c) :
-    L / (2 * (c / T ^ 2)) = L * T ^ 2 / (2 * c) := by
-  field_simp
-
-/-- The count after Theorem B, including the additive one needed for a constant path.
-For fixed positive L and c this is the claimed order LT². -/
-theorem oscillation_inverse_time_count_rounding {T c L : ℝ}
-    (hT : 0 < T) (hc : 0 < c) (hL : 0 ≤ L) :
-    let n := max 1 ⌈L * T ^ 2 / (2 * c)⌉₊
-    max 1 (L / (2 * (c / T ^ 2))) ≤ (n : ℝ) ∧
-      (n : ℝ) ≤ 1 + L * T ^ 2 / (2 * c) := by
-  intro n
-  have ha : 0 ≤ L * T ^ 2 / (2 * c) := by positivity
-  constructor
-  · rw [oscillation_inverse_time_count hT hc]
-    exact max_le (by exact_mod_cast (le_max_left _ _ : 1 ≤ n))
-      ((Nat.le_ceil _).trans (by exact_mod_cast (le_max_right _ _ : ⌈L * T ^ 2 / (2 * c)⌉₊ ≤ n)))
-  · dsimp only [n]
-    rw [Nat.cast_max, Nat.cast_one]
-    exact max_le (by linarith) (by linarith [Nat.ceil_lt_add_one ha])
-
-/-- Both error contributions of Theorem B can be budgeted to obtain 2c/T. -/
-theorem oscillation_inverse_time_budget {T ε b c : ℝ} (hT : 0 < T)
-    (hε : ε ≤ c / T ^ 2) (hb : b ≤ c / T ^ 2) :
-    T * (ε + b) ≤ 2 * c / T := by
-  rw [mul_add, show 2 * c / T = c / T + c / T by ring]
-  exact add_le_add ((oscillation_inverse_time_tolerance hT).2 hε)
-    ((oscillation_inverse_time_tolerance hT).2 hb)
-
-/-- The comparison after Theorem B as an actual product bound: at most
-1 + LT²/(2c) equal-cell factors and a bit budget c/T² give error at most 2c/T. -/
-theorem oscillation_inverse_time_product {H U : ℝ → 𝕄}
-   {T c L : ℝ}
-   (hT : 0 < T)
-   (hc : 0 < c)
-    (hH : IsTimeDepHamiltonian H)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
-   (hLip : ∀ x ∈ Icc (0 : ℝ) 1, ∀ y ∈ Icc (0 : ℝ) 1,
-      ‖H x - H y‖ ≤ L * |x - y|)
-    (k σ : ℕ)
-   (hsp : ∀ x ∈ Icc (0 : ℝ) 1, RowSparse σ (H x - (truncation k).2.2.1 (H x)))
-    (hk : Real.sqrt 2 * σ * ((2 : ℝ) ^ k)⁻¹ ≤ c / T ^ 2) :
-    let n := max 1 ⌈L * T ^ 2 / (2 * c)⌉₊
-    let s := fun j : ℕ ↦ (j : ℝ) / n
-    IsCheckpointPartition n s ∧ (n : ℝ) ≤ 1 + L * T ^ 2 / (2 * c) ∧
-      ‖midpointProductOver ((truncation k).2.2.2 H) T n s - U T‖ ≤ 2 * c / T := by
-  -- At x = 1 and y = 0, the Lipschitz hypothesis bounds a nonnegative norm by L.
-  have hL : 0 ≤ L := by simpa using (norm_nonneg _).trans (hLip 1 (by norm_num) 0 (by norm_num))
-  have hreg := UnitaryProducts.Prose.regulated_of_continuousOn
-    (continuousOn_of_norm_sub_le (fun s hs t ht ↦ hLip t ht s hs))
-  intro n s
-  have hn := oscillation_inverse_time_count_rounding hT hc hL
-  have hε : 0 < c / T ^ 2 := div_pos hc (sq_pos_of_pos hT)
-  have hs := rem_oscillation_count_lipschitz hε hLip n hn.1
-  refine ⟨hs.1, hn.2, ?_⟩
-  have hb := fine_bits_oscillation hT hreg hH hU n s hs.1 hε.le
-    (fun j hj x hx ↦ (hs.2.1 j hj x hx).trans hs.2.2) k σ hsp
-  exact hb.trans (oscillation_inverse_time_budget hT le_rfl hk)
-
 
 end UnitaryProducts.PaperProof

@@ -154,5 +154,4 @@ theorem unified_products_walk [NeZero d] {T : ℕ} (hT : 0 < T)
   dsimp [L, M, uniform_c1, uniform_c0, walkUniformSecond]
   ring
 
-
 end UnitaryProducts.PaperProof

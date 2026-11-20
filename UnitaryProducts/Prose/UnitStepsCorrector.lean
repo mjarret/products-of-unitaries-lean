@@ -11,7 +11,8 @@ public import UnitaryProducts.Corrector.ScalarEntrySolutions
 public import UnitaryProducts.Evolution.RoundedClockEvolution
 public import UnitaryProducts.Comparison.EndpointConstants
 public import Mathlib.MeasureTheory.Integral.Bochner.Set
-public import UnitaryProducts.Approximation.VariationMain
+public import UnitaryProducts.Evolution.ExplicitSchedule
+public import Mathlib.Topology.EMetricSpace.BoundedVariation
 public import UnitaryProducts.Comparison.EndpointComparison
 public import UnitaryProducts.Corrector.PeriodicFrameDecomposition
 public import Mathlib
@@ -30,7 +31,6 @@ public import Mathlib.LinearAlgebra.Eigenspace.Matrix
 public import Mathlib.LinearAlgebra.Matrix.Hermitian
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 public import Mathlib.Tactic.FinCases
-public import UnitaryProducts.Approximation.JRSComparison
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.CommutatorRegularity
 public import UnitaryProducts.Corrector.IntegratedComparison
@@ -77,16 +77,11 @@ public import UnitaryProducts.Corrector.PeriodicCharacterization
 - `clock`
 - `clock_bounds`
 - `clock_eq_of_abs_sub_lt`
-- `clock_error_integrable`
 - `clock_error_periodic`
 - `clock_switches_countable`
 - `globalResidual`
 - `hasDerivAt_centered_evolution`
 - `hasDerivWithinAt_local_hamiltonian`
-- `integral_clock_error_one`
-- `integral_rounded_discrepancy`
-- `integral_rounded_discrepancy_of_measurable`
-- `integral_sample_error`
 - `local_clock_weight_integrable`
 - `local_taylor_bound`
 - `local_taylor_chain`
@@ -95,21 +90,11 @@ public import UnitaryProducts.Corrector.PeriodicCharacterization
 - `mesh_reflection_clocks`
 - `norm_pow_le_width`
 - `normalized_rounded_evolutions`
-- `path_sample_eq`
 - `path_sub_eq_integral`
-- `rounded_discrepancy_integrable`
-- `rounded_discrepancy_measurable`
-- `rounded_evolution_bound`
-- `rounded_evolution_unit_steps`
-- `rounded_path_sub_eq_integral`
-- `rounded_residual_identity`
 - `sample`
-- `sample_eq_of_abs_sub_lt`
 - `sample_mem`
-- `sub_sample_eq_coordinate`
 - `taylor_remainder_eq_integral`
 - `trapezoid_square_error`
-- `unit_steps_coefficient`
 -/
 
 @[expose] public section
@@ -148,32 +133,6 @@ theorem clock_eq_of_abs_sub_lt {x : ℝ} {j : ℤ} (h : |x - j| < 1 / 2) :
   rw [clock, Int.floor_eq_iff]
   have hh := abs_lt.mp h
   constructor <;> linarith
-
-/-- Section 4, opening paragraph: the rounded path is constant on each open sample cell. -/
-theorem sample_eq_of_abs_sub_lt {N : ℕ} {s : ℝ} {j : ℤ}
-    (hs : |s - (j : ℝ) / N| < 1 / (2 * N)) : sample N s = (j : ℝ) / N := by
-  have hn : (0 : ℝ) < N := (mul_pos_iff_of_pos_left (by norm_num : (0 : ℝ) < 2)).mp
-    (one_div_pos.mp ((abs_nonneg _).trans_lt hs))
-  rw [sub_div' hn.ne', abs_div, abs_of_pos hn, div_mul_eq_div_div,
-    div_lt_div_iff_of_pos_right hn, mul_comm s] at hs
-  simp only [sample, clock_eq_of_abs_sub_lt hs]
-
-/-- Section 4, opening paragraph: evaluation of any path at a point inside a rounded cell. -/
-theorem path_sample_eq {E : Type*} (H : ℝ → E) {N : ℕ}
-    {s : ℝ} {j : ℤ} (hs : |s - (j : ℝ) / N| < 1 / (2 * N)) :
-    H (sample N s) = H ((j : ℝ) / N) := by rw [sample_eq_of_abs_sub_lt hs]
-
-/-- Section 4, proof of the comparison theorem: distance from the rounded time is `τ/N`. -/
-theorem sub_sample_eq_coordinate {N : ℕ} (hN : 0 < N) (s : ℝ) :
-    s - sample N s = ((N : ℝ) * s - clock (N * s)) / N := by
-  have hn : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hN.ne'
-  dsimp [sample]; field_simp
-
-/-- Section 4, following the opening display: the displayed coefficient is constant at N=T. -/
-theorem unit_steps_coefficient {N : ℕ} (hN : 0 < N) (L : ℝ) :
-    (N : ℝ) / (2 * N) * L = L / 2 ∧ (N : ℝ) * L / (4 * N) = L / 4 := by
-  have hn : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hN.ne'
-  constructor <;> field_simp
 
 /-- Local Hamiltonian chain rule on its actual parameter domain, including endpoint half cells. -/
 theorem hasDerivWithinAt_local_hamiltonian {E : Type*} [NormedAddCommGroup E]
@@ -215,98 +174,6 @@ theorem clock_error_periodic : Function.Periodic (fun x : ℝ ↦ |(clock x : �
   simp only [clock, ← round_eq, round_add_one, Int.cast_add, Int.cast_one,
     add_sub_add_right_eq_sub]
 
-/-- Section 4, sharp version of the opening display: the scalar rounding error is integrable
-on every bounded interval. -/
-theorem clock_error_integrable (a b : ℝ) :
-    IntervalIntegrable (fun x : ℝ ↦ |(clock x : ℝ) - x|) volume a b := by
-  apply (intervalIntegrable_const :
-    IntervalIntegrable (fun _ : ℝ ↦ (1 / 2 : ℝ)) volume a b).mono_fun'
-  · have hm : Measurable (fun x : ℝ ↦ |(clock x : ℝ) - x|) := by
-      unfold clock; fun_prop
-    exact hm.aestronglyMeasurable
-  · exact Filter.Eventually.of_forall fun x ↦ by
-      simpa only [Real.norm_eq_abs, abs_abs] using abs_clock_sub_le x
-
-/-- Section 4, sharp version of the opening display: the area under one period of the
-nearest-integer distance is `1/4`. -/
-theorem integral_clock_error_one : (∫ x in (0 : ℝ)..1, |(clock x : ℝ) - x|) = 1 / 4 := by
-  have he : (∫ x in (0 : ℝ)..1, |(clock x : ℝ) - x|) =
-      ∫ x in (-1 / 2 : ℝ)..(1 / 2), |x| := by
-    have hp := clock_error_periodic.intervalIntegral_add_eq 0 (-1 / 2)
-    norm_num at hp
-    rw [hp, show (-1 / 2 : ℝ) = -(1 / 2) by ring]
-    refine intervalIntegral.integral_congr fun x hx ↦ ?_
-    rw [uIcc_of_le (by norm_num : (-(1 / 2) : ℝ) ≤ 1 / 2)] at hx
-    by_cases ht : x < 1 / 2
-    · have hq : clock x = 0 := by
-        rw [clock, Int.floor_eq_iff]; norm_num; constructor <;> linarith [hx.1]
-      simp [hq]
-    · have hx' : x = 1 / 2 := by linarith [hx.2]
-      norm_num [hx', clock]
-  rw [he, ← intervalIntegral.integral_add_adjacent_intervals
-    (continuous_abs.intervalIntegrable (-1 / 2) 0)
-    (continuous_abs.intervalIntegrable 0 (1 / 2))]
-  have hl : (∫ x in (-1 / 2 : ℝ)..0, |x|) = ∫ x in (-1 / 2 : ℝ)..0, -x := by
-    refine intervalIntegral.integral_congr fun x hx ↦ ?_
-    rw [uIcc_of_le (by norm_num)] at hx
-    exact abs_of_nonpos hx.2
-  have hr : (∫ x in (0 : ℝ)..(1 / 2), |x|) = ∫ x in (0 : ℝ)..(1 / 2), x := by
-    refine intervalIntegral.integral_congr fun x hx ↦ ?_
-    rw [uIcc_of_le (by norm_num)] at hx
-    exact abs_of_nonneg hx.1
-  rw [hl, hr, intervalIntegral.integral_neg, integral_id, integral_id]
-  norm_num
-
-/-- Section 4: the exact full rounded-path clock integral, including both end half cells. -/
-theorem integral_sample_error {N : ℕ} (hN : 0 < N) :
-    (∫ s in (0 : ℝ)..1, |sample N s - s|) = 1 / (4 * N) := by
-  have hn : (0 : ℝ) < N := Nat.cast_pos.mpr hN
-  have hp := clock_error_periodic.intervalIntegral_add_zsmul_eq (N : ℤ) 0
-    clock_error_integrable
-  simp only [zero_add, zsmul_eq_mul, Int.cast_natCast, mul_one] at hp
-  rw [integral_clock_error_one] at hp
-  have hsample : (fun s : ℝ ↦ |sample N s - s|) =
-      fun s ↦ |(clock (N * s) : ℝ) - N * s| / N := by
-    funext s
-    rw [sample, div_sub' hn.ne', abs_div, abs_of_pos hn]
-  -- One factor 1/N is the sampling error; the second comes from changing variables.
-  rw [hsample, intervalIntegral.integral_div,
-    intervalIntegral.integral_comp_mul_left (fun x : ℝ ↦ |(clock x : ℝ) - x|) hn.ne']
-  simp only [mul_zero, mul_one, smul_eq_mul]
-  rw [hp] -- N periods, each with clock-error integral 1/4.
-  field_simp
-
-/-- Section 4: the rounded-path discrepancy is at most `L/(4N)`. Only measurability of
-this scalar discrepancy is needed beyond the stated Lipschitz bound; for a continuous path
-it follows by composition with the measurable rounded clock. -/
-theorem integral_rounded_discrepancy_of_measurable {E : Type*} [NormedAddCommGroup E]
-    {H : ℝ → E} {N : ℕ} (hN : 0 < N) {L : ℝ}
-    (hL : ∀ x ∈ Icc (0 : ℝ) 1, ∀ s ∈ Icc (0 : ℝ) 1,
-      ‖H x - H s‖ ≤ L * |x - s|)
-    (hm : AEStronglyMeasurable (fun s ↦ ‖H (sample N s) - H s‖)
-      (volume.restrict (Icc (0 : ℝ) 1))) :
-    (∫ s in (0 : ℝ)..1, ‖H (sample N s) - H s‖) ≤ L / (4 * N) := by
-  have hi : IntervalIntegrable (fun s ↦ L * |sample N s - s|) volume 0 1 := by
-    simp_rw [sample, div_sub' (Nat.cast_ne_zero.mpr hN.ne' : (N : ℝ) ≠ 0),
-      abs_div, abs_of_nonneg (Nat.cast_nonneg N : (0 : ℝ) ≤ N)]
-    simpa only [zero_div, div_self (show (N : ℝ) ≠ 0 from Nat.cast_ne_zero.mpr hN.ne')] using
-      (((clock_error_integrable 0 N).comp_mul_left (c := (N : ℝ))).div_const (N : ℝ)).const_mul L
-  have hbound : ∀ s ∈ Icc (0 : ℝ) 1,
-      ‖H (sample N s) - H s‖ ≤ L * |sample N s - s| :=
-    fun s hs ↦ hL _ (sample_mem (N := N) hs) _ hs
-  have hf : IntervalIntegrable (fun s ↦ ‖H (sample N s) - H s‖) volume 0 1 := by
-    apply hi.mono_fun'
-    · exact hm.mono_set (by simpa only [uIoc_of_le (by norm_num : (0 : ℝ) ≤ 1)] using
-        (Ioc_subset_Icc_self : Ioc (0 : ℝ) 1 ⊆ Icc 0 1))
-    · refine ae_restrict_of_forall_mem measurableSet_uIoc fun s hs ↦ ?_
-      rw [uIoc_of_le (by norm_num : (0 : ℝ) ≤ 1)] at hs
-      simpa only [norm_norm] using hbound s (Ioc_subset_Icc_self hs)
-  calc (∫ s in (0 : ℝ)..1, ‖H (sample N s) - H s‖)
-      ≤ ∫ s in (0 : ℝ)..1, L * |sample N s - s| :=
-        intervalIntegral.integral_mono_on (by norm_num) hf hi hbound
-    _ = L / (4 * N) := by
-      rw [intervalIntegral.integral_const_mul, integral_sample_error hN]; ring
-
 /-- Section 4, power-series argument: the power norm bound, valid in every normed algebra. -/
 theorem norm_pow_le_width {A : Type*} [NormedRing A] [NormOneClass A]
     {a : A} {w : ℝ} (ha : ‖a‖ ≤ w) (n : ℕ) : ‖a ^ n‖ ≤ w ^ n :=
@@ -324,98 +191,8 @@ theorem trapezoid_square_error {N : ℕ} (hN : 0 < N) :
   norm_num
   constructor <;> field_simp <;> ring
 
-/-- Section 4, opening display: continuity of the path on its parameter interval suffices
-for measurability of its rounded discrepancy. -/
-theorem rounded_discrepancy_measurable {E : Type*} [NormedAddCommGroup E]
-    {H : ℝ → E} (hc : ContinuousOn H (Icc (0 : ℝ) 1)) {N : ℕ} :
-    AEStronglyMeasurable (fun s ↦ ‖H (sample N s) - H s‖)
-      (volume.restrict (Icc (0 : ℝ) 1)) := by
-  have hq : StronglyMeasurable (fun s ↦ H (sample N s)) :=
-    (StronglyMeasurable.of_discrete (f := fun j : ℤ ↦ H ((j : ℝ) / N))).comp_measurable
-      (Int.measurable_floor.comp (by fun_prop : Measurable (fun s : ℝ ↦ N * s + 1 / 2)))
-  exact (hq.aestronglyMeasurable.sub (hc.aestronglyMeasurable measurableSet_Icc)).norm
-
-/-- Section 4: the sharp full rounded-path estimate under exactly the Lipschitz
-hypothesis on `[0,1]`. -/
-theorem integral_rounded_discrepancy {E : Type*} [NormedAddCommGroup E]
-    {H : ℝ → E} {N : ℕ} (hN : 0 < N) {L : ℝ}
-    (hL : ∀ x ∈ Icc (0 : ℝ) 1, ∀ s ∈ Icc (0 : ℝ) 1,
-      ‖H x - H s‖ ≤ L * |x - s|) :
-    (∫ s in (0 : ℝ)..1, ‖H (sample N s) - H s‖) ≤ L / (4 * N) := by
-  have hc := continuousOn_of_norm_sub_le (fun s hs t ht ↦ hL t ht s hs)
-  exact integral_rounded_discrepancy_of_measurable hN hL
-    (rounded_discrepancy_measurable (N := N) hc)
-
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- Section 4, opening display: the discrepancy is integrable under the stated Lipschitz
-assumption; no global regularity of an extension outside `[0,1]` is needed. -/
-theorem rounded_discrepancy_integrable {E : Type*} [NormedAddCommGroup E]
-    {H : ℝ → E} {N : ℕ} {L : ℝ}
-    (hL : ∀ x ∈ Icc (0 : ℝ) 1, ∀ s ∈ Icc (0 : ℝ) 1,
-      ‖H x - H s‖ ≤ L * |x - s|) :
-    IntervalIntegrable (fun s ↦ ‖H (sample N s) - H s‖) volume 0 1 := by
-  have h₀ : 0 ≤ L := by simpa using (norm_nonneg _).trans (hL 1 (by norm_num) 0 (by norm_num))
-  have hc := continuousOn_of_norm_sub_le (fun s hs t ht ↦ hL t ht s hs)
-  refine (intervalIntegrable_const (c := L)).mono_fun'
-    ((rounded_discrepancy_measurable (N := N) hc).mono_set ?_) ?_
-  · simpa only [uIoc_of_le (by norm_num : (0 : ℝ) ≤ 1)] using
-      (Ioc_subset_Icc_self : Ioc (0 : ℝ) 1 ⊆ Icc 0 1)
-  refine ae_restrict_of_forall_mem measurableSet_uIoc fun s hs ↦ ?_
-  have hs' : s ∈ Icc (0 : ℝ) 1 := Ioc_subset_Icc_self (by simpa using hs)
-  have ht := sample_mem (N := N) hs'
-  simpa only [norm_norm, mul_one] using (hL _ ht _ hs').trans
-    (mul_le_mul_of_nonneg_left (abs_le.mpr ⟨by linarith [ht.1, hs'.2],
-      by linarith [ht.2, hs'.1]⟩ : |sample N s - s| ≤ 1) h₀)
-
-/-- Section 4, opening display: Duhamel for the two evolutions on normalized time,
-followed by the sharp rounded-path integral estimate. -/
-theorem rounded_evolution_bound {H U V : ℝ → 𝕄} {N : ℕ} (hN : 0 < N) {T L : ℝ}
-    (hT : 0 ≤ T)
-    (hL : ∀ x ∈ Icc (0 : ℝ) 1, ∀ s ∈ Icc (0 : ℝ) 1,
-      ‖H x - H s‖ ≤ L * |x - s|)
-    (hU : IsEvolution (fun s ↦ T • H s) U 0 1)
-    (hV : IsEvolution (fun s ↦ T • H (sample N s)) V 0 1) :
-    ‖V 1 - U 1‖ ≤ T * (∫ s in (0 : ℝ)..1, ‖H (sample N s) - H s‖) ∧
-      ‖V 1 - U 1‖ ≤ T * L / (4 * N) := by
-  have he : (fun s ↦ ‖T • H s - T • H (sample N s)‖) =
-      fun s ↦ T * ‖H (sample N s) - H s‖ := by
-    funext s
-    rw [← smul_sub, norm_smul, Real.norm_eq_abs, abs_of_nonneg hT, norm_sub_rev]
-  have hi : IntervalIntegrable (fun s ↦ ‖T • H s - T • H (sample N s)‖) volume 0 1 := by
-    rw [he]; exact (rounded_discrepancy_integrable (N := N) hL).const_mul T
-  obtain ⟨hUc, hU₀, hUU, S, hS, hUd⟩ := hU
-  obtain ⟨hVc, hV₀, hVV, R, hR, hVd⟩ := hV
-  have hb := norm_sub_le_integral_sub_off_countable (S ∪ R) (hS.union hR)
-    (by norm_num : (0 : ℝ) ≤ 1)
-    hUc hVc
-    (fun s hs hn ↦ hUd s hs (fun h ↦ hn (Or.inl h)))
-    (fun s hs hn ↦ hVd s hs (fun h ↦ hn (Or.inr h))) hUU hVV
-    (hU₀.trans hV₀.symm) hi
-  rw [norm_sub_rev, he, intervalIntegral.integral_const_mul] at hb
-  have hclock := integral_rounded_discrepancy hN hL
-  have hscaled := mul_le_mul_of_nonneg_left hclock hT
-  -- Combine Duhamel with the sharp L/(4N) clock integral and collect the factors.
-  have hsharp : ‖V 1 - U 1‖ ≤ T * L / (4 * N) :=
-    hb.trans (hscaled.trans_eq (by ring))
-  exact ⟨hb, hsharp⟩
-
-/-- Section 4: at unit steps `T=N`, the sharp Duhamel estimate is `L/4`. -/
-theorem rounded_evolution_unit_steps {H U V : ℝ → 𝕄} {N : ℕ} {L : ℝ}
-    (hL : ∀ x ∈ Icc (0 : ℝ) 1, ∀ s ∈ Icc (0 : ℝ) 1,
-      ‖H x - H s‖ ≤ L * |x - s|)
-    (hU : IsEvolution (fun s ↦ (N : ℝ) • H s) U 0 1)
-    (hV : IsEvolution (fun s ↦ (N : ℝ) • H (sample N s)) V 0 1) :
-    ‖V 1 - U 1‖ ≤ L / 4 := by
-  rcases Nat.eq_zero_or_pos N with rfl | hN
-  · have hb := (rounded_evolution_bound (N := 1) (by decide) (T := 0) le_rfl hL
-      (by simpa using hU) (by simpa using hV)).2
-    exact (show ‖V 1 - U 1‖ ≤ 0 by simpa using hb).trans
-      (div_nonneg (unit_lipschitz_constant_nonneg (fun s hs t ht ↦ hL t ht s hs))
-        (by norm_num))
-  have hb := (rounded_evolution_bound hN (Nat.cast_nonneg N) hL hU hV).2
-  rwa [(unit_steps_coefficient hN L).2] at hb
 
 /-- Section 4.1, the remainder after imposing the corrector equation: its quadratic bound. -/
 theorem local_taylor_bound {H Hd : ℝ → 𝕄} {T n h j τ : ℝ}
@@ -452,16 +229,6 @@ theorem path_sub_eq_integral {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ
     (mem_nhdsWithin.mpr ⟨Iio (max a b), isOpen_Iio, hs.2,
       fun y hy ↦ ⟨le_of_lt (lt_trans hs.1 hy.2), hy.1.le⟩⟩)
 
-/-- Section 4, the residual calculation after unit-split: the rounded Hamiltonian difference
-is the integral of the derivative, and the interval length is `τ/N`. -/
-theorem rounded_path_sub_eq_integral {H Hd : ℝ → 𝕄} {N : ℕ} (hN : 0 < N) (T : ℝ)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    (hc : ContinuousOn Hd (Icc (0 : ℝ) 1)) {s : ℝ} (hs : s ∈ Icc (0 : ℝ) 1) :
-    T • H s - T • H (sample N s) = T • (∫ u in sample N s..s, Hd u) ∧
-      s - sample N s = ((N : ℝ) * s - clock (N * s)) / N := by
-  refine ⟨?_, sub_sample_eq_coordinate hN s⟩
-  rw [← smul_sub, path_sub_eq_integral hd hc (sample_mem (N := N) hs) hs]
-
 /-- Section 4.1, the remainder after imposing the corrector equation: its exact integral formula. -/
 theorem taylor_remainder_eq_integral {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     [CompleteSpace E] {H Hd : ℝ → E} {lo hi : ℝ}
@@ -472,45 +239,6 @@ theorem taylor_remainder_eq_integral {E : Type*} [NormedAddCommGroup E] [NormedS
   rw [intervalIntegral.integral_sub ((hc.mono (uIcc_subset_Icc ha hb)).intervalIntegrable)
     intervalIntegrable_const, intervalIntegral.integral_const,
     ← path_sub_eq_integral hd hc ha hb]
-
-/-- Section 4, the global residual calculation: substituting the corrector ODE and the
-fundamental theorem gives the integral remainder and the Hamiltonian-difference terms. -/
-theorem rounded_residual_identity {H Hd : ℝ → 𝕄} {N : ℕ} (hN : 0 < N) (T : ℝ)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    (hc : ContinuousOn Hd (Icc (0 : ℝ) 1)) {s : ℝ} (hs : s ∈ Icc (0 : ℝ) 1)
-    (r : ℝ) (Y : 𝕄) :
-    T • H s - T • H (sample N s) -
-        (((N : ℝ) * s - clock (N * s)) • ((T / N) • Hd (r / N)) - I • (T • (H (r / N) * Y - Y * H
-          (r / N)))) -
-        I • (T • (H s * Y - Y * H (sample N s))) =
-      T • (∫ u in sample N s..s, Hd u - Hd (r / N)) -
-        I • (T • ((H s - H (r / N)) * Y)) +
-        I • (T • (Y * (H (sample N s) - H (r / N)))) := by
-  have hp := rounded_path_sub_eq_integral hN T hd hc hs
-  have hi : IntervalIntegrable Hd volume (sample N s) s :=
-    (hc.mono (uIcc_subset_Icc (sample_mem (N := N) hs) hs)).intervalIntegrable
-  have hrem : T • H s - T • H (sample N s) -
-      ((N : ℝ) * s - clock (N * s)) • ((T / N) • Hd (r / N)) =
-      T • (∫ u in sample N s..s, Hd u - Hd (r / N)) := by
-    rw [intervalIntegral.integral_sub hi intervalIntegrable_const,
-      intervalIntegral.integral_const, smul_sub, ← hp.1, hp.2]
-    simp only [smul_smul, div_eq_mul_inv]
-    module
-  have hode :
-      (((N : ℝ) * s - clock (N * s)) • ((T / N) • Hd (r / N)) -
-        I • (T • (H (r / N) * Y - Y * H (r / N)))) +
-        I • ((T • H (r / N)) * Y - Y * (T • H (r / N))) =
-      ((N : ℝ) * s - clock (N * s)) • ((T / N) • Hd (r / N)) := by
-    simp only [smul_mul_assoc, mul_smul_comm, ← smul_sub]
-    abel
-  have he := Prose.rounded_residual_of_remainder
-    (T • H s) (T • H (sample N s)) (T • H (r / N))
-    ((T / N) • Hd (r / N)) Y
-    (((N : ℝ) * s - clock (N * s)) • ((T / N) • Hd (r / N)) -
-      I • (T • (H (r / N) * Y - Y * H (r / N))))
-    (T • (∫ u in sample N s..s, Hd u - Hd (r / N)))
-    ((N : ℝ) * s - clock (N * s)) hrem hode
-  simpa only [smul_mul_assoc, mul_smul_comm, ← smul_sub] using he
 
 /-- the proof of Theorem 4.2, mesh geometry: reflection of the left half of a mesh step gives the
 two

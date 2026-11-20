@@ -7,7 +7,7 @@ module
 
 public import UnitaryProducts.PaperProof.UnitExamples
 public import UnitaryProducts.Walks.LogarithmBranch
-public import UnitaryProducts.PaperProof.OddResonance
+public import UnitaryProducts.PaperProof.ExamplesPi
 
 /-! # Exact computations for the precessing spin of Example 5.2. -/
 
@@ -487,7 +487,6 @@ theorem full_turn_frozen_spectrum (θ : ℝ) (T : ℕ) :
   have hrad : (2 * π * (T : ℝ)) ^ 2 + (-θ) ^ 2 = 4 * π ^ 2 * (T : ℝ) ^ 2 + θ ^ 2 := by ring
   rw [hrad]
 
-
 /-- The distance between two rotations about one involutive axis. -/
 theorem involution_distance {d : ℕ} [NeZero d]
     {N : Matrix (Fin d) (Fin d) ℂ} (hN : N.IsHermitian) (hNN : N * N = 1)
@@ -715,7 +714,6 @@ theorem full_turn_error_limit (θ : ℝ) :
     (evol_mem_unitary pauli_relations.2.2.1 (θ / 2))] at hbound
   simpa only [Real.norm_eq_abs] using hbound
 
-
 /-- The difference of the two closed forms in the rotating frame. -/
 def frameError (ω θ : ℝ) (T : ℕ) : Matrix (Fin 2) (Fin 2) ℂ :=
   step ω (θ / (2 * T)) ^ T - evol ((ω * T) • X - θ • Z) (1 / 2)
@@ -730,13 +728,11 @@ theorem error_norm_frame (ω θ : ℝ) {T : ℕ} (hT : 0 < T) :
     CStarRing.norm_mem_unitary_mul _ (evol_mem_unitary pauli_relations.2.2.1 (θ / 2))]
   rfl
 
-
 /-- The norm of the third Pauli matrix is one in the operator norm. -/
 theorem norm_Z : ‖Z‖ = 1 := by
   have hh := congrArg norm pauli_relations.2.2.2.2.2.1
   rw [pauli_relations.2.2.1.isSelfAdjoint.norm_mul_self, norm_one] at hh
   exact (sq_eq_sq₀ (norm_nonneg Z) zero_le_one).mp (by simpa using hh)
-
 
 /-- Multiplying a small angle by its sine preserves its first-order limit. -/
 theorem scaled_sin_limit {x : ℕ → ℝ} {a : ℝ}
@@ -831,37 +827,6 @@ theorem odd_limit_factored (θ : ℝ) :
   field_simp
   ring
 
-
-/-- The first derivative of the schedule, in a notation usable by the Lipschitz estimate. -/
-def familySlope (ω θ s : ℝ) : Matrix (Fin 2) (Fin 2) ℂ :=
-  (ω * θ / 2 : ℝ) • axis (θ * s + π / 2)
-
-/-- The second derivative is minus the squared angular speed times the field. -/
-theorem familySlope_derivative (ω θ s : ℝ) :
-    HasDerivAt (familySlope ω θ) (-(θ ^ 2) • family ω θ s) s := by
-  have hd := ((hasDerivAt_id s).const_mul θ).add_const (π / 2)
-  have hh := ((hd.cos.ofReal_comp.smul_const X).add
-    (hd.sin.ofReal_comp.smul_const Y)).const_smul (ω * θ / 2)
-  convert hh using 1
-  · ext i j
-    simp [axis, family, Real.cos_add, Real.sin_add, Real.cos_pi_div_two,
-      Real.sin_pi_div_two, Complex.real_smul]
-    ring
-
-/-- The derivative of the spin schedule has Lipschitz constant ωθ²/2. -/
-theorem family_derivative_lipschitz {ω : ℝ} (hω : 0 ≤ ω) (θ s t : ℝ) :
-    ‖familySlope ω θ t - familySlope ω θ s‖ ≤ ω * θ ^ 2 / 2 * |t - s| := by
-  have hbound (x : ℝ) : ‖-(θ ^ 2) • family ω θ x‖ ≤ ω * θ ^ 2 / 2 := by
-    rw [norm_smul, Real.norm_eq_abs, abs_neg, abs_of_nonneg (sq_nonneg _),
-      family, norm_smul, Real.norm_eq_abs, abs_of_nonneg (by positivity : 0 ≤ ω / 2),
-      norm_axis, mul_one]
-    exact le_of_eq (by ring)
-  simpa only [Real.norm_eq_abs] using
-    (convex_univ : Convex ℝ (univ : Set ℝ)).norm_image_sub_le_of_norm_hasDerivWithin_le
-      (fun x _ ↦ (familySlope_derivative ω θ x).hasDerivWithinAt)
-      (fun x _ ↦ hbound x) (mem_univ s) (mem_univ t)
-
-
 /-- The axis-angle displacement appearing in the proof of Example 5.2(i). -/
 theorem axis_angle_limit (θ : ℝ) :
     Tendsto (fun n : ℕ ↦ (n : ℝ) *
@@ -895,7 +860,6 @@ theorem axis_angle_limit (θ : ℝ) :
     ring
   · congr 1
     field_simp
-
 
 /-- The sine and cosine of the normalized continuous-axis angle. -/
 theorem axis_arctan_coordinates {a : ℝ} (ha : 0 < a) (b : ℝ) :
@@ -1287,98 +1251,5 @@ theorem ex_precessing_spin (ω θ : ℝ) :
   · intro hω
     subst ω
     exact ⟨fun T j ↦ full_turn_factor θ (j / T), full_turn_error_limit θ⟩
-
-
-/-- The norm of the first derivative is constant throughout the spin path. -/
-theorem familySlope_norm {ω : ℝ} (hω : 0 ≤ ω) (θ s : ℝ) :
-    ‖familySlope ω θ s‖ = ω * |θ| / 2 := by
-  rw [familySlope, norm_smul, norm_axis, mul_one, Real.norm_eq_abs,
-    abs_div, abs_mul, abs_of_nonneg hω, abs_of_pos (by norm_num : (0 : ℝ) < 2)]
-
-/-- The supremum derivative norm is the same constant as its endpoint values. -/
-theorem familySlope_supNorm {ω : ℝ} (hω : 0 ≤ ω) (θ : ℝ) :
-    unitSupNorm (familySlope ω θ) = ω * |θ| / 2 := by
-  unfold unitSupNorm
-  have he : (fun s ↦ ‖familySlope ω θ s‖) '' Icc (0 : ℝ) 1 = {ω * |θ| / 2} := by
-    ext r
-    constructor
-    · rintro ⟨s, _, rfl⟩
-      exact familySlope_norm hω θ s
-    · intro hr
-      have hr' : r = ω * |θ| / 2 := hr
-      exact ⟨0, by constructor <;> norm_num, (familySlope_norm hω θ 0).trans hr'.symm⟩
-  rw [he, csSup_singleton]
-
-/-- Every spin Hamiltonian has spectral width at most its field strength. -/
-theorem family_width {ω : ℝ} (hω : 0 ≤ ω) (θ s : ℝ) (i j : Fin 2) :
-    |(family_hermitian ω θ s).eigenvalues i - (family_hermitian ω θ s).eigenvalues j| ≤ ω := by
-  have hnorm : ‖family ω θ s‖ = ω / 2 := by
-    rw [family, norm_smul, norm_axis, mul_one, Real.norm_eq_abs,
-      abs_of_nonneg (by positivity : 0 ≤ ω / 2)]
-  have hi := spectrum.norm_le_norm_of_mem ((family_hermitian ω θ s).eigenvalues_mem_spectrum_real i)
-  have hj := spectrum.norm_le_norm_of_mem ((family_hermitian ω θ s).eigenvalues_mem_spectrum_real j)
-  rw [hnorm, Real.norm_eq_abs] at hi hj
-  exact (abs_sub _ _).trans (by linarith)
-
-/-- The jump contribution is quadratic in the angular speed, as asserted
-in the optimality paragraph following Example 5.2. -/
-theorem spin_jump_quadratic {ω w : ℝ} (hω : 0 ≤ ω) (hωw : ω ≤ w)
-    (hw : w < 2 * π) (θ : ℝ) {T : ℕ} (hT : 0 < T) :
-    (∑ j ∈ Finset.Icc 1 T, ‖paperClockJump (family ω θ) (familySlope ω θ) T j‖) ≤
-      (1 / T : ℝ) *
-        (Corrector.frameMult w * ω / 2 +
-          (2 * deriv Corrector.frameMult w) * ω ^ 2 / 4) * θ ^ 2 := by
-  have hj := hamiltonian_jump_sum_integral hT (family ω θ) (familySlope ω θ)
-    (fun s _ ↦ family_hermitian ω θ s)
-    (fun s _ ↦ (family_derivative ω θ s).hasDerivWithinAt)
-    (fun s _ t _ ↦ family_derivative_lipschitz hω θ s t) hw
-    (fun j _ i k ↦ (family_width hω θ (j / T) i k).trans hωw)
-  have hw0 : 0 ≤ w := hω.trans hωw
-  rw [paperClockJump_sum_eq (family ω θ) (familySlope ω θ)
-    (fun s _ ↦ family_hermitian ω θ s) hw
-    (fun j _ i k ↦ (family_width hω θ (j / T) i k).trans hωw),
-    paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw]
-  rw [familySlope_supNorm hω] at hj
-  convert hj using 1
-  simp only [div_pow, mul_pow, sq_abs]
-  ring
-
-/-- The odd-runtime limit in Example 5.2(i) forces the endpoint coefficient
-at width pi. The other terms, after multiplication by the runtime, are
-quadratic in the angular speed and cannot reduce this linear coefficient. -/
-theorem precessing_spin_pi_optimal {c K : ℝ}
-    (hcomparison : ∀ (T : ℕ), 0 < T → ∀ θ : ℝ,
-      (T : ℝ) * ‖frameError π θ T‖ ≤
-        c * (‖familySlope π θ 0‖ + ‖familySlope π θ 1‖) + K * θ ^ 2) :
-    1 / (2 * π) - 1 / π ^ 2 ≤ c := by
-  let a := 1 / (2 * π) - 1 / π ^ 2
-  have hlinear (θ : ℝ) : a * (π * |θ|) ≤ c * π * |θ| + K * θ ^ 2 := by
-    have hlimit := le_of_tendsto (odd_error_limit θ)
-      (Eventually.of_forall (fun k : ℕ ↦ hcomparison (2 * k + 1) (by omega) θ))
-    rw [familySlope_norm pi_pos.le, familySlope_norm pi_pos.le,
-      show π * |θ| / 2 + π * |θ| / 2 = π * |θ| by ring,
-      odd_limit_factored] at hlimit
-    have hnonneg : 0 ≤ a * (π * |θ|) := by
-      have he : a * (π * |θ|) = (π - 2) * |θ| / (2 * π) := by
-        dsimp [a]
-        field_simp
-      rw [he]
-      exact div_nonneg (mul_nonneg (by linarith [pi_gt_three]) (abs_nonneg _))
-        (by positivity)
-    have hroot : 1 ≤ Real.sqrt (1 + θ ^ 2 / (4 * (π - 2) ^ 2)) := by
-      simpa only [Real.sqrt_one] using Real.sqrt_le_sqrt
-        (show (1 : ℝ) ≤ 1 + θ ^ 2 / (4 * (π - 2) ^ 2) from
-          le_add_of_nonneg_right (by positivity))
-    calc
-      a * (π * |θ|) ≤ a * (π * |θ|) *
-          Real.sqrt (1 + θ ^ 2 / (4 * (π - 2) ^ 2)) := le_mul_of_one_le_right hnonneg hroot
-      _ ≤ c * π * |θ| + K * θ ^ 2 := by simpa only [mul_assoc] using hlimit
-  apply linear_coefficient_le_of_quadratic_error (E := fun θ ↦ a * (π * |θ|)) pi_pos
-  · apply tendsto_const_nhds.congr'
-    filter_upwards [self_mem_nhdsWithin] with θ hθ
-    have hne : θ ≠ 0 := hθ
-    dsimp [a]
-    field_simp [pi_ne_zero, abs_ne_zero.mpr hne]
-  · exact Eventually.of_forall hlinear
 
 end UnitaryProducts.PaperProof.Spin

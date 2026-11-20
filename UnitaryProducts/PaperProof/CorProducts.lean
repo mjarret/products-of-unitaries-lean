@@ -124,7 +124,6 @@ theorem unitary_products_of_arc [NeZero d] (T : ℕ) (hT : 0 < T) :
     walkLogSlope_closed hw0 hw] at hwalk ⊢
   simpa only [div_eq_mul_inv, one_mul, mul_comm] using hwalk
 
-
 /-- Section 4.3: the least eigenvalue is a continuous choice of the left endpoint.
 The width hypothesis places every eigenvalue in that window, and spectral mapping
 places the exponential in its image arc. -/
@@ -201,7 +200,6 @@ theorem unitary_products_series_bound [NeZero d] (T : ℕ) (hT : 0 < T)
     (by simpa only [hwidthId] using hwindow)
   simpa only [hwidthId] using result
 
-
 /-- Appendix B: the coefficient `c₂`, with Definition 4.1's closed function. -/
 def paperWalkSquare (w : ℝ) : ℝ :=
   let c₁ := cellConstant w / 4 + 1 / 64
@@ -217,38 +215,6 @@ theorem paperWalkSquare_eq_series {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) :
     paperFrameMult_eq_series hw0 hw, paperFrameMult_deriv_eq_series hw0 hw,
     paperFrameMult_eq_series (le_refl 0) (by positivity : (0 : ℝ) < 2 * π),
     cellConstant_eq_frameBound hw0 hw, ← walkLogSlope_closed hw0 hw]
-
-/-- Appendix B: the assigned values of `c₀` and `κ` at width zero are
-limits of their closed formulas. The first follows from the analytic frame
-multiplier, and the second from continuity of the sinc function. -/
-theorem constants_zero_limits :
-    Tendsto cellConstant (𝓝 (0 : ℝ)) (𝓝 (1 / 24)) ∧
-    Tendsto (fun w : ℝ ↦ if w = 0 then 1 else (w / 2) / Real.sin (w / 2))
-      (𝓝 0) (𝓝 1) := by
-  have hframe := UnitaryProducts.Separation.analyticAt_frameMult_zero.continuousAt
-  have hhalf : ContinuousAt (fun w : ℝ ↦ w / 2) 0 :=
-    continuousAt_id.div_const 2
-  have hframe_half : ContinuousAt (fun w : ℝ ↦ frameMult (w / 2)) 0 :=
-    hframe.comp_of_eq hhalf (by simp)
-  have hcell : ContinuousAt (fun w : ℝ ↦ frameMult w - frameMult (w / 2) / 2) 0 :=
-    hframe.sub (hframe_half.div_const 2)
-  have hcell_eq : cellConstant =ᶠ[𝓝 (0 : ℝ)]
-      (fun w ↦ frameMult w - frameMult (w / 2) / 2) := by
-    filter_upwards [eventually_abs_sub_lt (0 : ℝ) (by positivity : 0 < 2 * π)] with w hw
-    exact cellConstant_eq_frameMult (by simpa only [sub_zero] using hw)
-  have hsinc : ContinuousAt (fun w : ℝ ↦ Real.sinc (w / 2)) 0 :=
-    Real.continuous_sinc.continuousAt.comp (by simpa only [zero_div] using hhalf)
-  have hsinc_ne : Real.sinc ((0 : ℝ) / 2) ≠ 0 := by simp
-  have hkappa := (hsinc.inv₀ hsinc_ne).tendsto
-  refine ⟨?_, ?_⟩
-  · simpa only [cellConstant, if_pos rfl] using
-      (hcell.congr_of_eventuallyEq hcell_eq).tendsto
-  · have hkappa_eq (w : ℝ) : (Real.sinc (w / 2))⁻¹ =
-        if w = 0 then 1 else (w / 2) / Real.sin (w / 2) := by
-      by_cases hw : w = 0
-      · simp [hw]
-      · rw [if_neg hw, Real.sinc_of_ne_zero (div_ne_zero hw (by norm_num)), inv_div]
-    simpa only [zero_div, Real.sinc_zero, inv_one, hkappa_eq] using hkappa
 
 /-- Appendix B and Theorem 4.6: each of the three coefficients of
 `𝓔̃_w(W)` is bounded by a constant times the inverse cube of the free arc.

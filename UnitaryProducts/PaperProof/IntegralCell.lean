@@ -18,85 +18,6 @@ noncomputable section
 namespace UnitaryProducts.PaperProof
 attribute [local instance] matrixCStarAlgebra
 
-/-- The scalar integral in the endpoint calculation, evaluated by its antiderivative. -/
-theorem cell_scalar_integral {x : ℝ} (hx : x ≠ 0) (τ : ℝ) :
-    (∫ s in (0 : ℝ)..τ, (s : ℂ) * Complex.exp (I * s * x)) =
-      (Complex.exp (I * τ * x) * (1 - I * τ * x) - 1) / (x : ℂ)^2 := by
-  have hxC : (x : ℂ) ≠ 0 := ofReal_ne_zero.mpr hx
-  let P : ℝ → ℂ := fun t ↦ Complex.exp (I * t * x) * (1 - I * t * x) / (x : ℂ)^2
-  have hd (t : ℝ) : HasDerivAt P ((t : ℂ) * Complex.exp (I * t * x)) t := by
-    have ht := ((hasDerivAt_ofReal t).const_mul I).mul_const (x : ℂ)
-    convert ((ht.cexp.mul (ht.const_sub 1)).div_const ((x : ℂ)^2)) using 1
-    dsimp [P]
-    field_simp
-    ring_nf
-    simp [I_sq]
-  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt (fun t _ ↦ hd t)
-    ((by fun_prop : Continuous fun t : ℝ ↦
-      (t : ℂ) * Complex.exp (I * t * x)).intervalIntegrable _ _)]
-  simp only [P, ofReal_zero, mul_zero, zero_mul, Complex.exp_zero, sub_zero, one_mul]
-  ring
-
-/-- The paired-sign trigonometric identity in the endpoint calculation. -/
-theorem cell_exp_cot {x : ℝ} (hs : Real.sin (x / 2) ≠ 0) :
-    Complex.exp (I * x / 2) * ((Real.cot (x / 2) : ℂ) - I) =
-        1 / (Real.sin (x / 2) : ℂ) ∧
-    Complex.exp (-(I * x / 2)) * ((Real.cot (x / 2) : ℂ) + I) =
-        1 / (Real.sin (x / 2) : ℂ) := by
-  have h := corrector_entry_exp_cot hs
-  have hsC : (Real.sin (x / 2) : ℂ) ≠ 0 := ofReal_ne_zero.mpr hs
-  have hi : Complex.exp (I * x / 2) * Complex.exp (-(I * x / 2)) = 1 := by
-    rw [← Complex.exp_add, add_neg_cancel, Complex.exp_zero]
-  constructor
-  · apply (eq_div_iff hsC).mpr
-    calc
-      _ = Complex.exp (I * x / 2) * Complex.exp (-(I * x / 2)) := by rw [h.1]; ring
-      _ = 1 := hi
-  · apply (eq_div_iff hsC).mpr
-    calc
-      _ = Complex.exp (I * x / 2) * Complex.exp (-(I * x / 2)) := by rw [h.2]; ring
-      _ = 1 := hi
-
-/-- At zero frequency both endpoint integrals equal one eighth. -/
-theorem cell_scalar_endpoint_zero {τ : ℝ} (hτ : τ = 1 / 2 ∨ τ = -1 / 2) :
-    (∫ s in (0 : ℝ)..τ, (s : ℂ) * Complex.exp (I * s * (0 : ℝ))) = 1 / 8 ∧
-    ((frameMult 0 - frameMult (0 / 2) / 2 : ℝ) : ℂ) +
-      Complex.exp (I * τ * (0 : ℝ)) * (frameMult 0 : ℂ) = 1 / 8 := by
-  have hd (t : ℝ) : HasDerivAt (fun s : ℝ ↦ (s : ℂ)^2 / 2) (t : ℂ) t := by
-    convert ((hasDerivAt_ofReal t).pow 2).div_const 2 using 1; ring
-  simp only [ofReal_zero, mul_zero, Complex.exp_zero, mul_one, one_mul]
-  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt (fun t _ ↦ hd t)
-    ((by fun_prop : Continuous fun t : ℝ ↦ (t : ℂ)).intervalIntegrable _ _)]
-  rcases hτ with rfl | rfl <;> norm_num [frameMult]
-
-/-- Both scalar endpoint integrals, including the zero mode, give the prescribed
-multiplier after subtracting the center series. -/
-theorem cell_scalar_endpoint {x : ℝ} (hx : |x| < 2 * π) {τ : ℝ}
-    (hτ : τ = 1 / 2 ∨ τ = -1 / 2) :
-    (∫ s in (0 : ℝ)..τ, (s : ℂ) * Complex.exp (I * s * x)) =
-      ((frameMult x - frameMult (x / 2) / 2 : ℝ) : ℂ) +
-        Complex.exp (I * τ * x) * (frameMult x : ℂ) := by
-  by_cases hx0 : x = 0
-  · subst x
-    exact (cell_scalar_endpoint_zero hτ).1.trans (cell_scalar_endpoint_zero hτ).2.symm
-  · have hxC : (x : ℂ) ≠ 0 := ofReal_ne_zero.mpr hx0
-    have hxhalf : x / 2 ≠ 0 := div_ne_zero hx0 (by norm_num)
-    have hs := (Separation.zero_or_sin_half_ne_zero (ne_two_pi_mul_of_abs_lt hx)).resolve_left hx0
-    have hc := congrArg Complex.ofReal (closedCell_cot_difference hx0 hx)
-    have he := cell_exp_cot hs
-    rw [cell_scalar_integral hx0, frameMult, if_neg hx0, frameMult, if_neg hxhalf]
-    push_cast at hc he ⊢
-    rw [show (x : ℂ) / 2 / 2 = x / 4 by ring]
-    rcases hτ with rfl | rfl
-    · simp only [ofReal_div, ofReal_one, ofReal_ofNat]
-      rw [show I * (1 / 2 : ℂ) * x = I * x / 2 by ring]
-      field_simp
-      linear_combination -(4 * (x : ℂ)) * hc + (4 * (x : ℂ)) * he.1
-    · simp only [ofReal_div, ofReal_neg, ofReal_one, ofReal_ofNat]
-      rw [show I * (-1 / 2 : ℂ) * x = -(I * x / 2) by ring]
-      field_simp
-      linear_combination -(4 * (x : ℂ)) * hc + (4 * (x : ℂ)) * he.2
-
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
@@ -144,7 +65,6 @@ theorem integralCell_conjugated (Ω D : 𝕄) (τ : ℝ) :
 def centeredCorrection (Ω D C : 𝕄) (τ : ℝ) : 𝕄 :=
   evol Ω τ * (C + ∫ s in (0 : ℝ)..τ,
     s • (evol Ω (-s) * D * evol Ω s)) * evol Ω (-τ)
-
 
 /-- The displayed variation-of-constants formula solves the cell equation for
 every center value, with no width or Hermiticity assumption. -/
@@ -288,39 +208,6 @@ theorem cell_entry_integrating_factor (x : ℝ) (a : ℂ) (y : ℝ → ℂ)
   simp only [ofReal_zero, mul_zero, zero_mul, Complex.exp_zero, one_mul] at hi
   linear_combination -hi
 
-/-- The scalar endpoint identity gives both matrix endpoint values of the
-center-integral construction; no periodicity hypothesis is used. -/
-theorem integralCell_endpoints {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
-    (hΩ : Ω.IsHermitian)
-    (hwid : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w) (D : 𝕄)
-    {τ : ℝ} (hτ : τ = 1 / 2 ∨ τ = -1 / 2) :
-    integralCell Ω D τ = frameOp Ω D := by
-  rcases Nat.eq_zero_or_pos d with rfl | hd
-  · exact Subsingleton.elim _ _
-  letI : NeZero d := ⟨hd.ne'⟩
-  let U : 𝕄 := hΩ.eigenvectorUnitary
-  let E (p q : Fin d) := ((entryCLM p q).comp
-    (ContinuousLinearMap.mulLeftRight ℂ 𝕄 (star U) U)).restrictScalars ℝ
-  apply (Unitary.conjStarAlgAut ℂ 𝕄 hΩ.eigenvectorUnitary).symm.injective
-  change star U * integralCell Ω D τ * U = star U * frameOp Ω D * U
-  ext p q
-  have hi := cell_entry_integrating_factor (hΩ.eigenvalues p - hΩ.eigenvalues q)
-    (E p q D) (fun t ↦ E p q (integralCell Ω D t))
-    (fun t ↦ corrector_eigenbasis_derivative Ω hΩ D (integralCell_hasDerivAt Ω D t) p q) τ
-  have hzero : integralCell Ω D 0 = integralCellCenter Ω D := by
-    simp [integralCell, evol_zero]
-  rw [cell_scalar_endpoint ((hwid p q).trans_lt hw) hτ, hzero] at hi
-  change Complex.exp _ * (star U * integralCell Ω D τ * U) p q =
-    (star U * integralCellCenter Ω D * U) p q + _ at hi
-  rw [integralCellCenter_entry hw hΩ hwid D p q] at hi
-  rw [frameOp_eq_paper_value hΩ hw hwid D]
-  change _ = (star U * (periodicCorrectorData Ω hΩ D).2.1 * U) p q
-  rw [corrector_end_eigenbasis_entry hΩ D p q ((hwid p q).trans_lt hw)]
-  apply mul_left_cancel₀ (Complex.exp_ne_zero (I * τ * (hΩ.eigenvalues p - hΩ.eigenvalues q)))
-  have hE : E p q D = (star U * D * U) p q := rfl
-  rw [hE] at hi
-  convert hi using 1 <;> dsimp [U] <;> push_cast <;> ring
-
 /-- Equation `eq:series-bound`, applied to the positive cosecant coefficients,
 gives the center norm in Lemma A.1. -/
 theorem integralCellCenter_norm {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
@@ -389,6 +276,5 @@ theorem integralCell_spec {w : ℝ} (hw : w < 2 * π) {Ω : 𝕄}
       have hA : ‖adL Ω‖ < 2 * π :=
         ((fact_adjoint Ω Ω Ω hΩ hwid 0).1.2.2.2.2).trans_lt hw
       rw [(integralCellCenter_series D hA).2]
-
 
 end UnitaryProducts.PaperProof

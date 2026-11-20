@@ -25,10 +25,8 @@ open scoped Topology Matrix.Norms.L2Operator
 noncomputable section
 namespace UnitaryProducts.Prose
 
-
 variable {d : ℕ} [NeZero d]
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
 
 omit [NeZero d] in
 /-- The display in the proof of the spectral comparison: for phases `θ < β < φ` of one turn with

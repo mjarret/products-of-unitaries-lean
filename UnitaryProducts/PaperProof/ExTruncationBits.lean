@@ -14,10 +14,8 @@ public import UnitaryProducts.Prose.FineSteps
 ## Declarations
 
 - `ex_truncation_bits`
-- `odd_of_scalarEntryMap_preserves_hermitian`
 - `scalarEntryMap_adjoint`
 - `scalarEntryMap_and_error_isHermitian`
-- `scalarEntryMap_preserves_hermitian_iff`
 - `truncBits_entry_sqrt_chain`
 - `truncBits_eq_sign_floor`
 - `truncBits_error_chain`
@@ -53,30 +51,6 @@ theorem scalarEntryMap_and_error_isHermitian (F : ℝ → ℝ) (hodd : Function.
     change (scalarEntryMap F A).conjTranspose = scalarEntryMap F A
     rw [scalarEntryMap_adjoint F hodd A, hA.eq]
   exact ⟨hm, hA.sub hm⟩
-
-/-- Section 3.1: the off-diagonal pair `iy,-iy` forces oddness in dimension at least two. -/
-theorem odd_of_scalarEntryMap_preserves_hermitian (hd : 2 ≤ d) (F : ℝ → ℝ)
-    (hF : ∀ A : 𝕄, A.IsHermitian → (scalarEntryMap F A).IsHermitian) :
-    Function.Odd F := by
-  classical
-  let p : Fin d := ⟨0, by omega⟩
-  let q : Fin d := ⟨1, by omega⟩
-  have hpq : p ≠ q := by simp [p, q]
-  intro y
-  let M : 𝕄 := fun i j ↦ if i = p ∧ j = q then ⟨0, y⟩ else 0
-  let A := M + M.conjTranspose
-  have hA : A.IsHermitian := by
-    change (M + M.conjTranspose).conjTranspose = M + M.conjTranspose
-    simp [Matrix.conjTranspose_add, add_comm]
-  have he := congrArg Complex.im ((hF A hA).apply q p)
-  simpa [scalarEntryMap, A, M, Matrix.add_apply, Matrix.conjTranspose_apply,
-    hpq, hpq.symm] using he.symm
-
-/-- Section 3.1: for `d ≥ 2`, oddness is exactly preservation of Hermitian matrices. -/
-theorem scalarEntryMap_preserves_hermitian_iff (hd : 2 ≤ d) (F : ℝ → ℝ) :
-    (∀ A : 𝕄, A.IsHermitian → (scalarEntryMap F A).IsHermitian) ↔ Function.Odd F :=
-  ⟨odd_of_scalarEntryMap_preserves_hermitian hd F,
-    fun hF _ hA ↦ (scalarEntryMap_and_error_isHermitian F hF hA).1⟩
 
 /-- Example 3.2: the floor/ceiling implementation equals the paper's sign formula. -/
 theorem truncBits_eq_sign_floor (k : ℕ) (x : ℝ) :

@@ -6,7 +6,6 @@ Authors: Michael Jarret
 module
 
 public import Mathlib
-public import UnitaryProducts.Approximation.JRSComparison
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.CommutatorRegularity
 public import UnitaryProducts.Corrector.IntegratedComparison

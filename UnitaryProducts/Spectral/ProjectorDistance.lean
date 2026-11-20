@@ -22,7 +22,6 @@ public import Mathlib.LinearAlgebra.Eigenspace.Matrix
 public import Mathlib.LinearAlgebra.Matrix.Hermitian
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 public import Mathlib.Tactic.FinCases
-public import UnitaryProducts.Approximation.JRSComparison
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.PeriodicFrameDecomposition
 public import UnitaryProducts.Corrector.CommutatorRegularity

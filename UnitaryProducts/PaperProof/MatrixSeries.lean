@@ -18,7 +18,6 @@ attribute [local instance] matrixCStarAlgebra
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-
 /-- Powers of the commutator in any unitary diagonalization, not a selected
 basis. This makes the basis-independence assertion precise. -/
 theorem ad_power_arbitrary_eigenbasis_entry (Ω E : 𝕄) (U : Matrix.unitaryGroup (Fin d) ℂ)
@@ -40,39 +39,5 @@ theorem ad_power_arbitrary_eigenbasis_entry (Ω E : 𝕄) (U : Matrix.unitaryGro
     rw [ih, pow_succ]
     push_cast
     ring
-
-set_option maxHeartbeats 800000 in
--- Matrix and operator-algebra instance synthesis requires a larger elaboration budget.
-/-- The Section 4.1 multiplier `frameOp Ω E` has entries `N(evp-evq) E_pq`
-in every unitary eigenbasis. Its definition is therefore independent of the basis. -/
-theorem frameOp_arbitrary_eigenbasis_entry [NeZero d] {Ω : 𝕄}
-    (hΩ : Ω.IsHermitian) {w : ℝ} (hw : w < 2 * π)
-    (hwidth : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| ≤ w)
-    (E : 𝕄) (U : Matrix.unitaryGroup (Fin d) ℂ) (ev : Fin d → ℝ)
-    (hdiag : star (U : 𝕄) * Ω * (U : 𝕄) = diagonal (fun p ↦ (ev p : ℂ)))
-    (hev : ∀ p q, |ev p - ev q| < 2 * π) (p q : Fin d) :
-    (star (U : 𝕄) * frameOp Ω E * (U : 𝕄)) p q =
-      (frameMult (ev p - ev q) : ℂ) * (star (U : 𝕄) * E * (U : 𝕄)) p q := by
-  have ha : ‖adL Ω‖ < 2 * π := by
-    exact (show ‖adL Ω‖ ≤ w by simpa using ad_power_norm_le hΩ hwidth 1).trans_lt hw
-  let c : ℕ → ℝ := frameCoeff
-  have hpos : Summable (fun n ↦ (c n : ℂ) • adL Ω ^ n) :=
-    (summable_norm_positiveFrameSeries (adL Ω) ha).of_norm
-  have hsE := (ContinuousLinearMap.apply ℂ 𝕄 E).summable hpos
-  have he := ((entryCLM p q).comp
-    (ContinuousLinearMap.mulLeftRight ℂ 𝕄 (star (U : 𝕄)) (U : 𝕄))).map_tsum hsE
-  simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.mulLeftRight_apply,
-    ContinuousLinearMap.apply_apply,
-    show ∀ X : 𝕄, entryCLM p q X = X p q from fun _ ↦ rfl] at he
-  rw [UnitaryProducts.Prose.frameOp_eq_positive_series Ω E ha,
-    frameMult_positive_power_series (hev p q), Complex.ofReal_tsum, ← tsum_mul_right]
-  change _ = ∑' n, ((c n * (ev p - ev q) ^ n : ℝ) : ℂ) * _
-  erw [he]
-  apply tsum_congr
-  intro n
-  simp only [ContinuousLinearMap.smul_apply, Matrix.mul_smul, Matrix.smul_mul,
-    Matrix.smul_apply, smul_eq_mul, Complex.ofReal_mul, Complex.ofReal_pow]
-  rw [ad_power_arbitrary_eigenbasis_entry Ω E U ev hdiag]
-  ring
 
 end UnitaryProducts.PaperProof

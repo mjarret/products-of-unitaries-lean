@@ -6,7 +6,11 @@ Authors: Michael Jarret
 module
 
 public import Mathlib.MeasureTheory.Integral.Bochner.Set
-public import UnitaryProducts.Approximation.VariationMain
+public import UnitaryProducts.Evolution.ExplicitSchedule
+public import Mathlib.Topology.EMetricSpace.BoundedVariation
+public import UnitaryProducts.Corrector.CommutatorRegularity
+public import UnitaryProducts.Evolution.Simulation
+public import UnitaryProducts.Walks.Logarithm
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Comparison.EndpointFrame
 public import UnitaryProducts.Corrector.PeriodicFrameDecomposition

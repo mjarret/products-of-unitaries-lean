@@ -8,7 +8,8 @@ module
 public import Mathlib.NumberTheory.ZetaValues
 public import UnitaryProducts.Comparison.EndpointConstants
 public import Mathlib.MeasureTheory.Integral.Bochner.Set
-public import UnitaryProducts.Approximation.VariationMain
+public import UnitaryProducts.Evolution.ExplicitSchedule
+public import Mathlib.Topology.EMetricSpace.BoundedVariation
 public import UnitaryProducts.Comparison.EndpointComparison
 public import UnitaryProducts.Corrector.PeriodicFrameDecomposition
 public import Mathlib
@@ -27,7 +28,6 @@ public import Mathlib.LinearAlgebra.Eigenspace.Matrix
 public import Mathlib.LinearAlgebra.Matrix.Hermitian
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 public import Mathlib.Tactic.FinCases
-public import UnitaryProducts.Approximation.JRSComparison
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.CommutatorRegularity
 public import UnitaryProducts.Corrector.IntegratedComparison
@@ -47,7 +47,7 @@ public import UnitaryProducts.Evolution.PiecewiseDressedComparison
 public import UnitaryProducts.Corrector.FrameOperator
 public import UnitaryProducts.Walks.LogarithmDerivative
 public import UnitaryProducts.Spectral.ProjectorDistance
-public import UnitaryProducts.Evolution.UnitaryGenerators
+public import UnitaryProducts.Evolution.Regulated
 public import UnitaryProducts.Paper.FineStepBounds
 public import UnitaryProducts.Spectral.GapDistance
 public import UnitaryProducts.Corrector.PeriodicCharacterization
@@ -63,7 +63,6 @@ public import UnitaryProducts.Corrector.PeriodicCharacterization
 - `norm_le_unitSupNorm`
 - `rescaled_evolution`
 - `rescaled_evolution_steps`
-- `step_products_unit`
 - `unitProduct`
 - `unitSupNorm`
 - `walk`
@@ -86,15 +85,6 @@ The empty product at `T = 0` is an internal convention; the paper assumes `T ≥
 def unitProduct (H : ℝ → 𝕄) (T : ℕ) : 𝕄 × (ℝ → ℝ) :=
   (UnitaryProducts.pieceProduct (fun _ ↦ 1) (fun j ↦ H (j / T)) T,
    fun t ↦ (⌊t + 1 / 2⌋ : ℤ))
-
-/-- Internal specialization of the general-duration encoding to the unit-step product
-of Definition 2.3. It also handles the empty product convention. -/
-theorem step_products_unit (H : ℝ → 𝕄) {N : ℕ} :
-    (stepProducts H N N).2.1 = (unitProduct H N).1 := by
-  rcases Nat.eq_zero_or_pos N with rfl | hN
-  · rfl
-  have hNZ : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.ne_of_gt hN)
-  simp only [stepProducts, unitProduct, div_self hNZ, one_smul]
 
 /-- On $|w|<2\pi$ the derivative of the closed form `frameMult` is $\mathcal N'(w)$, the
 derivative of the paper's series. -/

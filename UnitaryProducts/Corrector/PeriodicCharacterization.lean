@@ -19,7 +19,6 @@ public import Mathlib.NumberTheory.ZetaValues
 - `ne_two_pi_mul_of_abs_lt`
 - `exponentialOperators`
 - `eigen_interval`
-- `scaled_eigenvalue`
 - `periodicCorrectorData`
 - `periodicCorrector_zero`
 - `hasDerivAt_periodic_corrector`
@@ -128,19 +127,6 @@ theorem eigen_interval {h : 𝕄} (hh : h.IsHermitian) {w : ℝ}
   have hupp := (abs_le.mp (hw i q)).2
   rw [hq] at hupp
   exact ⟨hlow, sub_le_iff_le_add.mp hupp |>.trans_eq (add_comm _ _)⟩
-
-/-- Scaling a Hermitian matrix scales its spectrum, without choosing an ordering. -/
-theorem scaled_eigenvalue {A : 𝕄} (hA : A.IsHermitian)
-    (c : ℝ) (i : Fin d) : ∃ j,
-    (UnitaryProducts.Separation.isHermitian_real_smul hA c).eigenvalues i = c * hA.eigenvalues j
-      := by
-  letI : NeZero d := ⟨i.pos.ne'⟩
-  have hmem := (UnitaryProducts.Separation.isHermitian_real_smul hA
-    c).eigenvalues_mem_spectrum_real i
-  rw [spectrum.smul_eq_smul c A ⟨hA.eigenvalues i, hA.eigenvalues_mem_spectrum_real i⟩,
-    hA.spectrum_real_eq_range_eigenvalues] at hmem
-  rcases hmem with ⟨z, ⟨j, rfl⟩, hz⟩
-  exact ⟨j, hz.symm⟩
 
 /-- the canonical-cell construction in Lemma A.1 (the periodic corrector). The triple
 $(\mathcal N, \mathcal N(\mathrm{ad}_\Omega)(D), Y)$:

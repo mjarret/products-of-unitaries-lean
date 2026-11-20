@@ -47,9 +47,6 @@ def uniform_c1 (w : ℝ) : ℝ := uniform_c0 w / 4 + 1 / 64
 def uniform_linear_coefficient (w : ℝ) : ℝ :=
   2 * uniform_c0 w + 1 / 24 + frameBound w
 
-
-
-
 /-- The new coefficient of the walk's second derivative bound. -/
 def walkUniformSecond (w : ℝ) : ℝ := (1 / 24 + frameBound w) * walkLogSlope w
 
@@ -57,7 +54,6 @@ def walkUniformSecond (w : ℝ) : ℝ := (1 / 24 + frameBound w) * walkLogSlope 
 comparison. -/
 def walkEta (w : ℝ) : ℝ :=
   (1 + walkLogSlope w) / (2 * (π ^ 2 - w ^ 2 / 4) * Real.cos (w / 4))
-
 
 /-- The new coefficient of the walk's squared first derivative bound. -/
 def walkUniformSquare (w : ℝ) : ℝ :=
@@ -239,6 +235,5 @@ theorem walk_uniform_coefficient_equivalents :
   exact ⟨convert_limit _ 2 2 (by norm_num) h1,
     convert_limit _ 2 1 one_ne_zero h2,
     convert_limit _ 3 _ (by positivity) h3⟩
-
 
 end UnitaryProducts.PaperProof

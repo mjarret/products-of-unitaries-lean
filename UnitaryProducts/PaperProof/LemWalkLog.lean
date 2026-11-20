@@ -8,8 +8,23 @@ module
 public import UnitaryProducts.Paper.Vocabulary
 
 public import UnitaryProducts.Prose.WalkLogLocal
-public import UnitaryProducts.Prose.FinalSteps
-public import UnitaryProducts.PaperProof.SpectralProofSteps
+public import UnitaryProducts.Prose.ChainSteps
+public import Mathlib.Algebra.Order.Round
+public import UnitaryProducts.Evolution.RegulatedComparison
+public import UnitaryProducts.Evolution.RoundedClockEvolution
+public import UnitaryProducts.Spectral.SinTheta
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import Mathlib.LinearAlgebra.Eigenspace.Matrix
+public import Mathlib.Analysis.Real.Pi.Bounds
+public import UnitaryProducts.PaperProof.ClosedCellConstruction
+public import Mathlib.Analysis.Complex.CauchyIntegral
+public import Mathlib.Analysis.Complex.RemovableSingularity
+public import UnitaryProducts.Corrector.FrameMultiplier
+public import UnitaryProducts.Walks.LogHessian
+public import UnitaryProducts.Walks.WalkScalarCut
+public import Mathlib.Analysis.Convex.Deriv
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
+public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 public import UnitaryProducts.PaperProof.ResolventQuadratures
 
 /-!
@@ -246,7 +261,6 @@ theorem chord_quadratures {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) :
       ((Real.sqrt (1 - 2 * u * (1 - u) * (1 - Real.cos (w / 2))))⁻¹) ^ 3) =
         (Real.cos (w / 4))⁻¹ ^ 2 :=
   resolvent_chord_quadratures hw0 hw
-
 
 omit [NeZero d] in
 /-- The first differentiated integral, with the inverse derivative and product

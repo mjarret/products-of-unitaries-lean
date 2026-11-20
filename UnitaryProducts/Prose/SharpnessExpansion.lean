@@ -43,7 +43,6 @@ theorem sharp_unit_step_expanded {T : ℕ} (hT : 0 < T)
   field_simp [ht] at htrap ⊢
   linarith
 
-
 /-- The scalar integrated-Hamiltonian argument used in the sharpness proof.
 The comparison evolution is explicitly the exponential of the time integral;
 its endpoint is evaluated by `integral_quadratic_clock`. -/

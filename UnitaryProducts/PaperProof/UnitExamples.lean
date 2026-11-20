@@ -144,7 +144,6 @@ theorem sharp_example_computation (T : ℕ) (hT : 1 ≤ T) :
         (by linarith [Real.pi_gt_three]))]
     exact ⟨hUend, hs, hp, he, hf, hn⟩
 
-
 /-- The first sharpness error is asymptotic to `1/(6T)`: divide by that
 quantity and use continuity of the standard sinc function at zero. -/
 theorem sharp_corrected_error_asymptotic :

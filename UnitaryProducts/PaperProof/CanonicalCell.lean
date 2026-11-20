@@ -111,65 +111,6 @@ theorem canonical_cell_comparison_assembly {T : ℝ} (hT : 0 < T) {N : ℕ}
   simp only [V, mul_one] at hglobal
   exact hglobal
 
-/-- The closed residual and boundary estimates give the comparison on unit cells. -/
-theorem canonical_cell_bound_LM [NeZero d] {T : ℕ} (hT : 0 < T)
-    (H Hd U V : ℝ → 𝕄) (hH : IsTimeDepHamiltonian H)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L M w : ℝ} (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
-    (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
-    (hw : w < 2 * π) (hwidth : AllSampleWidth T T H hH w)
-    (hU : IsEvolution (fun t ↦ H (t / T)) U 0 T)
-    (hV : IsEvolution (fun t ↦ H (sample T (t / T))) V 0 T) :
-    let c₀ := frameBound w - frameBound (w / 2) / 2
-    let c₁ := c₀ / 4 + 1 / 64
-    let Yb := fun s ↦ frameOp (H s) (Hd s)
-    let sigma := ∑ j ∈ Finset.range T,
-      ‖Yb (((j : ℝ) + 1) / T) - Yb ((j : ℝ) / T)‖
-    ‖V T - U T‖ ≤ (1 / T : ℝ) * (2 * c₀ * L + M / 24 + c₁ * L ^ 2 + sigma) := by
-  intro c₀ c₁ Yb sigma
-  have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
-  have hb := (lem_boundary_uniform ht hT H Hd hH hd hbd hl hw hwidth).1
-  have hr := uniform_residual_integral ht.le hT H Hd hH hd hbd hl hw hwidth
-  have hc := canonical_cell_comparison_assembly ht hT H Hd U V hH hU hV _ _ hb hr.1 hr.2.2
-  simp only [div_self ht.ne', one_smul, pow_two, div_mul_eq_div_div,
-    sum_Icc_one_eq_sum_range, Nat.cast_add, Nat.cast_one, add_sub_cancel_right] at hc
-  exact hc.trans_eq (by dsimp [c₀, c₁, sigma, Yb]; ring)
-
-/-- Pointwise multiplier variation, by the series split and the mean value theorem. -/
-theorem canonical_cell_variation (H Hd : ℝ → 𝕄)
-    (hH : IsTimeDepHamiltonian H)
-    (hd : ∀ s ∈ Icc (0 : ℝ) 1, HasDerivWithinAt H (Hd s) (Icc 0 1) s)
-    {L M w : ℝ} (hw₀ : 0 ≤ w) (hw : w < 2 * π)
-    (hbd : ∀ s ∈ Icc (0 : ℝ) 1, ‖Hd s‖ ≤ L)
-    (hl : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1, ‖Hd t - Hd s‖ ≤ M * |t - s|)
-    {a b : ℝ} (ha : a ∈ Icc (0 : ℝ) 1) (hb : b ∈ Icc (0 : ℝ) 1)
-    (hwa : ∀ p q, |(hH a ha).eigenvalues p - (hH a ha).eigenvalues q| ≤ w)
-    (hwb : ∀ p q, |(hH b hb).eigenvalues p - (hH b hb).eigenvalues q| ≤ w) :
-    ‖frameOp (H b) (Hd b) - frameOp (H a) (Hd a)‖ ≤
-      (frameBound w * M + 2 * frameLip w * L ^ 2) * |b - a| := by
-  have hsplit : ‖frameOp (H b) (Hd b) - frameOp (H a) (Hd a)‖ ≤
-      frameBound w * ‖Hd b - Hd a‖ + 2 * frameLip w * ‖H b - H a‖ * ‖Hd a‖ := by
-    rcases Nat.eq_zero_or_pos d with rfl | hdim
-    · have hz (X : Matrix (Fin 0) (Fin 0) ℂ) : X = 0 := Subsingleton.elim _ _
-      simp only [hz, norm_zero, mul_zero, add_zero, le_refl]
-    · letI : NeZero d := ⟨hdim.ne'⟩
-      have hca := norm_sub_smul_one_le_of_eigenvalues (hH a ha) hw₀ (eigen_interval (hH a ha) hwa)
-      have hcb := norm_sub_smul_one_le_of_eigenvalues (hH b hb) hw₀ (eigen_interval (hH b hb) hwb)
-      exact (Prose.frameOp_change_split (H a) (H b) (Hd a) (Hd b)).trans
-        (Prose.frameOp_split_norm_bound hw hca hcb)
-  have hHdiff := norm_sub_le_of_derivWithin_le hd hbd a ha b hb
-  have hL : 0 ≤ L := (norm_nonneg _).trans (hbd a ha)
-  have hN := frameBound_nonneg hw₀
-  have hN' := frameLip_nonneg hw₀
-  apply hsplit.trans
-  calc
-    _ ≤ frameBound w * (M * |b-a|) + 2 * frameLip w * (L * |b-a|) * L :=
-      add_le_add (mul_le_mul_of_nonneg_left (hl a ha b hb) hN)
-        (mul_le_mul (mul_le_mul_of_nonneg_left hHdiff (by positivity)) (hbd a ha)
-          (norm_nonneg _) (by positivity))
-    _ = _ := by ring
-
-
 /-- Theorem 4.2: apply the comparison identity, bound the boundary terms,
 then integrate the residual profile by its three even cell moments. -/
 theorem unit_steps_uncentred [NeZero d] {T : ℕ} (hT : 0 < T)
@@ -209,6 +150,5 @@ theorem unit_steps_uncentred [NeZero d] {T : ℕ} (hT : 0 < T)
   simp only [div_self ht.ne', one_smul, pow_two, div_mul_eq_div_div,
     sum_Icc_one_eq_sum_range, Nat.cast_add, Nat.cast_one, add_sub_cancel_right] at hc
   exact hc.trans_eq (by dsimp [c₀, c₁, sigma, Yb]; ring)
-
 
 end UnitaryProducts.PaperProof

@@ -17,7 +17,6 @@ public import UnitaryProducts.Evolution.Simulation
 
 - `analyticOnNhd_tsum_coeff`
 - `continuousOn_of_norm_sub_le`
-- `unit_lipschitz_constant_nonneg`
 -/
 
 @[expose] public section
@@ -58,13 +57,6 @@ open UnitaryProducts.Corrector
 variable {d : ℕ}
 
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- A Lipschitz bound on the unit interval has a nonnegative constant. -/
-theorem unit_lipschitz_constant_nonneg {H : ℝ → 𝕄} {L : ℝ}
-    (h : ∀ s ∈ Icc (0 : ℝ) 1, ∀ t ∈ Icc (0 : ℝ) 1,
-      ‖H t - H s‖ ≤ L * |t - s|) : 0 ≤ L := by
-  simpa using (norm_nonneg _).trans (h 0 (left_mem_Icc.mpr zero_le_one)
-    1 (right_mem_Icc.mpr zero_le_one))
 
 /-- A real-parameter norm Lipschitz bound implies continuity on its domain. -/
 theorem continuousOn_of_norm_sub_le {E : Type*} [NormedAddCommGroup E]

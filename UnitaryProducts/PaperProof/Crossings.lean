@@ -172,35 +172,4 @@ theorem ex_crossings [NeZero d] (H Hd P : ℝ → 𝕄) (U : ℕ → ℝ → �
   exact crossing_leakage_tendsto_zero (fun _ ↦ norm_nonneg _)
     hcomparison hcontinuous hvanishing
 
-/-- Section 5's opening to the crossing example: two diagonal eigenvalues cross
-while their rank-one coordinate projectors extend continuously through the crossing. -/
-theorem diagonal_crossing_witness :
-    let P : Matrix (Fin 2) (Fin 2) ℂ := Matrix.diagonal ![1, 0]
-    let H : ℝ → Matrix (Fin 2) (Fin 2) ℂ :=
-      fun s ↦ (s - 1 / 2) • Matrix.diagonal ![1, -1]
-    Continuous H ∧ Continuous (fun _ : ℝ ↦ P) ∧ IsStarProjection P ∧
-      (∀ s, (H s).IsHermitian ∧ Commute (H s) P ∧
-        H s * P = (s - 1 / 2) • P ∧
-        H s * (1 - P) = -(s - 1 / 2) • (1 - P)) ∧ H (1 / 2) = 0 := by
-  intro P H
-  have hdiag : (Matrix.diagonal ![(1 : ℂ), -1]).IsHermitian := by
-    apply Matrix.isHermitian_diagonal_of_self_adjoint
-    change star ![(1 : ℂ), -1] = ![1, -1]
-    ext i
-    fin_cases i <;> simp
-  have hP : IsStarProjection P := by
-    constructor
-    · change P * P = P
-      simp [P, Matrix.diagonal_mul_diagonal]
-    · change star P = P
-      simp [P, Matrix.star_eq_conjTranspose]
-  refine ⟨(continuous_id.sub continuous_const).smul continuous_const,
-    continuous_const, hP, ?_, ?_⟩
-  · intro s
-    refine ⟨UnitaryProducts.Separation.isHermitian_real_smul hdiag _, ?_, ?_, ?_⟩
-    all_goals ext i j; fin_cases i <;> fin_cases j <;>
-      simp [H, P, Matrix.mul_apply, Fin.sum_univ_two, Complex.real_smul]
-  · simp [H]
-
-
 end UnitaryProducts.PaperProof

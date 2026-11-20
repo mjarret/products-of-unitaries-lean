@@ -19,7 +19,6 @@ public import UnitaryProducts.Walks.LogarithmDerivativeBounds
 
 ## Declarations
 
-- `comparison_of_primitive`
 - `comparison_with_jumps`
 - `hasDerivAt_corrected_product`
 - `hasDerivAt_evolution_adjoint`
@@ -262,27 +261,5 @@ theorem comparison_with_jumps {a b : ℝ}
   simp only [sub_sub (K t - G t), sub_sub_cancel, add_sub_cancel_left] at heq'
   dsimp only [C]
   linear_combination (norm := abel) heq'
-
-/-- The Burgarth specialization of Theorem 2.2: a primitive of `K - G`
-leaves only the commutator integral. Countably many derivative exceptions are allowed. -/
-theorem comparison_of_primitive {a b : ℝ} (hab : a ≤ b) (K G U V Y : ℝ → 𝕄)
-    (S : Set ℝ) (hS : S.Countable)
-    (hKr : IsRegulated K a b) (hGr : IsRegulated G a b)
-    (hU : IsEvolution K U a b) (hV : IsEvolution G V a b)
-    (hYc : ContinuousOn Y (Icc a b)) (hYa : Y a = 0)
-    (hYd : ∀ t ∈ Ioo a b, t ∉ S → HasDerivAt Y (K t - G t) t) :
-    star (U b) * (1 - I • Y b) * V b - 1 =
-      ∫ t in a..b, star (U t) * (K t * Y t - Y t * G t) * V t := by
-  have hYu : ContinuousOn Y (uIcc a b) := by rwa [uIcc_of_le hab]
-  have hiR := (((hKr.intervalIntegrable_on hab).mul_continuousOn hYu).sub
-    ((hGr.intervalIntegrable_on hab).continuousOn_mul hYu)).smul (-I)
-  have hb := comparison_with_jumps 0 (fun j ↦ if j = 0 then a else b)
-    (by intro i j hij; dsimp only; split_ifs <;> first | exact le_rfl | exact hab | omega)
-    (by simp) (by simp) K G U V (fun t ↦ -I • (K t * Y t - Y t * G t))
-    (fun _ ↦ Y) S hS hU hV hiR
-    (by intro j hj; simpa [Nat.eq_zero_of_le_zero hj] using hYc)
-    (by intro j hj t ht hn; simpa using hYd t (by simpa [Nat.eq_zero_of_le_zero hj] using ht) hn)
-  simp [hYa, mul_sub, sub_mul, smul_smul] at hb ⊢
-  linear_combination (norm := abel) hb
 
 end UnitaryProducts.Paper

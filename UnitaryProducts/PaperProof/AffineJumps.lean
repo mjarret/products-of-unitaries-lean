@@ -86,21 +86,6 @@ theorem jump_average_endpoint_errors {f : ℝ → E} {a b h : ℝ} (hab : a < b)
     exact (mul_le_mul_of_nonneg_left hleftbound (by positivity)).trans_eq
       (by field_simp)
 
-set_option maxHeartbeats 800000 in
--- The integral norm bound combines scalar and Banach-space instances.
-omit [CompleteSpace E] in
-/-- The norm of a mean derivative is bounded by the same uniform bound. -/
-theorem jump_average_norm_le {f : ℝ → E} {a b L : ℝ} (hab : a < b)
-    (hbound : ∀ s ∈ Icc a b, ‖f s‖ ≤ L) :
-    ‖(1 / (b - a)) • (∫ s in a..b, f s)‖ ≤ L := by
-  have hlen : 0 < b - a := sub_pos.mpr hab
-  rw [norm_smul_of_nonneg (by positivity)]
-  have hi := intervalIntegral.norm_integral_le_of_norm_le_const
-    (fun s hs ↦ hbound s (by rw [uIoc_of_le hab.le] at hs; exact ⟨hs.1.le, hs.2⟩))
-  have h := mul_le_mul_of_nonneg_left hi (by positivity : 0 ≤ 1 / (b - a))
-  rw [abs_of_pos hlen] at h
-  exact h.trans_eq (by field_simp)
-
 end MeanDerivative
 
 variable {d : ℕ}
@@ -136,41 +121,6 @@ theorem jumpSegment_frame_self_derivWithin (A B : 𝕄) {s : ℝ} (hs : s ∈ J)
   exact derivWithin_congr
     (fun t ht ↦ congrArg (frameOp (jumpSegment A B t)) (jumpSegment_derivWithin A B ht))
     (congrArg (frameOp (jumpSegment A B s)) (jumpSegment_derivWithin A B hs))
-
-set_option maxHeartbeats 800000 in
--- The mesh rescaling combines Banach integration with matrix scalar structures.
-/-- On an actual mesh cell, the slope is `T` times the derivative integral;
-the two endpoint errors are `h/(2T)` and its norm is at most `L`. -/
-theorem jump_sample_slope {H Hd : ℝ → 𝕄} {T : ℕ} (hT : 0 < T)
-    (hd : ∀ s ∈ J, HasDerivWithinAt H (Hd s) J s)
-    {h L : ℝ} (hlip : ∀ s ∈ J, ∀ t ∈ J, ‖Hd t - Hd s‖ ≤ h * |t - s|)
-    (hbd : ∀ s ∈ J, ‖Hd s‖ ≤ L) {j : ℕ} (hj : j < T) :
-    let a := (j : ℝ) / T
-    let b := ((j : ℝ) + 1) / T
-    let D := (T : ℝ) • (H b - H a)
-    D = (T : ℝ) • (∫ s in a..b, Hd s) ∧
-      ‖Hd b - D‖ ≤ h / (2 * T) ∧ ‖D - Hd a‖ ≤ h / (2 * T) ∧ ‖D‖ ≤ L := by
-  intro a b D
-  have ht : 0 < (T : ℝ) := Nat.cast_pos.mpr hT
-  have ha : a ∈ J := walkCubic_sample hj.le
-  have hb : b ∈ J := by
-    simpa only [b, Nat.cast_add, Nat.cast_one, Nat.cast_succ] using walkCubic_sample hj
-  have hab : a < b := (div_lt_div_iff_of_pos_right ht).mpr (by linarith)
-  have hlen : b - a = 1 / T := by dsimp [a, b]; ring
-  have hinv : 1 / (b - a) = (T : ℝ) := by rw [hlen]; simp
-  have hc : ContinuousOn Hd J := continuousOn_of_norm_sub_le hlip
-  have hsub : Icc a b ⊆ J := Icc_subset_Icc ha.1 hb.2
-  have hmean := jump_increment_eq_integral hd hc ha hb hab.le
-  have hD : D = (T : ℝ) • (∫ s in a..b, Hd s) := by
-    change (T : ℝ) • (H b - H a) = _
-    rw [hmean]
-  have he := jump_average_endpoint_errors hab (hc.mono hsub)
-    (fun s hs t ht ↦ hlip s (hsub hs) t (hsub ht))
-  have hn := jump_average_norm_le hab (fun s hs ↦ hbd s (hsub hs))
-  rw [hinv, ← hD] at he hn
-  have hcst : h * (b - a) / 2 = h / (2 * T) := by rw [hlen]; ring
-  rw [hcst] at he
-  exact ⟨hD, he.1, he.2, hn⟩
 
 set_option maxHeartbeats 800000 in
 -- The matrix additive identity elaborates the operator-valued frame expressions.
@@ -229,32 +179,6 @@ theorem affine_self_variation [NeZero d] {A B : 𝕄}
   have hi := unified_increment_integral_via_ftc hFc hpoint intervalIntegrable_const
     (show (0 : ℝ) ∈ J by norm_num) (show (1 : ℝ) ∈ J by norm_num) zero_le_one
   simpa [jumpSegment] using hi
-
-set_option maxHeartbeats 800000 in
--- The integral chain combines matrix norms with scalar integral estimates.
-/-- The third and fourth lines of the jump estimate: integrate the middle
-self-curve increment, then insert its pointwise derivative majorant. -/
-theorem affine_jump_integral_chain [NeZero d] {Ω D : ℝ → 𝕄} {Da Db : 𝕄}
-    (hΩ : ∀ s ∈ J, (Ω s).IsHermitian) {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π)
-    (hwidth : ∀ s (hs : s ∈ J) p q,
-      |(hΩ s hs).eigenvalues p - (hΩ s hs).eigenvalues q| ≤ w)
-    (hF : ContDiffOn ℝ 1 (fun s ↦ frameOp (Ω s) (D s)) J)
-    {g : ℝ → ℝ}
-    (hbound : ∀ s ∈ J, ‖derivWithin (fun t ↦ frameOp (Ω t) (D t)) J s‖ ≤ g s)
-    (hi : IntervalIntegrable g volume 0 1) :
-    ‖frameOp (Ω 1) Db - frameOp (Ω 0) Da‖ ≤
-      frameBound w * (‖Db - D 1‖ + ‖D 0 - Da‖) +
-        ∫ s in (0 : ℝ)..1, ‖derivWithin (fun t ↦ frameOp (Ω t) (D t)) J s‖ ∧
-    ‖frameOp (Ω 1) Db - frameOp (Ω 0) Da‖ ≤
-      frameBound w * (‖Db - D 1‖ + ‖D 0 - Da‖) + ∫ s in (0 : ℝ)..1, g s := by
-  have h0 : (0 : ℝ) ∈ J := by norm_num
-  have h1 : (1 : ℝ) ∈ J := by norm_num
-  have hout := affine_jump_outer_bounds (Da := Da) (Db := Db) (Ea := D 0) (Eb := D 1)
-    (hΩ 0 h0) (hΩ 1 h1) hw0 hw (hwidth 0 h0) (hwidth 1 h1)
-  have hnorm := unified_increment_norm_integral_chain hF h0 h1 zero_le_one
-  have hmajor := unified_increment_integral_via_ftc hF hbound hi h0 h1 zero_le_one
-  exact ⟨hout.trans (add_le_add le_rfl (hnorm.1.le.trans hnorm.2)),
-    hout.trans (add_le_add le_rfl hmajor)⟩
 
 set_option maxHeartbeats 800000 in
 -- The cell estimate combines spectral bounds, derivatives, and interval integrals.

@@ -156,5 +156,4 @@ theorem unified_mesh_integral_via_ftc {F : ℝ → E} {g : ℝ → ℝ}
   exact (unified_mesh_norm_integrals_le hF hT).trans
     (intervalIntegral.integral_mono_on (μ := volume) zero_le_one hiF hi hbound)
 
-
 end UnitaryProducts.PaperProof

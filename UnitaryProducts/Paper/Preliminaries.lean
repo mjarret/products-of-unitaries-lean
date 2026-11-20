@@ -7,7 +7,8 @@ module
 
 public import UnitaryProducts.Comparison.EndpointConstants
 public import Mathlib.MeasureTheory.Integral.Bochner.Set
-public import UnitaryProducts.Approximation.VariationMain
+public import UnitaryProducts.Evolution.ExplicitSchedule
+public import Mathlib.Topology.EMetricSpace.BoundedVariation
 public import UnitaryProducts.Comparison.EndpointComparison
 public import UnitaryProducts.Corrector.PeriodicFrameDecomposition
 public import Mathlib
@@ -26,7 +27,6 @@ public import Mathlib.LinearAlgebra.Eigenspace.Matrix
 public import Mathlib.LinearAlgebra.Matrix.Hermitian
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 public import Mathlib.Tactic.FinCases
-public import UnitaryProducts.Approximation.JRSComparison
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.CommutatorRegularity
 public import UnitaryProducts.Corrector.IntegratedComparison
@@ -47,7 +47,7 @@ public import UnitaryProducts.Corrector.FrameOperator
 public import UnitaryProducts.Walks.LogarithmDerivative
 public import UnitaryProducts.Spectral.ProjectorDistance
 public import UnitaryProducts.Evolution.EnergyRescale
-public import UnitaryProducts.Evolution.UnitaryGenerators
+public import UnitaryProducts.Evolution.Regulated
 public import UnitaryProducts.Spectral.SinTheta
 
 /-!
@@ -58,7 +58,6 @@ public import UnitaryProducts.Spectral.SinTheta
 - `IsEvolution`
 - `IsRegulated`
 - `duhamel`
-- `piecewiseData`
 - `piecewise_regulated`
 - `regulated_evolution`
 - `stepProducts`
@@ -73,28 +72,6 @@ open Complex Set Filter MeasureTheory
 noncomputable section
 variable {d : ℕ} [NeZero d]
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- **Equation (2.5)** (product of unitaries induced by a piecewise-constant family). `.1` says
-that $G$ is piecewise constant on $[a,b]$, and `.2` is the induced product
-$e^{-i(t_n-t_{n-1})G_{n-1}}\cdots e^{-i(t_1-t_0)G_0}$ of eq. (2.5).
-
-Reading the statement against the paper:
-* `.1` asks for $n>0$, nodes `t` with $t_0=a$, $t_n=b$, strictly increasing on $\{0,\dots,n\}$,
-  and matrices `A` with $G(s)=A_j$ on each open piece $(t_j,t_{j+1})$. The values of $G$ at the
-  nodes are free, as in the paper.
-* `.2 t A n` takes the nodes and the matrices as arguments; nothing is chosen from `.1`, and a
-  consumer passes the data that witness `.1`. It is `pieceProduct` with durations
-  $t_{j+1}-t_j$, whose recursion puts the latest factor on the left. It is total, but only its
-  value on data satisfying `.1` is the paper's product.
-* That the product depends only on $G$ is not part of the definition. It follows from the last
-  clause of `regulated_evolution`: the evolution at time $T$ equals the product for every
-  admissible partition. -/
-def piecewiseData (G : ℝ → 𝕄) (a b : ℝ) :
-    Prop × ((ℕ → ℝ) → (ℕ → 𝕄) → ℕ → 𝕄) :=
-  (∃ (n : ℕ) (t : ℕ → ℝ) (A : ℕ → 𝕄),
-    0 < n ∧ t 0 = a ∧ t n = b ∧ StrictMonoOn t (Iic n) ∧
-      ∀ j < n, ∀ s ∈ Ioo (t j) (t (j+1)), G s = A j,
-   fun t A n ↦ UnitaryProducts.pieceProduct (fun j ↦ t (j+1) - t j) A n)
 
 /-- The equal-step objects of the paper, bundled: the midpoint product, the $N$-step product
 $W_N$ of **Definition 2.3**, and the rounded clock $q(t)=\lfloor t+1/2\rfloor$ (after

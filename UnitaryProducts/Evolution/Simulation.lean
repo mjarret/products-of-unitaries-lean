@@ -12,11 +12,9 @@ public import Mathlib
 
 ## Declarations
 
-- `norm_pow_sub_pow_le`
 - `pow_sub_pow_sum`
 - `SolvesSchrodinger`
 - `abs_sub_level_lt`
-- `abs_sub_truncBits_le`
 - `abs_sub_truncBits_lt`
 - `commute_evol`
 - `evalCLM`
@@ -26,7 +24,6 @@ public import Mathlib
 - `evol_mem_unitary`
 - `evol_zero`
 - `hasDerivAt_evol`
-- `isHermitian_truncHerm`
 - `level`
 - `level_neg`
 - `norm_evalCLM_apply_le`
@@ -41,7 +38,6 @@ public import Mathlib
 - `re_inner_I_smul_hermitian_eq_zero`
 - `solvesSchrodinger_evol`
 - `star_evol_mul_self`
-- `star_truncBitsC`
 - `switchTime`
 - `switchTime_mono`
 - `switchTime_succ`
@@ -81,29 +77,6 @@ end UnitaryProducts.Paper.UnitStepsProse
 namespace UnitaryProducts.Corrector
 
 variable {A : Type*} [NormedRing A] [NormOneClass A]
-
-/-- Bound the full noncommutative telescope term by term, then sum its
-scalar geometric majorant. This is the finite-sum argument of the product comparison bound. -/
-theorem norm_pow_sub_pow_le {a b : A} {r : ℝ} (ha : ‖a‖ ≤ r) (hb : ‖b‖ ≤ r) (n : ℕ) :
-    ‖a ^ n - b ^ n‖ ≤ n * r ^ (n - 1) * ‖a - b‖ := by
-  rw [UnitaryProducts.Paper.UnitStepsProse.pow_sub_pow_sum]
-  calc
-    _ ≤ ∑ k ∈ Finset.range n, ‖a ^ k * (a - b) * b ^ (n - 1 - k)‖ :=
-      norm_sum_le _ _
-    _ ≤ ∑ k ∈ Finset.range n, r ^ k * ‖a - b‖ * r ^ (n - 1 - k) := by
-      apply Finset.sum_le_sum
-      intro k _
-      have hleft := (norm_pow_le a k).trans
-        (pow_le_pow_left₀ (norm_nonneg a) ha k)
-      have hright := (norm_pow_le b (n - 1 - k)).trans
-        (pow_le_pow_left₀ (norm_nonneg b) hb (n - 1 - k))
-      exact norm_mul_le_of_le (norm_mul_le_of_le hleft le_rfl) hright
-    _ = (∑ k ∈ Finset.range n, r ^ k * r ^ (n - 1 - k)) * ‖a - b‖ := by
-      rw [Finset.sum_mul]
-      apply Finset.sum_congr rfl
-      intro k _
-      ring
-    _ = _ := by rw [geom_sum₂_self]
 
 end UnitaryProducts.Corrector
 
@@ -487,10 +460,6 @@ theorem abs_sub_truncBits_lt (k : ℕ) (x : ℝ) : |x - truncBits k x| < ((2 : �
   rw [e, abs_div, abs_of_pos hp, div_lt_iff₀ hp, inv_mul_cancel₀ hp.ne']
   exact abs_sub_level_lt k x
 
-/-- $|x - [x]_k| \le 2^{-k}$. -/
-theorem abs_sub_truncBits_le (k : ℕ) (x : ℝ) : |x - truncBits k x| ≤ ((2 : ℝ) ^ k)⁻¹ :=
-  (abs_sub_truncBits_lt k x).le
-
 /-- Bit truncation is odd (Example 3.2(i)). -/
 theorem truncBits_neg (k : ℕ) (x : ℝ) : truncBits k (-x) = -truncBits k x := by
   rw [truncBits, truncBits, level_neg, Int.cast_neg, neg_div]
@@ -511,21 +480,11 @@ theorem truncBits_eq_self_iff (k : ℕ) (x : ℝ) : truncBits k x = x ↔ ∃ m 
 function acts on entries in §3.1. -/
 noncomputable def truncBitsC (k : ℕ) (z : ℂ) : ℂ := ⟨truncBits k z.re, truncBits k z.im⟩
 
-/-- Truncation commutes with complex conjugation. -/
-theorem star_truncBitsC (k : ℕ) (z : ℂ) : star (truncBitsC k z) = truncBitsC k (star z) := by
-  apply Complex.ext <;> simp [truncBitsC, truncBits_neg]
-
 /-- The entrywise $k$-bit truncation $H^{(k)}$ of Example 3.2. Since the truncation of a number is
 odd, it commutes with conjugation, so the truncation of a Hermitian matrix is again Hermitian
 (`isHermitian_truncHerm`). -/
 noncomputable def truncHerm (k : ℕ) (A : 𝕄) : 𝕄 :=
   Matrix.of fun i j ↦ truncBitsC k (A i j)
-
-/-- $H^{(k)}$ is Hermitian when $H$ is. -/
-theorem isHermitian_truncHerm (k : ℕ) {A : 𝕄} (hA : A.IsHermitian) :
-    (truncHerm k A).IsHermitian := by
-  ext i j
-  simp only [Matrix.conjTranspose_apply, truncHerm, Matrix.of_apply, star_truncBitsC, hA.apply]
 
 /-- Matrices that act equally on every vector are equal. -/
 theorem toEuclideanCLM_injective {M N : 𝕄} (h : ∀ v, Matrix.toEuclideanCLM (n := Fin d) (𝕜 := ℂ) M

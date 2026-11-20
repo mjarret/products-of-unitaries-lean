@@ -125,66 +125,6 @@ theorem cell_entry_ansatz_verified {x : ℝ} (hx : |x| < 2 * π) (a : ℂ) :
   convert (closedCellMultiplier_derivative x τ).mul_const a using 1
   ring
 
-/-- The closed scalar formula equals any solution with the prescribed left
-endpoint. This identifies the matrix corrector with the closed formula. -/
-theorem closedCellMultiplier_eq_entry {x : ℝ} (hx : |x| < 2 * π) (a : ℂ)
-    (y : ℝ → ℂ) (hy : ∀ t : ℝ, HasDerivAt y ((t : ℂ)*a-I*x*y t) t)
-    (hi : y (-1/2) = (frameMult x : ℂ)*a) (τ : ℝ) :
-    y τ = closedCellMultiplier τ x * a := by
-  by_cases hx₀ : x = 0
-  · subst x
-    have h := (corrector_entry_solutions_zero a y (by simpa using hy)).1
-    have hleft := h (-1/2)
-    rw [hi] at hleft
-    norm_num [frameMult] at hleft
-    rw [h τ, closedCellMultiplier, if_pos rfl]
-    linear_combination -hleft
-  · let z : ℝ → ℂ := fun t ↦ closedCellMultiplier t x * a
-    have hz (t : ℝ) : HasDerivAt z ((t : ℂ)*a-I*x*z t) t := by
-      convert (closedCellMultiplier_derivative x t).mul_const a using 1
-      dsimp [z]
-      ring
-    have hzi : z (-1/2) = (frameMult x : ℂ)*a := by
-      exact congrArg (· * a) (closedCellMultiplier_endpoints hx).2
-    obtain ⟨_, hall, _, _⟩ := corrector_entry_solutions hx₀ a
-    obtain ⟨c, hc⟩ := hall y hy
-    obtain ⟨c', hc'⟩ := hall z hz
-    have he : y (-1/2) = z (-1/2) := hi.trans hzi.symm
-    rw [hc, hc'] at he
-    have hc_eq : c = c' :=
-      mul_right_cancel₀ (Complex.exp_ne_zero _) (add_left_cancel he)
-    change y τ = z τ
-    rw [hc, hc', hc_eq]
-
-/-- The matrix corrector is exactly `yτ(ad Ω)(D)`, by its scalar entries. -/
-theorem periodicCorrector_eq_closedCell {Ω : 𝕄} (hΩ : Ω.IsHermitian)
-    (hw : ∀ p q, |hΩ.eigenvalues p - hΩ.eigenvalues q| < 2 * π) (D : 𝕄) (τ : ℝ) :
-    (periodicCorrectorData Ω hΩ D).2.2 τ =
-      complexSpectralMultiplier Ω hΩ (closedCellMultiplier τ) D := by
-  let U : 𝕄 := hΩ.eigenvectorUnitary
-  let e := Unitary.conjStarAlgAut ℂ 𝕄 hΩ.eigenvectorUnitary
-  let E (p q : Fin d) := ((entryCLM p q).comp
-    (ContinuousLinearMap.mulLeftRight ℂ 𝕄 (star U) U)).restrictScalars ℝ
-  apply e.symm.injective
-  change star U * ((periodicCorrectorData Ω hΩ D).2.2 τ) * U =
-    star U * (complexSpectralMultiplier Ω hΩ (closedCellMultiplier τ) D) * U
-  ext p q
-  rw [spectralMultiplier_eigenbasis_entry Ω hΩ (closedCellMultiplier τ) D p q]
-  have hinit : (periodicCorrectorData Ω hΩ D).2.2 (-1/2) =
-      (periodicCorrectorData Ω hΩ D).2.1 := by
-    simp [periodicCorrectorData, exponentialOperators, neg_div, frameExtension_zero]
-  exact closedCellMultiplier_eq_entry (hw p q) (E p q D)
-    (fun t ↦ E p q ((periodicCorrectorData Ω hΩ D).2.2 t))
-    (fun t ↦ corrector_eigenbasis_derivative Ω hΩ D
-      (hasDerivAt_periodic_corrector Ω hΩ D t) p q)
-    ((congrArg (E p q) hinit).trans (corrector_end_eigenbasis_entry hΩ D p q (hw p q))) τ
-
-/-- Appendix A: the cotangent multiplier has the positive coefficient expansion
-obtained directly from its partial fractions. -/
-theorem frameMult_positive_power_series {x : ℝ} (hx : |x| < 2 * π) :
-    frameMult x = ∑' n : ℕ, frameCoeff n * x ^ n :=
-  frameMult_eq_frameCoeff_series hx
-
 /-- The cosecant partial fractions in Lemma A.1, including the removable value at zero.
 The cotangent half-angle identity identifies the scalar value; summing the
 alternating coefficients gives the cosecant pole sum. -/

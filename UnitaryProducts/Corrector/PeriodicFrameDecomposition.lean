@@ -13,7 +13,6 @@ public import UnitaryProducts.Evolution.PiecewiseDressedComparison
 
 ## Declarations
 
-- `UnitaryProducts.Paper.corrector_cancels_taylor`
 - `frameExtension_zero`
 -/
 
@@ -23,17 +22,6 @@ namespace UnitaryProducts.Paper
 open Complex
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
-
-/-- Section 1 and the abstract, within-step cancellation: substituting the corrector equation
-removes the linear Taylor term from the comparison residual. The Taylor remainder and
-the product of the Hamiltonian difference with the corrector remain. -/
-theorem corrector_cancels_taylor (K G Y Yd D : 𝕄) (τ : ℝ)
-    (heq : Yd + I • (G * Y - Y * G) = τ • D) :
-    K - G - Yd - I • (K * Y - Y * G) =
-      K - G - τ • D - I • ((K - G) * Y) := by
-  rw [← heq]
-  simp only [smul_sub, sub_mul, sub_sub]
-  abel
 
 end UnitaryProducts.Paper
 

@@ -5,7 +5,10 @@ Authors: Michael Jarret
 -/
 module
 
-public import UnitaryProducts.Approximation.LevelPartitions
+public import UnitaryProducts.Corrector.CommutatorRegularity
+public import UnitaryProducts.Evolution.Pieces
+public import UnitaryProducts.Evolution.Simulation
+public import UnitaryProducts.Walks.Logarithm
 public import UnitaryProducts.Comparison.DiscreteAdiabatic
 public import UnitaryProducts.Corrector.PowerSeries
 

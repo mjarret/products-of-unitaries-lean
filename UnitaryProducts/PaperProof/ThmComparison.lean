@@ -7,7 +7,13 @@ module
 
 public import UnitaryProducts.Evolution.PiecewiseDressedComparison
 public import UnitaryProducts.Prose.LocalSteps
-public import UnitaryProducts.Prose.Preliminaries
+public import Mathlib.Algebra.Order.Round
+public import UnitaryProducts.Evolution.RegulatedComparison
+public import UnitaryProducts.Evolution.RoundedClockEvolution
+public import UnitaryProducts.Spectral.SinTheta
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import Mathlib.LinearAlgebra.Eigenspace.Matrix
+public import Mathlib.Analysis.Real.Pi.Bounds
 public import UnitaryProducts.PaperProof.Steps2
 
 /-!
@@ -126,64 +132,5 @@ theorem duhamel_bound {a b : ℝ} (hab : a ≤ b) {K G U V : ℝ → 𝕄}
   -- Equation (2.3): unitary invariance, the Duhamel identity, then the integral norm bound.
   have hcompare := (hunitary.trans hintegral).le
   exact hcompare.trans hnorm
-
-/-- Section 4.1: sufficient rates for a correction. A residual bounded by
-`cR / T²`, each of the `T` jumps bounded by `cJ / T²`, and endpoint bounds
-`c₀ / T` and `c₁ / T` give error at most `(cR + c₀ + c₁ + cJ) / T`.
-The constants may be fixed uniformly in `T`, giving the stated reciprocal-time order. -/
-theorem correction_rate_bound {T : ℕ} (hT : 0 < T)
-    (p : ℕ → ℝ) (hp : Monotone p) (ha : p 0 = 0) (hb : p (T + 1) = T)
-    (K G U V R : ℝ → 𝕄) (Y : ℕ → ℝ → 𝕄) (S : Set ℝ) (hS : S.Countable)
-    (hU : IsEvolution K U 0 T) (hV : IsEvolution G V 0 T)
-    (hRi : IntervalIntegrable R volume 0 T)
-    (hYc : ∀ j ≤ T, ContinuousOn (Y j) (Icc (p j) (p (j + 1))))
-    (hYd : ∀ j ≤ T, ∀ t ∈ Ioo (p j) (p (j + 1)), t ∉ S →
-      HasDerivAt (Y j) (K t - G t - I • (K t * Y j t - Y j t * G t) - R t) t)
-    (cR c₀ c₁ cJ : ℝ)
-    (hres : ∀ t ∈ Icc (0 : ℝ) T, ‖R t‖ ≤ cR / (T : ℝ) ^ 2)
-    (hleft : ‖Y 0 0‖ ≤ c₀ / T) (hright : ‖Y T T‖ ≤ c₁ / T)
-    (hjump : ∀ j < T, ‖Y (j + 1) (p (j + 1)) - Y j (p (j + 1))‖ ≤
-      cJ / (T : ℝ) ^ 2) :
-    ‖V T - U T‖ ≤ (cR + c₀ + c₁ + cJ) / T := by
-  have ht : (0 : ℝ) < T := Nat.cast_pos.mpr hT
-  have hcontract (t : ℝ) (htm : t ∈ Icc (0 : ℝ) T) (A : 𝕄) :
-      ‖star (U t) * A * V t‖ = ‖A‖ := by
-    have hu := Matrix.mem_unitaryGroup_iff'.mpr (hU.2.2.1 t htm)
-    have hv := Matrix.mem_unitaryGroup_iff'.mpr (hV.2.2.1 t htm)
-    rw [CStarRing.norm_mul_mem_unitary _ hv,
-      CStarRing.norm_mem_unitary_mul _ (Unitary.star_mem hu)]
-  have hintegral : ‖∫ t in (0 : ℝ)..T, star (U t) * R t * V t‖ ≤
-      (T : ℝ) * (cR / (T : ℝ) ^ 2) := by
-    have hbound := intervalIntegral.norm_integral_le_of_norm_le (μ := volume) ht.le
-      (Filter.Eventually.of_forall fun t ht' ↦
-        (hcontract t (Ioc_subset_Icc_self ht') (R t)).le.trans
-          (hres t (Ioc_subset_Icc_self ht')))
-      (intervalIntegrable_const (c := cR / (T : ℝ) ^ 2))
-    simpa only [intervalIntegral.integral_const, sub_zero, smul_eq_mul] using hbound
-  have hsum : ‖∑ j ∈ Finset.range T,
-      star (U (p (j + 1))) * (Y (j + 1) (p (j + 1)) - Y j (p (j + 1))) *
-        V (p (j + 1))‖ ≤ (T : ℝ) * (cJ / (T : ℝ) ^ 2) := by
-    calc
-      _ ≤ ∑ _j ∈ Finset.range T, cJ / (T : ℝ) ^ 2 := by
-        apply norm_sum_le_of_le
-        intro j hj
-        have hjT := Finset.mem_range.mp hj
-        have hpoint : p (j + 1) ∈ Icc (0 : ℝ) T :=
-          ⟨ha ▸ hp (Nat.zero_le _), hb ▸ hp (by omega)⟩
-        exact (hcontract _ hpoint _).le.trans (hjump j hjT)
-      _ = _ := by simp
-  have hidentity := comparison_with_jumps T p hp ha hb K G U V R Y S hS hU hV hRi hYc hYd
-  simp only [smul_sub, ← add_sub_assoc] at hidentity
-  have hu := Matrix.mem_unitaryGroup_iff'.mpr (hU.2.2.1 T ⟨ht.le, le_rfl⟩)
-  rw [Prose.unitary_difference_norm ⟨U T, hu⟩, hidentity,
-    intervalIntegral.integral_smul, add_sub_assoc, ← smul_sub, ← smul_add, ← smul_sub,
-    norm_smul, Complex.norm_I, one_mul]
-  have hboundary : ‖star (U T) * Y T T * V T - Y 0 0‖ ≤ c₁ / T + c₀ / T :=
-    norm_sub_le_of_le ((hcontract T ⟨ht.le, le_rfl⟩ _).le.trans hright) hleft
-  calc
-    _ ≤ (T : ℝ) * (cR / (T : ℝ) ^ 2) + (c₁ / T + c₀ / T) +
-        (T : ℝ) * (cJ / (T : ℝ) ^ 2) :=
-      norm_sub_le_of_le (norm_add_le_of_le hintegral hboundary) hsum
-    _ = _ := by field_simp; ring
 
 end UnitaryProducts.PaperProof

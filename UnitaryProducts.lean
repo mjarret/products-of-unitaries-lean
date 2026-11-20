@@ -7,24 +7,20 @@ module
 public import UnitaryProducts.Paper.Vocabulary
 public import UnitaryProducts.PaperProof.GapAdapted
 public import UnitaryProducts.PaperProof.PrecessingSpin
-public import UnitaryProducts.PaperProof.SpinProse
-public import UnitaryProducts.PaperProof.SpinRemainders
-public import UnitaryProducts.PaperProof.SpinUniform
-public import UnitaryProducts.PaperProof.SpinConsequences
-public import UnitaryProducts.PaperProof.BurgarthScaling
-public import UnitaryProducts.PaperProof.LeftHeld
-public import UnitaryProducts.PaperProof.OddResonance
-public import UnitaryProducts.PaperProof.ExamplesProse
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.DistLEIntegral
+public import UnitaryProducts.Walks.LogarithmDerivative
+public import UnitaryProducts.PaperProof.ExamplesPi
+public import UnitaryProducts.PaperProof.PropJumps
 public import UnitaryProducts.PaperProof.Crossings
-public import UnitaryProducts.Prose.Fidelity
+public import UnitaryProducts.Evolution.DuhamelIntegral
+public import UnitaryProducts.Walks.BandMultiplicity
 public import UnitaryProducts.PaperProof.CorWalkLeakage
-public import UnitaryProducts.PaperProof.ClosedCellLimit
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 public import Mathlib.Analysis.Complex.CauchyIntegral
 public import Mathlib.Analysis.Complex.RemovableSingularity
 public import UnitaryProducts.Corrector.FrameMultiplier
 public import UnitaryProducts.Walks.LogHessian
 public import UnitaryProducts.Walks.WalkScalarCut
-public import UnitaryProducts.PaperProof.WalkCutFormula
 public import Mathlib.MeasureTheory.Function.LpSpace.ContinuousFunctions
 public import Mathlib.Topology.ContinuousMap.Units
 public import UnitaryProducts.PaperProof.UnifiedDerivative
@@ -35,7 +31,7 @@ public import UnitaryProducts.PaperProof.MatrixSeries
 public import Mathlib.MeasureTheory.Function.JacobianOneDim
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 public import Mathlib.Analysis.Complex.LocallyUniformLimit
-public import UnitaryProducts.PaperProof.SpectralProofSteps
+public import UnitaryProducts.PaperProof.ClosedCellConstruction
 public import UnitaryProducts.PaperProof.UniformDerivativeSeries
 public import UnitaryProducts.PaperProof.UniformConstants
 public import Mathlib.Analysis.SpecialFunctions.Artanh
@@ -43,12 +39,7 @@ public import Mathlib.Analysis.SpecialFunctions.Artanh
 public import UnitaryProducts.PaperProof.AffineJumps
 public import UnitaryProducts.PaperProof.CorProducts
 public import UnitaryProducts.Paper.SpectralWindow
-public import UnitaryProducts.Prose.UnitaryFactors
-public import UnitaryProducts.Prose.CellMotivation
-public import UnitaryProducts.Prose.Discussion
 
-public import UnitaryProducts.PaperProof.RotatingFrame
-public import UnitaryProducts.PaperProof.FrameUnitSteps
 public import UnitaryProducts.Paper.UnitComparisonObjects
 public import UnitaryProducts.PaperProof.ClosedCellCorrector
 public import UnitaryProducts.PaperProof.CanonicalCell
@@ -75,7 +66,8 @@ public import UnitaryProducts.Spectral.BandTransfer
 public import UnitaryProducts.Spectral.TrackedBandGap
 public import UnitaryProducts.Comparison.EndpointComparison
 public import UnitaryProducts.Corrector.FrameBounds
-public import UnitaryProducts.Spectral.WidthAndGap
+public import UnitaryProducts.Spectral.ExactGap
+public import UnitaryProducts.Walks.LogarithmBranch
 public import UnitaryProducts.Walks.SharpComparison
 public import UnitaryProducts.Evolution.Simulation
 public import UnitaryProducts.Corrector.ScalarEntrySolutions
@@ -83,16 +75,17 @@ public import UnitaryProducts.Comparison.SharpInT
 public import UnitaryProducts.Approximation.EntryRounding
 public import UnitaryProducts.Prose.WalkComparisonJRS
 public import UnitaryProducts.Prose.ChainSteps
-public import UnitaryProducts.Prose.ResidualPointwise
 public import UnitaryProducts.Prose.LocalSteps
 public import UnitaryProducts.Prose.RoundedClockQuarter
 public import UnitaryProducts.Prose.UnitStepsWalks
 public import UnitaryProducts.Prose.WalkLogLocal
 public import UnitaryProducts.Prose.FineSteps
 public import UnitaryProducts.Prose.Introduction
-public import UnitaryProducts.Prose.Preliminaries
+public import Mathlib.Algebra.Order.Round
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import Mathlib.LinearAlgebra.Eigenspace.Matrix
+public import Mathlib.Analysis.Real.Pi.Bounds
 public import UnitaryProducts.Prose.UnitStepsCorrector
-public import UnitaryProducts.Prose.FinalSteps
 public import UnitaryProducts.PaperProof.ExTruncationBits
 public import UnitaryProducts.PaperProof.FactAdjoint
 public import UnitaryProducts.Corrector.PeriodicCharacterization
@@ -103,11 +96,10 @@ public import UnitaryProducts.PaperProof.RemTruncatedEndpoints
 public import UnitaryProducts.PaperProof.UniformConsequences
 public import UnitaryProducts.Prose.SyncSteps
 public import UnitaryProducts.PaperProof.UniformComparison
-public import UnitaryProducts.PaperProof.ThmUnitStepsMax
 
 public import UnitaryProducts.PaperProof.IntroTheorems
 
-public import UnitaryProducts.Prose.UnitTransfer
+public import UnitaryProducts.PaperProof.UnifiedProducts
 
 public import UnitaryProducts.PaperProof.UnitExamples
 public import UnitaryProducts.PaperProof.UniformCells
@@ -122,24 +114,21 @@ public import UnitaryProducts.PaperProof.UniformCellIntegrals
 public import UnitaryProducts.PaperProof.UnitRounded
 public import UnitaryProducts.Prose.SharpnessExpansion
 public import UnitaryProducts.Prose.GeneralSpectralSeries
-public import UnitaryProducts.Prose.ShiftedEvolution
 
 public import UnitaryProducts.PaperProof.PrincipalLog
-public import UnitaryProducts.PaperProof.PeriodicSpectrum
 
 import UnitaryProducts.PaperProof.ExponentialDefinitions
 
 public import UnitaryProducts.PaperProof.PropTransfer
-public import UnitaryProducts.Prose.ExactCorrection
 
-public import UnitaryProducts.PaperProof.CellEquations
+public import UnitaryProducts.PaperProof.LocalCell
+public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
+public import UnitaryProducts.Matrix.ExponentialEigenvectors
 
-public import UnitaryProducts.Prose.UnifiedQuadrature
 public import UnitaryProducts.PaperProof.UnifiedJumpsSupport
 
 public import UnitaryProducts.PaperProof.LemWalkBands
-public import UnitaryProducts.Walks.TrackedBandMultiplicity
-public import UnitaryProducts.PaperProof.ProductCoefficients
+public import UnitaryProducts.PaperProof.WalkCoefficients
 
 /-!
 # Products of unitaries

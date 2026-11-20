@@ -68,5 +68,4 @@ theorem paperFrameOp_eq_series {Ω : 𝕄} (hΩ : Ω.IsHermitian) {w : ℝ}
   simp only [UnitStepsProse.complexSpectralMultiplier, LinearMap.coe_toContinuousLinearMap',
     LinearMap.coe_mk, AddHom.coe_mk, WalkCut.complexFrameMult_ofReal]
 
-
 end UnitaryProducts.Paper

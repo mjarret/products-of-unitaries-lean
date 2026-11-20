@@ -13,7 +13,6 @@ public import UnitaryProducts.Corrector.SeparatedFrameKernel
 ## Declarations
 
 - `corrector_entry_solutions`
-- `corrector_entry_solutions_zero`
 -/
 
 @[expose] public section
@@ -27,23 +26,6 @@ namespace UnitaryProducts.Paper
 /-- The real embedding `ℝ → ℂ` has derivative `1`. -/
 theorem hasDerivAt_ofReal (τ : ℝ) : HasDerivAt (fun t : ℝ ↦ (t : ℂ)) 1 τ := by
   simpa using (hasDerivAt_id' τ).ofReal_comp
-
-/-- The exponential factors in the endpoint calculation of the proof of Lemma A.1. -/
-theorem corrector_entry_exp_cot {x : ℝ} (hs : Real.sin (x / 2) ≠ 0) :
-    Complex.exp (-(I * (x : ℂ) / 2)) =
-      (Real.sin (x / 2) : ℂ) * ((Real.cot (x / 2) : ℂ) - I) ∧
-    Complex.exp (I * (x : ℂ) / 2) =
-      (Real.sin (x / 2) : ℂ) * ((Real.cot (x / 2) : ℂ) + I) := by
-  have hsC : Complex.sin (x / 2) ≠ 0 := by exact_mod_cast hs
-  rw [show -(I * (x : ℂ) / 2) = -((x : ℂ) / 2) * I by ring,
-    show I * (x : ℂ) / 2 = ((x : ℂ) / 2) * I by ring,
-    Complex.exp_mul_I, Complex.exp_mul_I, Complex.cos_neg, Complex.sin_neg,
-    Real.cot_eq_cos_div_sin]
-  push_cast
-  constructor
-  · field_simp [hsC]
-    ring
-  · field_simp [hsC]
 
 /-- Supports the entrywise computation in the proof of Lemma A.1: for $x\ne0$ the
 solutions of $Y_{pq}'+ixY_{pq}=\tau D_{pq}$ are
@@ -119,30 +101,6 @@ theorem corrector_entry_solutions {x : ℝ} (hx : x ≠ 0) (a : ℂ) :
     push_cast
     rw [e1, e2]
     constructor <;> field_simp <;> ring
-
-/-- Supports the case $x=0$ of the entrywise computation of §4.1: every solution of
-$Y_{pq}'=\tau D_{pq}$ is $Y_{pq}(\tau)=c+(\tau^2/2)D_{pq}$, so its end values agree.
-
-Reading the statement against the paper:
-* `a` is $D_{pq}$ and $c$ is `y 0`.
-
-The proof follows the paper's: $y-(\tau^2/2)a$ has derivative $0$. -/
-theorem corrector_entry_solutions_zero (a : ℂ) (y : ℝ → ℂ)
-    (hy : ∀ τ : ℝ, HasDerivAt y ((τ : ℂ) * a) τ) :
-    (∀ τ : ℝ, y τ = y 0 + (τ : ℂ) ^ 2 / 2 * a) ∧ y (1 / 2) = y (-1 / 2) := by
-  have hg : ∀ τ : ℝ, HasDerivAt (fun t : ℝ ↦ y t - (t : ℂ) * t / 2 * a) 0 τ := by
-    intro τ
-    have ht := hasDerivAt_ofReal τ
-    convert (hy τ).sub (((ht.mul ht).div_const 2).mul_const a) using 1
-    ring
-  have hs : ∀ τ : ℝ, y τ = y 0 + (τ : ℂ) ^ 2 / 2 * a := by
-    intro τ
-    have h := is_const_of_deriv_eq_zero (fun t ↦ (hg t).differentiableAt)
-      (fun t ↦ (hg t).deriv) τ 0
-    simp only [ofReal_zero, mul_zero, zero_div, zero_mul, sub_zero] at h
-    linear_combination h
-  refine ⟨hs, ?_⟩
-  rw [hs, hs (-1 / 2), show (-1 / 2 : ℝ) = -(1 / 2) by ring, ofReal_neg, neg_sq]
 
 end UnitaryProducts.Paper
 

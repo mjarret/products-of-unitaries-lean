@@ -1,6 +1,6 @@
 name = "unitaryProducts"
-version = "1.1.0"
-defaultTargets = ["UnitaryProducts"]
+version = "1.2.0"
+defaultTargets = ["RoundedClocks", "UnitaryProducts"]
 
 [leanOptions]
 weak.linter.mathlibStandardSet = true
@@ -12,3 +12,6 @@ rev = "v4.28.0"
 
 [[lean_lib]]
 name = "UnitaryProducts"
+
+[[lean_lib]]
+name = "RoundedClocks"

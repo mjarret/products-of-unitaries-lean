@@ -67,8 +67,7 @@ def levelFunctionData (F : ℝ → ℝ) :
 def sparsity (s : ℕ) (A : 𝕄) : Prop × ℝ :=
   (0 < s ∧ UnitaryProducts.RowSparse s A, (UnitaryProducts.maxEntryNorm A : ℝ))
 
-/-- **Remark 3.9 (variation support)** (total variation), with the checkpoints and midpoints of
-§3.2. `.1` is the
+/-- The total variation, with the checkpoints and midpoints of §3.2. `.1` is the
 total variation $\ell(t)$ of $H$ up to time $t$, `.2.1` says that `t` is a sequence of
 checkpoints, and `.2.2` is the midpoint map $t_{j+1/2}=(t_j+t_{j+1})/2$.
 
@@ -87,7 +86,7 @@ Reading the statement against the paper:
   by $T$, as `inverseLevelTime` already does.
 * `.2.2` is the midpoint map. No statement projects it; consumers write the midpoint
   $(t_j+t_{j+1})/2$ literally. The equal-variation checkpoints are not a component of this
-  definition: they are `UnitaryProducts.inverseLevelTime` (Remark 3.9). -/
+  definition: they are `UnitaryProducts.inverseLevelTime`. -/
 def variationCheckpoints (H : ℝ → 𝕄) (T : ℝ) (n : ℕ) :
     (ℝ → ℝ≥0∞) × ((ℕ → ℝ) → Prop) × ((ℕ → ℝ) → ℕ → ℝ) :=
   (fun t ↦ eVariationOn H (Icc 0 t),

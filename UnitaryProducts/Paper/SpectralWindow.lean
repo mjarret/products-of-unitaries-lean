@@ -55,32 +55,10 @@ def spectralWindowGap (circular : Bool) (A : 𝕄) (a b : ℝ) : ℝ :=
       (x : ℂ) ∈ spectrum ℂ A ∩ spectralWindowSet false a b ∧
       (y : ℂ) ∈ spectrum ℂ A \ spectralWindowSet false a b ∧ r = |x-y|}
 
-/-- Definition 2.5(iii): multiplicities are those of the characteristic roots. -/
-def spectralWindowCount (circular : Bool) (A : 𝕄) (a b : ℝ) : ℕ := by
-  classical
-  exact (A.charpoly.roots.filter (fun z ↦ z ∈ spectralWindowSet circular a b)).card
-
 /-- Definition 2.5(iii): a band of a family has continuous endpoints on `[0,1]`.
 Continuity of the family or of its gap is not silently included. -/
 def spectralWindowFamily (circular : Bool) (A : ℝ → 𝕄) (a b : ℝ → ℝ) : Prop :=
   ContinuousOn a (Icc 0 1) ∧ ContinuousOn b (Icc 0 1) ∧
     ∀ s ∈ Icc (0 : ℝ) 1, spectralWindowBand circular (A s) (a s) (b s)
-
-/-- **Definition 2.5** (`def:spectral-window`), in paper order: band predicate,
-spectral projector, spectral gap (Hermitian) or eigenphase gap (unitary),
-family-band predicate, predicate of having
-`m` eigenvalues counted with multiplicity, and the two endpoint projectors.
-The Boolean selects Hermitian (`false`) or unitary (`true`) matrices. -/
-def spectralWindowData (circular : Bool) :
-    (𝕄 → ℝ → ℝ → Prop) × (𝕄 → ℝ → ℝ → 𝕄) × (𝕄 → ℝ → ℝ → ℝ) ×
-    ((ℝ → 𝕄) → (ℝ → ℝ) → (ℝ → ℝ) → Prop) ×
-    ((ℝ → 𝕄) → (ℝ → ℝ) → (ℝ → ℝ) → ℕ → Prop) ×
-    ((ℝ → 𝕄) → (ℝ → ℝ) → (ℝ → ℝ) → 𝕄 × 𝕄) :=
-  (spectralWindowBand circular, spectralWindowProjector circular,
-    spectralWindowGap circular, spectralWindowFamily circular,
-    fun A a b m ↦ spectralWindowFamily circular A a b ∧
-      ∀ s ∈ Icc (0 : ℝ) 1, spectralWindowCount circular (A s) (a s) (b s) = m,
-    fun A a b ↦ (spectralWindowProjector circular (A 0) (a 0) (b 0),
-      spectralWindowProjector circular (A 1) (a 1) (b 1)))
 
 end UnitaryProducts.Paper

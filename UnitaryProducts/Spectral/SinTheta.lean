@@ -227,7 +227,8 @@ theorem le_norm_shift_proj {m c : ℝ} (hc : 0 ≤ c) (hT : IsDiag b ev T) {S : 
 end Projections
 
 set_option maxHeartbeats 800000 in
--- Operator-norm instance unification in the compressed Sylvester estimate exceeds the default limit.
+-- Operator-norm instance unification in the compressed Sylvester estimate exceeds the default
+-- limit.
 open Classical in
 /-- **Davis–Kahan, Sylvester form, residual numerator.**  `P` projects onto eigenvalues of `T`
 within `c` of `m`, `Q'` onto eigenvalues of `T'` at least `c + δ` from `m`.  Then

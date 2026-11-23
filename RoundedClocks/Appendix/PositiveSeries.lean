@@ -7,11 +7,11 @@ module
 
 public import RoundedClocks.Definitions
 
-/-! # Positive series for the Appendix multiplier
+/-! # The positive series of `𝒩`
 
-This file proves the positive Taylor expansions used immediately before Lemma A.1.  The
-coefficients come from the cotangent partial fractions; pairing consecutive cosecant poles gives
-the positivity needed for the cell-center estimate.
+The preamble of Appendix A: by the partial fractions of the cotangent (DLMF 4.22.3),
+`𝒩(x) = ∑_{m ≥ 1} 2/(4π²m² - x²)` for `|x| < 2π`, so `𝒩(x) = ∑ₙ νₙ xⁿ` with every coefficient
+`νₙ ≥ 0`. Here `multiplierCoeff n` is `νₙ`.
 -/
 
 @[expose] public section
@@ -30,6 +30,14 @@ def multiplierEvenCoeff (k : ℕ) : ℝ :=
 /-- The Taylor coefficients of `𝒩`; all odd coefficients vanish. -/
 def multiplierCoeff (n : ℕ) : ℝ :=
   if Even n then multiplierEvenCoeff (n / 2) else 0
+
+/-- Every pole `2π(m+1)` lies at or beyond `2π`. -/
+theorem two_pi_le_pole (m : ℕ) : 2 * π ≤ 2 * π * (m + 1 : ℝ) := by
+  calc
+    2 * π = 2 * π * 1 := by ring
+    _ ≤ 2 * π * (m + 1 : ℝ) := by
+      gcongr
+      linarith [Nat.cast_nonneg (α := ℝ) m]
 
 /-- Each inverse-power sum defining an even coefficient converges. -/
 theorem summable_multiplierEvenCoeff (k : ℕ) :
@@ -54,7 +62,7 @@ theorem multiplierCoeff_even (k : ℕ) :
 theorem multiplierCoeff_odd (k : ℕ) : multiplierCoeff (2 * k + 1) = 0 := by
   simp [multiplierCoeff]
 
-/-- A single pole has the geometric expansion used in the manuscript. -/
+/-- A single pole has the geometric expansion `2/(b² - x²) = ∑ₖ 2 x^{2k}/b^{2k+2}`. -/
 theorem hasSum_multiplier_geometric {x b : ℝ} (hb : 0 < b) (hx : |x| < b) :
     HasSum (fun k : ℕ ↦ 2 / b ^ (2 * k + 2) * x ^ (2 * k))
       (2 / (b ^ 2 - x ^ 2)) := by
@@ -81,12 +89,7 @@ theorem multiplierEvenCoeff_le (k : ℕ) :
       2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2) ≤
         (2 / (2 * π * (m + 1 : ℝ)) ^ 2) / (2 * π) ^ (2 * k) := by
     have hb : 0 < 2 * π * (m + 1 : ℝ) := by positivity
-    have hbase : 2 * π ≤ 2 * π * (m + 1 : ℝ) := by
-      calc
-        2 * π = 2 * π * 1 := by ring
-        _ ≤ 2 * π * (m + 1 : ℝ) := by
-          gcongr
-          linarith [Nat.cast_nonneg (α := ℝ) m]
+    have hbase : 2 * π ≤ 2 * π * (m + 1 : ℝ) := two_pi_le_pole m
     calc
       _ = (2 / (2 * π * (m + 1 : ℝ)) ^ 2) /
           (2 * π * (m + 1 : ℝ)) ^ (2 * k) := by
@@ -135,39 +138,49 @@ theorem summable_multiplier_partialFraction_power {x : ℝ} (hx : |x| < 2 * π) 
   change multiplierEvenCoeff k * x ^ (2 * k) = _
   exact tsum_mul_right.symm
 
+/-- Absolute convergence permits the common pole/Taylor sum swap, with an arbitrary weight on
+each pole. -/
+theorem weighted_partialFraction_sum_swap (a : ℕ → ℝ) {x : ℝ} (hx : |x| < 2 * π)
+    (hprod : Summable (fun p : ℕ × ℕ ↦ a p.2 *
+      (2 / (2 * π * (p.2 + 1 : ℝ)) ^ (2 * p.1 + 2) * x ^ (2 * p.1)))) :
+    (∑' k : ℕ, (∑' m : ℕ,
+      a m * (2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2))) * x ^ (2 * k)) =
+      ∑' m : ℕ, a m * (2 / ((2 * π * (m + 1 : ℝ)) ^ 2 - x ^ 2)) := by
+  let f : ℕ → ℕ → ℝ := fun k m ↦ a m *
+    (2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2) * x ^ (2 * k))
+  have hrow (k : ℕ) : (∑' m, f k m) =
+      (∑' m, a m * (2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2))) * x ^ (2 * k) := by
+    simp only [f, ← mul_assoc, tsum_mul_right]
+  calc
+    _ = ∑' k, ∑' m, f k m := tsum_congr fun k ↦ (hrow k).symm
+    _ = ∑' m, ∑' k, f k m := hprod.tsum_comm.symm
+    _ = _ := by
+      apply tsum_congr
+      intro m
+      have hm : |x| < 2 * π * (m + 1 : ℝ) := hx.trans_le (two_pi_le_pole m)
+      exact ((hasSum_multiplier_geometric (by positivity) hm).mul_left (a m)).tsum_eq
+
 /-- Summing the geometric expansions recovers the cotangent pole sum. -/
 theorem multiplierEvenCoeff_power_eq_partialFractions {x : ℝ} (hx : |x| < 2 * π) :
     (∑' k : ℕ, multiplierEvenCoeff k * x ^ (2 * k)) =
       ∑' m : ℕ, 2 / ((2 * π * (m + 1 : ℝ)) ^ 2 - x ^ 2) := by
-  let f : ℕ → ℕ → ℝ := fun k m ↦
-    2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2) * x ^ (2 * k)
-  have hrow (k : ℕ) : (∑' m, f k m) = multiplierEvenCoeff k * x ^ (2 * k) :=
-    tsum_mul_right
-  have hprod : Summable (Function.uncurry f) := summable_multiplier_partialFraction_power hx
-  calc
-    _ = ∑' k, ∑' m, f k m := tsum_congr fun k ↦ (hrow k).symm
-    _ = ∑' m, ∑' k, f k m := hprod.tsum_comm.symm
-    _ = _ := tsum_congr fun m ↦ (hasSum_multiplier_geometric (by positivity)
-      (hx.trans_le (by
-        calc
-          2 * π = 2 * π * 1 := by ring
-          _ ≤ 2 * π * (m + 1 : ℝ) := by
-            gcongr
-            linarith [Nat.cast_nonneg (α := ℝ) m]))).tsum_eq
+  simpa only [multiplierEvenCoeff, one_mul] using
+    weighted_partialFraction_sum_swap (fun _ ↦ 1) hx (by
+      simpa only [one_mul] using summable_multiplier_partialFraction_power hx)
 
 /-- NIST Digital Library of Mathematical Functions, §4.22, equation 4.22.3.
 
 Source statement, quoted verbatim:
 `cot z = 1/z + 2z ∑_{n=1}^∞ 1/(z²-n²π²)`.
 
-Mathlib proves this as `cot_series_rep`. The paper substitutes `z=x/2` to obtain the positive
+Mathlib proves this as `cot_series_rep'`. The paper substitutes `z=x/2` to obtain the positive
 partial-fraction series for `𝒩(x)`. -/
 def DLMF_4_22_3 : Prop :=
   ∀ z : ℂ, (∀ n : ℤ, z ≠ n * (π : ℂ)) →
     Complex.cot z = 1 / z + 2 * z *
       ∑' n : ℕ, 1 / (z ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2)
 
-/-- The cotangent partial fractions are Mathlib's `cot_series_rep`, rescaled by `π`. -/
+/-- The cotangent partial fractions are Mathlib's `cot_series_rep'`, rescaled by `π`. -/
 theorem dlmf_4_22_3 : DLMF_4_22_3 := by
   intro z hz
   have hπ : (π : ℂ) ≠ 0 := by exact_mod_cast pi_ne_zero
@@ -206,151 +219,154 @@ theorem dlmf_4_22_3 : DLMF_4_22_3 := by
     rw [← hπx, he]
     field_simp [hπ, hm, hp, hd]
     ring
-  have hsum :
-      (∑' n : ℕ, (1 / (x - ((n : ℂ) + 1)) + 1 / (x + ((n : ℂ) + 1)))) / π =
-        2 * z * ∑' n : ℕ,
-          1 / (z ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2) := by
-    rw [← tsum_div_const, tsum_congr hterm, tsum_mul_left]
-  have hc := cot_series_rep hx
-  have hc' := cot_series_rep' hx
-  have hreindex :
-      (∑' n : ℕ+, (1 / (x - (n : ℂ)) + 1 / (x + (n : ℂ)))) =
-        ∑' n : ℕ, (1 / (x - ((n : ℂ) + 1)) + 1 / (x + ((n : ℂ) + 1))) := by
-    rw [← hc', hc]
-    ring
   calc
     Complex.cot z = 1 / z + ((π : ℂ) * Complex.cot ((π : ℂ) * x) - 1 / x) / π := by
       rw [hπx]
       dsimp [x]
       field_simp [hπ, hz0]
       ring
-    _ = 1 / z +
-        (∑' n : ℕ+, (1 / (x - (n : ℂ)) + 1 / (x + (n : ℂ)))) / π := by
-      rw [hc]
-      ring
-    _ = 1 / z +
-        (∑' n : ℕ, (1 / (x - ((n : ℂ) + 1)) + 1 / (x + ((n : ℂ) + 1)))) / π := by
-      rw [hreindex]
-    _ = _ := by rw [hsum]
+    _ = _ := by rw [cot_series_rep' hx, ← tsum_div_const, tsum_congr hterm, tsum_mul_left]
 
-/-- The real cotangent partial fractions, transferred from `dlmf_4_22_3`. -/
-private theorem real_cot_partialFractions {z : ℝ} (hz : ∀ n : ℤ, z ≠ n) :
-    π * Real.cot (π * z) = 1 / z + ∑' n : ℕ+, (1 / (z - n) + 1 / (z + n)) := by
-  have hπ : (π : ℂ) ≠ 0 := by exact_mod_cast pi_ne_zero
-  have hz0 : (z : ℂ) ≠ 0 := by exact_mod_cast hz 0
-  have hpoles : ∀ n : ℤ, (π : ℂ) * (z : ℂ) ≠ n * (π : ℂ) := by
-    intro n hn
-    apply hz n
-    have he : (z : ℂ) = (n : ℂ) := mul_left_cancel₀ hπ (by simpa [mul_comm] using hn)
-    exact_mod_cast he
-  have hc := dlmf_4_22_3 ((π : ℂ) * (z : ℂ)) hpoles
-  have hterm (n : ℕ) :
-      (π : ℂ) * (2 * ((π : ℂ) * (z : ℂ)) *
-        (1 / (((π : ℂ) * (z : ℂ)) ^ 2 -
-          ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2))) =
-        1 / ((z : ℂ) - ((n : ℂ) + 1)) + 1 / ((z : ℂ) + ((n : ℂ) + 1)) := by
-    have hm : (z : ℂ) - ((n : ℂ) + 1) ≠ 0 := by
-      rw [sub_ne_zero]
-      intro he
-      apply hz (n + 1)
-      exact_mod_cast he
-    have hp : (z : ℂ) + ((n : ℂ) + 1) ≠ 0 := by
-      intro he
-      apply hz (-(n + 1 : ℤ))
-      exact_mod_cast eq_neg_of_add_eq_zero_left he
-    have he :
-        ((π : ℂ) * (z : ℂ)) ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2 =
-          (π : ℂ) ^ 2 * ((z : ℂ) - ((n : ℂ) + 1)) *
-            ((z : ℂ) + ((n : ℂ) + 1)) := by
+/-- DLMF 4.22.5: the cosecant partial-fraction series, obtained from the cotangent series
+by `csc z = cot (z/2) - cot z` and the even/odd decomposition. -/
+theorem dlmf_4_22_5 :
+    ∀ z : ℂ, (∀ n : ℤ, z ≠ n * (π : ℂ)) →
+      (Complex.sin z)⁻¹ = 1 / z + 2 * z *
+        ∑' n : ℕ, (-1 : ℂ) ^ (n + 1) /
+          (z ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2) := by
+  intro z hz
+  have hπ : (π : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
+  have hz0 : z ≠ 0 := by simpa using hz 0
+  let a : ℕ → ℂ := fun m ↦ 1 / (z ^ 2 - ((m + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2)
+  -- the terms are summable, from Mathlib's cotangent terms
+  have hden (m : ℕ) : z ^ 2 - ((m + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2 ≠ 0 := by
+    intro h
+    have h' : (z - ((m + 1 : ℕ) : ℂ) * π) * (z + ((m + 1 : ℕ) : ℂ) * π) = 0 := by
+      linear_combination h
+    rcases mul_eq_zero.mp h' with h1 | h1
+    · exact hz (m + 1) (by push_cast at h1 ⊢; linear_combination h1)
+    · exact hz (-(m + 1)) (by push_cast at h1 ⊢; linear_combination h1)
+  have ha : Summable a := by
+    have hx : z / π ∈ Complex.integerComplement := by
+      rintro ⟨n, hn⟩
+      exact hz n ((div_eq_iff hπ).mp hn.symm)
+    refine ((summable_cotTerm hx).mul_left (1 / (2 * (z / π) * (π : ℂ) ^ 2))).congr fun m ↦ ?_
+    have hd := hden m
+    have key : (z / π + ((m : ℂ) + 1)) * (z / π - ((m : ℂ) + 1)) =
+        (z ^ 2 - ((m + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2) / (π : ℂ) ^ 2 := by
       push_cast
-      ring
-    have hd :
-        ((π : ℂ) * (z : ℂ)) ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2 ≠ 0 := by
-      rw [he]
-      exact mul_ne_zero (mul_ne_zero (pow_ne_zero _ hπ) hm) hp
-    rw [he]
-    field_simp [hπ, hm, hp, hd]
-    ring
-  have hsum :
-      (π : ℂ) * (2 * ((π : ℂ) * (z : ℂ)) *
-        ∑' n : ℕ, 1 / (((π : ℂ) * (z : ℂ)) ^ 2 -
-          ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2)) =
-        ∑' n : ℕ,
-          (1 / ((z : ℂ) - ((n : ℂ) + 1)) + 1 / ((z : ℂ) + ((n : ℂ) + 1))) := by
-    calc
-      _ = ((π : ℂ) * (2 * ((π : ℂ) * (z : ℂ)))) *
-          (∑' n : ℕ, 1 / (((π : ℂ) * (z : ℂ)) ^ 2 -
-            ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2)) := by ring
-      _ = (∑' n : ℕ, ((π : ℂ) * (2 * ((π : ℂ) * (z : ℂ)))) *
-          (1 / (((π : ℂ) * (z : ℂ)) ^ 2 -
-            ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2))) := tsum_mul_left.symm
-      _ = _ := tsum_congr fun n ↦ by simpa only [mul_assoc] using hterm n
-  have hreindex :
-      (∑' n : ℕ,
-        (1 / ((z : ℂ) - ((n : ℂ) + 1)) + 1 / ((z : ℂ) + ((n : ℂ) + 1)))) =
-        ∑' n : ℕ+, (1 / ((z : ℂ) - n) + 1 / ((z : ℂ) + n)) := by
-    rw [← Equiv.tsum_eq Equiv.pnatEquivNat.symm
-      (fun n : ℕ+ ↦ 1 / ((z : ℂ) - n) + 1 / ((z : ℂ) + n))]
-    apply tsum_congr
-    intro n
-    simp only [Equiv.pnatEquivNat_symm_apply]
-    norm_cast
-  have hfirst : (π : ℂ) * (1 / ((π : ℂ) * (z : ℂ))) = 1 / (z : ℂ) := by
-    field_simp [hπ, hz0]
-  have hcomplex :
-      (π : ℂ) * Complex.cot ((π : ℂ) * (z : ℂ)) =
-        1 / (z : ℂ) + ∑' n : ℕ+, (1 / ((z : ℂ) - n) + 1 / ((z : ℂ) + n)) := by
-    calc
-      _ = (π : ℂ) * (1 / ((π : ℂ) * (z : ℂ)) +
-          2 * ((π : ℂ) * (z : ℂ)) *
-            ∑' n : ℕ, 1 / (((π : ℂ) * (z : ℂ)) ^ 2 -
-              ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2)) := by rw [hc]
-      _ = (π : ℂ) * (1 / ((π : ℂ) * (z : ℂ))) +
-          (π : ℂ) * (2 * ((π : ℂ) * (z : ℂ)) *
-            ∑' n : ℕ, 1 / (((π : ℂ) * (z : ℂ)) ^ 2 -
-              ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2)) := by ring
-      _ = _ := by rw [hfirst, hsum, hreindex]
-  apply Complex.ofReal_injective
-  convert hcomplex using 1 <;>
-    simp only [Complex.ofReal_add, Complex.ofReal_mul, Complex.ofReal_div,
-      Complex.ofReal_one, Complex.ofReal_sub, Complex.ofReal_tsum,
-      Real.cot_eq_cos_div_sin, Complex.cot, Complex.ofReal_cos, Complex.ofReal_sin,
-      Complex.ofReal_natCast]
-
-/-- Rescaling the cotangent partial fractions gives the manuscript's multiplier. -/
-theorem cot_form_eq_multiplier_partialFractions {x : ℝ}
-    (hx : ∀ n : ℤ, x ≠ 2 * π * n) :
-    (1 - (x / 2) * Real.cot (x / 2)) / x ^ 2 =
-      ∑' n : ℕ+, 2 / (4 * π ^ 2 * (n : ℝ) ^ 2 - x ^ 2) := by
-  have hx0 : x ≠ 0 := by simpa using hx 0
-  have hp : 2 * π ≠ 0 := mul_ne_zero (by norm_num) pi_ne_zero
-  let z := x / (2 * π)
-  have hz : ∀ n : ℤ, z ≠ n := fun n hn ↦
-    hx n (by simpa only [mul_comm] using (div_eq_iff hp).mp hn)
-  have hz0 : z ≠ 0 := div_ne_zero hx0 hp
-  have hc := real_cot_partialFractions hz
-  have ht (n : ℕ+) : -(1 / (z - n) + 1 / (z + n)) / (2 * π * x) =
-      2 / (4 * π ^ 2 * (n : ℝ) ^ 2 - x ^ 2) := by
-    have hm : z - (n : ℝ) ≠ 0 := sub_ne_zero.mpr (hz (n : ℕ))
-    have ha : z + (n : ℝ) ≠ 0 := fun he ↦
-      hz (-(n : ℤ)) (by push_cast; exact eq_neg_of_add_eq_zero_left he)
-    have he : 4 * π ^ 2 * (n : ℝ) ^ 2 - x ^ 2 =
-        -(2 * π) ^ 2 * (z - n) * (z + n) := by
-      dsimp [z]
       field_simp
       ring
-    have hxe : x = 2 * π * z := by
-      dsimp [z]
-      field_simp
-    rw [he, hxe]
-    field_simp [hm, ha, hz0, pi_ne_zero]
+    rw [cotTerm_identity hx m, key]
+    simp only [a]
+    field_simp
+  have hae : Summable fun m ↦ a (2 * m) :=
+    ha.comp_injective (i := fun m ↦ 2 * m) fun m n (h : 2 * m = 2 * n) ↦ by omega
+  have hao : Summable fun m ↦ a (2 * m + 1) :=
+    ha.comp_injective (i := fun m ↦ 2 * m + 1) fun m n (h : 2 * m + 1 = 2 * n + 1) ↦ by omega
+  have hsplit : ∑' m, a m = ∑' m, a (2 * m) + ∑' m, a (2 * m + 1) :=
+    (tsum_even_add_odd hae hao).symm
+  -- the cotangent at `z` and at `z/2`
+  have hcot : Complex.cot z = 1 / z + 2 * z * ∑' m, a m := dlmf_4_22_3 z hz
+  have hz2 : ∀ n : ℤ, z / 2 ≠ n * (π : ℂ) := by
+    intro n h
+    exact hz (2 * n) (by push_cast; linear_combination 2 * h)
+  have hcot2 : Complex.cot (z / 2) = 2 / z + 4 * z * ∑' m, a (2 * m + 1) := by
+    have hterm (n : ℕ) : 1 / ((z / 2) ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2) =
+        4 * a (2 * n + 1) := by
+      simp only [a]
+      rw [show (z / 2) ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2 =
+        (z ^ 2 - ((2 * n + 1 + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2) / 4 by push_cast; ring, one_div_div]
+      ring
+    rw [dlmf_4_22_3 (z / 2) hz2, tsum_congr hterm, tsum_mul_left]
+    generalize (∑' m, a (2 * m + 1)) = s
+    field_simp
+  -- `csc z = cot (z/2) - cot z`
+  have hsin : Complex.sin z ≠ 0 := by
+    intro h
+    obtain ⟨n, hn⟩ := Complex.sin_eq_zero_iff.mp h
+    exact hz n hn
+  have hsin2 : Complex.sin (z / 2) ≠ 0 := by
+    intro h
+    obtain ⟨n, hn⟩ := Complex.sin_eq_zero_iff.mp h
+    exact hz2 n hn
+  have hs : Complex.sin z = 2 * Complex.sin (z / 2) * Complex.cos (z / 2) := by
+    rw [← Complex.sin_two_mul]
+    congr 1
     ring
-  rw [← tsum_congr ht, tsum_div_const, tsum_neg,
-    (eq_sub_iff_add_eq.mpr ((add_comm _ _).trans hc.symm)),
-    show π * z = x / 2 by dsimp [z]; field_simp]
-  dsimp [z]
-  field_simp
+  have hc : Complex.cos z = 2 * Complex.cos (z / 2) ^ 2 - 1 := by
+    rw [← Complex.cos_two_mul]
+    congr 1
+    ring
+  have hcos2 : Complex.cos (z / 2) ≠ 0 := by
+    intro h
+    exact hsin (by rw [hs, h, mul_zero])
+  have hcsc : (Complex.sin z)⁻¹ = Complex.cot (z / 2) - Complex.cot z := by
+    rw [Complex.cot_eq_cos_div_sin, Complex.cot_eq_cos_div_sin, hs, hc]
+    field_simp
+    ring
+  -- the alternating series, split into even and odd terms
+  have hbe (m : ℕ) : (-1 : ℂ) ^ (2 * m + 1) /
+      (z ^ 2 - ((2 * m + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2) = -a (2 * m) := by
+    simp only [a]
+    rw [pow_succ, pow_mul, neg_one_sq, one_pow]
+    ring
+  have hbo (m : ℕ) : (-1 : ℂ) ^ (2 * m + 1 + 1) /
+      (z ^ 2 - ((2 * m + 1 + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2) = a (2 * m + 1) := by
+    simp only [a]
+    rw [pow_succ, pow_succ, pow_mul, neg_one_sq, one_pow]
+    ring
+  have hb : ∑' n : ℕ, (-1 : ℂ) ^ (n + 1) / (z ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2) =
+      ∑' m, a (2 * m + 1) - ∑' m, a (2 * m) := by
+    have h := tsum_even_add_odd
+      (f := fun n : ℕ ↦ (-1 : ℂ) ^ (n + 1) / (z ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2))
+      (hae.neg.congr fun m ↦ (hbe m).symm) (hao.congr fun m ↦ (hbo m).symm)
+    rw [← h, tsum_congr hbe, tsum_congr hbo, tsum_neg]
+    ring
+  rw [hcsc, hcot2, hcot, hsplit, hb]
   ring
+
+
+/-- For `0 < |x| < 2π`, the half-argument `x/2` is not an integer multiple of `π`. -/
+theorem div_two_ne_int_mul_pi {x : ℝ} (hx0 : x ≠ 0) (hx : |x| < 2 * π) (n : ℤ) :
+    (x : ℂ) / 2 ≠ n * (π : ℂ) := by
+  have hn : x / 2 ≠ n * π := by
+    intro he
+    have he' : x = 2 * π * n := by linarith
+    by_cases hz : n = 0
+    · simp only [hz, Int.cast_zero, mul_zero] at he'
+      exact hx0 he'
+    · have h1 : (1 : ℝ) ≤ |(n : ℝ)| := by exact_mod_cast Int.one_le_abs hz
+      rw [he', abs_mul, abs_of_pos Real.two_pi_pos] at hx
+      exact hx.not_ge (le_mul_of_one_le_right Real.two_pi_pos.le h1)
+  exact_mod_cast hn
+
+/-- Substituting `z = x/2` in DLMF 4.22.3 gives `𝒩(x) = ∑_{m ≥ 1} 2/(4π²m² - x²)`. -/
+theorem 𝒩_eq_partialFractions {x : ℝ} (hx0 : x ≠ 0) (hx : |x| < 2 * π) :
+    𝒩 x = ∑' m : ℕ, 2 / ((2 * π * (m + 1 : ℝ)) ^ 2 - x ^ 2) := by
+  have hc := dlmf_4_22_3 ((x : ℂ) / 2) (div_two_ne_int_mul_pi hx0 hx)
+  have ht (m : ℕ) :
+      2 / ((2 * (π : ℂ) * (m + 1 : ℂ)) ^ 2 - (x : ℂ) ^ 2) =
+      -(1 / (((x : ℂ) / 2) ^ 2 - ((m + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2)) / 2 := by
+    push_cast
+    have he : ((x : ℂ) / 2) ^ 2 - (m + 1 : ℂ) ^ 2 * (π : ℂ) ^ 2 =
+        -((2 * (π : ℂ) * (m + 1 : ℂ)) ^ 2 - (x : ℂ) ^ 2) / 4 := by ring
+    rw [he]
+    field_simp
+    all_goals ring
+  apply Complex.ofReal_injective
+  simp only [Complex.ofReal_tsum, Complex.ofReal_div, Complex.ofReal_pow,
+    Complex.ofReal_mul, Complex.ofReal_sub, Complex.ofReal_add,
+    Complex.ofReal_natCast, Complex.ofReal_ofNat, Complex.ofReal_one]
+  rw [tsum_congr ht, tsum_div_const, tsum_neg]
+  generalize hs : (∑' n : ℕ, 1 /
+    (((x : ℂ) / 2) ^ 2 - ((n + 1 : ℕ) : ℂ) ^ 2 * (π : ℂ) ^ 2)) = s at hc ⊢
+  have hxC : (x : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr hx0
+  simp only [𝒩, if_neg hx0]
+  push_cast
+  rw [hc]
+  field_simp [hxC]
+  all_goals ring
 
 /-- The full multiplier coefficient series converges on the same interval. -/
 theorem summable_multiplierCoeff_power {x : ℝ} (hx : |x| < 2 * π) :
@@ -373,27 +389,6 @@ theorem multiplierCoeff_power_eq_partialFractions {x : ℝ} (hx : |x| < 2 * π) 
   simp only [multiplierCoeff_even, multiplierCoeff_odd, zero_mul, tsum_zero, add_zero] at hsplit
   exact hsplit.symm.trans (multiplierEvenCoeff_power_eq_partialFractions hx)
 
-/-- The cotangent formula equals the positive Taylor series away from zero. -/
-theorem multiplierCoeff_series_eq_cot {x : ℝ} (hx0 : x ≠ 0) (hx : |x| < 2 * π) :
-    (∑' n : ℕ, multiplierCoeff n * x ^ n) =
-      (1 - (x / 2) * Real.cot (x / 2)) / x ^ 2 := by
-  have hn (n : ℤ) : x ≠ 2 * π * n := by
-    by_cases hzero : n = 0
-    · simpa only [hzero, Int.cast_zero, mul_zero] using hx0
-    · rintro rfl
-      have h1 : (1 : ℝ) ≤ |(n : ℝ)| := by exact_mod_cast Int.one_le_abs hzero
-      rw [abs_mul, abs_of_pos Real.two_pi_pos] at hx
-      exact hx.not_ge (le_mul_of_one_le_right Real.two_pi_pos.le h1)
-  have hcot := cot_form_eq_multiplier_partialFractions hn
-  rw [hcot, multiplierCoeff_power_eq_partialFractions hx,
-    tsum_pnat_eq_tsum_succ
-      (f := fun n : ℕ ↦ 2 / (4 * π ^ 2 * (n : ℝ) ^ 2 - x ^ 2))]
-  apply tsum_congr
-  intro m
-  push_cast
-  congr 2
-  ring
-
 /-- The constant coefficient is `𝒩(0) = 1/12`. -/
 theorem multiplierCoeff_zero : multiplierCoeff 0 = 1 / 12 := by
   have hz := hasSum_zeta_two.mul_left (2 / (2 * π) ^ 2)
@@ -410,7 +405,7 @@ theorem multiplierCoeff_zero : multiplierCoeff 0 = 1 / 12 := by
   simpa only [multiplierEvenCoeff, Nat.mul_zero, zero_add, Nat.cast_add, Nat.cast_one,
     one_div] using ht.tsum_eq
 
-/-- On `|x| < 2π`, the positive series sums to the manuscript's multiplier `𝒩(x)`. -/
+/-- For `|x| < 2π`, the positive series sums to `𝒩(x)`: `𝒩(x) = ∑ₙ νₙ xⁿ`. -/
 theorem multiplierCoeff_series_eq (x : ℝ) (hx : |x| < 2 * π) :
     (∑' n : ℕ, multiplierCoeff n * x ^ n) = 𝒩 x := by
   by_cases hx0 : x = 0
@@ -419,6 +414,7 @@ theorem multiplierCoeff_series_eq (x : ℝ) (hx : |x| < 2 * π) :
     · simp [𝒩, multiplierCoeff_zero]
     · intro n hn
       simp [zero_pow hn]
-  · rw [multiplierCoeff_series_eq_cot hx0 hx, 𝒩, if_neg hx0]
+  · rw [multiplierCoeff_power_eq_partialFractions hx]
+    exact (𝒩_eq_partialFractions hx0 hx).symm
 
 end RoundedClocks

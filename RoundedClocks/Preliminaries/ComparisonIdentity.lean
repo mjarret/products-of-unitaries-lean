@@ -6,12 +6,13 @@ Authors: Michael Jarret
 module
 
 public import RoundedClocks.Preliminaries.EvolutionComparisonCalculus
-public import RoundedClocks.Preliminaries.PiecewiseEvolution
 
-/-! # Evolution comparison identity
+/-! # Bookkeeping for the proof of Theorem 2.2
 
-Theorem 2.2 follows by differentiating the relative evolution, integrating its residual, and
-bounding the resulting integral in operator norm.
+The differentiability hypotheses of Theorem 2.2 restricted to one piece `[pⱼ, pⱼ₊₁]`, the last
+line of (2.2) as an identity for almost every `t`, and the two rearrangements of finite sums in
+the display of the proof: `∑ⱼ [f]_{pⱼ}^{pⱼ₊₁} = f(b) - f(a)` in its first equality, and
+`∑ⱼ [fⱼ]_{pⱼ}^{pⱼ₊₁} = f_m(b) - f₀(a) - ∑ⱼ (fⱼ(pⱼ) - fⱼ₋₁(pⱼ))` in its last.
 -/
 
 @[expose] public section
@@ -25,21 +26,17 @@ namespace RoundedClocks
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- Restriction preserves the one-sided limits of a regulated family. -/
-lemma comparison_regulated_restrict {F : ℝ → 𝕄} {a b c e : ℝ}
-    (hF : IsRegulated F a b) (hac : a ≤ c) (heb : e ≤ b) : IsRegulated F c e := by
-  exact ⟨fun t ht ↦ hF.1 t ⟨hac.trans ht.1, ht.2.trans_le heb⟩,
-    fun t ht ↦ hF.2 t ⟨hac.trans_lt ht.1, ht.2.trans heb⟩⟩
-
-/-- Derivative data restrict to any closed subinterval without an initial-value assumption. -/
-lemma comparison_derivative_restrict {F D : ℝ → 𝕄} {a b c e : ℝ}
+/-- A derivative outside a countable set of `[a,b]` is one outside a countable set of every
+subinterval `[c,e]`. -/
+lemma DerivativeOffCountable.mono {F D : ℝ → 𝕄} {a b c e : ℝ}
     (h : DerivativeOffCountable F D a b) (hsub : Icc c e ⊆ Icc a b) :
     DerivativeOffCountable F D c e := by
   obtain ⟨S, hS, hd⟩ := h
   exact ⟨S, hS, fun t ht hn ↦ (hd t (hsub ht) hn).mono hsub⟩
 
-/-- Adding both endpoints turns interior correction data into closed-cell derivative data. -/
-lemma comparison_correction_derivative {Y D : ℝ → 𝕄} {a b : ℝ}
+/-- If `Y'(t) = D(t)` for all `t` with `a < t < b` outside a countable set, then `Y` has
+derivative `D` on `[a,b]` outside a countable set, which now also contains `a` and `b`. -/
+lemma DerivativeOffCountable.of_Ioo {Y D : ℝ → 𝕄} {a b : ℝ}
     {S : Set ℝ} (hS : S.Countable)
     (hd : ∀ t ∈ Ioo a b, t ∉ S → HasDerivAt Y (D t) t) :
     DerivativeOffCountable Y D a b := by
@@ -49,7 +46,9 @@ lemma comparison_correction_derivative {Y D : ℝ → 𝕄} {a b : ℝ}
   have hb : t < b := lt_of_le_of_ne ht.2 fun h ↦ hn (Or.inl h)
   exact (hd t ⟨ha, hb⟩ fun h ↦ hn (Or.inr (Or.inr h))).hasDerivWithinAt
 
-/-- The residual agrees almost everywhere with the difference of the two cited derivatives. -/
+/-- Last line of (2.2). With `R = K - G - Y' - i(KY - YG)`, where `D` stands for `Y'`,
+`iU†RV = iU†(K - G)V - i U†(Y' + i(KY - YG))V` for every `t` with `a < t < b` outside the
+countable set `S`, hence for almost every `t`. -/
 lemma comparison_residual_ae (K G U V Y D R : ℝ → 𝕄) {a b : ℝ}
     (hab : a ≤ b) {S : Set ℝ} (hS : S.Countable)
     (hR : ∀ t ∈ Ioo a b, t ∉ S →
@@ -65,16 +64,15 @@ lemma comparison_residual_ae (K G U V Y D R : ℝ → 𝕄) {a b : ℝ}
   simp only [mul_sub, sub_mul, mul_add, add_mul, smul_sub, smul_add]
   module
 
-/-- Adjacent endpoint values telescope, including zero-length cells. -/
+/-- First equality in the display of the proof of Theorem 2.2:
+`∑ⱼ (f(pⱼ₊₁) - f(pⱼ)) = f(pₙ₊₁) - f(p₀)`, also when some `pⱼ = pⱼ₊₁`. -/
 lemma comparison_telescope {E : Type*} [AddCommGroup E] (F : ℝ → E)
     (p : ℕ → ℝ) (n : ℕ) :
     (∑ j ∈ Finset.range (n + 1), (F (p (j + 1)) - F (p j))) =
-      F (p (n + 1)) - F (p 0) := by
-  induction n with
-  | zero => simp
-  | succ n ih => rw [Finset.sum_range_succ, ih]; abel
+      F (p (n + 1)) - F (p 0) := Finset.sum_range_sub (fun j ↦ F (p j)) (n + 1)
 
-/-- The sum of correction boundaries is its outer boundary minus its interior jumps. -/
+/-- Last equality in the display of the proof of Theorem 2.2, regrouping the sum at each `pⱼ`:
+`∑ⱼ (fⱼ(pⱼ₊₁) - fⱼ(pⱼ)) = fₙ(pₙ₊₁) - f₀(p₀) - ∑ⱼ (fⱼ₊₁(pⱼ₊₁) - fⱼ(pⱼ₊₁))`. -/
 lemma comparison_boundaries {E : Type*} [AddCommGroup E] (F : ℕ → ℝ → E)
     (p : ℕ → ℝ) (n : ℕ) :
     (∑ j ∈ Finset.range (n + 1), (F j (p (j + 1)) - F j (p j))) =
@@ -83,18 +81,5 @@ lemma comparison_boundaries {E : Type*} [AddCommGroup E] (F : ℕ → ℝ → E)
   induction n with
   | zero => simp
   | succ n ih => rw [Finset.sum_range_succ, ih, Finset.sum_range_succ]; abel
-
-/-- Weakly ordered partition points stay ordered at arbitrary indices. -/
-lemma comparison_partition_mono {p : ℕ → ℝ} {m : ℕ}
-    (hp : ∀ j ≤ m, p j ≤ p (j + 1)) {i j : ℕ} (hij : i ≤ j) (hj : j ≤ m + 1) :
-    p i ≤ p j := by
-  induction j generalizing i with
-  | zero => have hi : i = 0 := by omega
-            subst i
-            exact le_rfl
-  | succ j ih =>
-      rcases hij.eq_or_lt with rfl | hij
-      · exact le_rfl
-      · exact (ih (Nat.le_of_lt_succ hij) (by omega)).trans (hp j (by omega))
 
 end RoundedClocks

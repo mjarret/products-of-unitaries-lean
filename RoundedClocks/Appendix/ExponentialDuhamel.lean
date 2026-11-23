@@ -5,13 +5,16 @@ Authors: Michael Jarret
 -/
 module
 
-public import RoundedClocks.Appendix.EndValueCurve
+public import RoundedClocks.Appendix.JacobiTelescope
 public import RoundedClocks.Preliminaries.PiecewiseEvolution
 
-/-! # Duhamel differential of the exponential
+/-! # Lemma A.3: Duhamel's formula for `(e^{-iΩ})'`
 
-Lemma A.3 differentiates the matrix exponential by the Duhamel integral. Evolution identities
-give its centered decomposition.
+The proof of Lemma A.3 uses Duhamel's formula
+`(e^{-iΩ})' = -i∫₀¹ e^{-iσΩ} Ω' e^{-i(1-σ)Ω} dσ` without proof. This file proves it: the map
+`X ↦ e^{-iX}` is differentiable at a Hermitian `X₀`, with derivative
+`E ↦ -i∫₀¹ e^{-i(1-u)X₀} E e^{-iuX₀} du`. Here `evol G u` is `e^{-iuG}` and `evolDeriv X₀` is that
+derivative.
 -/
 
 @[expose] public section
@@ -22,114 +25,38 @@ namespace RoundedClocks.EndValue
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- The fixed-generator evolution used in the Duhamel integral. -/
+/-- `evol G u` is `e^{-iuG}`. -/
 abbrev evol (G : 𝕄) (u : ℝ) : 𝕄 := frozenEvolution G u
 
-/-- $e^{-i0G} = 1$. -/
+/-- `e^{-i0G} = 1`. -/
 theorem evol_zero (G : 𝕄) : evol G 0 = 1 := by simp [evol, frozenEvolution]
 
-/-- $e^{-i(u+v)G} = e^{-iuG}e^{-ivG}$. -/
+/-- `e^{-i(u+v)G} = e^{-iuG} e^{-ivG}`. -/
 theorem evol_add (G : 𝕄) (u v : ℝ) : evol G (u + v) = evol G u * evol G v := by
   let +nondep : NormedAlgebra ℚ 𝕄 := .restrictScalars ℚ ℂ 𝕄
   rw [evol, frozenEvolution, add_smul]
   exact exp_add_of_commute (((Commute.refl _).smul_left _).smul_right _)
 
-/-- $\frac{d}{du}e^{-iuG} = -iG\,e^{-iuG}$: Mathlib's `hasDerivAt_exp_smul_const'`, stated for
-`evol`. -/
+/-- `(e^{-iuG})' = -iG e^{-iuG}`, the derivative in `u`. -/
 theorem hasDerivAt_evol (G : 𝕄) (u : ℝ) :
     HasDerivAt (evol G) ((-I • G) * evol G u) u :=
   hasDerivAt_exp_smul_const' (𝕂 := ℝ) _ _
 
-/-- $-iG$ commutes with $e^{-iuG}$. -/
+/-- `-iG` commutes with `e^{-iuG}`. -/
 theorem commute_evol (G : 𝕄) (u : ℝ) : Commute (-I • G) (evol G u) :=
   ((Commute.refl (-I • G)).smul_right (u : ℝ)).exp_right
 
-/-- `e^{-iuG}` is unitary for Hermitian `G`: `-iuG` is skew-adjoint, and Mathlib's
-`NormedSpace.exp_mem_unitary_of_mem_skewAdjoint` applies. -/
-theorem evol_mem_unitary {G : 𝕄} (hG : G.IsHermitian) (u : ℝ) : evol G u ∈ unitary 𝕄 := by
-  let +nondep : NormedAlgebra ℚ 𝕄 := .restrictScalars ℚ ℂ 𝕄
-  have hI : -I ∈ skewAdjoint ℂ := by
-    rw [skewAdjoint.mem_iff, star_neg, Complex.star_def, Complex.conj_I]
-  exact exp_mem_unitary_of_mem_skewAdjoint
-    (skewAdjoint.smul_mem u (hG.isSelfAdjoint.smul_mem_skewAdjoint hI))
-
-/-- `(e^{-iuG})⋆ e^{-iuG} = 1` for Hermitian `G`. -/
-theorem star_evol_mul_self {G : 𝕄} (hG : G.IsHermitian) (u : ℝ) :
-    star (evol G u) * evol G u = 1 :=
-  Unitary.star_mul_self_of_mem (evol_mem_unitary hG u)
-
-/-- An isometry has norm at most one, including dimension zero. -/
-theorem norm_le_one_of_star_mul_self {X : 𝕄} (h : star X * X = 1) : ‖X‖ ≤ 1 := by
-  nontriviality 𝕄
-  exact (CStarRing.norm_of_mem_unitary (Matrix.mem_unitaryGroup_iff'.mpr h)).le
-
-/-- $\|e^{-iuG}\| \le 1$ for Hermitian $G$. -/
+/-- `‖e^{-iuG}‖ ≤ 1` for Hermitian `G`. -/
 theorem norm_evol_le {G : 𝕄} (hG : G.IsHermitian) (u : ℝ) : ‖evol G u‖ ≤ 1 :=
-  norm_le_one_of_star_mul_self (star_evol_mul_self hG u)
+  unitary_norm_le_one (by simpa only [evol, frozenEvolution, Complex.coe_smul] using
+    exp_neg_I_smul_isUnitary hG u)
 
-/-- The evolution is continuous in its time parameter. -/
+/-- `u ↦ e^{-iuG}` is continuous. -/
 theorem continuous_evol (G : 𝕄) : Continuous (evol G) :=
   continuous_iff_continuousAt.mpr fun u ↦ (hasDerivAt_evol G u).continuousAt
 
-/-- **Growth of real exponentials** (Grönwall): `‖e^{sX}‖ ≤ e^{s‖X‖}` for `s ≥ 0`. -/
-theorem norm_exp_smul_le (X : 𝕄) {s : ℝ} (hs : 0 ≤ s) : ‖exp (s • X)‖ ≤ Real.exp (s * ‖X‖) := by
-  have h1 : ‖exp ((0 : ℝ) • X)‖ ≤ 1 := by
-    rw [zero_smul, NormedSpace.exp_zero]; exact norm_le_one_of_star_mul_self (by simp)
-  simpa [gronwallBound_ε0, mul_comm] using norm_le_gronwallBound_of_norm_deriv_right_le
-    (f := fun u : ℝ ↦ exp (u • X)) (f' := fun u ↦ X * exp (u • X)) (δ := 1) (K := ‖X‖) (ε := 0)
-    (a := 0) (b := s)
-    (fun u _ ↦ (hasDerivAt_exp_smul_const' (𝕂 := ℝ) X u).continuousAt.continuousWithinAt)
-    (fun u _ ↦ (hasDerivAt_exp_smul_const' (𝕂 := ℝ) X u).hasDerivWithinAt) h1
-    (fun u _ ↦ by simpa using norm_mul_le X (exp (u • X))) s ⟨hs, le_rfl⟩
-
-/-- **Lipschitz bound for the exponential**: `‖e^{A} - e^{B}‖ ≤ ‖A - B‖ e^{max(‖A‖, ‖B‖)}`.
-Differentiate `v ↦ e^{vA} e^{(1-v)B}`, whose derivative is `e^{vA} (A - B) e^{(1-v)B}`. -/
-theorem norm_exp_sub_exp_le (A B : 𝕄) :
-    ‖exp A - exp B‖ ≤ ‖A - B‖ * Real.exp (max ‖A‖ ‖B‖) := by
-  set φ : ℝ → 𝕄 := fun v ↦ exp (v • A) * exp ((1 - v) • B)
-  have hderiv : ∀ v ∈ Icc (0 : ℝ) 1, HasDerivWithinAt φ
-      (exp (v • A) * (A - B) * exp ((1 - v) • B)) (Icc 0 1) v := by
-    intro v _
-    have hB : HasDerivAt (fun v : ℝ ↦ exp ((1 - v) • B)) (-(B * exp ((1 - v) • B))) v := by
-      simpa [Function.comp_def] using
-        (hasDerivAt_exp_smul_const' (𝕂 := ℝ) B (1 - v)).scomp v ((hasDerivAt_id v).const_sub 1)
-    convert ((hasDerivAt_exp_smul_const' (𝕂 := ℝ) A v).mul hB).hasDerivWithinAt using 1
-    rw [((Commute.refl A).smul_right v).exp_right.eq]
-    noncomm_ring
-  have hbound : ∀ v ∈ Ico (0 : ℝ) 1, ‖exp (v • A) * (A - B) * exp ((1 - v) • B)‖
-      ≤ ‖A - B‖ * Real.exp (max ‖A‖ ‖B‖) := by
-    intro v hv
-    have h1 := norm_exp_smul_le A hv.1
-    have h2 := norm_exp_smul_le B (by linarith [hv.2] : 0 ≤ 1 - v)
-    have hexp : Real.exp (v * ‖A‖) * Real.exp ((1 - v) * ‖B‖) ≤ Real.exp (max ‖A‖ ‖B‖) := by
-      rw [← Real.exp_add, Real.exp_le_exp]
-      linarith [mul_le_mul_of_nonneg_left (le_max_left ‖A‖ ‖B‖) hv.1,
-        mul_le_mul_of_nonneg_left (le_max_right ‖A‖ ‖B‖) (sub_nonneg.mpr hv.2.le)]
-    calc _ ≤ Real.exp (v * ‖A‖) * ‖A - B‖ * Real.exp ((1 - v) * ‖B‖) :=
-          norm_mul_le_of_le (norm_mul_le_of_le h1 le_rfl) h2
-      _ = ‖A - B‖ * (Real.exp (v * ‖A‖) * Real.exp ((1 - v) * ‖B‖)) := by ring
-      _ ≤ _ := by gcongr
-  simpa [φ] using norm_image_sub_le_of_norm_deriv_le_segment' hderiv hbound 1 ⟨zero_le_one, le_rfl⟩
-
-/-- `‖e^{-ivA} - e^{-ivB}‖ ≤ |v| ‖A - B‖ e^{max(‖A‖, ‖B‖)}` for `|v| ≤ 1`. -/
-theorem norm_evol_sub_evol_le_exp (A B : 𝕄) {v : ℝ} (hv : |v| ≤ 1) :
-    ‖evol A v - evol B v‖ ≤ |v| * ‖A - B‖ * Real.exp (max ‖A‖ ‖B‖) := by
-  have hkey := norm_exp_sub_exp_le (v • (-I • A)) (v • (-I • B))
-  have h1 : ‖v • (-I • A) - v • (-I • B)‖ = |v| * ‖A - B‖ := by
-    rw [← smul_sub, ← smul_sub, norm_smul, Real.norm_eq_abs, norm_smul, norm_neg,
-      Complex.norm_I, one_mul]
-  have h2 : ∀ X : 𝕄, ‖v • (-I • X)‖ ≤ ‖X‖ := by
-    intro X
-    rw [norm_smul, Real.norm_eq_abs, norm_smul, norm_neg, Complex.norm_I, one_mul]
-    exact mul_le_of_le_one_left (norm_nonneg X) hv
-  change ‖exp (v • (-I • A)) - exp (v • (-I • B))‖ ≤ _
-  refine hkey.trans ?_
-  rw [h1]
-  exact mul_le_mul_of_nonneg_left (Real.exp_le_exp.mpr (max_le_max (h2 A) (h2 B)))
-    (by positivity)
-
-/-- **Duhamel for two constant Hamiltonians**:
-`e^{-iA} - e^{-iB} = -i ∫₀¹ e^{-i(1-u)A} (A - B) e^{-iuB} du`. -/
+/-- Duhamel's formula for two constant matrices:
+`e^{-iA} - e^{-iB} = -i∫₀¹ e^{-i(1-u)A} (A - B) e^{-iuB} du`. -/
 theorem evol_sub_evol (A B : 𝕄) :
     evol A 1 - evol B 1 = -I • ∫ u in (0:ℝ)..1, evol A (1 - u) * (A - B) * evol B u := by
   have hderiv : ∀ u : ℝ, HasDerivAt (fun u : ℝ ↦ evol A (1 - u) * evol B u)
@@ -156,13 +83,14 @@ theorem evol_sub_evol (A B : 𝕄) :
   simp only [sub_self, sub_zero, evol_zero, one_mul, mul_one] at hFTC
   rw [neg_smul, hFTC, neg_sub]
 
-/-- The integral defining the differential is continuous in the time variable. -/
+/-- `u ↦ e^{-i(1-u)B} E e^{-iuB}` is continuous. -/
 theorem continuous_integrand (B E : 𝕄) :
     Continuous (fun u : ℝ ↦ evol B (1 - u) * E * evol B u) :=
   (((continuous_evol B).comp (continuous_const.sub continuous_id)).mul
     continuous_const).mul (continuous_evol B)
 
-/-- The Duhamel differential, defined directly by its integral. -/
+/-- The derivative of `X ↦ e^{-iX}` at `B`, as a linear map: `E ↦ -i∫₀¹ e^{-i(1-u)B} E e^{-iuB} du`.
+-/
 def evolDeriv (B : 𝕄) : 𝕄 →L[ℂ] 𝕄 :=
   LinearMap.toContinuousLinearMap
     { toFun := fun E ↦ -I • ∫ u in (0 : ℝ)..1, evol B (1 - u) * E * evol B u
@@ -177,20 +105,19 @@ def evolDeriv (B : 𝕄) : 𝕄 →L[ℂ] 𝕄 :=
         simp only [mul_smul_comm, smul_mul_assoc, intervalIntegral.integral_smul]
         exact smul_comm _ _ _ }
 
-/-- Evaluation of the differential is the Duhamel integral. -/
+/-- `evolDeriv B E = -i∫₀¹ e^{-i(1-u)B} E e^{-iuB} du`. -/
 theorem evolDeriv_apply (B E : 𝕄) :
     evolDeriv B E = -I • ∫ u in (0 : ℝ)..1, evol B (1 - u) * E * evol B u := rfl
 
-/-- A uniform integrand bound gives its interval length bound. -/
+/-- `‖∫_a^t f‖ ≤ C (t - a)` when `‖f‖ ≤ C` on `[a,t]`. -/
 theorem norm_intervalIntegral_le {f : ℝ → 𝕄} {a t C : ℝ} (hat : a ≤ t)
     (h : ∀ s ∈ Icc a t, ‖f s‖ ≤ C) : ‖∫ s in a..t, f s‖ ≤ C * (t - a) := by
-  have hn := intervalIntegral.norm_integral_le_of_norm_le_const fun s hs ↦
-    h s (Ioc_subset_Icc_self (by rwa [uIoc_of_le hat] at hs))
-  rwa [abs_of_nonneg (sub_nonneg.mpr hat)] at hn
+  simpa [abs_of_nonneg (sub_nonneg.mpr hat)] using
+    intervalIntegral.norm_integral_le_of_norm_le_const (f := f) (a := a) (b := t) (C := C)
+      fun s hs ↦ h s (Ioc_subset_Icc_self (by rwa [uIoc_of_le hat] at hs))
 
-/-- **The second-order Duhamel expansion.**  If `e^{-ivA}` and `e^{-ivB}` stay within `Q` of each
-other on `[0, 1]` and `B` is Hermitian, then
-the Duhamel remainder has norm at most `Q ‖A - B‖`. -/
+/-- The remainder in Duhamel's formula: if `‖e^{-ivA} - e^{-ivB}‖ ≤ Q` for `0 ≤ v ≤ 1` and `B` is
+Hermitian, then `‖e^{-iA} - e^{-iB} + i∫₀¹ e^{-i(1-u)B} (A - B) e^{-iuB} du‖ ≤ Q ‖A - B‖`. -/
 theorem norm_evol_duhamel_two_le [NeZero d] {A B : 𝕄} {Q : ℝ} (hB : B.IsHermitian)
     (hQ : ∀ v ∈ Icc (0 : ℝ) 1, ‖evol A v - evol B v‖ ≤ Q) :
     ‖evol A 1 - evol B 1 +
@@ -223,40 +150,56 @@ theorem norm_evol_duhamel_two_le [NeZero d] {A B : 𝕄} {Q : ℝ} (hB : B.IsHer
       _ = Q * ‖A - B‖ := mul_one _
   simpa using hb
 
-/-- **`X ↦ e^{-iX}` is differentiable**, with differential `evolDeriv X₀` at a Hermitian `X₀`
-(the second-order Duhamel expansion gives a quadratic remainder). -/
+/-- For `X` within distance `1` of `X₀` and `0 ≤ v ≤ 1`, `‖e^{-ivX} - e^{-ivX₀}‖ ≤ K ‖X - X₀‖` with
+one constant `K`, as the exponential is continuously differentiable. -/
+theorem evol_lipschitz_on_ball (X₀ : 𝕄) :
+    ∃ K : ℝ, 0 < K ∧ ∀ X : 𝕄, ‖X - X₀‖ ≤ 1 →
+      ∀ v ∈ Icc (0 : ℝ) 1, ‖evol X v - evol X₀ v‖ ≤ K * ‖X - X₀‖ := by
+  have hc : ContDiff ℝ 1 (exp : 𝕄 → 𝕄) := contDiff_iff_contDiffAt.mpr fun X ↦
+    (NormedSpace.exp_analytic (𝕂 := ℂ) X).contDiffAt.restrict_scalars ℝ
+  obtain ⟨K, hK⟩ := hc.contDiffOn.exists_lipschitzOnWith one_ne_zero
+    (convex_closedBall (0 : 𝕄) (‖X₀‖ + 1)) (isCompact_closedBall _ _)
+  have hball {X : 𝕄} (hX : ‖X‖ ≤ ‖X₀‖ + 1) {v : ℝ} (hv : v ∈ Icc (0 : ℝ) 1) :
+      v • (-I • X) ∈ Metric.closedBall (0 : 𝕄) (‖X₀‖ + 1) := by
+    rw [Metric.mem_closedBall, dist_zero_right, norm_smul, norm_smul,
+      norm_neg, Complex.norm_I, one_mul, Real.norm_eq_abs, abs_of_nonneg hv.1]
+    exact (mul_le_of_le_one_left (norm_nonneg X) hv.2).trans hX
+  refine ⟨K + 1, by positivity, fun X hX v hv ↦ ?_⟩
+  have hnorm : ‖X‖ ≤ ‖X₀‖ + 1 := by
+    have hn : ‖X‖ ≤ ‖X₀‖ + ‖X - X₀‖ := by simpa using norm_add_le X₀ (X - X₀)
+    exact hn.trans (add_le_add le_rfl hX)
+  have h := hK.norm_sub_le (hball hnorm hv)
+    (hball (X := X₀) (le_add_of_nonneg_right zero_le_one) hv)
+  change ‖evol X v - evol X₀ v‖ ≤ _ at h
+  have hdiff : ‖v • (-I • X) - v • (-I • X₀)‖ = v * ‖X - X₀‖ := by
+    rw [← smul_sub, ← smul_sub, norm_smul, norm_smul,
+      norm_neg, Complex.norm_I, one_mul, Real.norm_eq_abs, abs_of_nonneg hv.1]
+  rw [hdiff] at h
+  exact h.trans (mul_le_mul (le_add_of_nonneg_right zero_le_one : (K : ℝ) ≤ K + 1)
+    (mul_le_of_le_one_left (norm_nonneg _) hv.2)
+    (mul_nonneg hv.1 (norm_nonneg _)) (by positivity))
+
+/-- `X ↦ e^{-iX}` is differentiable at a Hermitian `X₀`, with derivative `evolDeriv X₀`: the
+remainder in Duhamel's formula is quadratic in `‖X - X₀‖`. -/
 theorem hasFDerivAt_evol_one [NeZero d] {X₀ : 𝕄} (hX₀ : X₀.IsHermitian) :
     HasFDerivAt (fun X : 𝕄 ↦ evol X 1) (evolDeriv X₀) X₀ := by
-  set M : ℝ := Real.exp (‖X₀‖ + 1) with hMdef
-  have hM0 : 0 < M := Real.exp_pos _
+  obtain ⟨K, hK, hbound⟩ := evol_lipschitz_on_ball X₀
   refine HasFDerivAtFilter.of_isLittleO ?_
   rw [Asymptotics.isLittleO_iff]
   intro ε hε
-  have hδ0 : 0 < min 1 (ε / M) := lt_min zero_lt_one (by positivity)
-  have hball : ∀ᶠ X in nhds X₀, ‖X - X₀‖ ≤ min 1 (ε / M) :=
-    Filter.mem_of_superset (Metric.ball_mem_nhds X₀ hδ0) fun X hX ↦ (mem_ball_iff_norm.mp hX).le
-  filter_upwards [hball] with X hX
-  have hx1 : ‖X - X₀‖ ≤ 1 := hX.trans (min_le_left _ _)
-  have hx2 : ‖X - X₀‖ ≤ ε / M := hX.trans (min_le_right _ _)
-  have hQ : ∀ v ∈ Icc (0 : ℝ) 1, ‖evol X v - evol X₀ v‖ ≤ ‖X - X₀‖ * M := by
-    intro v hv
-    have hv1 : |v| ≤ 1 := by rw [abs_of_nonneg hv.1]; exact hv.2
-    refine (norm_evol_sub_evol_le_exp X X₀ hv1).trans ?_
-    have hnt : ‖X‖ ≤ ‖X₀‖ + ‖X - X₀‖ := by simpa using norm_add_le X₀ (X - X₀)
-    have hmax : max ‖X‖ ‖X₀‖ ≤ ‖X₀‖ + 1 := max_le (by linarith) (by linarith)
-    calc |v| * ‖X - X₀‖ * Real.exp (max ‖X‖ ‖X₀‖)
-        ≤ 1 * ‖X - X₀‖ * Real.exp (‖X₀‖ + 1) := by gcongr
-      _ = ‖X - X₀‖ * M := by rw [one_mul, hMdef]
-  have hR := norm_evol_duhamel_two_le (A := X) (B := X₀) hX₀ hQ
-  have hid : evol X 1 - evol X₀ 1 - evolDeriv X₀ (X - X₀)
-      = evol X 1 - evol X₀ 1 + I • (∫ u in (0:ℝ)..1, evol X₀ (1 - u) * (X - X₀) * evol X₀ u) := by
-    rw [evolDeriv_apply, neg_smul, sub_neg_eq_add]
+  have hδ : 0 < min 1 (ε / K) := lt_min zero_lt_one (div_pos hε hK)
+  filter_upwards [Metric.ball_mem_nhds X₀ hδ] with X hX
+  have hx := (mem_ball_iff_norm.mp hX).le
+  have hQ := hbound X (hx.trans (min_le_left _ _))
   change ‖evol X 1 - evol X₀ 1 - evolDeriv X₀ (X - X₀)‖ ≤ ε * ‖X - X₀‖
-  rw [hid]
-  exact hR.trans (mul_le_mul_of_nonneg_right ((le_div_iff₀ hM0).mp hx2) (norm_nonneg _))
+  rw [evolDeriv_apply, neg_smul, sub_neg_eq_add]
+  have hsmall : K * ‖X - X₀‖ ≤ ε := by
+    simpa only [mul_comm] using (le_div_iff₀ hK).mp (hx.trans (min_le_right _ _))
+  exact (norm_evol_duhamel_two_le hX₀ hQ).trans
+    (mul_le_mul_of_nonneg_right hsmall (norm_nonneg _))
 
-
-/-- The Duhamel derivative along a curve holds on an arbitrary domain, including endpoints. -/
+/-- Duhamel's formula along a curve: `(e^{-iΩ})' = -i∫₀¹ e^{-i(1-u)Ω} Ω' e^{-iuΩ} du` at a point
+where `Ω` is Hermitian, for a derivative within any set. -/
 theorem hasDerivWithinAt_evol_curve [NeZero d] {Ω : ℝ → 𝕄} {D : 𝕄}
     {S : Set ℝ} {s : ℝ} (hΩ : (Ω s).IsHermitian)
     (hd : HasDerivWithinAt Ω D S s) :

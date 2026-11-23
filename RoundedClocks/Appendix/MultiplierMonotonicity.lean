@@ -7,10 +7,10 @@ module
 
 public import RoundedClocks.Appendix.PositiveSeries
 
-/-! # Monotonicity of the multiplier
+/-! # `𝒩` and `𝒩'` on `[0, 2π)`
 
-Theorems 4.4 and 4.6 use the positive Taylor coefficients of `𝒩` to prove its monotonicity and the
-nonnegativity of its derivative on `[0, 2π)`.
+As every coefficient of `𝒩(x) = ∑ₙ νₙ xⁿ` is nonnegative, `𝒩` is increasing on `[0, 2π)`, so
+`𝒩(w) ≥ 𝒩(0) > 0` and `𝒩'(w) ≥ 0` for `0 ≤ w < 2π`. Theorems 4.4 and 4.6 use these signs.
 -/
 
 @[expose] public section

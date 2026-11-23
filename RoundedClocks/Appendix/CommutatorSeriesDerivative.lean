@@ -8,12 +8,14 @@ module
 public import RoundedClocks.Appendix.MatrixSeries
 public import Mathlib.Analysis.Complex.LocallyUniformLimit
 
-/-! # Termwise differentiation of the multiplier series
+/-! # The inner sum of equation (A.2)
 
-Equation (A.2) for `g = 𝒩` gives the derivative of
-`𝒩([Ω,·])A` along a curve, and its bound `𝒩(w) ‖A'‖ + 2 𝒩'(w) ‖Ω'‖ ‖A‖`. The series
-`𝒩(x) = ∑ νₙ xⁿ` is evaluated in the Banach algebra of operators on matrices, where it is
-analytic, so termwise differentiation is the chain rule.
+For elements `a` and `b` of a ring, `powDeriv a b n` (in `Definitions.lean`) is
+`∑_{j<n} a^{n-1-j} b a^j`, the derivative of `a ↦ aⁿ` in the direction `b`. With `a = [Ω,·]` and
+`b = [Ω',·]` it is the sum over `k` in (A.2). This file proves that the sum telescopes when `b` is
+a commutator `ab' - b'a`, that
+`‖powDeriv a b n‖ ≤ n r^{n-1} ‖b‖` for `‖a‖ ≤ r`, and that `∑ n gₙ r^{n-1}` converges inside the
+radius of convergence of `∑ gₙ xⁿ`.
 -/
 
 @[expose] public section
@@ -25,10 +27,6 @@ open Complex (I)
 noncomputable section
 
 namespace RoundedClocks
-
-/-- The derivative of `a ↦ aⁿ` in the direction `b`: `∑_{j<n} a^{n-1-j} b a^j`. -/
-def powDeriv {A : Type*} [Ring A] (a b : A) (n : ℕ) : A :=
-  ∑ j ∈ Finset.range n, a ^ (n - 1 - j) * b * a ^ j
 
 /-- `powDeriv` is additive in the direction. -/
 theorem powDeriv_add {A : Type*} [Ring A] (a b c : A) (n : ℕ) :
@@ -67,20 +65,17 @@ theorem norm_powDeriv_le {A : Type*} [NormedRing A] [NormOneClass A] {a b : A} {
   simp only [Finset.sum_const, Finset.card_range, nsmul_eq_mul]
   ring
 
-/-- The derivative coefficients `νₙ n r^{n-1}` are summable for `0 ≤ r < 2π`. -/
-theorem summable_multiplierCoeff_deriv {r : ℝ} (hr0 : 0 ≤ r) (hr : r < 2 * π) :
-    Summable (fun n : ℕ ↦ multiplierCoeff n * n * r ^ (n - 1)) := by
-  set R := (r + 2 * π) / 2
-  have hrR : r < R := by simp only [R]; linarith
-  have hR0 : 0 ≤ R := hr0.trans hrR.le
-  have hRs : Summable (fun n : ℕ ↦ multiplierCoeff n * R ^ n) :=
-    summable_multiplierCoeff_power (by rw [abs_of_nonneg hR0]; simp only [R]; linarith)
-  have hd (n : ℕ) (z : ℂ) : HasDerivAt (fun z : ℂ ↦ (multiplierCoeff n : ℂ) * z ^ n)
-      ((multiplierCoeff n : ℂ) * n * z ^ (n - 1)) z := by
-    convert ((hasDerivAt_id z).pow n).const_mul (multiplierCoeff n : ℂ) using 1
+/-- Inside the radius of convergence the derivative series converges: if every `gₙ ≥ 0` and
+`∑ gₙ Rⁿ` converges, then `∑ n gₙ r^{n-1}` converges for `0 ≤ r < R`. -/
+theorem summable_coeff_deriv {g : ℕ → ℝ} (hg : ∀ n, 0 ≤ g n) {r R : ℝ} (hr0 : 0 ≤ r)
+    (hrR : r < R) (hRs : Summable (fun n : ℕ ↦ g n * R ^ n)) :
+    Summable (fun n : ℕ ↦ g n * n * r ^ (n - 1)) := by
+  have hd (n : ℕ) (z : ℂ) : HasDerivAt (fun z : ℂ ↦ (g n : ℂ) * z ^ n)
+      ((g n : ℂ) * n * z ^ (n - 1)) z := by
+    convert ((hasDerivAt_id z).pow n).const_mul (g n : ℂ) using 1
     simp [mul_assoc]
   have hs := Complex.hasSum_deriv_of_summable_norm hRs
-    (F := fun n z ↦ (multiplierCoeff n : ℂ) * z ^ n) (U := Metric.ball 0 R)
+    (F := fun n z ↦ (g n : ℂ) * z ^ n) (U := Metric.ball 0 R)
     (fun n z _ ↦ (hd n z).differentiableAt.differentiableWithinAt)
     Metric.isOpen_ball (fun n z hz ↦ ?_) (z := (r : ℂ)) ?_
   · have hs' := Complex.reCLM.summable hs.summable
@@ -88,17 +83,23 @@ theorem summable_multiplierCoeff_deriv {r : ℝ} (hr0 : 0 ≤ r) (hr : r < 2 * �
       Complex.natCast_re, Complex.ofReal_im, Complex.natCast_im, zero_mul, mul_zero,
       sub_zero, ← Complex.ofReal_pow] using hs'
   · rw [norm_mul, Complex.norm_real, Real.norm_eq_abs,
-      abs_of_nonneg (multiplierCoeff_nonneg n), norm_pow]
+      abs_of_nonneg (hg n), norm_pow]
     exact mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (norm_nonneg z)
-      (mem_ball_zero_iff.mp hz).le n) (multiplierCoeff_nonneg n)
+      (mem_ball_zero_iff.mp hz).le n) (hg n)
   · simpa only [mem_ball_zero_iff, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hr0]
       using hrR
+
+/-- The derivative coefficients `νₙ n r^{n-1}` are summable for `0 ≤ r < 2π`. -/
+theorem summable_multiplierCoeff_deriv {r : ℝ} (hr0 : 0 ≤ r) (hr : r < 2 * π) :
+    Summable (fun n : ℕ ↦ multiplierCoeff n * n * r ^ (n - 1)) := by
+  have hrR : r < (r + 2 * π) / 2 := by linarith
+  exact summable_coeff_deriv multiplierCoeff_nonneg hr0 hrR
+    (summable_multiplierCoeff_power (by rw [abs_of_nonneg (hr0.trans hrR.le)]; linarith))
 
 section BanachAlgebra
 
 variable {A : Type*} [NormedRing A] [NormedAlgebra ℂ A] [CompleteSpace A] [NormOneClass A]
 
-omit [CompleteSpace A] in
 omit [CompleteSpace A] in
 /-- The termwise derivative series `∑ νₙ powDeriv a b n` converges absolutely. -/
 theorem summable_norm_powDeriv {a b : A} {r : ℝ} (ha : ‖a‖ ≤ r) (hr : r < 2 * π) :

@@ -7,10 +7,12 @@ module
 public import RoundedClocks.Appendix.ExponentialDuhamel
 public import Mathlib.MeasureTheory.Function.JacobianOneDim
 
-/-! # Centered Duhamel decomposition
+/-! # Lemma A.3: the matrices `X` and `Λ`
 
-Lemma A.3 rewrites the exponential derivative as two half evolutions around a centered integral
-and bounds the resulting terms.
+With `Ω'_σ = e^{iσΩ} Ω' e^{-iσΩ}`, the proof of Lemma A.3 sets `X = ∫_{-1/2}^{1/2} Ω'_τ dτ` and
+`Λ = -i∫_{-1/2}^{1/2} ∫₀^τ Ω'_σ dσ dτ`. Then `Ω' = X + [Ω,Λ]`, `‖X‖ = ‖(e^{-iΩ})'‖`, and
+`‖Λ‖ ≤ ‖Ω'‖/4`. Here `evol Ω σ` is `e^{-iσΩ}`, `centeredDuhamel Ω D` is `X`, and
+`centeredRemainder Ω D` is `Λ`, with `D` in place of `Ω'`.
 -/
 @[expose] public section
 noncomputable section
@@ -21,22 +23,27 @@ namespace RoundedClocks.EndValue
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- The derivative transported by the two positive half evolutions. -/
+/-- `i e^{iΘ/2} V e^{iΘ/2}`. With `Θ = Ω` and `V = (e^{-iΩ})'` this is `X`, as
+`(e^{-iΩ})' = -i e^{-iΩ/2} X e^{-iΩ/2}`. -/
 def centeredSymmetrize (Θ V : 𝕄) : 𝕄 :=
   I • (evol Θ (-1 / 2) * V * evol Θ (-1 / 2))
 
-/-- Both half evolutions are unitary, and the scalar phase has modulus one. -/
+/-- `‖i e^{iΘ/2} V e^{iΘ/2}‖ = ‖V‖` for Hermitian `Θ`. -/
 theorem norm_centeredSymmetrize {Θ : 𝕄} (hΘ : Θ.IsHermitian) (V : 𝕄) :
     ‖centeredSymmetrize Θ V‖ = ‖V‖ := by
+  have hmem (u : ℝ) : evol Θ u ∈ unitary 𝕄 := by
+    simpa only [evol, frozenEvolution, Complex.coe_smul] using
+      exp_neg_I_smul_isUnitary hΘ u
   rw [centeredSymmetrize, norm_smul, Complex.norm_I, one_mul,
-    CStarRing.norm_mul_mem_unitary _ (evol_mem_unitary hΘ _),
-    CStarRing.norm_mem_unitary_mul _ (evol_mem_unitary hΘ _)]
+    CStarRing.norm_mul_mem_unitary _ (hmem _),
+    CStarRing.norm_mem_unitary_mul _ (hmem _)]
 
-/-- The centered Duhamel average `X` in Lemma A.3. -/
+/-- The `X = ∫_{-1/2}^{1/2} Ω'_τ dτ` of the proof of Lemma A.3, with `Ω'_τ = e^{iτΩ} Ω' e^{-iτΩ}`;
+here `Θ` is `Ω` and `Ωd` is `Ω'`. -/
 def centeredDuhamel (Θ Ωd : 𝕄) : 𝕄 :=
   ∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ), evol Θ (-τ) * Ωd * evol Θ τ
 
-/-- Duhamel's formula with the paper's order of the two time arguments. -/
+/-- Duhamel's formula in the paper's form: `(e^{-iΩ})' = -i∫₀¹ e^{-iσΩ} Ω' e^{-i(1-σ)Ω} dσ`. -/
 theorem centered_evolDeriv_duhamel [NeZero d] (Θ Ωd : 𝕄) :
     evolDeriv Θ Ωd = -I • ∫ σ in (0 : ℝ)..1,
       evol Θ σ * Ωd * evol Θ (1 - σ) := by
@@ -47,7 +54,8 @@ theorem centered_evolDeriv_duhamel [NeZero d] (Θ Ωd : 𝕄) :
     (a := 0) (b := 1)
   simpa only [sub_self, sub_zero, sub_sub_cancel] using h
 
-/-- The substitution `σ = 1/2 - τ` transports Duhamel's derivative to `X`. -/
+/-- `(e^{-iΩ})' = -i e^{-iΩ/2} X e^{-iΩ/2}`, by the substitution `σ = 1/2 - τ`; stated as
+`X = i e^{iΩ/2} (e^{-iΩ})' e^{iΩ/2}`. -/
 theorem centeredDuhamel_eq_centeredSymmetrize [NeZero d] (Θ Ωd : 𝕄) :
     centeredDuhamel Θ Ωd = centeredSymmetrize Θ (evolDeriv Θ Ωd) := by
   let F : ℝ → 𝕄 := fun σ ↦ evol Θ σ * Ωd * evol Θ (1 - σ)
@@ -77,39 +85,36 @@ theorem centeredDuhamel_eq_centeredSymmetrize [NeZero d] (Θ Ωd : 𝕄) :
   norm_num at hsub
   simpa only [centeredDuhamel, neg_div, neg_sub] using hsub.symm
 
-/-- The two unitary half evolutions preserve the norm of the centered average. -/
+/-- `‖X‖ = ‖(e^{-iΩ})'‖`. -/
 theorem norm_centeredDuhamel [NeZero d] {Θ : 𝕄} (hΘ : Θ.IsHermitian) (Ωd : 𝕄) :
     ‖centeredDuhamel Θ Ωd‖ = ‖evolDeriv Θ Ωd‖ := by
   rw [centeredDuhamel_eq_centeredSymmetrize, norm_centeredSymmetrize hΘ]
 
-/-- The inner primitive used to define the commutator remainder. -/
+/-- The inner integral `∫₀^τ Ω'_σ dσ` in the definition of `Λ`. -/
 def centeredPrimitive (Ω D : 𝕄) (τ : ℝ) : 𝕄 :=
   ∫ σ in (0 : ℝ)..τ, evol Ω (-σ) * D * evol Ω σ
 
-/-- The double integral `Λ` in Lemma A.3. -/
+/-- The `Λ = -i∫_{-1/2}^{1/2} ∫₀^τ Ω'_σ dσ dτ` of the proof of Lemma A.3. -/
 def centeredRemainder (Ω D : 𝕄) : 𝕄 :=
   -I • ∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ), centeredPrimitive Ω D τ
 
-/-- The conjugation integrand is continuous on the whole real line. -/
+/-- `σ ↦ Ω'_σ` is continuous. -/
 theorem continuous_centeredConjugation (Ω D : 𝕄) :
     Continuous (fun τ : ℝ ↦ evol Ω (-τ) * D * evol Ω τ) :=
   (((continuous_evol Ω).comp continuous_neg).mul continuous_const).mul (continuous_evol Ω)
 
-/-- The inner integral depends continuously on its upper endpoint. -/
+/-- `τ ↦ ∫₀^τ Ω'_σ dσ` is continuous. -/
 theorem continuous_centeredPrimitive (Ω D : 𝕄) : Continuous (centeredPrimitive Ω D) :=
   intervalIntegral.continuous_primitive
     (fun a b ↦ (continuous_centeredConjugation Ω D).intervalIntegrable a b) 0
 
-/-- Lemma A.3: the conjugated derivative satisfies
-`∂σ Ω'σ = i[Ω, Ω'σ]`, equivalently the commutator is `-i` times that derivative. -/
+/-- `∂_σ Ω'_σ = i[Ω, Ω'_σ]`. -/
 theorem centered_conjugation_hasDerivAt (Ω D : 𝕄) (σ : ℝ) :
     HasDerivAt (fun t : ℝ ↦ evol Ω (-t) * D * evol Ω t)
       (I • adL Ω (evol Ω (-σ) * D * evol Ω σ)) σ := by
   let f : ℝ → 𝕄 := fun t ↦ evol Ω (-t) * D * evol Ω t
-  have hcomm (t : ℝ) : Ω * evol Ω t = evol Ω t * Ω := by
-    have hh := (commute_evol Ω t).eq
-    simp only [smul_mul_assoc, mul_smul_comm] at hh
-    exact (smul_right_injective 𝕄 (neg_ne_zero.mpr I_ne_zero)) hh
+  have hcomm (t : ℝ) : Ω * evol Ω t = evol Ω t * Ω :=
+    ((((Commute.refl Ω).smul_right (-I)).smul_right t).exp_right).eq
   change HasDerivAt f (I • adL Ω (f σ)) σ
   have hn : HasDerivAt (fun s : ℝ ↦ evol Ω (-s))
       (I • (Ω * evol Ω (-σ))) σ := by
@@ -121,16 +126,14 @@ theorem centered_conjugation_hasDerivAt (Ω D : 𝕄) (σ : ℝ) :
   rw [hcomm σ]
   module
 
-/-- Lemma A.3: `[Ω, Ω'σ] = -i ∂σ Ω'σ`, the identity that gives
-the double integral for `Λ`. -/
+/-- `[Ω, Ω'_σ] = -i ∂_σ Ω'_σ`. -/
 theorem centered_conjugation_commutator_eq_deriv (Ω D : 𝕄) (σ : ℝ) :
     adL Ω (evol Ω (-σ) * D * evol Ω σ) =
       -I • deriv (fun t : ℝ ↦ evol Ω (-t) * D * evol Ω t) σ := by
   rw [(centered_conjugation_hasDerivAt Ω D σ).deriv, smul_smul]
   simp
 
-/-- Integrating the derivative of conjugation gives the endpoint
-identity used in the third line of Lemma A.3's derivation. -/
+/-- `Ω'_τ - Ω' = i[Ω, ∫₀^τ Ω'_σ dσ]`: the integral of `∂_σ Ω'_σ` from `0` to `τ`. -/
 theorem conjugation_sub_eq_commutator_integral (Ω D : 𝕄) (τ : ℝ) :
     evol Ω (-τ) * D * evol Ω τ - D = I • adL Ω (centeredPrimitive Ω D τ) := by
   let f : ℝ → 𝕄 := fun σ ↦ evol Ω (-σ) * D * evol Ω σ
@@ -143,8 +146,7 @@ theorem conjugation_sub_eq_commutator_integral (Ω D : 𝕄) (τ : ℝ) :
     (adL Ω).intervalIntegral_comp_comm (hc.intervalIntegrable 0 τ)] at hFTC
   simpa [f, centeredPrimitive, evol_zero] using hFTC.symm
 
-/-- Lemma A.3, first identity: the commutator commutes with the
-two integrals defining `Λ`. -/
+/-- Line 1 of the display `[Ω,Λ] = Ω' - X`: `[Ω,Λ] = -i∫_{-1/2}^{1/2} ∫₀^τ [Ω, Ω'_σ] dσ dτ`. -/
 theorem centeredRemainder_commutator_integral (Ω D : 𝕄) :
     adL Ω (centeredRemainder Ω D) =
       -I • ∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ),
@@ -158,8 +160,7 @@ theorem centeredRemainder_commutator_integral (Ω D : 𝕄) :
   exact ((adL Ω).intervalIntegral_comp_comm
     ((continuous_centeredConjugation Ω D).intervalIntegrable 0 τ)).symm
 
-/-- Lemma A.3, second identity substitutes the derivative
-of the conjugated input into the double commutator integral. -/
+/-- Line 2 of the display: `[Ω,Λ] = -∫_{-1/2}^{1/2} ∫₀^τ ∂_σ Ω'_σ dσ dτ`. -/
 theorem centeredRemainder_commutator_deriv (Ω D : 𝕄) :
     adL Ω (centeredRemainder Ω D) =
       -(∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ),
@@ -170,8 +171,7 @@ theorem centeredRemainder_commutator_deriv (Ω D : 𝕄) :
     intervalIntegral.integral_smul]
   rw [smul_smul, show (-I) * (-I) = (-1 : ℂ) by simp, neg_one_smul]
 
-/-- Lemma A.3, third verification line: the inner derivative integral is
-the conjugation at `τ` minus its value at zero. -/
+/-- Line 3 of the display: `[Ω,Λ] = -∫_{-1/2}^{1/2} (Ω'_τ - Ω') dτ`. -/
 theorem centeredRemainder_commutator_boundary (Ω D : 𝕄) :
     adL Ω (centeredRemainder Ω D) =
       -(∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ),
@@ -186,8 +186,8 @@ theorem centeredRemainder_commutator_boundary (Ω D : 𝕄) :
     ((continuous_centeredConjugation Ω D).intervalIntegrable 0 τ)]
   exact (conjugation_sub_eq_commutator_integral Ω D τ).symm
 
-/-- Lemma A.3: the two integrals for `X` and `Λ`, together with the
-last verification line `[Ω, Λ] = Ω' - X`. -/
+/-- Line 4 of the display: `[Ω,Λ] = Ω' - X`, together with the definitions of `X` and `Λ` as
+integrals. -/
 theorem centeredDuhamel_decomposition (Ω D : 𝕄) :
     centeredDuhamel Ω D =
       (∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ), evol Ω (-τ) * D * evol Ω τ) ∧
@@ -204,22 +204,25 @@ theorem centeredDuhamel_decomposition (Ω D : 𝕄) :
   simp only [centeredDuhamel, neg_div]
   abel
 
-/-- The integral decomposition gives precisely `D = X + [Ω,Λ]`. -/
+/-- `Ω' = X + [Ω,Λ]`. -/
 theorem centeredDuhamel_add_commutator (Ω D : 𝕄) :
     D = centeredDuhamel Ω D + adL Ω (centeredRemainder Ω D) := by
   rw [(centeredDuhamel_decomposition Ω D).2.2]
   abel
 
-/-- Unitary conjugation gives the sharp length bound for the inner primitive. -/
+/-- `‖∫₀^τ Ω'_σ dσ‖ ≤ |τ| ‖Ω'‖`, as conjugation by a unitary preserves the norm. -/
 theorem norm_centeredPrimitive_le {Ω : 𝕄} (hΩ : Ω.IsHermitian) (D : 𝕄) (τ : ℝ) :
     ‖centeredPrimitive Ω D τ‖ ≤ |τ| * ‖D‖ := by
+  have hmem (u : ℝ) : evol Ω u ∈ unitary 𝕄 := by
+    simpa only [evol, frozenEvolution, Complex.coe_smul] using
+      exp_neg_I_smul_isUnitary hΩ u
   have hb := intervalIntegral.norm_integral_le_of_norm_le_const (a := 0) (b := τ)
     (f := fun σ : ℝ ↦ evol Ω (-σ) * D * evol Ω σ) (C := ‖D‖) (fun σ _ ↦ by
-      rw [CStarRing.norm_mul_mem_unitary _ (evol_mem_unitary hΩ _),
-        CStarRing.norm_mem_unitary_mul _ (evol_mem_unitary hΩ _)])
+      rw [CStarRing.norm_mul_mem_unitary _ (hmem _),
+        CStarRing.norm_mem_unitary_mul _ (hmem _)])
   simpa only [centeredPrimitive, sub_zero, mul_comm] using hb
 
-/-- The scalar integral responsible for the coefficient one quarter. -/
+/-- `∫_{-1/2}^{1/2} |τ| dτ = 1/4`. -/
 theorem integral_abs_centered_half :
     (∫ τ in (-1 / 2 : ℝ)..(1 / 2 : ℝ), |τ|) = 1 / 4 := by
   have hleft : (∫ τ in (-1 / 2 : ℝ)..0, |τ|) = 1 / 8 := by
@@ -236,7 +239,7 @@ theorem integral_abs_centered_half :
     (continuous_abs.intervalIntegrable 0 (1 / 2)), hleft, hright]
   norm_num
 
-/-- The commutator remainder has norm at most one quarter of the input norm. -/
+/-- `‖Λ‖ ≤ ∫_{-1/2}^{1/2} |τ| dτ ‖Ω'‖ = ‖Ω'‖/4`. -/
 theorem norm_centeredRemainder_le {Ω : 𝕄} (hΩ : Ω.IsHermitian) (D : 𝕄) :
     ‖centeredRemainder Ω D‖ ≤ ‖D‖ / 4 := by
   rw [centeredRemainder, norm_smul, norm_neg, Complex.norm_I, one_mul]

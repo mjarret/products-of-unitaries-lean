@@ -7,10 +7,13 @@ module
 
 public import RoundedClocks.Appendix.LogarithmIntegral
 
-/-! # Local principal logarithm
+/-! # Lemma A.2: equation (A.3) near a point
 
-Lemma A.2 expresses the Hermitian logarithm on a fixed spectral arc and transports derivatives
-through the local principal branch.
+Fix `s₀ ∈ [0,1]`. The paper multiplies `W` by a constant phase so that `a(s₀) = -w/2`. Here the
+phase is `c = e^{iμ}` with `μ = a(s₀) + w/2`, and `V = cW`. For `s` near `s₀`,
+`H = μ + i∫₀¹ (V-1) S_u du` with `S_u = (1+u(V-1))⁻¹`, which is the first line of (A.3).
+Differentiating twice under the integral gives the second and third lines and shows that `H` is
+twice continuously differentiable.
 -/
 
 @[expose] public section
@@ -21,12 +24,11 @@ open scoped Topology Matrix.Norms.L2Operator
 noncomputable section
 namespace RoundedClocks.WalkLog
 
-open WalkLogCalculus
 attribute [local instance] matrixCStarAlgebra
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- The fixed phase of the exponential is a scalar functional calculus at `H`. -/
+/-- `e^{iμ} e^{-iH}` is the functional calculus of `z ↦ e^{iμ} e^{-iz}` at a Hermitian `H`. -/
 theorem phase_exp_eq_cfc (H : 𝕄) (hH : H.IsHermitian) (μ : ℝ) :
     Complex.exp (I * (μ : ℂ)) • NormedSpace.exp (-I • H) =
       cfc (fun z : ℂ ↦ Complex.exp (I * (μ : ℂ)) * Complex.exp (-I * z)) H := by
@@ -34,7 +36,8 @@ theorem phase_exp_eq_cfc (H : 𝕄) (hH : H.IsHermitian) (μ : ℝ) :
     ((Matrix.finite_spectrum H).continuousOn _)]
   rfl
 
-/-- The principal logarithm recovers every Hermitian matrix in the open centered turn. -/
+/-- The first line of (A.3) at one point: if the spectrum of the Hermitian `H` lies in `(μ-π, μ+π)`,
+then `H = μ + i∫₀¹ (V-1) S_u du` for `V = e^{iμ} e^{-iH}`. -/
 theorem walkLogIntegral_phase_recovery {H : 𝕄} {μ : ℝ} (hH : H.IsHermitian)
     (hwin : HasRealSpectrumIn H (Ioo (μ - π) (μ + π))) :
     H = (μ : ℂ) • 1 + I • walkLogIntegral
@@ -87,7 +90,10 @@ theorem walkLogIntegral_phase_recovery {H : 𝕄} {μ : ℝ} (hH : H.IsHermitian
   · simp only [neg_mul, neg_im, mul_im, I_re, I_im, ofReal_re, ofReal_im]
     linarith [hθ.1]
 
-/-- A fixed center recovers the chosen logarithm on a nondegenerate relative interval. -/
+/-- Equation (A.3) for `s` near `s₀`. On an interval `K` that contains `s₀` and is a neighbourhood
+of `s₀` in `[0,1]`, with `μ = a(s₀) + w/2` and `V = e^{iμ} W`: `H = μ + i∫₀¹ (V-1) S_u du` (first
+line), this function is `C²`, and its first and second derivatives are `i∫₀¹ S_u V' S_u du` and
+`i∫₀¹ (S_u V'' S_u - 2u S_u V' S_u V' S_u) du` (second and third lines). -/
 theorem exists_local_walkLogIntegral_contDiffOn {H W : ℝ → 𝕄} {a : ℝ → ℝ} {w : ℝ}
     (hw : w < 2 * π) (ha : ContinuousOn a (Icc (0 : ℝ) 1))
     (hc : IsC2Family W) (hW : IsUnitaryFamily W 0 1)
@@ -160,7 +166,7 @@ theorem exists_local_walkLogIntegral_contDiffOn {H W : ℝ → 𝕄} {a : ℝ �
   · intro s hs
     exact (hdd s hs).const_smul I
 
-/-- The locally recovered pointwise logarithm is twice continuously differentiable. -/
+/-- `H` is twice continuously differentiable for `s ∈ [0,1]`. -/
 theorem walk_log_isC2Family {H W : ℝ → 𝕄} {a : ℝ → ℝ} {w : ℝ}
     (hw : w < 2 * π) (ha : ContinuousOn a (Icc (0 : ℝ) 1))
     (hc : IsC2Family W) (hW : IsUnitaryFamily W 0 1)
@@ -175,7 +181,9 @@ theorem walk_log_isC2Family {H W : ℝ → 𝕄} {a : ℝ → ℝ} {w : ℝ}
   exact ((hF s hsK).mono_of_mem_nhdsWithin hmem).congr_of_eventuallyEq
     (mem_of_superset hmem fun t ht ↦ hEq ht) (hEq hsK)
 
-/-- Both derivatives of the chosen logarithm use the same fixed phase at each point. -/
+/-- The second and third lines of (A.3) at `s₀`, with `c = e^{i(a(s₀)+w/2)}` and
+`S_u = (1+u(cW(s₀)-1))⁻¹`: `H'(s₀) = i∫₀¹ S_u (cW') S_u du` and
+`H''(s₀) = i∫₀¹ (S_u (cW'') S_u - 2u S_u (cW') S_u (cW') S_u) du`. -/
 theorem walk_log_local_derivatives {H W : ℝ → 𝕄} {a : ℝ → ℝ} {w : ℝ}
     (hw : w < 2 * π) (ha : ContinuousOn a (Icc (0 : ℝ) 1))
     (hc : IsC2Family W) (hW : IsUnitaryFamily W 0 1)
@@ -205,6 +213,7 @@ theorem walk_log_local_derivatives {H W : ℝ → 𝕄} {a : ℝ → ℝ} {w : �
   have hcD : ContDiffOn ℝ 1 (∂W) (Icc (0 : ℝ) 1) :=
     hc.derivWithin huniq01 (by norm_num)
   have hWdd := hcD.differentiableOn (by norm_num)
+  -- On `K`, `V' = cW'` and `V'' = cW''`.
   have hD : EqOn D (fun s ↦ c • ∂W s) K := by
     intro s hs
     exact (((hWd s (hsub hs)).hasDerivWithinAt.const_smul c).mono hsub)
@@ -213,6 +222,7 @@ theorem walk_log_local_derivatives {H W : ℝ → 𝕄} {a : ℝ → ℝ} {w : �
     intro s hs
     have ht := ((hWdd s (hsub hs)).hasDerivWithinAt.const_smul c).mono hsub
     exact (ht.congr hD (hD hs)).derivWithin (huniq s hs)
+  -- The second line of (A.3) on `K`: `H' = i∫₀¹ S_u V' S_u du`.
   have hG : EqOn (∂H) G K := by
     intro s hs
     have hdH := (hd s hs).congr hEq (hEq hs)
@@ -221,6 +231,7 @@ theorem walk_log_local_derivatives {H W : ℝ → 𝕄} {a : ℝ → ℝ} {w : �
       (hcH.differentiableOn (by norm_num) s (hsub hs))
     exact hglobal.symm.trans hlocal
   have hfirst : ∂H s₀ = G s₀ := hG hsK
+  -- The third line of (A.3) at `s₀`.
   have hsecond : ∂∂H s₀ = I • walkLogSecondIntegral (V s₀) (D s₀) (E s₀) := by
     exact (((hdd s₀ hsK).congr hG (hG hsK)).mono_of_mem_nhdsWithin hmem)
       |>.derivWithin (huniq01 s₀ hs₀)

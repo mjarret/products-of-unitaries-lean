@@ -6,9 +6,17 @@ Authors: Michael Jarret
 module
 
 public import Mathlib
-public import RoundedClocks.Definitions
+public import RoundedClocks.Preliminaries.Basic
 
-/-! The Weyl and calculus facts used by the gap-adapted schedule. -/
+/-! # Example 5.1: the gap-adapted schedule
+
+For the affine path `(1-x)H₀ + xH₁` with `‖H₀‖ ≤ 1` and `‖H₁‖ ≤ 1`, every eigenvalue lies in
+`[-1,1]`, so `Γ ≤ 2` and every sample has eigenvalue differences of modulus at most `2`.
+Integrating `Γ(u)^{-p} u' = c_p` gives `u(1) = 1`, and `H' = c_p Γ(u)^p (H₁ - H₀)` gives the three
+displayed lines. Here `gapInterp H₀ H₁ x` is `(1-x)H₀ + xH₁`, and `Γ(x)` is
+`leastEigenvalueGap (gapInterp H₀ H₁ x)`. The Lipschitz constant of `Γ` is in
+`GapAdaptedSpectralGap.lean`.
+-/
 
 @[expose] public section
 
@@ -22,60 +30,43 @@ namespace RoundedClocks
 variable {n : ℕ}
 
 local notation "Mat" => Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ
-local notation "Tmat" => Matrix.toEuclideanCLM (n := Fin (n + 1)) (𝕜 := ℂ)
-local notation "Euc" => EuclideanSpace ℂ (Fin (n + 1))
 
-/-- The re-indexing from sorted eigenvalue positions to matrix indices. -/
-private noncomputable def sortIdx (m : ℕ) : Fin (Fintype.card (Fin m)) ≃ Fin m :=
-  Fintype.equivOfCardEq (Fintype.card_fin _)
-
-/-- Mathlib's indexed eigenvalue at `sortIdx` is the corresponding sorted eigenvalue. -/
-private theorem eigenvalues_sortIdx {A : Mat} (hA : IsHermitian A)
-    (j : Fin (Fintype.card (Fin (n + 1)))) :
-    hA.eigenvalues (sortIdx (n + 1) j) = hA.eigenvalues₀ j :=
-  congrArg hA.eigenvalues₀ ((sortIdx (n + 1)).symm_apply_apply j)
-
-/-- The affine Hamiltonian path used in Example 5.1. -/
+/-- The affine path `(1-x)H₀ + xH₁` of Example 5.1. -/
 def gapInterp (H₀ H₁ : Mat) (x : ℝ) : Mat := (1 - x) • H₀ + x • H₁
 
-/-- Real affine combinations of Hermitian matrices are Hermitian. -/
+/-- `(1-x)H₀ + xH₁` is Hermitian. -/
 theorem gapInterp_hermitian {H₀ H₁ : Mat} (h₀ : IsHermitian H₀)
     (h₁ : IsHermitian H₁) (x : ℝ) : IsHermitian (gapInterp H₀ H₁ x) := by
-  exact (IsSelfAdjoint.smul (isSelfAdjoint_iff.mpr (star_trivial _)) h₀).add
-    (IsSelfAdjoint.smul (isSelfAdjoint_iff.mpr (star_trivial _)) h₁)
+  exact ((IsSelfAdjoint.all (1 - x)).smul h₀).add ((IsSelfAdjoint.all x).smul h₁)
 
-/-- The difference of affine samples is the parameter difference times `H₁-H₀`. -/
+/-- `((1-x)H₀ + xH₁) - ((1-y)H₀ + yH₁) = (x - y)(H₁ - H₀)`. -/
 theorem gapInterp_sub (H₀ H₁ : Mat) (x y : ℝ) :
     gapInterp H₀ H₁ x - gapInterp H₀ H₁ y = (x - y) • (H₁ - H₀) := by
-  unfold gapInterp
-  module
+  have h := (AffineMap.lineMap (k := ℝ) H₀ H₁).linearMap_vsub x y
+  simpa [gapInterp, AffineMap.lineMap_apply_module] using h.symm
 
-/-- The affine interpolation of two contractions is a contraction. -/
+/-- `‖(1-x)H₀ + xH₁‖ ≤ 1` for `x ∈ [0,1]`, when `‖H₀‖ ≤ 1` and `‖H₁‖ ≤ 1`. -/
 theorem gapInterp_norm_le {H₀ H₁ : Mat} (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1)
     {x : ℝ} (hx : x ∈ Icc (0 : ℝ) 1) : ‖gapInterp H₀ H₁ x‖ ≤ 1 := by
-  calc
-    _ ≤ ‖(1 - x) • H₀‖ + ‖x • H₁‖ := norm_add_le _ _
-    _ = (1 - x) * ‖H₀‖ + x * ‖H₁‖ := by
-      rw [norm_smul, norm_smul, Real.norm_eq_abs, Real.norm_eq_abs,
-        abs_of_nonneg (sub_nonneg.mpr hx.2), abs_of_nonneg hx.1]
-    _ ≤ (1 - x) * 1 + x * 1 := add_le_add
-      (mul_le_mul_of_nonneg_left hn₀ (sub_nonneg.mpr hx.2))
-      (mul_le_mul_of_nonneg_left hn₁ hx.1)
-    _ = 1 := by ring
+  exact mem_closedBall_zero_iff.mp <| convex_closedBall 0 1 (mem_closedBall_zero_iff.mpr hn₀)
+    (mem_closedBall_zero_iff.mpr hn₁) (sub_nonneg.mpr hx.2) hx.1 (sub_add_cancel 1 x)
 
-/-- The sorted eigenvalues along the affine path. -/
+/-- The eigenvalues of `(1-x)H₀ + xH₁` in decreasing order; index `Fin.last n` is the least
+eigenvalue. -/
 def gapEigen (H₀ H₁ : Mat) (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁)
     (k : Fin (n + 1)) (x : ℝ) : ℝ :=
   (gapInterp_hermitian h₀ h₁ x).eigenvalues₀ ⟨k, by simpa using k.isLt⟩
 
-/-- The last decreasing eigenvalue is the least one. -/
+/-- The last eigenvalue in decreasing order is the least one. -/
 theorem gapEigen_least {H₀ H₁ : Mat} (h₀ : IsHermitian H₀)
     (h₁ : IsHermitian H₁) (k : Fin (n + 1)) (x : ℝ) :
     gapEigen H₀ H₁ h₀ h₁ (Fin.last n) x ≤ gapEigen H₀ H₁ h₀ h₁ k x := by
   apply (gapInterp_hermitian h₀ h₁ x).eigenvalues₀_antitone
   exact k.le_last
 
-/-- The least positive difference from the least eigenvalue, in sorted coordinates. -/
+/-- `Gamma` is the least positive difference between an eigenvalue of `(1-x)H₀ + xH₁` and its least
+eigenvalue: the spectral gap `Γ(x)` of the least eigenvalue, in terms of the eigenvalues in
+decreasing order. -/
 def IsLeastGap (H₀ H₁ : Mat) (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁)
     (x Gamma : ℝ) : Prop :=
   (∃ k, 0 < gapEigen H₀ H₁ h₀ h₁ k x -
@@ -87,49 +78,27 @@ def IsLeastGap (H₀ H₁ : Mat) (h₀ : IsHermitian H₀) (h₁ : IsHermitian H
     Gamma ≤ gapEigen H₀ H₁ h₀ h₁ k x -
       gapEigen H₀ H₁ h₀ h₁ (Fin.last n) x
 
-/-- A real number is a Hermitian eigenvalue exactly when it is a sorted eigenvalue. -/
+/-- A real number is an eigenvalue of a Hermitian matrix exactly when it occurs in the decreasing
+list of its eigenvalues. -/
 private theorem ofReal_mem_spectrum_iff {A : Mat} (hA : IsHermitian A) (x : ℝ) :
     (x : ℂ) ∈ spectrum ℂ A ↔
       ∃ j : Fin (Fintype.card (Fin (n + 1))), hA.eigenvalues₀ j = x := by
-  rw [show (x : ℂ) = algebraMap ℝ ℂ x from rfl, spectrum.algebraMap_mem_iff,
-    hA.spectrum_real_eq_range_eigenvalues]
-  constructor
-  · rintro ⟨i, rfl⟩
-    refine ⟨(sortIdx (n + 1)).symm i, ?_⟩
-    rw [← eigenvalues_sortIdx hA, Equiv.apply_symm_apply]
-  · rintro ⟨j, rfl⟩
-    exact ⟨sortIdx (n + 1) j, eigenvalues_sortIdx hA j⟩
+  have h : Set.range hA.eigenvalues = Set.range hA.eigenvalues₀ :=
+    EquivLike.range_comp hA.eigenvalues₀ (Fintype.equivOfCardEq (Fintype.card_fin _)).symm
+  simpa [hA.spectrum_eq_image_range] using Set.ext_iff.mp h x
 
-/-- The least eigenvalue is the final sorted eigenvalue. -/
+/-- The least eigenvalue is the last one in decreasing order. -/
 theorem leastEigenvalue_eq {A : Mat} (hA : IsHermitian A) :
     leastEigenvalue A = hA.eigenvalues₀ ⟨Fin.last n, by simp⟩ := by
-  have hset : {x : ℝ | (x : ℂ) ∈ spectrum ℂ A} = Set.range hA.eigenvalues₀ := by
-    ext x
-    exact ofReal_mem_spectrum_iff hA x
-  rw [leastEigenvalue, hset]
-  apply le_antisymm
-  · exact csInf_le (Set.finite_range _).bddBelow ⟨_, rfl⟩
-  · refine le_csInf (Set.range_nonempty _) ?_
-    rintro _ ⟨j, rfl⟩
-    apply hA.eigenvalues₀_antitone
-    rw [Fin.le_iff_val_le_val]
-    have hj := j.isLt
-    simp only [Fintype.card_fin] at hj
-    simp only [Fin.val_last]
-    omega
+  simpa only [Function.comp_apply, Fintype.card_fin, finCongr_apply, Nat.add_sub_cancel,
+    Fin.val_last] using (sorted_eigenvalues hA).2.csInf_eq
 
-/-- A least-eigenvalue gap is nonnegative, including when the defining set is empty. -/
-theorem gap_leastEigenvalueGap_nonneg (A : Mat) : 0 ≤ leastEigenvalueGap A := by
-  let S := {r : ℝ | ∃ y : ℝ, (y : ℂ) ∈ spectrum ℂ A ∧ leastEigenvalue A < y ∧
-    r = y - leastEigenvalue A}
-  change 0 ≤ sInf S
-  by_cases hS : S.Nonempty
-  · refine le_csInf hS ?_
-    rintro r ⟨y, _, hy, rfl⟩
-    exact sub_nonneg.mpr hy.le
-  · rw [Set.not_nonempty_iff_eq_empty.mp hS, Real.sInf_empty]
+/-- `leastEigenvalueGap A ≥ 0`, also when `A` has only one eigenvalue. -/
+theorem leastEigenvalueGap_nonneg (A : Mat) : 0 ≤ leastEigenvalueGap A := by
+  exact Real.sInf_nonneg (by rintro r ⟨y, -, hy, rfl⟩; exact sub_nonneg.mpr hy.le)
 
-/-- A positive least-eigenvalue gap is attained and bounds every larger eigenvalue. -/
+/-- A positive `leastEigenvalueGap A` is the least positive difference between an eigenvalue of `A`
+and its least eigenvalue. -/
 theorem leastGap_of_pos {A : Mat} (hA : IsHermitian A) (hpos : 0 < leastEigenvalueGap A) :
     let e : Fin (n + 1) → ℝ := fun k ↦ hA.eigenvalues₀ ⟨k, by simpa using k.isLt⟩
     (∃ k, 0 < e k - e (Fin.last n) ∧ leastEigenvalueGap A = e k - e (Fin.last n)) ∧
@@ -166,7 +135,22 @@ theorem leastGap_of_pos {A : Mat} (hA : IsHermitian A) (hpos : 0 < leastEigenval
   · rwa [hm]
   · rw [hm]
 
-/-- Every eigenvalue of an affine sample lies in `[-1,1]`. -/
+/-- When `Γ(x) > 0`, `Γ(x) = leastEigenvalueGap ((1-x)H₀ + xH₁)` is the least positive difference
+between an eigenvalue and the least eigenvalue. -/
+theorem isLeastGap_leastEigenvalueGap {H₀ H₁ : Mat} (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁)
+    {x : ℝ} (hpos : 0 < leastEigenvalueGap (gapInterp H₀ H₁ x)) :
+    IsLeastGap H₀ H₁ h₀ h₁ x (leastEigenvalueGap (gapInterp H₀ H₁ x)) :=
+  leastGap_of_pos (gapInterp_hermitian h₀ h₁ x) hpos
+
+/-- `Γ(x) ≥ Γ_*` for `x ∈ [0,1]`, where `Γ_* = inf_{x ∈ [0,1]} Γ(x)`. -/
+theorem sInf_leastEigenvalueGap_le (H₀ H₁ : Mat) {x : ℝ} (hx : x ∈ Icc (0 : ℝ) 1) :
+    sInf ((fun x : ℝ ↦ leastEigenvalueGap (gapInterp H₀ H₁ x)) '' Icc 0 1) ≤
+      leastEigenvalueGap (gapInterp H₀ H₁ x) := by
+  refine csInf_le ⟨0, ?_⟩ ⟨x, hx, rfl⟩
+  rintro _ ⟨z, -, rfl⟩
+  exact leastEigenvalueGap_nonneg (gapInterp H₀ H₁ z)
+
+/-- Weyl: every eigenvalue of `(1-x)H₀ + xH₁` lies in `[-1,1]`. -/
 private theorem gapInterp_eigenvalue_bounds {H₀ H₁ : Mat}
     (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁) (hn₀ : ‖H₀‖ ≤ 1)
     (hn₁ : ‖H₁‖ ≤ 1) {x : ℝ} (hx : x ∈ Icc (0 : ℝ) 1) (i : Fin (n + 1)) :
@@ -178,7 +162,7 @@ private theorem gapInterp_eigenvalue_bounds {H₀ H₁ : Mat}
     simpa only [Real.norm_eq_abs] using hi
   exact abs_le.mp (hiabs.trans hn)
 
-/-- Every affine sample has eigenvalue differences at most two. -/
+/-- Every sample `(1-x)H₀ + xH₁` has eigenvalue differences of modulus at most `2`. -/
 theorem gapInterp_width {H₀ H₁ : Mat} (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁)
     (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1) {x : ℝ} (hx : x ∈ Icc (0 : ℝ) 1)
     (i j : Fin (n + 1)) :
@@ -188,17 +172,25 @@ theorem gapInterp_width {H₀ H₁ : Mat} (h₀ : IsHermitian H₀) (h₁ : IsHe
   have hj := gapInterp_eigenvalue_bounds h₀ h₁ hn₀ hn₁ hx j
   exact abs_sub_le_iff.mpr ⟨by linarith [hi.2, hj.1], by linarith [hi.1, hj.2]⟩
 
-/-- The least spectral gap is at most two. -/
-theorem interp_gap_le_two {H₀ H₁ : Mat} (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁)
+/-- `Γ ≤ 2`, for `Γ` given as the least positive difference from the least eigenvalue. -/
+theorem gap_le_two {H₀ H₁ : Mat} (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁)
     (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1) {x Gamma : ℝ}
     (hx : x ∈ Icc (0 : ℝ) 1) (hGamma : IsLeastGap H₀ H₁ h₀ h₁ x Gamma) : Gamma ≤ 2 := by
   obtain ⟨k, hk, rfl⟩ := hGamma.1
-  have hw := gapInterp_width h₀ h₁ hn₀ hn₁ hx (sortIdx (n + 1) ⟨k, by simpa using k.isLt⟩)
-    (sortIdx (n + 1) ⟨Fin.last n, by simp⟩)
-  rw [eigenvalues_sortIdx, eigenvalues_sortIdx] at hw
+  have hw := gapInterp_width h₀ h₁ hn₀ hn₁ hx
+    (eigenvalueIndexEquiv (n + 1) ⟨k, by simpa using k.isLt⟩)
+    (eigenvalueIndexEquiv (n + 1) ⟨Fin.last n, by simp⟩)
+  rw [eigenvalues_eigenvalueIndexEquiv, eigenvalues_eigenvalueIndexEquiv] at hw
   exact (le_abs_self _).trans hw
 
-/-- The power function has the Lipschitz constant used in the manuscript. -/
+/-- Example 5.1: `Γ ≤ 2`, as the eigenvalues of `(1-x)H₀ + xH₁` lie in `[-1,1]`. -/
+theorem leastEigenvalueGap_le_two {H₀ H₁ : Mat} (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁)
+    (hn₀ : ‖H₀‖ ≤ 1) (hn₁ : ‖H₁‖ ≤ 1) {x : ℝ} (hx : x ∈ Icc (0 : ℝ) 1)
+    (hpos : 0 < leastEigenvalueGap (gapInterp H₀ H₁ x)) :
+    leastEigenvalueGap (gapInterp H₀ H₁ x) ≤ 2 :=
+  gap_le_two h₀ h₁ hn₀ hn₁ hx (isLeastGap_leastEigenvalueGap h₀ h₁ hpos)
+
+/-- `y ↦ y^p` has Lipschitz constant `p 2^{p-1}` for `0 ≤ y ≤ 2`. -/
 private theorem rpow_lipschitz_two {p x y : ℝ} (hp : 1 ≤ p)
     (hx : x ∈ Icc (0 : ℝ) 2) (hy : y ∈ Icc (0 : ℝ) 2) :
     |x ^ p - y ^ p| ≤ p * 2 ^ (p - 1) * |x - y| := by
@@ -213,7 +205,7 @@ private theorem rpow_lipschitz_two {p x y : ℝ} (hp : 1 ≤ p)
   simpa only [Real.norm_eq_abs] using
     (convex_Icc (0 : ℝ) 2).norm_image_sub_le_of_norm_hasDerivWithin_le hd hb hy hx
 
-/-- The normalizing inverse-gap integral is positive. -/
+/-- `c_p = ∫₀¹ Γ(x)^{-p} dx > 0`. -/
 theorem gap_normalization_pos {Gamma : ℝ → ℝ}
     (hGamma : ContinuousOn Gamma (Icc (0 : ℝ) 1))
     (hpos : ∀ x ∈ Icc (0 : ℝ) 1, 0 < Gamma x) (p : ℝ) :
@@ -224,7 +216,7 @@ theorem gap_normalization_pos {Gamma : ℝ → ℝ}
     (fun x hx ↦ (Real.rpow_pos_of_pos (hpos x ⟨hx.1.le, hx.2⟩) _).le)
     ⟨0, by norm_num, Real.rpow_pos_of_pos (hpos 0 (by norm_num)) _⟩
 
-/-- Integrating the schedule ODE gives the normalized inverse-gap primitive. -/
+/-- Integrating `Γ(u)^{-p} u' = c_p` from `0` to `s`: `∫₀^{u(s)} Γ(x)^{-p} dx = c_p s`. -/
 private theorem gap_schedule_integral {Gamma u : ℝ → ℝ} {p : ℝ}
     (hGamma : ContinuousOn Gamma (Icc (0 : ℝ) 1))
     (hpos : ∀ x ∈ Icc (0 : ℝ) 1, 0 < Gamma x) (hu0 : u 0 = 0)
@@ -271,7 +263,7 @@ private theorem gap_schedule_integral {Gamma u : ℝ → ℝ} {p : ℝ}
   rw [hu0] at hchange
   exact hchange.symm.trans hint
 
-/-- The normalizing integral makes the schedule reach `u(1)=1`. -/
+/-- Integrating `Γ(u)^{-p} u' = c_p` gives `u(1) = 1`. -/
 theorem gap_schedule_endpoint {Gamma u : ℝ → ℝ} {p : ℝ}
     (hGamma : ContinuousOn Gamma (Icc (0 : ℝ) 1))
     (hpos : ∀ x ∈ Icc (0 : ℝ) 1, 0 < Gamma x) (hu0 : u 0 = 0)
@@ -296,7 +288,7 @@ theorem gap_schedule_endpoint {Gamma u : ℝ → ℝ} {p : ℝ}
     ((hpow.mono hsmall).intervalIntegrable_of_Icc hlt.le)
   linarith
 
-/-- The ODE and `Gamma ≤ 2` give the schedule's Lipschitz bound. -/
+/-- `u` has Lipschitz constant `2^p c_p`, as `u' = c_p Γ(u)^p` and `Γ ≤ 2`. -/
 private theorem gap_schedule_lipschitz {Gamma u : ℝ → ℝ} {p cp : ℝ} (hp : 0 ≤ p)
     (hcp : 0 ≤ cp) (hGamma : ∀ x ∈ Icc (0 : ℝ) 1, Gamma x ∈ Icc (0 : ℝ) 2)
     (hurange : MapsTo u (Icc (0 : ℝ) 1) (Icc (0 : ℝ) 1))
@@ -313,20 +305,16 @@ private theorem gap_schedule_lipschitz {Gamma u : ℝ → ℝ} {p cp : ℝ} (hp 
   simpa only [Real.norm_eq_abs] using
     (convex_Icc (0 : ℝ) 1).norm_image_sub_le_of_norm_hasDerivWithin_le hu hb hs ht
 
-/-- Differentiating the scheduled affine Hamiltonian. -/
+/-- `H' = u' (H₁ - H₀)` for `H = (1-u)H₀ + uH₁`. -/
 theorem gap_schedule_derivative (H₀ H₁ : Mat) {u : ℝ → ℝ} {s v : ℝ}
     (hu : HasDerivWithinAt u v (Icc 0 1) s) :
     HasDerivWithinAt (fun s ↦ gapInterp H₀ H₁ (u s)) (v • (H₁ - H₀))
       (Icc 0 1) s := by
-  have heq : (fun s ↦ gapInterp H₀ H₁ (u s)) =
-      (fun s ↦ H₀ + u s • (H₁ - H₀)) := by
-    funext x
-    unfold gapInterp
-    module
-  rw [heq]
-  simpa using (hu.smul_const (H₁ - H₀)).const_add H₀
+  have h := (AffineMap.hasDerivAt_lineMap (a := H₀) (b := H₁)
+    (x := u s)).scomp_hasDerivWithinAt s hu
+  simpa [Function.comp_def, gapInterp, AffineMap.lineMap_apply_module] using h
 
-/-- The derivative supremum bound in Example 5.1. -/
+/-- The second displayed line of Example 5.1: `‖H'‖∞ ≤ 2^p c_p ‖H₁ - H₀‖`, as `Γ ≤ 2`. -/
 theorem gap_derivative_supNorm_le (D : Mat) {Gamma u : ℝ → ℝ} {p cp : ℝ}
     (hp : 0 ≤ p) (hcp : 0 ≤ cp)
     (hGamma : ∀ x ∈ Icc (0 : ℝ) 1, Gamma x ∈ Icc (0 : ℝ) 2)
@@ -345,7 +333,9 @@ theorem gap_derivative_supNorm_le (D : Mat) {Gamma u : ℝ → ℝ} {p cp : ℝ}
         (mul_le_mul_of_nonneg_left (Real.rpow_le_rpow hg.1 hg.2 hp) hcp) (norm_nonneg _)
       _ = _ := by ring
 
-/-- Multiplying the manuscript's three Lipschitz constants. -/
+/-- The third displayed line of Example 5.1: `H'` has Lipschitz constant `p 4^p c_p² ‖H₁ - H₀‖²`,
+the product of the Lipschitz constants `p 2^{p-1}` of `y ↦ y^p`, `2‖H₁ - H₀‖` of `Γ`, and `2^p c_p`
+of `u`, times `c_p ‖H₁ - H₀‖`. -/
 theorem gap_derivative_lipschitz (D : Mat) {Gamma u : ℝ → ℝ} {p cp : ℝ}
     (hp : 1 ≤ p) (hcp : 0 ≤ cp)
     (hGamma : ∀ x ∈ Icc (0 : ℝ) 1, Gamma x ∈ Icc (0 : ℝ) 2)
@@ -381,7 +371,8 @@ theorem gap_derivative_lipschitz (D : Mat) {Gamma u : ℝ → ℝ} {p cp : ℝ}
         hcp) (norm_nonneg _)
     _ = _ := by rw [Real.rpow_sub_one (by norm_num), hfour]; ring
 
-/-- The endpoint derivative identity in Example 5.1. -/
+/-- The first displayed line of Example 5.1: `‖H'(0)‖ + ‖H'(1)‖ = c_p ‖H₁ - H₀‖ (Γ(0)^p + Γ(1)^p)`.
+-/
 theorem gap_derivative_endpoints (D : Mat) {Gamma u : ℝ → ℝ} {p cp : ℝ}
     (hcp : 0 ≤ cp) (hGamma0 : 0 ≤ Gamma 0) (hGamma1 : 0 ≤ Gamma 1)
     (hu0 : u 0 = 0) (hu1 : u 1 = 1) :

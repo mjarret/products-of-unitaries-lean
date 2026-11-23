@@ -7,10 +7,12 @@ module
 
 public import RoundedClocks.Definitions
 
-/-! # Resolvent calculus
+/-! # Lemma A.2: differentiating the integral formula
 
-Lemma A.2 uses the segment resolvent from `1` to a unitary matrix; its inverse, derivative, and
-commutation identities give the logarithm integral.
+With `S_u = (1 + u(W - 1))⁻¹`, the identities `u(W-1)S_u = 1 - S_u` and `∂_s S_u = -u S_u W' S_u`
+turn the first line of (A.3) into the second and the second into the third. Differentiation under
+the integral sign then shows that `∫₀¹ (W-1) S_u du` is twice continuously differentiable on a
+closed interval. Here `walkLogResolvent W u` is `S_u`.
 -/
 
 @[expose] public section
@@ -20,19 +22,18 @@ open scoped Matrix.Norms.L2Operator Topology
 
 noncomputable section
 
-namespace RoundedClocks.WalkLogCalculus
+namespace RoundedClocks.WalkLog
 
 section Resolvent
 
 variable {A : Type*} [NormedRing A] [NormedAlgebra ℝ A] [CompleteSpace A]
 
-/-- The resolvent $Z_u = (1 + u(V - 1))^{-1}$ of the proof of Lemma A.2, along the segment from
-$1$ to $V$. `Ring.inverse` returns `0` when $1 + u(V - 1)$ is not invertible; every use proves
-invertibility first. -/
+/-- The `S_u = (1 + u(V - 1))⁻¹` of the proof of Lemma A.2. `Ring.inverse` returns `0` when
+`1 + u(V - 1)` is not invertible; every use proves invertibility first. -/
 def walkLogResolvent (V : A) (t : ℝ) : A := Ring.inverse (1 + t • (V - 1))
 
 omit [CompleteSpace A] in
-/-- Lemma A.2: the division-free resolvent identity, valid also at `u = 0`. -/
+/-- `u(V - 1)S_u = 1 - S_u`, also at `u = 0`. -/
 theorem walkLogResolvent_mul_sub (V : A) (u : ℝ)
     (hu : IsUnit (1 + u • (V - 1))) :
     u • ((V - 1) * walkLogResolvent V u) = 1 - walkLogResolvent V u := by
@@ -43,7 +44,7 @@ theorem walkLogResolvent_mul_sub (V : A) (u : ℝ)
     exact Ring.mul_inverse_cancel _ hu
   exact eq_sub_iff_add_eq.mpr (by simpa only [add_comm] using hsum)
 
-/-- The inverse derivative in a form convenient for a real matrix path. -/
+/-- `(V⁻¹)' = -V⁻¹ V' V⁻¹` along a path of invertible elements. -/
 theorem hasDerivWithinAt_ringInverse_path {V : ℝ → A} {D : A} {s : ℝ}
     {S : Set ℝ} (hV : HasDerivWithinAt V D S s) (hu : IsUnit (V s)) :
     HasDerivWithinAt (fun r ↦ Ring.inverse (V r))
@@ -54,7 +55,7 @@ theorem hasDerivWithinAt_ringInverse_path {V : ℝ → A} {D : A} {s : ℝ}
   simpa only [ContinuousLinearMap.neg_apply, ContinuousLinearMap.mulLeftRight_apply,
     ← hu, Ring.inverse_unit] using hi.comp_hasDerivWithinAt s hV
 
-/-- $\partial_s Z_u(V(s)) = -u\,Z_uV'Z_u$. -/
+/-- `∂_s S_u = -u S_u V' S_u`. -/
 theorem hasDerivWithinAt_walkLogResolvent {V : ℝ → A} {D : A} {s t : ℝ}
     {S : Set ℝ} (hV : HasDerivWithinAt V D S s)
     (hu : IsUnit (1 + t • (V s - 1))) :
@@ -63,7 +64,8 @@ theorem hasDerivWithinAt_walkLogResolvent {V : ℝ → A} {D : A} {s t : ℝ}
   simpa only [walkLogResolvent, mul_smul_comm, smul_mul_assoc, neg_smul] using
     hasDerivWithinAt_ringInverse_path (((hV.sub_const 1).const_smul t).const_add 1) hu
 
-/-- The derivative of the logarithm integrand is $Z_uDZ_u$, as $u(V-1)Z_u = 1-Z_u$. -/
+/-- From the first line of (A.3) to the second: `((V - 1)S_u)' = S_u V' S_u`, as
+`u(V - 1)S_u = 1 - S_u`. -/
 theorem hasDerivWithinAt_walkLogIntegrand {V : ℝ → A} {D : A} {s t : ℝ}
     {S : Set ℝ} (hV : HasDerivWithinAt V D S s)
     (hu : IsUnit (1 + t • (V s - 1))) :
@@ -84,7 +86,7 @@ theorem hasDerivWithinAt_walkLogIntegrand {V : ℝ → A} {D : A} {s t : ℝ}
         mul_neg,
         mul_assoc, sub_eq_add_neg]
 
-/-- $(s, u) \mapsto Z_u(V(s))$ is jointly continuous where $1 + u(V(s) - 1)$ is invertible. -/
+/-- `(s, u) ↦ S_u(V(s))` is jointly continuous where `1 + u(V(s) - 1)` is invertible. -/
 theorem continuousOn_walkLogResolvent {V : ℝ → A} {S : Set ℝ}
     (hV : ContinuousOn V S)
     (hu : ∀ s ∈ S, ∀ t ∈ Icc (0 : ℝ) 1, IsUnit (1 + t • (V s - 1))) :
@@ -100,7 +102,9 @@ theorem continuousOn_walkLogResolvent {V : ℝ → A} {S : Set ℝ}
   exact hi.comp_continuousWithinAt
     (f := fun q : ℝ × ℝ ↦ 1 + q.2 • (V q.1 - 1)) (hh p hp)
 
-/-- Differentiating the first resolvent sandwich gives the logarithm Hessian integrand. -/
+/-- From the second line of (A.3) to the third:
+`(S_u D S_u)' = S_u D' S_u - u(S_u V' S_u D S_u + S_u D S_u V' S_u)`; with `D = V'` the last two
+terms are equal. -/
 theorem hasDerivWithinAt_walkLogSandwich {V D : ℝ → A} {Vd Dd : A} {s t : ℝ}
     {S : Set ℝ} (hV : HasDerivWithinAt V Vd S s)
     (hD : HasDerivWithinAt D Dd S s)
@@ -119,7 +123,7 @@ theorem hasDerivWithinAt_walkLogSandwich {V D : ℝ → A} {Vd Dd : A} {s t : �
 
 end Resolvent
 
-/-- The integral representation in the first line of the logarithm display. -/
+/-- The integral `∫₀¹ (V - 1) S_u du` in the first line of (A.3). -/
 def walkLogIntegral {d : ℕ} (V : Matrix (Fin d) (Fin d) ℂ) :=
   ∫ t : ℝ in (0 : ℝ)..1, (V - 1) * walkLogResolvent V t
 
@@ -131,7 +135,8 @@ open scoped Topology
 variable {A : Type*} [NormedAddCommGroup A] [NormedSpace ℝ A] [CompleteSpace A]
 
 omit [CompleteSpace A] in
-/-- Differentiation on a compact rectangle supplies its own uniform majorant. -/
+/-- Differentiation under the integral sign over `0 ≤ u ≤ 1`, for an integrand whose derivative in
+the parameter is jointly continuous on a compact rectangle. -/
 theorem hasDerivAt_integral_compact_rectangle {F F' : ℝ → ℝ → A} {a b s : ℝ}
     (hs : s ∈ Ioo a b)
     (hF : ContinuousOn (Function.uncurry F) (Icc a b ×ˢ Icc (0 : ℝ) 1))
@@ -141,11 +146,9 @@ theorem hasDerivAt_integral_compact_rectangle {F F' : ℝ → ℝ → A} {a b s 
     HasDerivAt (fun x ↦ ∫ t : ℝ in (0 : ℝ)..1, F x t)
       (∫ t : ℝ in (0 : ℝ)..1, F' s t) s := by
   have hx (x : ℝ) (hx : x ∈ Icc a b) : ContinuousOn (F x) (Icc (0 : ℝ) 1) :=
-    hF.comp (continuous_const.prodMk continuous_id).continuousOn
-      (fun t ht ↦ ⟨hx, ht⟩)
+    hF.uncurry_left x hx
   have hx' (x : ℝ) (hx : x ∈ Icc a b) : ContinuousOn (F' x) (Icc (0 : ℝ) 1) :=
-    hF'.comp (continuous_const.prodMk continuous_id).continuousOn
-      (fun t ht ↦ ⟨hx, ht⟩)
+    hF'.uncurry_left x hx
   obtain ⟨C, hC⟩ := (isCompact_Icc.prod isCompact_Icc).exists_bound_of_continuousOn hF'
   have hU : Set.uIoc (0 : ℝ) 1 = Ioc (0 : ℝ) 1 := Set.uIoc_of_le (by norm_num)
   have hK : Set.uIcc (0 : ℝ) 1 = Icc (0 : ℝ) 1 := Set.uIcc_of_le (by norm_num)
@@ -172,7 +175,8 @@ section PathDerivatives
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- The first logarithm derivative obtained by differentiating its compact integral. -/
+/-- The second line of (A.3) in the interior of an interval:
+`(∫₀¹ (V - 1)S_u du)' = ∫₀¹ S_u V' S_u du`. -/
 theorem hasDerivAt_walkLogIntegral {V D : ℝ → 𝕄} {a b s : ℝ}
     (hs : s ∈ Ioo a b) (hV : ContinuousOn V (Icc a b))
     (hD : ContinuousOn D (Icc a b))
@@ -195,7 +199,8 @@ theorem hasDerivAt_walkLogIntegral {V D : ℝ → 𝕄} {a b s : ℝ}
   exact (hasDerivWithinAt_walkLogIntegrand (S := Set.univ) (hd x hx).hasDerivWithinAt
     (hu x ⟨hx.1.le, hx.2.le⟩ t ht)).hasDerivAt (by simp)
 
-/-- The second logarithm derivative obtained from the differentiated resolvent sandwich. -/
+/-- The third line of (A.3) in the interior of an interval:
+`(∫₀¹ S_u V' S_u du)' = ∫₀¹ (S_u V'' S_u - 2u S_u V' S_u V' S_u) du`. -/
 theorem hasDerivAt_walkLogDerivativeIntegral {V D E : ℝ → 𝕄} {a b s : ℝ}
     (hs : s ∈ Ioo a b) (hV : ContinuousOn V (Icc a b))
     (hD : ContinuousOn D (Icc a b)) (hE : ContinuousOn E (Icc a b))
@@ -237,8 +242,8 @@ section CompactCalculus
 
 variable {A : Type*} [NormedAddCommGroup A] [NormedSpace ℝ A]
 
-/-- Lemma A.2(ii), continuity under the integral: a continuous integrand on a
-closed rectangle has a continuous parameter integral, including at its endpoints. -/
+/-- An integrand that is jointly continuous on a closed rectangle has a continuous integral over
+`0 ≤ u ≤ 1`, also at the ends of the parameter interval. -/
 theorem continuousOn_integral_rectangle {F : ℝ → ℝ → A} {a b : ℝ}
     (hF : ContinuousOn (Function.uncurry F) (Icc a b ×ˢ Icc (0 : ℝ) 1)) :
     ContinuousOn (fun s ↦ ∫ u : ℝ in (0 : ℝ)..1, F s u) (Icc a b) := by
@@ -261,8 +266,8 @@ theorem continuousOn_integral_rectangle {F : ℝ → ℝ → A} {a b : ℝ}
       min_eq_right hu.2, max_eq_right hu.1]
   · simp only [Icc_eq_empty hab, continuousOn_empty]
 
-/-- Lemma A.2(ii), endpoint differentiation: continuous interior derivatives extend
-to derivatives within the closed interval. This is used for both integral derivatives. -/
+/-- A continuous function whose derivative in the open interval extends continuously to `[a,b]` has
+that derivative within `[a,b]` at every point, also at `a` and `b`. -/
 theorem hasDerivWithinAt_Icc_of_continuous_derivative {F G : ℝ → A} {a b : ℝ}
     (hab : a < b) (hF : ContinuousOn F (Icc a b)) (hG : ContinuousOn G (Icc a b))
     (hd : ∀ s ∈ Ioo a b, HasDerivAt F (G s) s) {s : ℝ} (hs : s ∈ Icc a b) :
@@ -284,8 +289,8 @@ theorem hasDerivWithinAt_Icc_of_continuous_derivative {F G : ℝ → A} {a b : �
   rw [closure_Ioo hab.ne] at hh
   exact hh
 
-/-- Lemma A.2(ii): two continuous derivatives obtained by integration imply `C²`
-on a closed interval, using derivatives within that interval at both endpoints. -/
+/-- A function with two successive continuous derivatives on `[a,b]` in this sense is twice
+continuously differentiable on `[a,b]`. -/
 theorem contDiffOn_two_of_integral_derivatives {F G H : ℝ → A} {a b : ℝ}
     (hab : a < b) (hF : ContinuousOn F (Icc a b)) (hG : ContinuousOn G (Icc a b))
     (hH : ContinuousOn H (Icc a b))
@@ -318,19 +323,18 @@ section IntegralDerivatives
 
 variable {A : Type*} [NormedRing A] [NormedAlgebra ℝ A] [CompleteSpace A]
 
-/-- Lemma A.2(ii), the first derivative integral following (log-integral), before
-multiplication by `i` and addition of the fixed scalar center. -/
+/-- The integral `∫₀¹ S_u D S_u du` in the second line of (A.3), without the factor `i`; the paper
+has `D = W'`. -/
 def walkLogFirstIntegral (V D : A) : A :=
   ∫ u : ℝ in (0 : ℝ)..1, walkLogResolvent V u * D * walkLogResolvent V u
 
-/-- Lemma A.2(ii), the second derivative integral following (log-integral), before
-multiplication by `i`; the two inverse derivatives give the coefficient `2u`. -/
+/-- The integral `∫₀¹ (S_u E S_u - 2u S_u D S_u D S_u) du` in the third line of (A.3), without the
+factor `i`; the paper has `D = W'` and `E = W''`. -/
 def walkLogSecondIntegral (V D E : A) : A :=
   ∫ u : ℝ in (0 : ℝ)..1, walkLogResolvent V u * E * walkLogResolvent V u -
     (2 * u) • (walkLogResolvent V u * D * walkLogResolvent V u * D * walkLogResolvent V u)
 
-/-- Lemma A.2(ii): the second differentiated integrand is jointly continuous on
-the entire parameter rectangle, including its boundary. -/
+/-- The integrand in the third line of (A.3) is jointly continuous for `0 ≤ u ≤ 1`. -/
 theorem continuousOn_walkLogSecondIntegrand {V D E : ℝ → A} {S : Set ℝ}
     (hV : ContinuousOn V S) (hD : ContinuousOn D S) (hE : ContinuousOn E S)
     (hu : ∀ s ∈ S, ∀ u ∈ Icc (0 : ℝ) 1, IsUnit (1 + u • (V s - 1))) :
@@ -355,9 +359,8 @@ section IntegralCalculus
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- Lemma A.2(ii): differentiating under the compact resolvent integral twice
-produces continuous first and second derivatives and a `C²` integral on a closed
-interval. The formulas use derivatives within the interval at both endpoints. -/
+/-- Equation (A.3) on a closed interval: `∫₀¹ (V - 1)S_u du` is `C²`, and its first and second
+derivatives, one-sided at the ends, are the integrals in the second and third lines. -/
 theorem walkLogIntegral_contDiffOn_two {V D E : ℝ → 𝕄} {a b : ℝ}
     (hab : a < b) (hV : ContinuousOn V (Icc a b))
     (hD : ContinuousOn D (Icc a b)) (hE : ContinuousOn E (Icc a b))
@@ -394,8 +397,7 @@ theorem walkLogIntegral_contDiffOn_two {V D E : ℝ → 𝕄} {a b : ℝ}
     (fun s hs ↦ hasDerivAt_walkLogDerivativeIntegral hs hV hD hE hd hdd hu)
   exact ⟨hc, hH, hdw, hddw⟩
 
-/-- Lemma A.2(ii): the only smoothness hypothesis needed for twice differentiating
-the resolvent integral is `C²` of the walk; its within-derivatives supply `D` and `E`. -/
+/-- The same for a `C²` family `V`, with `D = V'` and `E = V''` taken within the interval. -/
 theorem walkLogIntegral_contDiffOn_of_contDiffOn {V : ℝ → 𝕄} {a b : ℝ}
     (hab : a < b) (hc : ContDiffOn ℝ 2 V (Icc a b))
     (hu : ∀ s ∈ Icc a b, ∀ u ∈ Icc (0 : ℝ) 1, IsUnit (1 + u • (V s - 1))) :
@@ -421,4 +423,4 @@ theorem walkLogIntegral_contDiffOn_of_contDiffOn {V : ℝ → 𝕄} {a b : ℝ}
 
 end IntegralCalculus
 
-end RoundedClocks.WalkLogCalculus
+end RoundedClocks.WalkLog

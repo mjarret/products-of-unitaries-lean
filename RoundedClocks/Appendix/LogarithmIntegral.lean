@@ -8,10 +8,11 @@ module
 public import RoundedClocks.Appendix.LogarithmChord
 public import RoundedClocks.Appendix.LogarithmResolventCalculus
 
-/-! # Principal logarithm integral
+/-! # Lemma A.2: the integral formula for the principal logarithm
 
-Lemma A.2 identifies the chord integral with the principal logarithm and transfers this identity
-to matrices through the resolvent calculus.
+For complex `z ∉ (-∞, 0]`, `Log z = ∫₀¹ (z-1)(1+u(z-1))⁻¹ du`. The functional calculus carries the
+formula to a normal matrix `V` with no eigenvalue in `(-∞, 0]`: `Log V = ∫₀¹ (V-1) S_u du` with
+`S_u = (1+u(V-1))⁻¹`.
 -/
 
 @[expose] public section
@@ -22,18 +23,16 @@ open scoped Matrix.Norms.L2Operator Topology
 noncomputable section
 namespace RoundedClocks.WalkLog
 
-open WalkLogCalculus
 
 attribute [local instance] matrixCStarAlgebra
 
-/-- Lemma A.2: Mathlib's principal-log integral along the segment from `1` to `z`. -/
+/-- `Log z = ∫₀¹ (z-1)(1+u(z-1))⁻¹ du` for complex `z ∉ (-∞, 0]`. -/
 theorem integral_log_chord {z : ℂ} (hz : z ∈ Complex.slitPlane) :
     (∫ u : ℝ in (0 : ℝ)..1, (z - 1) / (1 + (u : ℂ) * (z - 1))) = Complex.log z := by
-  have hlog := Complex.log_eq_integral (z := z - 1) (by simpa using hz)
-  simpa only [add_sub_cancel, div_eq_mul_inv, Complex.real_smul,
-    intervalIntegral.integral_const_mul] using hlog.symm
+  simpa [div_eq_mul_inv] using
+    (Complex.log_eq_integral (z := z - 1) (by simpa using hz)).symm
 
-/-- The functional calculus preserves the scalar logarithm integral. -/
+/-- `∫₀¹ (V-1) S_u du = Log V` for a normal matrix `V` with no eigenvalue in `(-∞, 0]`. -/
 theorem walkLogIntegral_eq_cfc {d : ℕ} (V : Matrix (Fin d) (Fin d) ℂ) [IsStarNormal V]
     (hspec : spectrum ℂ V ⊆ Complex.slitPlane) :
     walkLogIntegral V = cfc Complex.log V := by

@@ -7,11 +7,11 @@ module
 
 public import RoundedClocks.Definitions
 
-/-! # The scalar multiplier guessed in the proof of Lemma A.1
+/-! # Lemma A.1: the function `𝒩_τ(x)`
 
-The manuscript sets `Y(τ) = 𝒩_τ([Ω,·]) D`. The scalar multiplier
-`𝒩_τ(x)` satisfies `∂_τ 𝒩_τ(x) + i x 𝒩_τ(x) = τ`, is `C¹` in `τ`, and equals `𝒩(x)` at
-`τ = ±1/2`.
+The proof of Lemma A.1 guesses `Y(τ) = 𝒩_τ([Ω,·])D`. The function `𝒩_τ(x)` satisfies
+`∂_τ𝒩_τ(x) + ix𝒩_τ(x) = τ`, is continuously differentiable in `τ`, and equals `𝒩(x)` at
+`τ = ±1/2`. Here `cellMultiplier τ x` is `𝒩_τ(x)`.
 -/
 
 @[expose] public section
@@ -20,30 +20,26 @@ namespace RoundedClocks
 
 open Complex
 
-/-- The scalar multiplier `𝒩_τ(x)` guessed in the proof of Lemma A.1. -/
+/-- The `𝒩_τ(x)` of the proof of Lemma A.1. -/
 noncomputable def cellMultiplier (τ x : ℝ) : ℂ :=
   if x = 0 then (τ : ℂ) ^ 2 / 2 - 1 / 24 else
     (1 - Complex.I * (x : ℂ) * (τ : ℂ)) / (x : ℂ) ^ 2 -
       Complex.exp (-Complex.I * (x : ℂ) * (τ : ℂ)) / (2 * (x : ℂ) * (Real.sin (x / 2) : ℂ))
 
-/-- The real embedding into the complex numbers has derivative one. -/
-private lemma hasDerivAt_ofReal' (t : ℝ) : HasDerivAt (fun s : ℝ ↦ (s : ℂ)) 1 t := by
-  simpa using (hasDerivAt_id' t).ofReal_comp
-
-/-- Differentiating the displayed scalar guess gives `∂_τ 𝒩_τ + i x 𝒩_τ = τ`. -/
+/-- `∂_τ𝒩_τ(x) + ix𝒩_τ(x) = τ`. -/
 theorem cellMultiplier_derivative (x τ : ℝ) :
     HasDerivAt (fun s : ℝ ↦ cellMultiplier s x)
       ((τ : ℂ) - Complex.I * (x : ℂ) * cellMultiplier τ x) τ := by
+  have ht : HasDerivAt (fun s : ℝ ↦ (s : ℂ)) 1 τ := Complex.ofRealCLM.hasDerivAt
   by_cases hx : x = 0
   · subst x
-    have h := (((hasDerivAt_ofReal' τ).pow 2).div_const (2 : ℂ)).sub_const (1 / 24 : ℂ)
+    have h := ((ht.pow 2).div_const (2 : ℂ)).sub_const (1 / 24 : ℂ)
     convert h using 1 <;> norm_num [cellMultiplier]
   · have hxC : (x : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr hx
     let c : ℂ := -1 / (2 * (x : ℂ) * (Real.sin (x / 2) : ℂ))
     let y : ℝ → ℂ := fun s ↦
       (1 / (x : ℂ) ^ 2 - Complex.I * (s : ℂ) / x) +
         c * Complex.exp (-Complex.I * (x : ℂ) * (s : ℂ))
-    have ht := hasDerivAt_ofReal' τ
     have hy : HasDerivAt y ((τ : ℂ) - Complex.I * x * y τ) τ := by
       have h :=
         (((ht.const_mul Complex.I).div_const (x : ℂ)).const_sub (1 / (x : ℂ) ^ 2)).add
@@ -60,7 +56,7 @@ theorem cellMultiplier_derivative (x τ : ℝ) :
       ring
     simpa only [heq] using hy
 
-/-- The multiplier is `C¹` in `τ`. -/
+/-- `τ ↦ 𝒩_τ(x)` is continuously differentiable. -/
 theorem cellMultiplier_contDiff (x : ℝ) : ContDiff ℝ 1 (fun τ : ℝ ↦ cellMultiplier τ x) := by
   have hd : Differentiable ℝ (fun τ : ℝ ↦ cellMultiplier τ x) :=
     fun τ ↦ (cellMultiplier_derivative x τ).differentiableAt
@@ -72,18 +68,14 @@ theorem cellMultiplier_contDiff (x : ℝ) : ContDiff ℝ 1 (fun τ : ℝ ↦ cel
   rw [this]
   exact Complex.continuous_ofReal.sub (continuous_const.mul hd.continuous)
 
-/-- Inside the admissible arc, `sin(x/2)` is nonzero away from `x = 0`. -/
+/-- `sin(x/2) ≠ 0` for `0 < |x| < 2π`. -/
 private lemma sin_half_ne_zero_of_abs_lt {x : ℝ} (hx0 : x ≠ 0) (hx : |x| < 2 * Real.pi) :
     Real.sin (x / 2) ≠ 0 := by
-  rcases lt_or_gt_of_ne hx0 with hn | hp
-  · have hs : 0 < Real.sin ((-x) / 2) := Real.sin_pos_of_pos_of_lt_pi
-      (by linarith) (by have := (abs_lt.mp hx).1; linarith)
-    rw [show x / 2 = -((-x) / 2) by ring, Real.sin_neg]
-    linarith
-  · exact (Real.sin_pos_of_pos_of_lt_pi (by linarith)
-      (by have := (abs_lt.mp hx).2; linarith)).ne'
+  rw [Ne, Real.sin_eq_zero_iff_of_lt_of_lt (by linarith [(abs_lt.mp hx).1])
+    (by linarith [(abs_lt.mp hx).2])]
+  simpa using hx0
 
-/-- Both endpoint values of the scalar guess are the multiplier `𝒩(x)`. -/
+/-- `𝒩_{±1/2}(x) = 𝒩(x)` for `|x| < 2π`. -/
 theorem cellMultiplier_endpoints {x : ℝ} (hx : |x| < 2 * Real.pi) :
     cellMultiplier (-1 / 2) x = (𝒩 x : ℂ) ∧ cellMultiplier (1 / 2) x = (𝒩 x : ℂ) := by
   by_cases hx0 : x = 0

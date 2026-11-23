@@ -8,10 +8,11 @@ module
 public import RoundedClocks.Appendix.CellMultiplier
 public import RoundedClocks.Appendix.MatrixSeries
 
-/-! # The guessed matrix family in Lemma A.1
+/-! # Lemma A.1(i): the guess `Y(τ) = 𝒩_τ([Ω,·])D`
 
-The scalar multiplier gives the differential equation, continuous differentiability, and
-both endpoint values after conjugating by an orthonormal eigenbasis.
+In an orthonormal eigenbasis of `Ω`, the guess has entries `𝒩_τ(λ_p - λ_q) D_pq`. The identities
+`∂_τ𝒩_τ(x) + ix𝒩_τ(x) = τ` and `𝒩_{±1/2}(x) = 𝒩(x)` give `Y' + i[Ω,Y] = τD` and
+`Y(±1/2) = 𝒩([Ω,·])D`. Here `cellGuess Ω hΩ D τ` is `Y(τ)`.
 -/
 
 @[expose] public section
@@ -34,28 +35,21 @@ def cellGuess (Ω : 𝕄) (hΩ : IsHermitian Ω) (D : 𝕄) (τ : ℝ) : 𝕄 :=
       ((hΩ.eigenvectorUnitary : 𝕄)† * D * (hΩ.eigenvectorUnitary : 𝕄)) p q) *
     (hΩ.eigenvectorUnitary : 𝕄)†
 
-/-- The commutator acts entrywise by the difference of eigenvalues. -/
+/-- `[Ω,A]_pq = (λ_p - λ_q) A_pq` in the eigenbasis of `Ω`. -/
 theorem cell_commutator_entry (Ω : 𝕄) (hΩ : IsHermitian Ω) (A : 𝕄) (p q : Fin d) :
     ((hΩ.eigenvectorUnitary : 𝕄)† * (Ω * A - A * Ω) *
       (hΩ.eigenvectorUnitary : 𝕄)) p q =
     ((hΩ.eigenvalues p - hΩ.eigenvalues q : ℝ) : ℂ) *
       ((hΩ.eigenvectorUnitary : 𝕄)† * A * (hΩ.eigenvectorUnitary : 𝕄)) p q := by
-  have hdiag : star (hΩ.eigenvectorUnitary : 𝕄) * Ω *
-      (hΩ.eigenvectorUnitary : 𝕄) =
-      Matrix.diagonal (fun p ↦ (hΩ.eigenvalues p : ℂ)) := by
-    simpa only [Unitary.conjStarAlgAut_apply, Unitary.coe_star, star_star,
-      Function.comp_apply] using hΩ.conjStarAlgAut_star_eigenvectorUnitary
   simpa only [pow_one, adL_apply] using
-    adL_pow_eigenbasis_entry Ω A hΩ.eigenvectorUnitary hΩ.eigenvalues hdiag 1 p q
+    adL_pow_eigenbasis_entry Ω A hΩ.eigenvectorUnitary hΩ.eigenvalues
+      (eigenvectorUnitary_conj_eq_diagonal hΩ) 1 p q
 
 /-- Entry arrays map continuously to matrices with the operator norm. -/
 private def cellMatrixCLM : (Fin d → Fin d → ℂ) →L[ℝ] 𝕄 :=
-  LinearMap.toContinuousLinearMap
-    { toFun := Matrix.of
-      map_add' := fun _ _ ↦ rfl
-      map_smul' := fun _ _ ↦ rfl }
+  LinearMap.toContinuousLinearMap (Matrix.ofLinearEquiv ℝ).toLinearMap
 
-/-- Differentiating the guess gives the differential equation of Lemma A.1. -/
+/-- Differentiating the guess: `Y' + i[Ω,Y] = τD`, as `∂_τ𝒩_τ(x) + ix𝒩_τ(x) = τ`. -/
 theorem cellGuess_hasDerivAt (Ω : 𝕄) (hΩ : IsHermitian Ω) (D : 𝕄) (τ : ℝ) :
     HasDerivAt (cellGuess Ω hΩ D)
       (τ • D - I • (Ω * cellGuess Ω hΩ D τ - cellGuess Ω hΩ D τ * Ω)) τ := by
@@ -66,16 +60,19 @@ theorem cellGuess_hasDerivAt (Ω : 𝕄) (hΩ : IsHermitian Ω) (D : 𝕄) (τ :
   let F' : Fin d → Fin d → ℂ := fun p q ↦
     ((τ : ℂ) - I * (hΩ.eigenvalues p - hΩ.eigenvalues q : ℝ) *
       cellMultiplier τ (hΩ.eigenvalues p - hΩ.eigenvalues q)) * A p q
+  -- Entrywise in the eigenbasis, `(𝒩_τ(x) D_pq)' = (τ - ix𝒩_τ(x)) D_pq`.
   have hF : HasDerivAt F F' τ := by
     apply hasDerivAt_pi.mpr
     intro p
     apply hasDerivAt_pi.mpr
     intro q
     exact (cellMultiplier_derivative _ τ).mul_const (A p q)
+  -- Conjugating back, `Y'(τ) = Ψ F' Ψ†`.
   let L := (ContinuousLinearMap.mulLeftRight ℝ 𝕄 U U†).comp cellMatrixCLM
   have h := L.hasFDerivAt.comp_hasDerivAt τ hF
   change HasDerivAt (cellGuess Ω hΩ D) (U * Matrix.of F' * U†) τ at h
   convert h using 1
+  -- `Ψ F' Ψ† = τD - i[Ω,Y]`: compare entries in the eigenbasis, where `[Ω,Y]_pq = x Y_pq`.
   let e := Unitary.conjStarAlgAut ℂ 𝕄 (star hΩ.eigenvectorUnitary)
   have he (X : 𝕄) : e X = U† * X * U := by
     simp only [e, U, Unitary.conjStarAlgAut_apply, Unitary.coe_star, star_star]
@@ -115,14 +112,12 @@ theorem cellGuess_contDiff (Ω : 𝕄) (hΩ : IsHermitian Ω) (D : 𝕄) :
   exact ((ContinuousLinearMap.mulLeftRight ℝ 𝕄 U U†).comp
     cellMatrixCLM).contDiff.comp hF
 
-/-- Both end values of the guess are the correction multiplier applied to `D`. -/
+/-- The end values of the guess: `Y(±1/2) = 𝒩([Ω,·])D`, as `𝒩_{±1/2}(x) = 𝒩(x)`. -/
 theorem cellGuess_endpoints {Ω : 𝕄} (hΩ : IsHermitian Ω) (D : 𝕄) {w : ℝ}
     (hw : w < 2 * π) (hwidth : HasEigenvalueDifferences Ω w) :
     cellGuess Ω hΩ D (-1 / 2) = 𝒩ad Ω D ∧
       cellGuess Ω hΩ D (1 / 2) = 𝒩ad Ω D := by
-  have hx (p q : Fin d) : |hΩ.eigenvalues p - hΩ.eigenvalues q| < 2 * π :=
-    (hwidth _ (hΩ.eigenvalues_mem_spectrum_real p) _
-      (hΩ.eigenvalues_mem_spectrum_real q)).trans_lt hw
+  have hx := abs_eigenvalues_sub_lt_two_pi hΩ hw hwidth
   rw [𝒩ad, dif_pos hΩ, if_pos hx]
   constructor
   · simp only [cellGuess, (cellMultiplier_endpoints (hx _ _)).1]

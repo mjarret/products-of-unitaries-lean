@@ -5,15 +5,17 @@ Authors: Michael Jarret
 -/
 module
 
-public import RoundedClocks.Examples.Spectral
-public import RoundedClocks.UnitSteps.ExponentialCoordinates
-public import RoundedClocks.UnitSteps.TruncatedProductBounds
+public import RoundedClocks.Preliminaries.Basic
+public import RoundedClocks.UnitSteps.WalkLeakage.ExponentialCoordinates
+public import RoundedClocks.UnitSteps.Basic
 public import RoundedClocks.UnitSteps.ExponentialSpectrum
 
-/-! # Endpoint projectors and phases
+/-! # The endpoint projectors of Theorem 4.7
 
-Corollary 4.7 identifies the spectral projectors at the endpoints and matches their phase factors
-with the Hermitian logarithm.
+Proof of Theorem 4.7: "As `W(s) = e^{-iH(s)}`, `P` and `Q` are the spectral projectors of `H(0)`
+and `H(1)` for their eigenvalues in `(α(0), β(0))` and `(α(1), β(1))`
+(`walk_arcBandProjector_exp`), and they commute with `e^{iH(0)/2}` and `e^{-iH(1)/2}`
+(`walk_phase_commute_bandProjector`)."
 -/
 
 @[expose] public section
@@ -34,7 +36,8 @@ open scoped InnerProductSpace
 
 attribute [local instance] Classical.propDecidable
 
-/-- A selected-eigenspace projector keeps exactly the selected basis vectors. -/
+/-- If an orthonormal basis `b_j` diagonalizes `T` with eigenvalues `ev_j`, the spectral projector
+of `T` for the eigenvalues in `S` maps `b_j` to itself when `ev_j ∈ S` and to `0` otherwise. -/
 theorem walk_starProjection_basis
     (b : OrthonormalBasis (Fin d) ℂ (EuclideanSpace ℂ (Fin d)))
     (ev : Fin d → ℂ)
@@ -50,33 +53,33 @@ theorem walk_starProjection_basis
     rw [hdiag, inner_smul_right]
     simp only [orthonormal_iff_ite.mp b.orthonormal]
     by_cases hkj : k = j <;> simp [hkj]
-  have hproj (j : Fin d) : E.starProjection (b j) =
-      if ev j ∈ S then b j else 0 := by
-    by_cases hj : ev j ∈ S
-    · rw [if_pos hj]
-      apply Submodule.starProjection_eq_self_iff.mpr
-      have hle : Module.End.eigenspace T.toLinearMap (ev j) ≤ E :=
-        le_iSup_of_le (ev j) (le_iSup_of_le hj le_rfl)
-      exact hle (Module.End.mem_eigenspace_iff.mpr (hvec j))
-    · rw [if_neg hj]
-      apply (Submodule.starProjection_apply_eq_zero_iff E).mpr
-      have hker : E ≤ LinearMap.ker (innerSL ℂ (b j)).toLinearMap := by
-        refine iSup_le fun z ↦ iSup_le fun hz ↦ ?_
-        intro u hu
-        change ⟪b j, u⟫_ℂ = 0
-        have he := congrArg (fun u : (EuclideanSpace ℂ (Fin d)) ↦ ⟪b j, u⟫_ℂ)
-          (Module.End.mem_eigenspace_iff.mp hu)
-        change ⟪b j, T u⟫_ℂ = ⟪b j, z • u⟫_ℂ at he
-        rw [hdiag, inner_smul_right] at he
-        by_contra hn
-        have hzj := mul_right_cancel₀ hn he
-        exact hj (hzj.symm ▸ hz)
-      apply (Submodule.mem_orthogonal' E (b j)).mpr
+  change E.starProjection (b j) = if ev j ∈ S then b j else 0
+  by_cases hj : ev j ∈ S
+  · rw [if_pos hj]
+    apply Submodule.starProjection_eq_self_iff.mpr
+    have hle : Module.End.eigenspace T.toLinearMap (ev j) ≤ E :=
+      le_iSup_of_le (ev j) (le_iSup_of_le hj le_rfl)
+    exact hle (Module.End.mem_eigenspace_iff.mpr (hvec j))
+  · rw [if_neg hj]
+    apply (Submodule.starProjection_apply_eq_zero_iff E).mpr
+    have hker : E ≤ LinearMap.ker (innerSL ℂ (b j)).toLinearMap := by
+      refine iSup_le fun z ↦ iSup_le fun hz ↦ ?_
       intro u hu
-      exact hker hu
-  exact hproj j
+      change ⟪b j, u⟫_ℂ = 0
+      have he := congrArg (fun u : (EuclideanSpace ℂ (Fin d)) ↦ ⟪b j, u⟫_ℂ)
+        (Module.End.mem_eigenspace_iff.mp hu)
+      change ⟪b j, T u⟫_ℂ = ⟪b j, z • u⟫_ℂ at he
+      rw [hdiag, inner_smul_right] at he
+      by_contra hn
+      have hzj := mul_right_cancel₀ hn he
+      exact hj (hzj.symm ▸ hz)
+    apply (Submodule.mem_orthogonal' E (b j)).mpr
+    intro u hu
+    exact hker hu
 
-/-- In one open turn, the phase arc and real interval select the same projector. -/
+/-- If the eigenvalues of a Hermitian `H` lie in `(α, α + 2π)` and `β < α + 2π`, the spectral
+projector of `e^{-iH}` for the arc `{e^{-iθ} : α < θ < β}` is the spectral projector of `H` for
+its eigenvalues in `(α, β)`. -/
 theorem walk_arcBandProjector_exp {H : 𝕄} (hH : IsHermitian H) {α β : ℝ}
     (hβ : β < α + 2 * Real.pi)
     (hturn : ∀ j, hH.eigenvalues j ∈ Set.Ioo α (α + 2 * Real.pi)) :
@@ -101,30 +104,12 @@ theorem walk_arcBandProjector_exp {H : 𝕄} (hH : IsHermitian H) {α β : ℝ}
   have hi : (hH.eigenvalues j : ℂ) ∈ interval α β ↔
       hH.eigenvalues j ∈ Set.Ioo α β := by
     simp [interval]
-  rw [WalkLeakageSpectrum.phase_mem_arc_iff hβ (hturn j), hi]
+  rw [phase_mem_arc_iff hβ (hturn j), hi]
 
-/-- An arc spectral projector is orthogonal, without a normality assumption. -/
-theorem walk_arcProjector_isOrthogonal (W : 𝕄) (a b : ℝ) :
-    IsOrthogonalProjector (arcBandProjector W a b) := by
-  exact spectralProjector_isOrthogonal W (arc a b)
-
-/-- Every scalar exponential of a Hermitian matrix commutes with its band projector. -/
+/-- `e^{zH}` commutes with the spectral projector of a Hermitian `H` for its eigenvalues in
+`(a, b)`. -/
 theorem walk_phase_commute_bandProjector {H : 𝕄} (hH : IsHermitian H)
     (a b : ℝ) (z : ℂ) : Commute (exp (z • H)) (bandProjector H a b) := by
   exact ((spectralProjector_commute hH (interval a b)).symm.smul_left z).exp_left
-
-/-- The final negative half-step phase is unitary. -/
-theorem walk_negative_halfPhase_isUnitary {H : 𝕄} (hH : IsHermitian H) :
-    IsUnitary (exp (-(I / 2) • H)) := by
-  have he : -(I / 2) • H = ((1 / 2 : ℝ) : ℂ) • (-I • H) := by module
-  rw [he]
-  exact phase_isUnitary hH (1 / 2)
-
-/-- The initial positive half-step phase is unitary. -/
-theorem walk_positive_halfPhase_isUnitary {H : 𝕄} (hH : IsHermitian H) :
-    IsUnitary (exp ((I / 2) • H)) := by
-  have he : (I / 2) • H = ((-(1 / 2) : ℝ) : ℂ) • (-I • H) := by module
-  rw [he]
-  exact phase_isUnitary hH (-(1 / 2))
 
 end RoundedClocks

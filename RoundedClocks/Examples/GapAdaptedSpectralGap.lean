@@ -6,11 +6,12 @@ Authors: Michael Jarret
 module
 
 public import RoundedClocks.Examples.GapAdapted
-public import RoundedClocks.UnitSteps.unitary_products
 
-/-! # The spectral gap along an affine path
+/-! # Example 5.1: the Lipschitz constant of `Γ`
 
-Ordered eigenvalues and the least spectral gap vary Lipschitz-continuously along the affine path.
+By Weyl's perturbation theorem (Bhatia, Corollary III.2.6), the ordered eigenvalues of
+`(1-x)H₀ + xH₁` are Lipschitz in `x` with constant `‖H₁ - H₀‖`. As `Γ_* > 0`, the least eigenvalue
+keeps its multiplicity, so `Γ` is Lipschitz with constant `2‖H₁ - H₀‖`.
 -/
 
 @[expose] public section
@@ -26,7 +27,8 @@ variable {n : ℕ}
 
 local notation "Mat" => Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ
 
-/-- Bhatia's ordered-eigenvalue bound along the affine path. -/
+/-- Weyl: each ordered eigenvalue of `(1-x)H₀ + xH₁` is Lipschitz in `x` with constant `‖H₁ - H₀‖`.
+-/
 theorem eigen_lipschitz (bhatia : Bhatia_Corollary_III_2_6)
     {H₀ H₁ : Mat} (h₀ : IsHermitian H₀)
     (h₁ : IsHermitian H₁) (k : Fin (n + 1)) (x y : ℝ) :
@@ -40,7 +42,7 @@ theorem eigen_lipschitz (bhatia : Bhatia_Corollary_III_2_6)
   simpa only [gapEigen, Function.comp_apply, finCongr_apply, gapInterp_sub,
     norm_smul, Real.norm_eq_abs, mul_comm] using h
 
-/-- Every ordered eigenvalue depends continuously on the path parameter. -/
+/-- Each ordered eigenvalue of `(1-x)H₀ + xH₁` is continuous in `x`. -/
 theorem eigen_continuous (bhatia : Bhatia_Corollary_III_2_6)
     {H₀ H₁ : Mat} (h₀ : IsHermitian H₀)
     (h₁ : IsHermitian H₁) (k : Fin (n + 1)) :
@@ -49,8 +51,9 @@ theorem eigen_continuous (bhatia : Bhatia_Corollary_III_2_6)
   intro x y
   simpa only [Real.dist_eq] using eigen_lipschitz bhatia h₀ h₁ k x y
 
-/-- A continuous nonnegative function uniformly separated from zero cannot cross zero. -/
-theorem zero_iff {f : ℝ → ℝ} {g : ℝ} (hg : 0 < g)
+/-- A continuous function on `[0,1]` whose every value is `0` or at least `g > 0` vanishes at every
+point or at none. -/
+theorem eq_zero_iff_of_separated {f : ℝ → ℝ} {g : ℝ} (hg : 0 < g)
     (hf : ContinuousOn f (Icc (0 : ℝ) 1))
     (hsep : ∀ x ∈ Icc (0 : ℝ) 1, f x = 0 ∨ g ≤ f x)
     {x y : ℝ} (hx : x ∈ Icc (0 : ℝ) 1) (hy : y ∈ Icc (0 : ℝ) 1) :
@@ -65,7 +68,8 @@ theorem zero_iff {f : ℝ → ℝ} {g : ℝ} (hg : 0 < g)
       ha hb hf hmid
     rcases hsep z hz with heq | hge <;> linarith
 
-/-- A uniform positive gap makes the ground-space multiplicity constant. -/
+/-- As `Γ_* > 0`, the least eigenvalue keeps its multiplicity: an ordered eigenvalue that equals the
+least eigenvalue at one `x ∈ [0,1]` equals it at every `x ∈ [0,1]`. -/
 theorem ground_indices_constant (bhatia : Bhatia_Corollary_III_2_6)
     {H₀ H₁ : Mat}
     (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁) (Gamma : ℝ → ℝ) {g : ℝ}
@@ -88,9 +92,10 @@ theorem ground_indices_constant (bhatia : Bhatia_Corollary_III_2_6)
     rcases (gapEigen_least h₀ h₁ k z).eq_or_lt with heq | hlt
     · exact Or.inl (sub_eq_zero.mpr heq.symm)
     · exact Or.inr ((hlow z hz).trans ((hGamma z hz).2 k hlt))
-  simpa only [sub_eq_zero] using zero_iff hg hcont hsep hx hy
+  simpa only [sub_eq_zero] using eq_zero_iff_of_separated hg hcont hsep hx hy
 
-/-- One fixed sorted position is the first excited level along a uniformly gapped path. -/
+/-- One ordered eigenvalue is the first above the least eigenvalue for every `x ∈ [0,1]`, so `Γ` is
+its difference from the least eigenvalue. -/
 theorem first_excited_fixed (bhatia : Bhatia_Corollary_III_2_6)
     {H₀ H₁ : Mat}
     (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁) (Gamma : ℝ → ℝ) {g : ℝ}
@@ -136,8 +141,9 @@ theorem first_excited_fixed (bhatia : Bhatia_Corollary_III_2_6)
     (gapInterp_hermitian h₀ h₁ x).eigenvalues₀_antitone hjk
   linarith
 
-/-- The least spectral gap is Lipschitz with twice the path speed. -/
-theorem interp_gap_lipschitz (bhatia : Bhatia_Corollary_III_2_6)
+/-- `Γ` is Lipschitz with constant `2‖H₁ - H₀‖`, for `Γ` given as the least positive difference from
+the least eigenvalue. -/
+theorem gap_lipschitz (bhatia : Bhatia_Corollary_III_2_6)
     {H₀ H₁ : Mat}
     (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁) (Gamma : ℝ → ℝ) {g : ℝ}
     (hg : 0 < g) (hGamma : ∀ x ∈ Icc (0 : ℝ) 1, IsLeastGap H₀ H₁ h₀ h₁ x (Gamma x))
@@ -155,5 +161,18 @@ theorem interp_gap_lipschitz (bhatia : Bhatia_Corollary_III_2_6)
       congr 1
       ring
     _ ≤ _ := (abs_sub _ _).trans (by linarith)
+
+/-- Example 5.1: as `Γ_* > 0`, the least eigenvalue keeps its multiplicity, so
+`Γ(x) = leastEigenvalueGap ((1-x)H₀ + xH₁)` is Lipschitz with constant `2‖H₁ - H₀‖`. -/
+theorem leastEigenvalueGap_lipschitz (bhatia : Bhatia_Corollary_III_2_6) {H₀ H₁ : Mat}
+    (h₀ : IsHermitian H₀) (h₁ : IsHermitian H₁)
+    (hΓstar : 0 < sInf ((fun x : ℝ ↦ leastEigenvalueGap (gapInterp H₀ H₁ x)) '' Icc 0 1))
+    {x y : ℝ} (hx : x ∈ Icc (0 : ℝ) 1) (hy : y ∈ Icc (0 : ℝ) 1) :
+    |leastEigenvalueGap (gapInterp H₀ H₁ x) - leastEigenvalueGap (gapInterp H₀ H₁ y)| ≤
+      2 * ‖H₁ - H₀‖ * |x - y| :=
+  gap_lipschitz bhatia h₀ h₁ (fun x ↦ leastEigenvalueGap (gapInterp H₀ H₁ x)) hΓstar
+    (fun _ hz ↦ isLeastGap_leastEigenvalueGap h₀ h₁
+      (hΓstar.trans_le (sInf_leastEigenvalueGap_le H₀ H₁ hz)))
+    (fun _ hz ↦ sInf_leastEigenvalueGap_le H₀ H₁ hz) hx hy
 
 end RoundedClocks.GapAdaptedSpectralGap

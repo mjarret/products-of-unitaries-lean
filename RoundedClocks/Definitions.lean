@@ -21,8 +21,22 @@ the conjugate transpose of `A`.
 * `A†` : the conjugate transpose of the matrix `A`.
 * `∂f` : the derivative `f'` of `f` in `[0,1]`, one-sided at `0` and at `1`; `∂∂f` is `f''`.
 * `‖f‖∞` : the supremum of `‖f s‖` over `s ∈ [0,1]`.
-* `𝒩`, `c₀`, `c₁`, `c₂`, `κ`, `ℰ`, `ℰtilde` : the multiplier of Definition 4.1 and the constants of
-  Appendix B. The script letter `𝒩` is not Mathlib's neighbourhood filter `𝓝`.
+* `orderedProduct n A` : the product `A(n-1) ⋯ A(1) A(0)`, with later factors on the left.
+* `entrywiseFamily F H`, `truncation k H` : `H^{(F)}` of Definition 3.1 and the truncation `H^{(k)}`
+  of Example 3.2.
+* `𝒩 x`, `𝒩' x` : the multiplier `𝒩(x)` of Definition 4.1 and its derivative `𝒩'(x)`. The script
+  letter `𝒩` is not Mathlib's neighbourhood filter `𝓝`.
+* `𝒩ad Ω E` : `𝒩([Ω,·])E` of Definition 4.1, and `endValue Ω s` is `𝒩([Ω(s),·])Ω'(s)`.
+* `Δ H T j` : the jump `Δ_j` of Theorem 4.2.
+* `c₀ w`, `c₁ w`, `c₂ w`, `κ w`, `ℰ w L H`, `ℰtilde w W` : the constants `c₀`, `c₁`, `c₂`, `κ`,
+  `ℰ_w(H)`, and `ℰ̃_w(W)` of Appendix B at width `w`.
+* `adL Ω` : the commutator `[Ω,·]` of Appendix A, and `adL Ω ^ n` is `[Ω,·]ⁿ`.
+
+## Eigenvalues
+
+An eigenvalue of a matrix `A` is an element of `spectrum ℂ A`. For a real `λ`,
+`(λ : ℂ) ∈ spectrum ℂ A` and `λ ∈ spectrum ℝ A` say the same, and both forms appear. The
+eigenvalues of a Hermitian matrix are real.
 
 ## Conventions
 
@@ -35,7 +49,11 @@ gives its hypotheses in the paper's words.
   Hermitian family generates exactly one.
 * `spectralGap`, `eigenphaseGap`, and `leastEigenvalueGap` are infima; the infimum of an empty set
   of real numbers is `0`.
-* `‖f‖∞` is a supremum; it is `0` when `‖f‖` is unbounded on `[0,1]`.
+* `∂f` is `0` at every `s` where `f` has no derivative in `[0,1]`.
+* `‖f‖∞` is a supremum; it is `0` when `‖f‖` is unbounded for `s ∈ [0,1]`.
+* `midpointApproximationError` is a supremum; it is `0` when `H` is unbounded between two
+  checkpoints. A regulated `H` is bounded.
+* `𝒩 x` is `1/x²` at `x = 2πm` with `m ≠ 0`, where the paper leaves `𝒩` undefined.
 * `𝒩([Ω,·])E` is `0` unless `Ω` is Hermitian with eigenvalue differences of modulus less than `2π`.
 -/
 
@@ -50,6 +68,9 @@ noncomputable section
 
 namespace RoundedClocks
 
+/-- Operator-norm matrices form a C-star algebra for the continuous functional calculus. -/
+def matrixCStarAlgebra (d : ℕ) : CStarAlgebra (Matrix (Fin d) (Fin d) ℂ) where
+
 variable {d : ℕ}
 
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
@@ -58,7 +79,7 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 scoped postfix:max "†" => star
 
 /-- The derivative of `f` in `[0,1]`, one-sided at `0` and at `1`. -/
-def deriv01 {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : ℝ → E) : ℝ → E :=
+abbrev deriv01 {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : ℝ → E) : ℝ → E :=
   derivWithin f (Set.Icc (0 : ℝ) 1)
 
 /-- `∂f` is the derivative of `f` in `[0,1]`, one-sided at `0` and at `1`. -/
@@ -75,9 +96,10 @@ def supNorm {E : Type*} [NormedAddCommGroup E] (f : ℝ → E) : ℝ :=
 /-- A matrix `A` is *Hermitian* if `A† = A`. -/
 abbrev IsHermitian (A : 𝕄) : Prop := A.IsHermitian
 
-/-- A matrix family `A(t)` with `t ∈ [a,b]` is *Hermitian* if every `A(t)` is Hermitian. -/
-def IsHermitianFamily (A : ℝ → 𝕄) (a b : ℝ) : Prop :=
-  ∀ t ∈ Icc a b, IsHermitian (A t)
+/-- Section 2. A matrix family `A(t)` with `t ∈ [a,b]` is *Hermitian* if every `A(t)` is
+Hermitian. -/
+abbrev IsHermitianFamily (A : ℝ → 𝕄) (a b : ℝ) : Prop :=
+  MapsTo A (Icc a b) {X | IsSelfAdjoint X}
 
 /-- **Definition 2.1.** A matrix-valued function `H(t)` with `t ∈ [a,b]` is *regulated* if `H` has
 a right limit at every `t ∈ [a,b)` and a left limit at every `t ∈ (a,b]`. -/
@@ -94,17 +116,19 @@ def IsPiecewiseConstant (G : ℝ → 𝕄) (a b : ℝ) : Prop :=
     ∀ j < n, ∀ x ∈ Ioo (t j) (t (j + 1)), G x = A j
 
 /-- A matrix `A` is *unitary* if `A† A = 1`. For square matrices this gives `A A† = 1` too. -/
-abbrev IsUnitary (A : 𝕄) : Prop := A† * A = 1
+abbrev IsUnitary (A : 𝕄) : Prop := A ∈ unitary 𝕄
 
-/-- A matrix family `A(t)` with `t ∈ [a,b]` is *unitary* if every `A(t)` is unitary. -/
-def IsUnitaryFamily (A : ℝ → 𝕄) (a b : ℝ) : Prop :=
-  ∀ t ∈ Icc a b, IsUnitary (A t)
+/-- A matrix family `A(t)` with `t ∈ [a,b]` is *unitary* if every `A(t)` is unitary (used in
+Lemma A.2). -/
+abbrev IsUnitaryFamily (A : ℝ → 𝕄) (a b : ℝ) : Prop :=
+  MapsTo A (Icc a b) (unitary 𝕄 : Set 𝕄)
 
-/-- An *orthogonal projector* is a matrix `P` with `P² = P = P†`. -/
+/-- Section 2. An *orthogonal projector* is a matrix `P` with `P² = P = P†`. -/
 abbrev IsOrthogonalProjector (P : 𝕄) : Prop := IsStarProjection P
 
-/-- A family `A(s)` is *continuous* for `s ∈ [0,1]`. -/
-def IsContinuousFamily {E : Type*} [TopologicalSpace E] (A : ℝ → E) : Prop :=
+/-- A family `A(s)` is *continuous* for `s ∈ [0,1]` (used in Definition 2.5(iv), Theorem 4.7,
+Example 5.3, and Lemma A.2). -/
+abbrev IsContinuousFamily {E : Type*} [TopologicalSpace E] (A : ℝ → E) : Prop :=
   ContinuousOn A (Icc 0 1)
 
 /-- Equation (2.1). A family `G(t)` with `t ∈ [a,b]` *generates* the *evolution* `V(t)` for
@@ -115,17 +139,18 @@ def Generates (G V : ℝ → 𝕄) (a b : ℝ) : Prop :=
     ∃ S : Set ℝ, S.Countable ∧
       ∀ t ∈ Icc a b, t ∉ S → HasDerivWithinAt V (-I • (G t * V t)) (Icc a b) t
 
-/-- The evolution on `[0,T]` that `G` generates. A regulated Hermitian family generates exactly
-one evolution (`generates_exists`, `generates_unique`). For a family that generates no
-evolution, the value is the constant `1`. -/
+/-- Section 2. The evolution `V(t)` for `t ∈ [0,T]` that `G` generates. A regulated Hermitian
+family generates exactly one evolution (`generates_exists`, `generates_unique`). For a family that
+generates no evolution, the value is the constant `1`. -/
 def evolutionOf (G : ℝ → 𝕄) (T : ℝ) : ℝ → 𝕄 :=
   open Classical in if h : ∃ V, Generates G V 0 T then h.choose else fun _ ↦ 1
 
 /-- Section 2. A *time-dependent Hamiltonian* is a Hermitian family `H(s)` with `s ∈ [0,1]`. -/
-def IsTimeDepHamiltonian (H : ℝ → 𝕄) : Prop :=
-  IsHermitianFamily H 0 1
+abbrev IsTimeDepHamiltonian (H : ℝ → 𝕄) : Prop :=
+  MapsTo H (Icc 0 1) {X | IsSelfAdjoint X}
 
-/-- A *regulated time-dependent Hamiltonian* is both regulated and Hermitian on `[0,1]`. -/
+/-- A *regulated time-dependent Hamiltonian* is a time-dependent Hamiltonian `H(s)` that is
+regulated for `s ∈ [0,1]` (used in Theorem B and throughout Section 3). -/
 def IsRegulatedTimeDepHamiltonian (H : ℝ → 𝕄) : Prop :=
   IsRegulated H 0 1 ∧ IsTimeDepHamiltonian H
 
@@ -134,9 +159,15 @@ evolution `U(t)` for `t ∈ [0,T]` generated by `H(t/T)`. Its final value is `ev
 def evolution (H : ℝ → 𝕄) (T : ℝ) : ℝ → 𝕄 :=
   evolutionOf (fun t ↦ H (t / T)) T
 
-/-- The product `W((T-1)/T) ⋯ W(1/T) W(0)` of the `T` samples of a family `W`. -/
+/-- The product `A(n-1) ⋯ A(1) A(0)` of `n` matrices, with later factors on the left (used in
+equation (2.4) and in Definitions 2.3 and 3.5). -/
+abbrev orderedProduct (n : ℕ) (A : ℕ → 𝕄) : 𝕄 :=
+  ((List.range n).reverse.map A).prod
+
+/-- The product `W((T-1)/T) ⋯ W(1/T) W(0)` of the `T` samples of a family `W` (used in
+Definition 2.3 and in Theorems 4.6 and 4.7). -/
 def sampleProduct (W : ℝ → 𝕄) (T : ℕ) : 𝕄 :=
-  ((List.range T).reverse.map fun j : ℕ ↦ W (j / T)).prod
+  orderedProduct T fun j ↦ W (j / T)
 
 /-- **Definition 2.3.** For a time-dependent Hamiltonian `H(s)` with `s ∈ [0,1]` and an integer
 `T ≥ 1`, the *`T`-step product* of `H` is `W_T = e^{-iH((T-1)/T)} ⋯ e^{-iH(0)}`. -/
@@ -149,10 +180,10 @@ run on the rounded clock `⌊t+1/2⌋`. By the rounded-clock identity (2.5),
 def roundedEvolution (H : ℝ → 𝕄) (T : ℕ) : ℝ → 𝕄 :=
   evolutionOf (fun t ↦ H ((⌊t + 1 / 2⌋ : ℝ) / T)) T
 
-/-- The real numbers `{λ : a < λ < b}`, as a set of complex numbers. -/
-def interval (a b : ℝ) : Set ℂ := (fun x : ℝ ↦ (x : ℂ)) '' Ioo a b
+/-- Definition 2.5(i). The real numbers `{λ : a < λ < b}`, as a set of complex numbers. -/
+abbrev interval (a b : ℝ) : Set ℂ := (fun x : ℝ ↦ (x : ℂ)) '' Ioo a b
 
-/-- The arc `{e^{-iθ} : a < θ < b}` of the unit circle. -/
+/-- Definition 2.5(ii). The arc `{e^{-iθ} : a < θ < b}` of the unit circle. -/
 def arc (a b : ℝ) : Set ℂ := (fun θ : ℝ ↦ Complex.exp (-I * (θ : ℂ))) '' Ioo a b
 
 /-- **Definition 2.5(i).** If `A` is Hermitian, a *band* of `A` is a nonempty proper subset of its
@@ -175,7 +206,8 @@ def IsArcBand (A : 𝕄) (a b : ℝ) : Prop :=
     (spectrum ℂ A \ arc a b).Nonempty ∧ Complex.exp (-I * (a : ℂ)) ∉ spectrum ℂ A ∧
     Complex.exp (-I * (b : ℂ)) ∉ spectrum ℂ A
 
-/-- The distance along the circle between `e^{-iθ}` and `e^{-iφ}`: `min_{k ∈ ℤ} |θ - φ + 2πk|`. -/
+/-- Definition 2.5(ii). The distance along the circle between `e^{-iθ}` and `e^{-iφ}`:
+`min_{k ∈ ℤ} |θ - φ + 2πk|`. -/
 def circleDistance (θ φ : ℝ) : ℝ := ⨅ k : ℤ, |θ - φ + 2 * π * k|
 
 /-- **Definition 2.5(ii).** The *eigenphase gap* of the band `{e^{-iθ} : a < θ < b}` of a unitary
@@ -196,28 +228,32 @@ def spectralProjector (A : 𝕄) (S : Set ℂ) : 𝕄 :=
     (⨆ z ∈ S, Module.End.eigenspace
       ((Matrix.toEuclideanCLM (n := Fin d) (𝕜 := ℂ)) A).toLinearMap z).starProjection
 
-/-- `P` is the *spectral projector* of `A` for the eigenvalues in `S`. -/
+/-- `P` is the *spectral projector* of `A` for the eigenvalues in `S` (used in Example 5.3 and in
+the Davis–Kahan theorem of `Citations.lean`). -/
 def IsSpectralProjector (P A : 𝕄) (S : Set ℂ) : Prop :=
   P = spectralProjector A S
 
-/-- `P` is the spectral projector of a Hermitian `A` for one eigenvalue. -/
+/-- Example 5.3. `P` is the spectral projector of a Hermitian `A` for one eigenvalue. -/
 def IsOneEigenvalueProjector (P A : 𝕄) : Prop :=
   ∃ μ : ℝ, IsSpectralProjector P A {(μ : ℂ)}
 
-/-- The spectral projector of the Hermitian band `{λ : a < λ < b}` of `A`. -/
+/-- Definition 2.5(iii). The spectral projector of the band `{λ : a < λ < b}` of a Hermitian `A`
+(used in Remark 3.8). -/
 def bandProjector (A : 𝕄) (a b : ℝ) : 𝕄 :=
   spectralProjector A (interval a b)
 
-/-- The spectral projector of the unitary band `{e^{-iθ} : a < θ < b}` of `A`. -/
+/-- Definition 2.5(iii). The spectral projector of the band `{e^{-iθ} : a < θ < b}` of a unitary
+`A` (used in Theorem 4.7). -/
 def arcBandProjector (A : 𝕄) (a b : ℝ) : 𝕄 :=
   spectralProjector A (arc a b)
 
-/-- Two matrices have *equal rank*. -/
-def HasEqualRank (A B : 𝕄) : Prop :=
+/-- Remark 3.8. Two matrices have *equal rank*. -/
+abbrev HasEqualRank (A B : 𝕄) : Prop :=
   A.rank = B.rank
 
-/-- The real spectrum of `A` lies in `S`. -/
-def HasRealSpectrumIn (A : 𝕄) (S : Set ℝ) : Prop :=
+/-- The real eigenvalues of `A` lie in `S`: for a Hermitian `A`, its spectrum lies in `S` (used
+in Theorem 4.7 and Lemma A.2). -/
+abbrev HasRealSpectrumIn (A : 𝕄) (S : Set ℝ) : Prop :=
   spectrum ℝ A ⊆ S
 
 /-- **Definition 2.5(iv).** A *band* of a unitary family `A(s)` with `s ∈ [0,1]` is a band of each
@@ -238,25 +274,33 @@ def eigenvalueCount (A : 𝕄) (S : Set ℂ) : ℕ :=
 /-- **Definition 3.1.** For a function `F : ℝ → ℝ` and a matrix `A`, `A^{(F)}` is the matrix with
 entries `F(Re A_pq) + i F(Im A_pq)`. For a matrix-valued function `H`, `H^{(F)}(s)` is
 `entrywise F (H s)`. -/
-def entrywise (F : ℝ → ℝ) (A : 𝕄) : 𝕄 :=
-  Matrix.of fun p q ↦ ⟨F (A p q).re, F (A p q).im⟩
+abbrev entrywise (F : ℝ → ℝ) (A : 𝕄) : 𝕄 :=
+  A.map (fun z ↦ ⟨F z.re, F z.im⟩)
 
-/-- Example 3.2. *Bit truncation* is `[x]_k = sgn(x) 2^{-k} ⌊2^k |x|⌋`. The truncation `H^{(k)}`
-of `H` is `fun s ↦ entrywise (bitTruncation k) (H s)`. -/
+/-- **Definition 3.1**, for functions. For a matrix-valued function `H(s)`,
+`H^{(F)}(s) = H(s)^{(F)}`. -/
+abbrev entrywiseFamily (F : ℝ → ℝ) (H : ℝ → 𝕄) : ℝ → 𝕄 :=
+  fun s ↦ entrywise F (H s)
+
+/-- Example 3.2. *Bit truncation* is `[x]_k = sgn(x) 2^{-k} ⌊2^k |x|⌋`. -/
 def bitTruncation (k : ℕ) (x : ℝ) : ℝ :=
   Real.sign x * ((2 : ℝ) ^ k)⁻¹ * (⌊(2 : ℝ) ^ k * |x|⌋ : ℝ)
+
+/-- Example 3.2. The truncation `H^{(k)} = H^{([·]_k)}` of `H` at the `k`th binary place. -/
+abbrev truncation (k : ℕ) (H : ℝ → 𝕄) : ℝ → 𝕄 :=
+  entrywiseFamily (bitTruncation k) H
 
 /-- Example 3.2. `σ_k` is the largest number of entries that truncation at the `k`-th binary place
 changes in a row of `H(s)`, over all rows and all `s ∈ [0,1]`. -/
 def sparsity (k : ℕ) (H : ℝ → 𝕄) : ℕ :=
   ⨆ s : Icc (0 : ℝ) 1, ⨆ p : Fin d,
-    (Finset.univ.filter fun q ↦ entrywise (bitTruncation k) (H s) p q ≠ H s p q).card
+    (Finset.univ.filter fun q ↦ truncation k H s p q ≠ H s p q).card
 
 /-- Section 3. *Checkpoints* `0 = s_0 ≤ ⋯ ≤ s_N = 1`. -/
 def IsCheckpoints (N : ℕ) (s : ℕ → ℝ) : Prop :=
   (∀ j < N, s j ≤ s (j + 1)) ∧ s 0 = 0 ∧ s N = 1
 
-/-- *Strict checkpoints* are `0 = s_0 < ⋯ < s_N = 1`. -/
+/-- Lemma 3.4. *Strict checkpoints* are `0 = s_0 < ⋯ < s_N = 1`. -/
 def IsStrictCheckpoints (N : ℕ) (s : ℕ → ℝ) : Prop :=
   IsCheckpoints N s ∧ ∀ j < N, s j < s (j + 1)
 
@@ -266,9 +310,9 @@ def IsStrictCheckpoints (N : ℕ) (s : ℕ → ℝ) : Prop :=
 def HasMidpointError (H : ℝ → 𝕄) (N : ℕ) (s : ℕ → ℝ) (ε : ℝ) : Prop :=
   ∀ j < N, ∀ x ∈ Ioo (s j) (s (j + 1)), ‖H x - H ((s j + s (j + 1)) / 2)‖ ≤ ε
 
-/-- The paper's worst midpoint approximation error
-`max_j sup_{s_j < x < s_{j+1}} ‖H(x) - H^{(F)}(s_{j+1/2})‖`. Empty intervals contribute
-`0`, as does an empty list of checkpoints. -/
+/-- Theorem 3.6. The largest distance of `H` from its truncated midpoint sample within an
+interval between checkpoints, `max_j sup_{s_j < x < s_{j+1}} ‖H(x) - H^{(F)}(s_{j+1/2})‖`. Empty
+intervals contribute `0`, as does an empty list of checkpoints. -/
 def midpointApproximationError (F : ℝ → ℝ) (H : ℝ → 𝕄) (N : ℕ)
     (s : ℕ → ℝ) : ℝ :=
   sSup ({0} ∪ {r : ℝ | ∃ j < N, ∃ x ∈ Ioo (s j) (s (j + 1)),
@@ -279,37 +323,51 @@ checkpoints `s_0, …, s_N` is
 `e^{-iT(s_N - s_{N-1})A(s_{N-1/2})} ⋯ e^{-iT(s_1 - s_0)A(s_{1/2})}`,
 where `s_{j+1/2} = (s_j + s_{j+1})/2`. -/
 def midpointProduct (A : ℝ → 𝕄) (T : ℝ) (N : ℕ) (s : ℕ → ℝ) : 𝕄 :=
-  ((List.range N).reverse.map fun j ↦
-    exp ((-I * (T * (s (j + 1) - s j) : ℝ)) • A ((s j + s (j + 1)) / 2))).prod
+  orderedProduct N fun j ↦
+    exp ((-I * (T * (s (j + 1) - s j) : ℝ)) • A ((s j + s (j + 1)) / 2))
 
 /-- Remark 3.8. The Hermitian family `A` has the endpoint bands
 `{λ : a(s) < λ < b(s)}` at `s ∈ {0,1}`. -/
 def HasEndpointBands (A : ℝ → 𝕄) (a b : ℝ → ℝ) : Prop :=
   ∀ s ∈ ({0, 1} : Set ℝ), IsBand (A s) (a s) (b s)
 
+/-- Remark 3.8. For the band `{λ : a < λ < b}` of a Hermitian `A`, with eigenvalues `S` in the
+band, the interval `I = [min S, max S]`. -/
+abbrev bandHull (A : 𝕄) (a b : ℝ) : Set ℝ :=
+  let S := {x : ℝ | (x : ℂ) ∈ spectrum ℂ A ∩ interval a b}
+  Icc (sInf S) (sSup S)
+
 /-- Remark 3.8. For the band `{λ : a < λ < b}` of a Hermitian `A`, with eigenvalues `S` in
-the band, the real numbers within `ε` of the interval `[min S, max S]`. -/
+the band, the real numbers within `ε` of the interval `I = [min S, max S]`. -/
 def nearBand (A : 𝕄) (a b ε : ℝ) : Set ℂ :=
   let S := {x : ℝ | (x : ℂ) ∈ spectrum ℂ A ∩ interval a b}
   (fun x : ℝ ↦ (x : ℂ)) '' Icc (sInf S - ε) (sSup S + ε)
 
 /-! ## Section 4: the width hypothesis, the multiplier, and the constants -/
 
-/-- A matrix family `A(t)` is *continuously differentiable* for `t ∈ [a,b]`. -/
-def IsC1FamilyOn (A : ℝ → 𝕄) (a b : ℝ) : Prop :=
+/-- A matrix family `A(t)` is *continuously differentiable* for `t ∈ [a,b]` (used in
+Lemma A.1). -/
+abbrev IsC1FamilyOn (A : ℝ → 𝕄) (a b : ℝ) : Prop :=
   ContDiffOn ℝ 1 A (Icc a b)
 
-/-- A matrix family `A(s)` is *continuously differentiable* for `s ∈ [0,1]`. -/
-abbrev IsC1Family (A : ℝ → 𝕄) : Prop := IsC1FamilyOn A 0 1
+/-- A matrix family `A(s)` is *continuously differentiable* for `s ∈ [0,1]` (used in equation
+(A.2) and Lemma A.3). -/
+abbrev IsC1Family (A : ℝ → 𝕄) : Prop := ContDiffOn ℝ 1 A (Icc 0 1)
 
-/-- A matrix family `A(s)` is *twice continuously differentiable* for `s ∈ [0,1]`. -/
-def IsC2Family (A : ℝ → 𝕄) : Prop :=
+/-- A matrix family `A(s)` is *twice continuously differentiable* for `s ∈ [0,1]` (used in
+Theorems 4.6 and 4.7 and in Lemmas A.2 and A.3). -/
+abbrev IsC2Family (A : ℝ → 𝕄) : Prop :=
   ContDiffOn ℝ 2 A (Icc 0 1)
 
 /-- Section 4. A matrix has *eigenvalue differences of modulus at most `w`*. The paper applies this
 to Hermitian matrices, whose eigenvalues are real. -/
 def HasEigenvalueDifferences (A : 𝕄) (w : ℝ) : Prop :=
   ∀ x ∈ spectrum ℝ A, ∀ y ∈ spectrum ℝ A, |x - y| ≤ w
+
+/-- Section 4. Every `H(s)` with `s ∈ [0,1]` has eigenvalue differences of modulus at most `w`
+(used in Theorem 4.6, Example 5.1, equation (A.2), and Lemma A.3). -/
+abbrev HasWidth (H : ℝ → 𝕄) (w : ℝ) : Prop :=
+  ∀ s ∈ Icc (0 : ℝ) 1, HasEigenvalueDifferences (H s) w
 
 /-- Theorem 4.2. The samples `H(j/T)` for `0 ≤ j ≤ T` have eigenvalue differences of modulus at
 most `w`: the *width hypothesis* when `w < 2π`. -/
@@ -322,10 +380,14 @@ def HasLipschitzDerivative (H : ℝ → 𝕄) (L : ℝ) : Prop :=
   DifferentiableOn ℝ H (Icc 0 1) ∧
     ∀ s₁ ∈ Icc (0 : ℝ) 1, ∀ s₂ ∈ Icc (0 : ℝ) 1, ‖∂H s₁ - ∂H s₂‖ ≤ L * |s₁ - s₂|
 
-/-- **Definition 4.1.** `𝒩(x) = (1 - (x/2) cot(x/2)) / x²` for `x ≠ 0`, and `𝒩(0) = 1/12`. This is
-the multiplier at real `x`; `𝒩ℂ` is the same formula at complex `x`. -/
+/-- **Definition 4.1.** `𝒩(x) = (1 - (x/2) cot(x/2)) / x²` for `x ≠ 0`, and `𝒩(0) = 1/12`, at
+real `x`. -/
 def 𝒩 (x : ℝ) : ℝ :=
   if x = 0 then 1 / 12 else (1 - (x / 2) * Real.cot (x / 2)) / x ^ 2
+
+/-- `𝒩'(x)`, the derivative of the multiplier `𝒩` of Definition 4.1 (used in Appendix B and in
+Lemma A.3). -/
+abbrev 𝒩' (x : ℝ) : ℝ := deriv 𝒩 x
 
 /-- **Definition 4.1.** For a Hermitian `Ω` with eigenvalue differences of modulus less than `2π`
 and a matrix `E`, `𝒩([Ω,·])E` is the matrix with `ψ_p† (𝒩([Ω,·])E) ψ_q = 𝒩(λ_p - λ_q) ψ_p† E ψ_q`
@@ -339,6 +401,11 @@ def 𝒩ad (Ω E : 𝕄) : 𝕄 :=
         (𝒩 (hΩ.eigenvalues p - hΩ.eigenvalues q) : ℂ) * (Ψ† * E * Ψ) p q) * Ψ†
     else 0
   else 0
+
+/-- Lemma A.3. For a family `Ω(s)`, the function `s ↦ 𝒩([Ω(s),·])Ω'(s)`. For `Ω = H`, its values
+at the samples `j/T` are `T` times the end values of the corrections of Section 4.1. -/
+abbrev endValue (Ω : ℝ → 𝕄) : ℝ → 𝕄 :=
+  fun s ↦ 𝒩ad (Ω s) (∂Ω s)
 
 /-- Theorem 4.2. The jump
 `Δ_j = (1/T) (𝒩([H(j/T),·])H'(j/T) - 𝒩([H((j-1)/T),·])H'((j-1)/T))`. -/
@@ -360,13 +427,13 @@ def c₁ (w : ℝ) : ℝ := c₀ w / 4 + 1 / 64
 /-- Appendix B.
 `c₂ = (1/24 + 𝒩(w))/cos²(w/4) + c₁κ² + 2𝒩'(w)κ + (𝒩(w) - 𝒩(0))κ²`. -/
 def c₂ (w : ℝ) : ℝ :=
-  (1 / 24 + 𝒩 w) / Real.cos (w / 4) ^ 2 + c₁ w * κ w ^ 2 + 2 * deriv 𝒩 w * κ w +
+  (1 / 24 + 𝒩 w) / Real.cos (w / 4) ^ 2 + c₁ w * κ w ^ 2 + 2 * 𝒩' w * κ w +
     (𝒩 w - 𝒩 0) * κ w ^ 2
 
 /-- Appendix B. For `H`, `L`, and `w` as in Theorem 4.2,
 `ℰ_w(H) = c₀ (‖H'(0)‖ + ‖H'(1)‖) + (1/24 + 𝒩(w)) L + (c₁ + 2𝒩'(w)) ‖H'‖∞²`. -/
 def ℰ (w L : ℝ) (H : ℝ → 𝕄) : ℝ :=
-  c₀ w * (‖∂H 0‖ + ‖∂H 1‖) + (1 / 24 + 𝒩 w) * L + (c₁ w + 2 * deriv 𝒩 w) * ‖∂H‖∞ ^ 2
+  c₀ w * (‖∂H 0‖ + ‖∂H 1‖) + (1 / 24 + 𝒩 w) * L + (c₁ w + 2 * 𝒩' w) * ‖∂H‖∞ ^ 2
 
 /-- Appendix B. For `W` and `w` as in Theorem 4.6,
 `ℰ̃_w(W) = c₀κ (‖W'(0)‖ + ‖W'(1)‖) + (1/24 + 𝒩(w)) κ ‖W''‖∞ + c₂ ‖W'‖∞²`. -/
@@ -383,8 +450,7 @@ def IsLogarithm (W : ℝ → 𝕄) (α : ℝ → ℝ) (H : ℝ → 𝕄) : Prop 
 /-! ## Section 5: examples -/
 
 /-- Example 5.1. The least eigenvalue of a Hermitian `A`. -/
-def leastEigenvalue (A : 𝕄) : ℝ :=
-  sInf {x : ℝ | (x : ℂ) ∈ spectrum ℂ A}
+abbrev leastEigenvalue (A : 𝕄) : ℝ := sInf (spectrum ℝ A)
 
 /-- Example 5.1. The spectral projector of a Hermitian `A` for its least eigenvalue. -/
 def leastEigenvalueProjector (A : 𝕄) : 𝕄 :=
@@ -396,7 +462,26 @@ def leastEigenvalueGap (A : 𝕄) : ℝ :=
   sInf {r : ℝ | ∃ y : ℝ, (y : ℂ) ∈ spectrum ℂ A ∧ leastEigenvalue A < y ∧
     r = y - leastEigenvalue A}
 
-/-! ## Appendix A: spectral bounds -/
+/-- Example 5.1. `Γ(x)`, the spectral gap of the least eigenvalue of `(1-x)H₀ + xH₁`. -/
+abbrev interpolationGap (H₀ H₁ : 𝕄) (x : ℝ) : ℝ :=
+  leastEigenvalueGap ((1 - x) • H₀ + x • H₁)
+
+/-- Example 5.1. `c_p = ∫_0^1 Γ(x)^{-p} dx`. -/
+abbrev gapNormalization (H₀ H₁ : 𝕄) (p : ℝ) : ℝ :=
+  ∫ x in (0 : ℝ)..1, interpolationGap H₀ H₁ x ^ (-p)
+
+/-! ## Appendix A: lemmas behind the unit-step comparisons -/
+
+/-- Appendix A. The commutator `[Ω,·]` with `Ω`, as a continuous linear map of matrices;
+`adL Ω ^ n` is the `n`-fold commutator `[Ω,·]ⁿ`. -/
+abbrev adL (Ω : 𝕄) : 𝕄 →L[ℂ] 𝕄 :=
+  LinearMap.toContinuousLinearMap (LieAlgebra.ad ℂ 𝕄 Ω)
+
+/-- Equation (A.2). `powDeriv a b n` is `∑_{j<n} a^{n-1-j} b a^j`, the derivative of `a ↦ aⁿ` in
+the direction `b`. With `a = [Ω,·]` and `b = [Ω',·]`, `powDeriv (adL Ω) (adL Ω') n A` is the sum
+`∑_{k=0}^{n-1} [Ω,·]^k [Ω', [Ω,·]^{n-1-k} A]` of (A.2). -/
+def powDeriv {A : Type*} [Ring A] (a b : A) (n : ℕ) : A :=
+  ∑ j ∈ Finset.range n, a ^ (n - 1 - j) * b * a ^ j
 
 /-- Lemma A.2. The spectrum of the unitary family `W(s)` lies in the closed phase interval
 `{e^{-iθ} : θ ∈ [a(s), a(s) + w]}` for every `s ∈ [0,1]`. -/

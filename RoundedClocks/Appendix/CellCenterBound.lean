@@ -5,13 +5,16 @@ Authors: Michael Jarret
 -/
 module
 
-public import RoundedClocks.Appendix.CellMultiplier
-public import RoundedClocks.Appendix.MatrixSeries
+public import RoundedClocks.Appendix.CellFamily
 public import RoundedClocks.Citations
 
-/-! # Cosecant series at the center of a cell
+/-! # Lemma A.1: the bound `‖Y(0)‖ ≤ c₀ ‖D‖`
 
-Lemma A.1 uses the alternating cosecant series to control the corrector at the center of each cell.
+By the partial fractions of the cosecant (DLMF 4.22.5),
+`-𝒩₀(x) = ∑_{m ≥ 1} (-1)^{m+1} 2/(4π²m² - x²)`, whose coefficient of each `x^{2k}` is an alternating
+sum with decreasing terms and so nonnegative. Equation (A.1) then gives
+`‖Y(0)‖ = ‖𝒩₀([Ω,·])D‖ ≤ -𝒩₀(w) ‖D‖ = c₀ ‖D‖`. Here `cellCenterCoeff k` is the coefficient of
+`x^{2k}` in `-𝒩₀`.
 -/
 
 @[expose] public section
@@ -27,23 +30,13 @@ variable {d : ℕ}
 
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- The cosecant pole sum gives the negative center multiplier away from zero. -/
-theorem cellCenter_partialFractions_ne_zero (dlmf_4_22_5 : DLMF_4_22_5)
+/-- Substituting `z = x/2` in DLMF 4.22.5 gives
+`-𝒩₀(x) = ∑_{m ≥ 1} (-1)^{m+1} 2/(4π²m² - x²)` for `x ≠ 0`. -/
+theorem cellCenter_partialFractions_ne_zero
     {x : ℝ} (hx0 : x ≠ 0) (hx : |x| < 2 * π) :
     -cellMultiplier 0 x = ((∑' m : ℕ,
       (-1 : ℝ) ^ m * (2 / ((2 * π * (m + 1 : ℝ)) ^ 2 - x ^ 2))) : ℝ) := by
-  have hn (n : ℤ) : x / 2 ≠ n * π := by
-    intro he
-    have he' : x = 2 * π * n := by linarith
-    by_cases hz : n = 0
-    · simp only [hz, Int.cast_zero, mul_zero] at he'
-      exact hx0 he'
-    · have h1 : (1 : ℝ) ≤ |(n : ℝ)| := by exact_mod_cast Int.one_le_abs hz
-      rw [he', abs_mul, abs_of_pos Real.two_pi_pos] at hx
-      exact hx.not_ge (le_mul_of_one_le_right Real.two_pi_pos.le h1)
-  have hnc (n : ℤ) : (x : ℂ) / 2 ≠ n * (π : ℂ) := by
-    exact_mod_cast hn n
-  have hc := dlmf_4_22_5 ((x : ℂ) / 2) hnc
+  have hc := dlmf_4_22_5 ((x : ℂ) / 2) (div_two_ne_int_mul_pi hx0 hx)
   have ht (m : ℕ) :
       (-1 : ℂ) ^ m * (2 / ((2 * (π : ℂ) * (m + 1 : ℂ)) ^ 2 - (x : ℂ) ^ 2)) =
       ((-1 : ℂ) ^ (m + 1) /
@@ -70,7 +63,8 @@ theorem cellCenter_partialFractions_ne_zero (dlmf_4_22_5 : DLMF_4_22_5)
   field_simp [hxC]
   ring
 
-/-- The even Taylor coefficients obtained directly from the cosecant poles. -/
+/-- The coefficient of `x^{2k}` in `-𝒩₀(x)`: the alternating sum
+`∑_{m ≥ 1} (-1)^{m+1} 2/(2πm)^{2k+2}`. -/
 def cellCenterCoeff (k : ℕ) : ℝ :=
   ∑' m : ℕ, (-1 : ℝ) ^ m * (2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2))
 
@@ -85,7 +79,7 @@ theorem summable_cellCenterCoeff (k : ℕ) :
       0 ≤ 2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2))]
   exact le_rfl
 
-/-- Decreasing positive pole magnitudes make every alternating coefficient nonnegative. -/
+/-- Each coefficient is an alternating sum with decreasing terms and so nonnegative. -/
 theorem cellCenterCoeff_nonneg (k : ℕ) : 0 ≤ cellCenterCoeff k := by
   have ha : Antitone (fun m : ℕ ↦ 2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2)) := by
     intro i j hij
@@ -134,28 +128,12 @@ theorem summable_cellCenter_partialFraction_power {x : ℝ} (hx : |x| < 2 * π) 
 theorem cellCenterCoeff_power_eq_partialFractions {x : ℝ} (hx : |x| < 2 * π) :
     (∑' k : ℕ, cellCenterCoeff k * x ^ (2 * k)) =
       ∑' m : ℕ, (-1 : ℝ) ^ m * (2 / ((2 * π * (m + 1 : ℝ)) ^ 2 - x ^ 2)) := by
-  let f : ℕ → ℕ → ℝ := fun k m ↦ (-1 : ℝ) ^ m *
-    (2 / (2 * π * (m + 1 : ℝ)) ^ (2 * k + 2) * x ^ (2 * k))
-  have hrow (k : ℕ) : (∑' m, f k m) = cellCenterCoeff k * x ^ (2 * k) := by
-    simp only [f, cellCenterCoeff, ← mul_assoc, tsum_mul_right]
-  have hprod : Summable (Function.uncurry f) :=
-    summable_cellCenter_partialFraction_power hx
-  calc
-    _ = ∑' k, ∑' m, f k m := tsum_congr fun k ↦ (hrow k).symm
-    _ = ∑' m, ∑' k, f k m := hprod.tsum_comm.symm
-    _ = _ := by
-      apply tsum_congr
-      intro m
-      have hm : |x| < 2 * π * (m + 1 : ℝ) := hx.trans_le (by
-        calc
-          2 * π = 2 * π * 1 := by ring
-          _ ≤ 2 * π * (m + 1 : ℝ) := by
-            gcongr
-            linarith [Nat.cast_nonneg (α := ℝ) m])
-      exact ((hasSum_multiplier_geometric (by positivity) hm).mul_left
-        ((-1 : ℝ) ^ m)).tsum_eq
+  simpa only [cellCenterCoeff] using
+    weighted_partialFraction_sum_swap (fun m ↦ (-1 : ℝ) ^ m) hx
+      (summable_cellCenter_partialFraction_power hx)
 
-/-- Splitting the zeta-two series into even and odd terms gives the diagonal coefficient. -/
+/-- Splitting the zeta-two series into even and odd terms gives the constant coefficient
+`-𝒩₀(0) = 1/24`. -/
 theorem cellCenterCoeff_zero : cellCenterCoeff 0 = 1 / 24 := by
   let f : ℕ → ℝ := fun m ↦ 2 / (2 * π * (m + 1 : ℝ)) ^ 2
   have hs : Summable f := by simpa [f] using summable_multiplierEvenCoeff 0
@@ -188,8 +166,9 @@ theorem cellCenterCoeff_zero : cellCenterCoeff 0 = 1 / 24 := by
   rw [hodd, htotal] at hsplit hasplit
   linarith
 
-/-- The negative center multiplier agrees with its cosecant series, including the diagonal. -/
-theorem cellCenterCoeff_series_eq (dlmf_4_22_5 : DLMF_4_22_5)
+/-- For `|x| < 2π`, the series `∑ₖ cellCenterCoeff k · x^{2k}` sums to `-𝒩₀(x)`, also at
+`x = 0`. -/
+theorem cellCenterCoeff_series_eq
     {x : ℝ} (hx : |x| < 2 * π) :
     ((∑' k : ℕ, cellCenterCoeff k * x ^ (2 * k)) : ℝ) = -cellMultiplier 0 x := by
   by_cases hx0 : x = 0
@@ -199,9 +178,9 @@ theorem cellCenterCoeff_series_eq (dlmf_4_22_5 : DLMF_4_22_5)
     · intro k hk
       simp [zero_pow (by omega : 2 * k ≠ 0)]
   · rw [cellCenterCoeff_power_eq_partialFractions hx]
-    exact (cellCenter_partialFractions_ne_zero dlmf_4_22_5 hx0 hx).symm
+    exact (cellCenter_partialFractions_ne_zero hx0 hx).symm
 
-/-- At a nonnegative width the negative center multiplier is the printed constant. -/
+/-- `-𝒩₀(w) = c₀`, the constant of Appendix B. -/
 theorem neg_cellMultiplier_zero_eq_c₀ (w : ℝ) :
     -cellMultiplier 0 w = (c₀ w : ℂ) := by
   by_cases hw : w = 0
@@ -210,18 +189,26 @@ theorem neg_cellMultiplier_zero_eq_c₀ (w : ℝ) :
   · simp [cellMultiplier, c₀, hw]
 
 /-- The alternating cosecant series gives `c₀(w) ≥ 0` for `0 ≤ w < 2π`. -/
-theorem c₀_nonneg_of_width (dlmf_4_22_5 : DLMF_4_22_5)
+theorem c₀_nonneg_of_width
     {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) : 0 ≤ c₀ w := by
   have habs : |w| < 2 * π := by rwa [abs_of_nonneg hw0]
   have heq : ((∑' k : ℕ, cellCenterCoeff k * w ^ (2 * k) : ℝ) : ℂ) = (c₀ w : ℂ) :=
-    (cellCenterCoeff_series_eq dlmf_4_22_5 habs).trans (neg_cellMultiplier_zero_eq_c₀ w)
+    (cellCenterCoeff_series_eq habs).trans (neg_cellMultiplier_zero_eq_c₀ w)
   have hreal : (∑' k : ℕ, cellCenterCoeff k * w ^ (2 * k)) = c₀ w :=
     Complex.ofReal_injective heq
   rw [← hreal]
   exact tsum_nonneg fun k ↦
     mul_nonneg (cellCenterCoeff_nonneg k) (pow_nonneg hw0 (2 * k))
 
-/-- The cosecant series evaluated on the commutator. -/
+/-- `κ ≥ 0` for `0 ≤ w < 2π`. -/
+theorem κ_nonneg_of_width {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π) : 0 ≤ κ w := by
+  unfold κ
+  split_ifs with hz
+  · norm_num
+  · exact div_nonneg (by positivity)
+      (Real.sin_pos_of_pos_of_lt_pi (by positivity) (by linarith)).le
+
+/-- The series `∑ₖ cellCenterCoeff k · [Ω,·]^{2k} E`, which is `-𝒩₀([Ω,·])E`. -/
 def cellCenterSeriesOp (Ω E : 𝕄) : 𝕄 :=
   ∑' k : ℕ, (cellCenterCoeff k : ℂ) • (adL Ω ^ (2 * k)) E
 
@@ -230,42 +217,16 @@ theorem summable_norm_cellCenterSeriesOp [NeZero d] {Ω E : 𝕄} (hΩ : IsHermi
     {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π)
     (hwidth : HasEigenvalueDifferences Ω w) :
     Summable (fun k : ℕ ↦ ‖(cellCenterCoeff k : ℂ) • (adL Ω ^ (2 * k)) E‖) := by
-  have hs := (summable_cellCenterCoeff_power (by rwa [abs_of_nonneg hw0])).mul_right ‖E‖
-  apply Summable.of_nonneg_of_le (fun _ ↦ norm_nonneg _) (fun k ↦ ?_) hs
-  rw [norm_smul, Complex.norm_real, Real.norm_eq_abs,
-    abs_of_nonneg (cellCenterCoeff_nonneg k)]
-  calc
-    cellCenterCoeff k * ‖(adL Ω ^ (2 * k)) E‖ ≤
-        cellCenterCoeff k * (w ^ (2 * k) * ‖E‖) :=
-      mul_le_mul_of_nonneg_left (norm_adL_pow_apply_le hΩ hw0 hwidth (2 * k))
-        (cellCenterCoeff_nonneg k)
-    _ = cellCenterCoeff k * w ^ (2 * k) * ‖E‖ := by ring
+  exact summable_norm_adL_series cellCenterCoeff_nonneg (norm_adL_le_width hΩ hw0 hwidth)
+    (summable_cellCenterCoeff_power (by rwa [abs_of_nonneg hw0]))
 
-/-- The manuscript's positive-series estimate bounds the center commutator series. -/
+/-- Equation (A.1) for the series of `-𝒩₀`. -/
 theorem norm_cellCenterSeriesOp_le [NeZero d] {Ω E : 𝕄} (hΩ : IsHermitian Ω)
     {w : ℝ} (hw0 : 0 ≤ w) (hw : w < 2 * π)
     (hwidth : HasEigenvalueDifferences Ω w) :
     ‖cellCenterSeriesOp Ω E‖ ≤ (∑' k, cellCenterCoeff k * w ^ (2 * k)) * ‖E‖ := by
-  have hs := summable_norm_cellCenterSeriesOp hΩ hw0 hw hwidth (E := E)
-  have hb (k : ℕ) : ‖(cellCenterCoeff k : ℂ) • (adL Ω ^ (2 * k)) E‖ ≤
-      cellCenterCoeff k * w ^ (2 * k) * ‖E‖ := by
-    rw [norm_smul, Complex.norm_real, Real.norm_eq_abs,
-      abs_of_nonneg (cellCenterCoeff_nonneg k)]
-    calc
-      cellCenterCoeff k * ‖(adL Ω ^ (2 * k)) E‖ ≤
-          cellCenterCoeff k * (w ^ (2 * k) * ‖E‖) :=
-        mul_le_mul_of_nonneg_left (norm_adL_pow_apply_le hΩ hw0 hwidth (2 * k))
-          (cellCenterCoeff_nonneg k)
-      _ = cellCenterCoeff k * w ^ (2 * k) * ‖E‖ := by ring
-  have hscalar :=
-    (summable_cellCenterCoeff_power (by rwa [abs_of_nonneg hw0])).mul_right ‖E‖
-  calc
-    ‖cellCenterSeriesOp Ω E‖ ≤
-        ∑' k : ℕ, ‖(cellCenterCoeff k : ℂ) • (adL Ω ^ (2 * k)) E‖ :=
-      norm_tsum_le_tsum_norm hs
-    _ ≤ ∑' k : ℕ, cellCenterCoeff k * w ^ (2 * k) * ‖E‖ :=
-      hs.tsum_le_tsum hb hscalar
-    _ = _ := tsum_mul_right
+  exact norm_adL_series_le cellCenterCoeff_nonneg (norm_adL_le_width hΩ hw0 hwidth)
+    (summable_cellCenterCoeff_power (by rwa [abs_of_nonneg hw0]))
 
 /-- In an eigenbasis, each entry of the matrix series is its scalar power series. -/
 theorem cellCenterSeriesOp_eigenbasis_entry [NeZero d] {Ω E : 𝕄}
@@ -276,56 +237,22 @@ theorem cellCenterSeriesOp_eigenbasis_entry [NeZero d] {Ω E : 𝕄}
       (∑' k : ℕ, cellCenterCoeff k *
         (hΩ.eigenvalues p - hΩ.eigenvalues q) ^ (2 * k) : ℝ) *
           (star U * E * U) p q := by
-  dsimp only
-  let U : 𝕄 := hΩ.eigenvectorUnitary
-  have hs := (summable_norm_cellCenterSeriesOp hΩ hw0 hw hwidth (E := E)).of_norm
-  have hmap := ((matrixEntryCLM p q).comp
-    (ContinuousLinearMap.mulLeftRight ℂ 𝕄 (star U) U)).map_tsum hs
-  simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.mulLeftRight_apply,
-    matrixEntryCLM_apply] at hmap
-  have hdiag : star (hΩ.eigenvectorUnitary : 𝕄) * Ω *
-      (hΩ.eigenvectorUnitary : 𝕄) =
-      Matrix.diagonal (fun p ↦ (hΩ.eigenvalues p : ℂ)) := by
-    simpa only [Unitary.conjStarAlgAut_apply, Unitary.coe_star, star_star,
-      Function.comp_apply] using hΩ.conjStarAlgAut_star_eigenvectorUnitary
-  change (star U * cellCenterSeriesOp Ω E * U) p q = _
-  rw [cellCenterSeriesOp]
-  calc
-    (star U * (∑' k : ℕ, (cellCenterCoeff k : ℂ) • (adL Ω ^ (2 * k)) E) * U) p q =
-        ∑' k : ℕ, (star U * ((cellCenterCoeff k : ℂ) •
-          (adL Ω ^ (2 * k)) E) * U) p q := hmap
-    _ = (∑' k : ℕ, (cellCenterCoeff k : ℂ) *
-        ((hΩ.eigenvalues p - hΩ.eigenvalues q : ℝ) : ℂ) ^ (2 * k)) *
-          (star U * E * U) p q := by
-      rw [← tsum_mul_right]
-      apply tsum_congr
-      intro k
-      simp only [Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_apply, smul_eq_mul]
-      rw [adL_pow_eigenbasis_entry Ω E hΩ.eigenvectorUnitary hΩ.eigenvalues
-        hdiag (2 * k) p q]
-      ring
-    _ = _ := by
-      simp only [Complex.ofReal_tsum, Complex.ofReal_mul, Complex.ofReal_pow]
-      rfl
+  exact adL_series_eigenbasis_entry hΩ
+    (summable_norm_cellCenterSeriesOp hΩ hw0 hw hwidth (E := E)).of_norm p q
 
-/-- The center bound of Lemma A.1: ‖𝒩_0([Ω,·])D‖ ≤ c₀ ‖D‖. -/
-theorem norm_cellCenter_le (dlmf_4_22_5 : DLMF_4_22_5) [NeZero d] {w : ℝ}
+/-- Lemma A.1(ii), first bound: `‖Y(0)‖ = ‖𝒩₀([Ω,·])D‖ ≤ -𝒩₀(w) ‖D‖ = c₀ ‖D‖`. -/
+theorem norm_cellCenter_le [NeZero d] {w : ℝ}
     (hw0 : 0 ≤ w) (hw : w < 2 * π) {Ω : 𝕄} (hΩ : IsHermitian Ω)
     (hwidth : HasEigenvalueDifferences Ω w) (D : 𝕄) :
-    ‖(hΩ.eigenvectorUnitary : 𝕄) * Matrix.of (fun p q ↦
-      cellMultiplier 0 (hΩ.eigenvalues p - hΩ.eigenvalues q) *
-        ((hΩ.eigenvectorUnitary : 𝕄)† * D * (hΩ.eigenvectorUnitary : 𝕄)) p q) *
-      (hΩ.eigenvectorUnitary : 𝕄)†‖ ≤ c₀ w * ‖D‖ := by
+    ‖cellGuess Ω hΩ D 0‖ ≤ c₀ w * ‖D‖ := by
   let U : 𝕄 := hΩ.eigenvectorUnitary
   let F : 𝕄 := Matrix.of fun p q ↦
     cellMultiplier 0 (hΩ.eigenvalues p - hΩ.eigenvalues q) * (star U * D * U) p q
   have hkey : star U * cellCenterSeriesOp Ω D * U = -F := by
     ext p q
-    have hx : |hΩ.eigenvalues p - hΩ.eigenvalues q| < 2 * π :=
-      (hwidth _ (hΩ.eigenvalues_mem_spectrum_real p) _
-        (hΩ.eigenvalues_mem_spectrum_real q)).trans_lt hw
+    have hx := abs_eigenvalues_sub_lt_two_pi hΩ hw hwidth p q
     rw [cellCenterSeriesOp_eigenbasis_entry hΩ hw0 hw hwidth,
-      cellCenterCoeff_series_eq dlmf_4_22_5 hx]
+      cellCenterCoeff_series_eq hx]
     simp [F, U]
   have hU : star U * U = 1 :=
     Matrix.mem_unitaryGroup_iff'.mp hΩ.eigenvectorUnitary.property
@@ -340,7 +267,7 @@ theorem norm_cellCenter_le (dlmf_4_22_5 : DLMF_4_22_5) [NeZero d] {w : ℝ}
     simpa only [neg_neg] using congrArg Neg.neg he
   have hc : (∑' k, cellCenterCoeff k * w ^ (2 * k)) = c₀ w := by
     apply Complex.ofReal_injective
-    exact (cellCenterCoeff_series_eq dlmf_4_22_5 (by rwa [abs_of_nonneg hw0])).trans
+    exact (cellCenterCoeff_series_eq (by rwa [abs_of_nonneg hw0])).trans
       (neg_cellMultiplier_zero_eq_c₀ w)
   change ‖U * F * star U‖ ≤ _
   calc

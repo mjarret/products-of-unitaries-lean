@@ -7,10 +7,12 @@ module
 
 public import RoundedClocks.Appendix.MatrixSeries
 
-/-! # Quadratic growth in the cell equation
+/-! # Lemma A.1(ii): the bound `‖Y(τ)‖ ≤ ‖Y(0)‖ + τ² ‖D‖/2`
 
-Lemma A.1 bounds the cell corrector by solving its differential equation and controlling the
-commutator term quadratically in the cell width.
+As `Y' + i[Ω,Y] = τD`, the conjugate `e^{iτΩ} Y e^{-iτΩ}` has derivative `τ e^{iτΩ} D e^{-iτΩ}`.
+Integrating from `0` to `τ` gives
+`Y(τ) = e^{-iτΩ} (Y(0) + ∫₀^τ σ e^{iσΩ} D e^{-iσΩ} dσ) e^{iτΩ}`, and conjugation by a unitary
+preserves the norm. Here `cellPhase Ω τ` is `e^{iτΩ}`.
 -/
 
 @[expose] public section
@@ -28,40 +30,31 @@ variable {d : ℕ}
 
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- The unitary integrating factor `exp(iτΩ)`. -/
+/-- `cellPhase Ω τ` is `e^{iτΩ}`. -/
 private def cellPhase (Ω : 𝕄) (τ : ℝ) : 𝕄 := exp (τ • (I • Ω))
 
-/-- Differentiating the integrating factor on the right of its generator. -/
+/-- `(e^{iτΩ})' = e^{iτΩ} iΩ`. -/
 private lemma cellPhase_deriv (Ω : 𝕄) (τ : ℝ) :
     HasDerivAt (cellPhase Ω) (cellPhase Ω τ * (I • Ω)) τ :=
   hasDerivAt_exp_smul_const (I • Ω) τ
 
-/-- Differentiating the inverse integrating factor on the left of its generator. -/
+/-- `(e^{-iτΩ})' = -iΩ e^{-iτΩ}`. -/
 private lemma cellPhase_neg_deriv (Ω : 𝕄) (τ : ℝ) :
     HasDerivAt (fun σ ↦ cellPhase Ω (-σ)) ((-I • Ω) * cellPhase Ω (-τ)) τ := by
   simpa only [cellPhase, Function.comp_def, neg_smul, neg_mul, smul_neg, one_smul] using
     (hasDerivAt_exp_smul_const' (I • Ω) (-τ)).scomp τ (hasDerivAt_neg τ)
 
-/-- The integrating factor is continuous. -/
+/-- `τ ↦ e^{iτΩ}` is continuous. -/
 private lemma cellPhase_continuous (Ω : 𝕄) : Continuous (cellPhase Ω) :=
   continuous_iff_continuousAt.mpr fun τ ↦ (cellPhase_deriv Ω τ).continuousAt
 
-/-- The adjoint of the integrating factor reverses time. -/
+/-- `(e^{iτΩ})† = e^{-iτΩ}` for Hermitian `Ω`. -/
 private lemma cellPhase_star {Ω : 𝕄} (hΩ : IsHermitian Ω) (τ : ℝ) :
     star (cellPhase Ω τ) = cellPhase Ω (-τ) := by
   simp [cellPhase, NormedSpace.star_exp, star_smul, hΩ.isSelfAdjoint.star_eq,
     neg_smul, smul_neg]
 
-/-- Hermiticity makes the integrating factor unitary. -/
-private lemma cellPhase_unitary {Ω : 𝕄} (hΩ : IsHermitian Ω) (τ : ℝ) :
-    star (cellPhase Ω τ) * cellPhase Ω τ = 1 := by
-  let +nondep : NormedAlgebra ℚ 𝕄 := .restrictScalars ℚ ℂ 𝕄
-  have hI : I ∈ skewAdjoint ℂ := by
-    rw [skewAdjoint.mem_iff, Complex.star_def, Complex.conj_I]
-  exact Unitary.star_mul_self_of_mem (NormedSpace.exp_mem_unitary_of_mem_skewAdjoint
-    (skewAdjoint.smul_mem τ (hΩ.isSelfAdjoint.smul_mem_skewAdjoint hI)))
-
-/-- The conjugated equation has derivative `σ exp(iσΩ) D exp(-iσΩ)`. -/
+/-- If `Y' + i[Ω,Y] = σD`, then `e^{iσΩ} Y e^{-iσΩ}` has derivative `σ e^{iσΩ} D e^{-iσΩ}`. -/
 private lemma cell_conjugate_deriv (Ω D : 𝕄) {Y : ℝ → 𝕄} {σ : ℝ}
     (hY : HasDerivWithinAt Y (σ • D - I • (Ω * Y σ - Y σ * Ω))
       (Icc (-1 / 2 : ℝ) (1 / 2)) σ) :
@@ -74,7 +67,7 @@ private lemma cell_conjugate_deriv (Ω D : 𝕄) {Y : ℝ → 𝕄} {σ : ℝ}
     smul_mul_assoc, neg_smul, neg_mul, mul_neg, mul_assoc]
   abel
 
-/-- The absolute value of the oriented integral of `|σ|` is `τ²/2`. -/
+/-- `|∫₀^τ |σ| dσ| = τ²/2`, for `τ` of either sign. -/
 private lemma cell_abs_integral (τ : ℝ) :
     |(∫ σ in (0 : ℝ)..τ, |σ|)| = τ ^ 2 / 2 := by
   rcases le_total 0 τ with ht | ht
@@ -90,7 +83,7 @@ private lemma cell_abs_integral (τ : ℝ) :
       abs_neg, abs_of_nonneg (by positivity)]
     norm_num
 
-/-- Integrating the conjugated equation and undoing conjugation recovers the solution. -/
+/-- Integrating from `0` to `τ`: `Y(τ) = e^{-iτΩ} (Y(0) + ∫₀^τ σ e^{iσΩ} D e^{-iσΩ} dσ) e^{iτΩ}`. -/
 private lemma cell_integral_formula {Ω : 𝕄} (hΩ : IsHermitian Ω) (D : 𝕄)
     {Y : ℝ → 𝕄} (hY : ∀ τ ∈ Icc (-1 / 2 : ℝ) (1 / 2),
       HasDerivWithinAt Y (τ • D - I • (Ω * Y τ - Y τ * Ω))
@@ -100,7 +93,7 @@ private lemma cell_integral_formula {Ω : 𝕄} (hΩ : IsHermitian Ω) (D : 𝕄
       σ • (cellPhase Ω σ * D * cellPhase Ω (-σ))) * cellPhase Ω τ := by
   let Z := fun σ ↦ cellPhase Ω σ * Y σ * cellPhase Ω (-σ)
   let F := fun σ ↦ σ • (cellPhase Ω σ * D * cellPhase Ω (-σ))
-  -- Differentiation cancels the two commutator terms.
+  -- `Z(σ) = e^{iσΩ} Y(σ) e^{-iσΩ}` has derivative `F(σ) = σ e^{iσΩ} D e^{-iσΩ}`.
   have hZ (σ : ℝ) (hσ : σ ∈ Icc (-1 / 2 : ℝ) (1 / 2)) :
       HasDerivWithinAt Z (F σ) (Icc (-1 / 2 : ℝ) (1 / 2)) σ :=
     cell_conjugate_deriv Ω D (hY σ hσ)
@@ -111,7 +104,7 @@ private lemma cell_integral_formula {Ω : 𝕄} (hΩ : IsHermitian Ω) (D : 𝕄
   have hF : Continuous F :=
     continuous_id.smul (((cellPhase_continuous Ω).mul continuous_const).mul
       ((cellPhase_continuous Ω).comp continuous_neg))
-  -- Integrating the conjugated equation from zero to τ recovers Z.
+  -- Integrating from `0` to `τ`: `∫₀^τ F = Z(τ) - Z(0)`.
   have hint : (∫ σ in (0 : ℝ)..τ, F σ) = Z τ - Z 0 := by
     apply intervalIntegral.integral_eq_sub_of_hasDeriv_right
       ((show ContinuousOn Z (Icc (-1 / 2 : ℝ) (1 / 2)) from
@@ -125,17 +118,19 @@ private lemma cell_integral_formula {Ω : 𝕄} (hΩ : IsHermitian Ω) (D : 𝕄
     · exact hF.intervalIntegrable _ _
   have hzero : Z 0 = Y 0 := by simp [Z, cellPhase]
   have hsum : Y 0 + ∫ σ in (0 : ℝ)..τ, F σ = Z τ := by rw [hint, hzero]; abel
-  -- Conjugating back gives the integral representation.
+  -- `Z(0) = Y(0)`, and conjugating back gives `Y(τ)`.
   change Y τ = cellPhase Ω (-τ) *
     (Y 0 + ∫ σ in (0 : ℝ)..τ, F σ) * cellPhase Ω τ
   rw [hsum]
   have hi : cellPhase Ω (-τ) * cellPhase Ω τ = 1 := by
-    rw [← cellPhase_star hΩ]; exact cellPhase_unitary hΩ τ
+    rw [← cellPhase_star hΩ]
+    simpa only [cellPhase, Complex.ofReal_neg, neg_smul, smul_neg, neg_neg] using
+      Unitary.star_mul_self_of_mem (exp_neg_I_smul_isUnitary hΩ (-τ))
   simp only [Z, ← mul_assoc, hi, one_mul]
   rw [mul_assoc, hi, mul_one]
 
 
-/-- A pointwise linear norm bound integrates to quadratic growth. -/
+/-- If `‖F(σ)‖ ≤ |σ| C` for every `σ`, then `‖∫₀^τ F‖ ≤ (τ²/2) C`. -/
 private lemma cell_integral_bound (F : ℝ → 𝕄) (C τ : ℝ) (hC : 0 ≤ C)
     (hpoint : ∀ σ : ℝ, ‖F σ‖ ≤ |σ| * C) :
     ‖∫ σ in (0 : ℝ)..τ, F σ‖ ≤ τ ^ 2 / 2 * C := by
@@ -152,21 +147,24 @@ private lemma cell_integral_bound (F : ℝ → 𝕄) (C τ : ℝ) (hC : 0 ≤ C)
       abs_of_nonneg hC, cell_abs_integral]
   exact hbound.trans_eq hscalar
 
-/-- Unitary conjugation preserves the norm in the integrating factor. -/
+/-- `‖σ e^{iσΩ} D e^{-iσΩ}‖ = |σ| ‖D‖`. -/
 private lemma cell_integrand_norm [NeZero d] {Ω : 𝕄} (hΩ : IsHermitian Ω)
     (D : 𝕄) (σ : ℝ) :
     ‖σ • (cellPhase Ω σ * D * cellPhase Ω (-σ))‖ = |σ| * ‖D‖ := by
   rw [norm_smul, Real.norm_eq_abs, ← cellPhase_star hΩ,
-    norm_unitary_conj_eq D (cellPhase_unitary hΩ σ)]
+    norm_unitary_conj_eq D (by
+      simpa only [cellPhase, Complex.ofReal_neg, neg_smul, smul_neg, neg_neg] using
+        exp_neg_I_smul_isUnitary hΩ (-σ))]
 
-/-- Unitary invariance and the integral triangle inequality bound the conjugated integral. -/
+/-- `‖∫₀^τ σ e^{iσΩ} D e^{-iσΩ} dσ‖ ≤ (τ²/2) ‖D‖`. -/
 private lemma cell_integral_norm [NeZero d] {Ω : 𝕄} (hΩ : IsHermitian Ω)
     (D : 𝕄) (τ : ℝ) :
     ‖∫ σ in (0 : ℝ)..τ, σ • (cellPhase Ω σ * D * cellPhase Ω (-σ))‖ ≤
       τ ^ 2 / 2 * ‖D‖ :=
   cell_integral_bound _ ‖D‖ τ (norm_nonneg D) fun σ ↦ (cell_integrand_norm hΩ D σ).le
 
-/-- A solution of Y′ + i[Ω,Y] = τD grows from Y(0) by at most τ²‖D‖/2. -/
+/-- Lemma A.1(ii), second bound: a solution of `Y' + i[Ω,Y] = τD` for `|τ| ≤ 1/2` satisfies
+`‖Y(τ)‖ ≤ ‖Y(0)‖ + τ² ‖D‖/2`. -/
 theorem norm_le_of_cellEquation [NeZero d] {Ω : 𝕄} (hΩ : IsHermitian Ω) (D : 𝕄)
     {Y : ℝ → 𝕄} (hY : ∀ τ ∈ Icc (-1 / 2 : ℝ) (1 / 2),
       HasDerivWithinAt Y (τ • D - I • (Ω * Y τ - Y τ * Ω))
@@ -178,7 +176,9 @@ theorem norm_le_of_cellEquation [NeZero d] {Ω : 𝕄} (hΩ : IsHermitian Ω) (D
   generalize (∫ σ in (0 : ℝ)..τ, σ • (cellPhase Ω σ * D * cellPhase Ω (-σ))) = J
     at hformula hbound
   have hn : ‖cellPhase Ω (-τ) * (Y 0 + J) * star (cellPhase Ω (-τ))‖ = ‖Y 0 + J‖ :=
-    norm_unitary_conj_eq (Y 0 + J) (cellPhase_unitary hΩ (-τ))
+    norm_unitary_conj_eq (Y 0 + J) (by
+      simpa only [cellPhase, Complex.ofReal_neg, neg_smul, smul_neg, neg_neg] using
+        exp_neg_I_smul_isUnitary hΩ τ)
   rw [cellPhase_star hΩ, neg_neg] at hn
   calc
     ‖Y τ‖ = ‖cellPhase Ω (-τ) * (Y 0 + J) * cellPhase Ω τ‖ := by rw [hformula]

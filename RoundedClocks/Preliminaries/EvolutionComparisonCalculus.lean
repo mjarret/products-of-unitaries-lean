@@ -5,12 +5,15 @@ Authors: Michael Jarret
 -/
 module
 
-public import RoundedClocks.Citations
+public import RoundedClocks.Preliminaries.Regulated
+public import RoundedClocks.Preliminaries.RegulatedIntegrability
 
-/-! # Differential identities for evolution comparison
+/-! # The derivatives in equation (2.2)
 
-Theorem 2.2 uses one-sided differentiation, adjoint differentiation, and the product rule to
-compute the residual of the relative evolution.
+Outside a countable set, `(U†V)' = iU†(K - G)V` and `(U†YV)' = U†(Y' + i(KY - YG))V`, the first
+and third lines of (2.2). Both derivatives are regulated, so the fundamental theorem of calculus
+gives each of
+`U†V` and `U†YV` is the integral of its derivative over a piece `[pⱼ, pⱼ₊₁]` of Theorem 2.2.
 -/
 
 @[expose] public section
@@ -26,84 +29,11 @@ namespace RoundedClocks
 variable {d : ℕ}
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- Continuity on a closed interval supplies both one-sided limits. -/
-lemma comparison_continuous_regulated {F : ℝ → 𝕄} {a b : ℝ}
-    (hF : ContinuousOn F (Icc a b)) : IsRegulated F a b := by
-  constructor
-  · intro t ht
-    refine ⟨F t, (hF t ⟨ht.1, ht.2.le⟩).mono_of_mem_nhdsWithin ?_⟩
-    exact mem_of_superset (Icc_mem_nhdsGT ht.2) fun x hx ↦ ⟨ht.1.trans hx.1, hx.2⟩
-  · intro t ht
-    refine ⟨F t, (hF t ⟨ht.1.le, ht.2⟩).mono_of_mem_nhdsWithin ?_⟩
-    exact mem_of_superset (Icc_mem_nhdsLT ht.1) fun x hx ↦ ⟨hx.1, hx.2.trans ht.2⟩
-
-/-- Regulated matrix functions are closed under addition. -/
-lemma comparison_regulated_add {F G : ℝ → 𝕄} {a b : ℝ}
-    (hF : IsRegulated F a b) (hG : IsRegulated G a b) :
-    IsRegulated (fun t ↦ F t + G t) a b := by
-  constructor
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.1 t ht
-    obtain ⟨N, hN⟩ := hG.1 t ht
-    exact ⟨L + N, hL.add hN⟩
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.2 t ht
-    obtain ⟨N, hN⟩ := hG.2 t ht
-    exact ⟨L + N, hL.add hN⟩
-
-/-- Regulated matrix functions are closed under subtraction. -/
-lemma comparison_regulated_sub {F G : ℝ → 𝕄} {a b : ℝ}
-    (hF : IsRegulated F a b) (hG : IsRegulated G a b) :
-    IsRegulated (fun t ↦ F t - G t) a b := by
-  constructor
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.1 t ht
-    obtain ⟨N, hN⟩ := hG.1 t ht
-    exact ⟨L - N, hL.sub hN⟩
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.2 t ht
-    obtain ⟨N, hN⟩ := hG.2 t ht
-    exact ⟨L - N, hL.sub hN⟩
-
-/-- Regulated matrix functions are closed under multiplication. -/
-lemma comparison_regulated_mul {F G : ℝ → 𝕄} {a b : ℝ}
-    (hF : IsRegulated F a b) (hG : IsRegulated G a b) :
-    IsRegulated (fun t ↦ F t * G t) a b := by
-  constructor
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.1 t ht
-    obtain ⟨N, hN⟩ := hG.1 t ht
-    exact ⟨L * N, hL.mul hN⟩
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.2 t ht
-    obtain ⟨N, hN⟩ := hG.2 t ht
-    exact ⟨L * N, hL.mul hN⟩
-
-/-- Taking adjoints preserves regulatedness. -/
-lemma comparison_regulated_adjoint {F : ℝ → 𝕄} {a b : ℝ}
-    (hF : IsRegulated F a b) : IsRegulated (fun t ↦ (F t)†) a b := by
-  constructor
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.1 t ht
-    exact ⟨L†, hL.star⟩
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.2 t ht
-    exact ⟨L†, hL.star⟩
-
-/-- Constant complex scalar multiplication preserves regulatedness. -/
-lemma comparison_regulated_smul {F : ℝ → 𝕄} {a b : ℝ}
-    (c : ℂ) (hF : IsRegulated F a b) : IsRegulated (fun t ↦ c • F t) a b := by
-  constructor
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.1 t ht
-    exact ⟨c • L, tendsto_const_nhds.smul hL⟩
-  · intro t ht
-    obtain ⟨L, hL⟩ := hF.2 t ht
-    exact ⟨c • L, tendsto_const_nhds.smul hL⟩
-
-/-- The two primitives on a correction interval follow from Dieudonné, Section 8.7. -/
+/-- First and third lines of (2.2), integrated over one piece `[a,b]`. Outside a countable set,
+`(U†V)' = iU†(K - G)V` and `(U†YV)' = U†(Y' + i(KY - YG))V`. Both right sides are regulated, so by
+the fundamental theorem of calculus, each of `U†V` and `U†YV` is the integral of its derivative. -/
 lemma comparison_piece_primitives
-    (dieudonne_section_8_7 : Dieudonne_Section_8_7)
+    (dieudonne_7_6_1 : Dieudonne_7_6_1)
     (K G U V Y Y' : ℝ → 𝕄) (a b : ℝ) (hab : a ≤ b)
     (hK : IsRegulated K a b) (hG : IsRegulated G a b)
     (hY' : IsRegulated Y' a b) (hKh : IsHermitianFamily K a b)
@@ -112,28 +42,25 @@ lemma comparison_piece_primitives
     (hUd : DerivativeOffCountable U (fun t ↦ -I • (K t * U t)) a b)
     (hVd : DerivativeOffCountable V (fun t ↦ -I • (G t * V t)) a b)
     (hYd : DerivativeOffCountable Y Y' a b) :
-    let P := fun t ↦ (U t)† * V t
-    let Q := fun t ↦ (U t)† * Y t * V t
-    let A := fun t ↦ I • ((U t)† * (K t - G t) * V t)
-    let B := fun t ↦ (U t)† * (Y' t + I • (K t * Y t - Y t * G t)) * V t
-    IsRegulated A a b ∧ IsRegulated B a b ∧
-      (P b - P a = ∫ t in a..b, A t) ∧ (Q b - Q a = ∫ t in a..b, B t) := by
-  dsimp only
-  have hUr := comparison_regulated_adjoint (comparison_continuous_regulated hU)
-  have hVr := comparison_continuous_regulated hV
-  have hYr := comparison_continuous_regulated hY
-  have hA := comparison_regulated_smul I
-    (comparison_regulated_mul (comparison_regulated_mul hUr
-      (comparison_regulated_sub hK hG)) hVr)
-  have hB := comparison_regulated_mul (comparison_regulated_mul hUr
-    (comparison_regulated_add hY' (comparison_regulated_smul I
-      (comparison_regulated_sub (comparison_regulated_mul hK hYr)
-        (comparison_regulated_mul hYr hG))))) hVr
-  have hP := hU.star.mul hV
-  have hQ := (hU.star.mul hY).mul hV
+    IsRegulated (fun t ↦ I • ((U t)† * (K t - G t) * V t)) a b ∧
+      IsRegulated (fun t ↦ (U t)† * (Y' t + I • (K t * Y t - Y t * G t)) * V t) a b ∧
+      ((U b)† * V b - (U a)† * V a = ∫ t in a..b, I • ((U t)† * (K t - G t) * V t)) ∧
+      ((U b)† * Y b * V b - (U a)† * Y a * V a =
+        ∫ t in a..b, (U t)† * (Y' t + I • (K t * Y t - Y t * G t)) * V t) := by
+  -- The continuous functions `U†`, `V`, and `Y` are regulated.
+  have hUr := (ContinuousOn.isRegulated hU).adjoint
+  have hVr := ContinuousOn.isRegulated hV
+  have hYr := ContinuousOn.isRegulated hY
+  -- So `iU†(K - G)V` and `U†(Y' + i(KY - YG))V` are regulated.
+  have hdUV := ((hUr.mul (hK.sub hG)).mul hVr).const_smul I
+  have hdUYV := (hUr.mul (hY'.add (((hK.mul hYr).sub (hYr.mul hG)).const_smul I))).mul hVr
+  -- The functions `U†V` and `U†YV` are continuous.
+  have hUV := hU.star.mul hV
+  have hUYV := (hU.star.mul hY).mul hV
   obtain ⟨DU, hDU, hUd⟩ := hUd
   obtain ⟨DV, hDV, hVd⟩ := hVd
   obtain ⟨DY, hDY, hYd⟩ := hYd
+  -- Outside the countable set where `U`, `V`, or `Y` fails to be differentiable:
   have hderivs : ∀ t ∈ Icc a b, t ∉ DU ∪ DV ∪ DY →
       HasDerivWithinAt (fun s ↦ (U s)† * V s)
         (I • ((U t)† * (K t - G t) * V t)) (Icc a b) t ∧
@@ -146,20 +73,29 @@ lemma comparison_piece_primitives
     have hUt := hUd t ht hn.1.1
     have hVt := hVd t ht hn.1.2
     have hYt := hYd t ht hn.2
+    -- `(U†)' = iU†K`, as `K` is Hermitian.
     have hstar : HasDerivWithinAt (fun s ↦ (U s)†)
         (I • ((U t)† * K t)) (Icc a b) t := by
-      simpa [show (K t)† = K t from (hKh t ht).eq, Complex.star_def] using hUt.star
+      simpa [show (K t)† = K t from (hKh ht).star_eq, Complex.star_def] using hUt.star
     constructor
-    · convert hstar.mul hVt using 1
+    · -- The product rule: `(U†V)' = iU†KV - iU†GV`, the first line of (2.2).
+      convert hstar.mul hVt using 1
       simp [mul_add, add_mul, mul_assoc, sub_eq_add_neg]
-    · convert (hstar.mul hYt).mul hVt using 1
+    · -- The product rule: `(U†YV)' = iU†KYV + U†Y'V - iU†YGV`, the third line of (2.2).
+      convert (hstar.mul hYt).mul hVt using 1
       simp [mul_add, add_mul, mul_assoc, sub_eq_add_neg, add_comm, add_assoc]
-  refine ⟨hA, hB, ?_, ?_⟩
-  · apply dieudonne_section_8_7 d _ _ a b hab hP hA
-    exact ⟨DU ∪ DV ∪ DY, (hDU.union hDV).union hDY,
-      fun t ht hn ↦ (hderivs t ht hn).1⟩
-  · apply dieudonne_section_8_7 d _ _ a b hab hQ hB
-    exact ⟨DU ∪ DV ∪ DY, (hDU.union hDV).union hDY,
-      fun t ht hn ↦ (hderivs t ht hn).2⟩
+  -- A continuous function whose derivative is regulated outside a countable set is the integral
+  -- of its derivative, by Mathlib’s fundamental theorem off a countable set.
+  refine ⟨hdUV, hdUYV, ?_, ?_⟩
+  · exact (MeasureTheory.integral_eq_of_hasDerivAt_off_countable_of_le _ _ hab
+      ((hDU.union hDV).union hDY) hUV
+      (fun t ht ↦ ((hderivs t (Ioo_subset_Icc_self ht.1) ht.2).1.hasDerivAt
+        (Icc_mem_nhds ht.1.1 ht.1.2)))
+      (hdUV.intervalIntegrable dieudonne_7_6_1 hab)).symm
+  · exact (MeasureTheory.integral_eq_of_hasDerivAt_off_countable_of_le _ _ hab
+      ((hDU.union hDV).union hDY) hUYV
+      (fun t ht ↦ ((hderivs t (Ioo_subset_Icc_self ht.1) ht.2).2.hasDerivAt
+        (Icc_mem_nhds ht.1.1 ht.1.2)))
+      (hdUYV.intervalIntegrable dieudonne_7_6_1 hab)).symm
 
 end RoundedClocks

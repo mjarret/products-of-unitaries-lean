@@ -8,10 +8,11 @@ module
 public import Mathlib
 public import RoundedClocks.Definitions
 
-/-! # Ranks of spectral projectors
+/-! # The rank of a spectral projector (Remark 3.8)
 
-The truncated-endpoint statement counts the eigenvalues selected by a spectral projector and
-turns that count into the required endpoint indices.
+The spectral projector of a Hermitian `A` for the eigenvalues in a set `S` has rank equal to the
+number of eigenvalues of `A` in `S`, counted with multiplicity. Remark 3.8 uses this count to
+conclude that `P_s` and `P̃_s` have equal rank.
 -/
 
 @[expose] public section
@@ -21,8 +22,9 @@ noncomputable section
 namespace RoundedClocks
 
 open Classical in
-/-- The rank of a spectral projector counts the selected eigenvalues with multiplicity. -/
-theorem truncated_endpoints_spectralProjector_rank {d : ℕ}
+/-- The rank of the spectral projector of a Hermitian `A` for the eigenvalues in `S` is the number
+of eigenvalues of `A` in `S`, counted with multiplicity. -/
+theorem rank_spectralProjector {d : ℕ}
     {A : Matrix (Fin d) (Fin d) ℂ} (hA : A.IsHermitian) (S : Set ℂ) :
     (spectralProjector A S).rank =
       (Finset.univ.filter (fun j : Fin d => (hA.eigenvalues j : ℂ) ∈ S)).card := by
@@ -31,23 +33,19 @@ theorem truncated_endpoints_spectralProjector_rank {d : ℕ}
   let E := ⨆ z ∈ S, Module.End.eigenspace (T A).toLinearMap z
   let b := hA.eigenvectorBasis.toBasis
   let s := Finset.univ.filter (fun j : Fin d => (hA.eigenvalues j : ℂ) ∈ S)
+  -- An orthonormal eigenbasis `b` of `A`: `A bⱼ = λⱼ bⱼ`, so `A` multiplies the `j`th coordinate
+  -- of every vector by `λⱼ`.
   have hb (j : Fin d) : T A (b j) = (hA.eigenvalues j : ℂ) • b j := by
     apply WithLp.ofLp_injective
     simpa [T, b, Matrix.ofLp_toEuclideanCLM] using hA.mulVec_eigenvectorBasis j
   have hcoord (x : EuclideanSpace ℂ (Fin d)) (j : Fin d) :
       b.repr (T A x) j = (hA.eigenvalues j : ℂ) * b.repr x j := by
-    calc
-      b.repr (T A x) j =
-          b.repr (T A (∑ i, b.repr x i • b i)) j := by rw [b.sum_repr]
-      _ = (hA.eigenvalues j : ℂ) * b.repr x j := by
-        simp only [map_sum, map_smul, hb, smul_smul]
-        simp only [b.repr_self, Finsupp.finset_sum_apply, Finsupp.smul_apply,
-          smul_eq_mul]
-        rw [Finset.sum_eq_single j]
-        · simp [mul_comm]
-        · intro i hi hij
-          simp [Ne.symm hij]
-        · simp
+    have h := (Matrix.isHermitian_iff_isSymmetric.1 hA).eigenvectorBasis_apply_self_apply
+      finrank_euclideanSpace x ((Fintype.equivOfCardEq (Fintype.card_fin _)).symm j)
+    simpa [T, b, Matrix.IsHermitian.eigenvectorBasis, Matrix.IsHermitian.eigenvalues,
+      Matrix.IsHermitian.eigenvalues₀, OrthonormalBasis.repr_apply_apply] using h
+  -- The span of the eigenvectors of `A` with eigenvalues in `S` is the span of the `bⱼ` with
+  -- `λⱼ ∈ S`: an eigenvector for `z ∈ S` has zero coordinate along every `bⱼ` with `λⱼ ≠ z`.
   have hspan : E = Submodule.span ℂ (Set.range (fun j : s => b j)) := by
     apply le_antisymm
     · refine iSup_le fun z => iSup_le fun hz => ?_
@@ -76,6 +74,7 @@ theorem truncated_endpoints_spectralProjector_rank {d : ℕ}
   have hmap : (T (spectralProjector A S)).toLinearMap = E.starProjection.toLinearMap := by
     change (T (T.symm E.starProjection)).toLinearMap = _
     rw [T.apply_symm_apply]
+  -- The rank of the projector is the dimension of its range, which the `bⱼ` with `λⱼ ∈ S` span.
   calc
     (spectralProjector A S).rank =
         Module.finrank ℂ (LinearMap.range (T (spectralProjector A S)).toLinearMap) := by

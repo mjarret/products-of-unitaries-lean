@@ -7,10 +7,11 @@ module
 
 public import RoundedClocks.Definitions
 
-/-! # Constants as the free arc closes
+/-! # Fact B.2: the constants as the free arc closes
 
-Fact B.2 follows from the trigonometric reflections at width `2π - ϑ` and the resulting limits of
-the constants as the free arc closes.
+With `ϑ = 2π - w`, `sin(w/2) = sin(ϑ/2)` and `cos(w/4) = sin(ϑ/4)`. So, as `ϑ → 0`, `ϑ κ → 2π`,
+`ϑ c₀ → 1/(2π)`, `ϑ 𝒩(w) → 1/(2π)`, `ϑ² 𝒩'(w) → 1/(2π)`, and `ϑ/cos(w/4) → 4`. Multiplying these
+limits gives `c₀κ ~ (1/24 + 𝒩(w))κ ~ ϑ⁻²` and `c₂ ~ (8/π + 5π/2 + 2) ϑ⁻³`.
 -/
 
 @[expose] public section
@@ -22,7 +23,7 @@ noncomputable section
 
 namespace RoundedClocks
 
-/-- The trigonometric reflections at width `2π - ϑ`. -/
+/-- `sin(w/2) = sin(ϑ/2)`, `cos(w/2) = -cos(ϑ/2)`, and `cos(w/4) = sin(ϑ/4)` for `w = 2π - ϑ`. -/
 private theorem free_arc_reflections (ϑ : ℝ) :
     Real.sin ((2 * π - ϑ) / 2) = Real.sin (ϑ / 2) ∧
       Real.cos ((2 * π - ϑ) / 2) = -Real.cos (ϑ / 2) ∧
@@ -32,7 +33,7 @@ private theorem free_arc_reflections (ϑ : ℝ) :
     Real.sin_pi_sub, Real.cos_pi_sub, Real.cos_pi_div_two_sub]
   exact ⟨rfl, rfl, rfl⟩
 
-/-- The manuscript's closed formula for `𝒩'` on the open spectral interval. -/
+/-- Differentiating (4.4): `𝒩'(x) = -2/x³ + cot(x/2)/(2x²) + 1/(4x sin²(x/2))` for `0 < x < 2π`. -/
 theorem deriv_𝒩_closed {x : ℝ} (hx0 : 0 < x) (hx : x < 2 * π) :
     deriv 𝒩 x = -2 / x ^ 3 + Real.cot (x / 2) / (2 * x ^ 2) +
       1 / (4 * x * Real.sin (x / 2) ^ 2) := by
@@ -64,7 +65,8 @@ theorem deriv_𝒩_closed {x : ℝ} (hx0 : 0 < x) (hx : x < 2 * π) :
     linear_combination (-4 * x ^ 2) * htrig
   exact (he.hasDerivAt_iff.mpr hd').deriv
 
-/-- The four scaled limits stated in the first sentence of Fact B.2's proof. -/
+/-- The limits in the first two sentences of the proof of Fact B.2, as `ϑ → 0` from above with
+`w = 2π - ϑ`: `ϑ κ → 2π`, `ϑ c₀ → 1/(2π)`, `ϑ 𝒩(w) → 1/(2π)`, and `ϑ² 𝒩'(w) → 1/(2π)`. -/
 theorem free_arc_edge_limits :
     Tendsto (fun ϑ ↦ ϑ * κ (2 * π - ϑ)) (𝓝[>] 0) (𝓝 (2 * π)) ∧
     Tendsto (fun ϑ ↦ ϑ * c₀ (2 * π - ϑ)) (𝓝[>] 0) (𝓝 (1 / (2 * π))) ∧
@@ -90,6 +92,7 @@ theorem free_arc_edge_limits :
     rw [Real.sinc_of_ne_zero (div_ne_zero hϑ two_ne_zero)]
     field_simp
   refine ⟨?_, ?_, ?_, ?_⟩
+  -- `ϑ κ(2π-ϑ) = (2π-ϑ)/sinc(ϑ/2) → 2π`.
   · have hcont : ContinuousAt (fun ϑ : ℝ ↦
         (2 * π - ϑ) / Real.sinc (ϑ / 2)) 0 := hw.div hsinc hs0
     have hlim := hcont.tendsto.mono_left hgt
@@ -100,6 +103,7 @@ theorem free_arc_edge_limits :
     have hwn : 2 * π - ϑ ≠ 0 := by linarith [hϑ.2, Real.pi_pos]
     rw [κ, if_neg hwn, (free_arc_reflections ϑ).1, (hreflect hϑ0).1]
     field_simp
+  -- `ϑ c₀(2π-ϑ) = 1/((2π-ϑ) sinc(ϑ/2)) - ϑ/(2π-ϑ)² → 1/(2π)`.
   · have hcont : ContinuousAt (fun ϑ : ℝ ↦
         1 / ((2 * π - ϑ) * Real.sinc (ϑ / 2)) - ϑ / (2 * π - ϑ) ^ 2) 0 :=
       (continuousAt_const.div (hw.mul hsinc) (mul_ne_zero hw0 hs0)).sub
@@ -114,6 +118,7 @@ theorem free_arc_edge_limits :
       field_simp
     have ht := hlim.congr' heq.symm
     simpa only [zero_div, Real.sinc_zero, sub_zero, mul_one] using ht
+  -- `ϑ 𝒩(2π-ϑ) = ϑ/(2π-ϑ)² + cos(ϑ/2)/(sinc(ϑ/2)(2π-ϑ)) → 1/(2π)`.
   · have hcont : ContinuousAt (fun ϑ : ℝ ↦
         ϑ / (2 * π - ϑ) ^ 2 +
           Real.cos (ϑ / 2) / (Real.sinc (ϑ / 2) * (2 * π - ϑ))) 0 :=
@@ -135,6 +140,7 @@ theorem free_arc_edge_limits :
       ring
     have ht := hlim.congr' heq.symm
     simpa only [zero_div, Real.sinc_zero, Real.cos_zero, sub_zero, zero_add, one_mul] using ht
+  -- `ϑ² 𝒩'(2π-ϑ) → 1/(2π)`, from the formula for `𝒩'`.
   · have hcont : ContinuousAt (fun ϑ : ℝ ↦
         -2 * ϑ ^ 2 / (2 * π - ϑ) ^ 3 -
           ϑ * Real.cos (ϑ / 2) /
@@ -165,7 +171,7 @@ theorem free_arc_edge_limits :
     convert ht using 1
     all_goals norm_num
 
-/-- The quarter-gap denominator contributes the factor `4` in the proof of Fact B.2. -/
+/-- `ϑ/cos(w/4) → 4`, as `cos(w/4) = sin(ϑ/4) ~ ϑ/4`. -/
 theorem tendsto_free_arc_div_cos :
     Tendsto (fun ϑ : ℝ ↦ ϑ / Real.cos ((2 * π - ϑ) / 4))
       (𝓝[>] 0) (𝓝 4) := by
@@ -187,8 +193,7 @@ theorem tendsto_free_arc_div_cos :
     Real.sinc_of_ne_zero (div_ne_zero hϑ.1.ne' four_ne_zero)]
   field_simp
 
-/-- Multiplying the three coefficients by their natural powers of the free arc gives the
-limits displayed in Fact B.2. -/
+/-- The limits of Fact B.2: `ϑ² c₀κ → 1`, `ϑ² (1/24 + 𝒩(w))κ → 1`, and `ϑ³ c₂ → 8/π + 5π/2 + 2`. -/
 theorem free_arc_coefficient_limits :
     Tendsto (fun ϑ ↦ c₀ (2 * π - ϑ) * κ (2 * π - ϑ) * ϑ ^ 2)
       (𝓝[>] 0) (𝓝 1) ∧
@@ -215,6 +220,8 @@ theorem free_arc_coefficient_limits :
     convert h using 1
     exact funext fun ϑ ↦ by ring
   · have hcos := tendsto_free_arc_div_cos
+    -- The four terms of `c₂`, each multiplied by `ϑ³`:
+    -- `(1/24 + 𝒩)/cos²(w/4) → 8/π`, `c₁κ² → π/2`, `2𝒩'κ → 2`, and `(𝒩 - 𝒩(0))κ² → 2π`.
     have h1 := ((hid.div_const 24).add hN).mul (hcos.pow 2)
     have h2 := hc1.mul (hκ.pow 2)
     have h3 := (hN'.const_mul 2).mul hκ
@@ -228,7 +235,7 @@ theorem free_arc_coefficient_limits :
     convert h using 1
     exact funext fun ϑ ↦ by simp only [c₂]; ring
 
-/-- The three asymptotic equivalents in Fact B.2. -/
+/-- The three asymptotic equivalences of Fact B.2. -/
 theorem free_arc_equivalents :
     (fun ϑ ↦ c₀ (2 * π - ϑ) * κ (2 * π - ϑ)) ~[𝓝[>] 0]
       (fun ϑ ↦ 1 / ϑ ^ 2) ∧
@@ -248,7 +255,7 @@ theorem free_arc_equivalents :
     convert_limit _ 2 1 one_ne_zero h2,
     convert_limit _ 3 _ (by positivity) h3⟩
 
-/-- Each coefficient is also bounded by the common inverse-cube scale. -/
+/-- Every coefficient of `ℰ̃_w(W)` is `O(ϑ⁻³)`. -/
 theorem free_arc_isBigO :
     (fun ϑ ↦ c₀ (2 * π - ϑ) * κ (2 * π - ϑ)) =O[𝓝[>] 0]
       (fun ϑ ↦ 1 / ϑ ^ 3) ∧

@@ -5,13 +5,17 @@ Authors: Michael Jarret
 -/
 module
 
-public import RoundedClocks.UnitSteps.ExponentialCoordinates
+public import RoundedClocks.UnitSteps.WalkLeakage.Band
+public import RoundedClocks.UnitSteps.WalkLeakage.ExponentialCoordinates
 public import RoundedClocks.UnitSteps.ExponentialSpectrum
 
-/-! # Uniqueness of the Hermitian logarithm
+/-! # Uniqueness of the logarithm with spectrum in `(α, α + 2π)`
 
-Corollary 4.7 shows that two Hermitian logarithms with spectra in the same open turn agree whenever
-their unitary exponentials agree.
+Theorem 4.7 takes "the Hermitian `H(s)` with `e^{-iH(s)} = W(s)` and spectrum in
+`(α(s), α(s) + 2π)`". Hermitian `A` and `B` with spectra in `(α, α + 2π)` and
+`e^{-iA} = e^{-iB}` are equal (`logarithm_unique`), as `θ ↦ e^{-iθ}` is injective for
+`θ ∈ (α, α + 2π)`. The proof of Theorem 4.7 uses this to identify the `H` of the statement with
+`α + π + i Log(e^{i(α+π)} W)`.
 -/
 
 @[expose] public section
@@ -20,7 +24,7 @@ open scoped Matrix.Norms.L2Operator InnerProductSpace
 
 noncomputable section
 
-namespace RoundedClocks.WalkLeakageUnique
+namespace RoundedClocks.WalkLeakage
 
 variable {d : ℕ}
 
@@ -28,7 +32,9 @@ local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 local notation "𝔼" => EuclideanSpace ℂ (Fin d)
 local notation "𝒯" => Matrix.toEuclideanCLM (n := Fin d) (𝕜 := ℂ)
 
-/-- The open-turn uniqueness step implicit in the first sentence of Theorem 4.7's proof. -/
+/-- Hermitian `A` and `B` with spectra in `(α, α + 2π)` and `e^{-iA} = e^{-iB}` are equal: in
+eigenbases `ψ_i` of `A` and `φ_j` of `B`, `e^{-iλ_i} ψ_i† φ_j = e^{-iμ_j} ψ_i† φ_j`, so
+`λ_i = μ_j` wherever `ψ_i† φ_j ≠ 0`. -/
 theorem logarithm_unique {A B : 𝕄} {α : ℝ}
     (hA : A.IsHermitian) (hB : B.IsHermitian)
     (hAspec : HasRealSpectrumIn A (Set.Ioo α (α + 2 * Real.pi)))
@@ -45,11 +51,8 @@ theorem logarithm_unique {A B : 𝕄} {α : ℝ}
     simp only [orthonormal_iff_ite.mp hB.eigenvectorBasis.orthonormal]
     by_cases hkj : k = j <;> simp [hkj]
   have hvec (j : Fin d) : 𝒯 B (hB.eigenvectorBasis j) =
-      (hB.eigenvalues j : ℂ) • hB.eigenvectorBasis j := by
-    apply WithLp.ofLp_injective
-    rw [Matrix.ofLp_toEuclideanCLM, WithLp.ofLp_smul, hB.mulVec_eigenvectorBasis j,
-      RCLike.real_smul_eq_coe_smul (K := ℂ)]
-    rfl
+      (hB.eigenvalues j : ℂ) • hB.eigenvectorBasis j :=
+    toEuclideanCLM_eigenvectorBasis hB j
   apply (Matrix.toEuclideanCLM (n := Fin d) (𝕜 := ℂ)).injective
   apply ContinuousLinearMap.coe_injective
   apply hB.eigenvectorBasis.toBasis.ext
@@ -70,17 +73,18 @@ theorem logarithm_unique {A B : 𝕄} {α : ℝ}
           (walk_inner_phase_eigenvectorBasis hA i (hB.eigenvectorBasis j)).symm
         _ = _ := by rw [hexp, hphase, inner_smul_right]
     have hev : hA.eigenvalues i = hB.eigenvalues j :=
-      WalkLeakageSpectrum.phase_inj
+      phase_inj
         (hAspec (hA.eigenvalues_mem_spectrum_real i))
         (hBspec (hB.eigenvalues_mem_spectrum_real j)) (mul_right_cancel₀ hc he)
     rw [hev]
 
-/-- Two open-turn Hermitian logarithms agree on their defining time interval. -/
+/-- Two logarithms of `W` with spectra in `(α(s), α(s) + 2π)` agree for `s ∈ [0,1]`. -/
 theorem logarithms_eqOn {W : ℝ → 𝕄} {α : ℝ → ℝ} {H K : ℝ → 𝕄}
     (hH : IsLogarithm W α H) (hK : IsLogarithm W α K) :
     Set.EqOn H K (Set.Icc 0 1) := by
   intro s hs
-  exact logarithm_unique (hH.1 s hs) (hK.1 s hs)
-    (hH.2.2 s hs) (hK.2.2 s hs) ((hH.2.1 s hs).trans (hK.2.1 s hs).symm)
+  exact logarithm_unique (hH.isHermitian hs) (hK.isHermitian hs)
+    (hH.spectrum_subset s hs) (hK.spectrum_subset s hs)
+    ((hH.exp_eq s hs).trans (hK.exp_eq s hs).symm)
 
-end RoundedClocks.WalkLeakageUnique
+end RoundedClocks.WalkLeakage

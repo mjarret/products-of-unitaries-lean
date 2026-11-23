@@ -7,10 +7,11 @@ module
 
 public import RoundedClocks.Definitions
 
-/-! # Constants at width pi
+/-! # Fact B.1: the constants at width `π`
 
-Fact B.1 evaluates the multiplier and its derivative at width `π`, then derives the constants used
-in Theorem A.
+The values `c₀ = 1/(2π) - 1/π²`, `𝒩(π) = 1/π²`, and `𝒩'(π) = 1/(4π) - 2/π³` follow from the
+definitions and (4.4). The bound on `ℰ_π(H)` follows from `‖H'(0)‖ + ‖H'(1)‖ ≤ 2‖H'‖∞`,
+`2c₀ < 0.116`, `1/24 + 𝒩(π) < 0.143`, and `c₁ + 2𝒩'(π) < 0.061`.
 -/
 
 @[expose] public section
@@ -26,7 +27,7 @@ variable {d : ℕ}
 
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- At `π`, the multiplier and its derivative have the values displayed in Fact B.1. -/
+/-- `𝒩(π) = 1/π²` and `𝒩'(π) = 1/(4π) - 2/π³`, from (4.4). -/
 theorem multiplier_values_at_pi :
     𝒩 π = 1 / π ^ 2 ∧ deriv 𝒩 π = 1 / (4 * π) - 2 / π ^ 3 := by
   have hvalue : 𝒩 π = 1 / π ^ 2 := by
@@ -50,8 +51,8 @@ theorem multiplier_values_at_pi :
     ring
   exact (he.hasDerivAt_iff.mpr hd').deriv
 
-/-- The three rational decimal bounds used in Fact B.1. -/
-theorem constants_pi_decimal_bounds :
+/-- The three decimal bounds of Fact B.1, written in `π`. -/
+theorem pi_decimal_bounds :
     2 * (1 / (2 * π) - 1 / π ^ 2) < (116 / 1000 : ℝ) ∧
     1 / 24 + 1 / π ^ 2 < (143 / 1000 : ℝ) ∧
     5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 < (61 / 1000 : ℝ) := by
@@ -74,7 +75,7 @@ theorem constants_pi_decimal_bounds :
       ring]
     linarith
 
-/-- A Lipschitz derivative is bounded at each endpoint by its supremum on `[0,1]`. -/
+/-- `‖H'(0)‖ ≤ ‖H'‖∞` and `‖H'(1)‖ ≤ ‖H'‖∞`, so `‖H'(0)‖ + ‖H'(1)‖ ≤ 2‖H'‖∞`. -/
 theorem endpoint_derivatives_le_supNorm {H : ℝ → 𝕄} {L : ℝ}
     (hH : HasLipschitzDerivative H L) : ‖∂H 0‖ ≤ ‖∂H‖∞ ∧ ‖∂H 1‖ ≤ ‖∂H‖∞ := by
   have hL : 0 ≤ L := by
@@ -87,40 +88,51 @@ theorem endpoint_derivatives_le_supNorm {H : ℝ → 𝕄} {L : ℝ}
   exact ⟨hlip.continuousOn.norm.le_sSup_image_Icc (by norm_num),
     hlip.continuousOn.norm.le_sSup_image_Icc (by norm_num)⟩
 
-/-- Fact B.1 after substituting the three exact values and bounding both endpoints. -/
-theorem energy_pi_bound (H : ℝ → 𝕄) (L : ℝ) (hH : HasLipschitzDerivative H L) :
+/-- `c₀ = 1/(2π) - 1/π²` at width `π`. -/
+theorem c₀_pi : c₀ π = 1 / (2 * π) - 1 / π ^ 2 := by
+  simp only [c₀, if_neg Real.pi_ne_zero, Real.sin_pi_div_two]
+  ring
+
+/-- The three decimal bounds in the proof of Fact B.1: `2c₀ < 0.116`, `1/24 + 𝒩(π) < 0.143`, and
+`c₁ + 2𝒩'(π) < 0.061`. -/
+theorem constants_pi_decimal_bounds :
+    2 * c₀ π < 0.116 ∧ 1 / 24 + 𝒩 π < 0.143 ∧ c₁ π + 2 * deriv 𝒩 π < 0.061 := by
+  obtain ⟨h1, h2, h3⟩ := pi_decimal_bounds
+  refine ⟨?_, ?_, ?_⟩
+  · rw [c₀_pi, show (0.116 : ℝ) = 116 / 1000 by norm_num]
+    exact h1
+  · rw [multiplier_values_at_pi.1, show (0.143 : ℝ) = 143 / 1000 by norm_num]
+    exact h2
+  · rw [c₁, c₀_pi, multiplier_values_at_pi.2, show (0.061 : ℝ) = 61 / 1000 by norm_num,
+      show (1 / (2 * π) - 1 / π ^ 2) / 4 + 1 / 64 + 2 * (1 / (4 * π) - 2 / π ^ 3) =
+        5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 by ring]
+    exact h3
+
+/-- The bound of Fact B.1: `ℰ_π(H) ≤ 0.116 ‖H'‖∞ + 0.143 L + 0.061 ‖H'‖∞²`. -/
+theorem ℰ_pi_le (H : ℝ → 𝕄) (L : ℝ) (hH : HasLipschitzDerivative H L) :
     ℰ π L H ≤ 0.116 * ‖∂H‖∞ + 0.143 * L + 0.061 * ‖∂H‖∞ ^ 2 := by
   have hL : 0 ≤ L := by
     have h := hH.2 0 (by norm_num) 1 (by norm_num)
     norm_num at h
     exact (norm_nonneg _).trans h
-  have hc0 : c₀ π = 1 / (2 * π) - 1 / π ^ 2 := by
-    simp only [c₀, if_neg Real.pi_ne_zero, Real.sin_pi_div_two]
-    ring
-  have hN := multiplier_values_at_pi
-  have hend := endpoint_derivatives_le_supNorm hH
-  have hsup : 0 ≤ ‖∂H‖∞ := (norm_nonneg _).trans hend.1
-  have hc0_nonneg : 0 ≤ 1 / (2 * π) - 1 / π ^ 2 := by
-    rw [show 1 / (2 * π) - 1 / π ^ 2 = (π - 2) / (2 * π ^ 2) by
+  obtain ⟨h0, h1⟩ := endpoint_derivatives_le_supNorm hH
+  have hsup : 0 ≤ ‖∂H‖∞ := (norm_nonneg _).trans h0
+  have hc0 : 0 ≤ c₀ π := by
+    rw [c₀_pi, show 1 / (2 * π) - 1 / π ^ 2 = (π - 2) / (2 * π ^ 2) by
       field_simp [Real.pi_ne_zero]]
     exact div_nonneg (sub_nonneg.mpr (by linarith [Real.pi_gt_three])) (by positivity)
   obtain ⟨hc, hLcoeff, hquad⟩ := constants_pi_decimal_bounds
-  rw [ℰ, c₁, hc0, hN.1, hN.2]
-  have hends :
-      (1 / (2 * π) - 1 / π ^ 2) * (‖∂H 0‖ + ‖∂H 1‖) ≤
-        (116 / 1000 : ℝ) * ‖∂H‖∞ := by
-    calc
-      _ ≤ (1 / (2 * π) - 1 / π ^ 2) * (‖∂H‖∞ + ‖∂H‖∞) :=
-        mul_le_mul_of_nonneg_left (add_le_add hend.1 hend.2) hc0_nonneg
-      _ = (2 * (1 / (2 * π) - 1 / π ^ 2)) * ‖∂H‖∞ := by ring
-      _ ≤ (116 / 1000 : ℝ) * ‖∂H‖∞ := mul_le_mul_of_nonneg_right hc.le hsup
-  have hcoeff := add_le_add (add_le_add hends
-    (mul_le_mul_of_nonneg_right hLcoeff.le hL))
-    (mul_le_mul_of_nonneg_right hquad.le (sq_nonneg ‖∂H‖∞))
-  rw [show (1 / (2 * π) - 1 / π ^ 2) / 4 + 1 / 64 +
-      2 * (1 / (4 * π) - 2 / π ^ 3) =
-      5 / (8 * π) - 1 / (4 * π ^ 2) - 4 / π ^ 3 + 1 / 64 by ring]
-  norm_num at hcoeff ⊢
-  exact hcoeff
+  calc
+    ℰ π L H = c₀ π * (‖∂H 0‖ + ‖∂H 1‖) + (1 / 24 + 𝒩 π) * L +
+        (c₁ π + 2 * deriv 𝒩 π) * ‖∂H‖∞ ^ 2 := rfl
+    -- `‖H'(0)‖ + ‖H'(1)‖ ≤ 2‖H'‖∞`.
+    _ ≤ 2 * c₀ π * ‖∂H‖∞ + (1 / 24 + 𝒩 π) * L + (c₁ π + 2 * deriv 𝒩 π) * ‖∂H‖∞ ^ 2 := by
+      have hends := mul_le_mul_of_nonneg_left (add_le_add h0 h1) hc0
+      linarith
+    -- `2c₀ < 0.116`, `1/24 + 𝒩(π) < 0.143`, and `c₁ + 2𝒩'(π) < 0.061`.
+    _ ≤ 0.116 * ‖∂H‖∞ + 0.143 * L + 0.061 * ‖∂H‖∞ ^ 2 :=
+      add_le_add (add_le_add (mul_le_mul_of_nonneg_right hc.le hsup)
+        (mul_le_mul_of_nonneg_right hLcoeff.le hL))
+        (mul_le_mul_of_nonneg_right hquad.le (sq_nonneg ‖∂H‖∞))
 
 end RoundedClocks

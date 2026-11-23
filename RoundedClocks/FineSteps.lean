@@ -5,7 +5,12 @@ Authors: Michael Jarret
 -/
 module
 
-public import RoundedClocks.Bridge
+public import RoundedClocks.Definitions
+public import RoundedClocks.Preliminaries
+public import RoundedClocks.FineSteps.FineStepEstimates
+public import RoundedClocks.FineSteps.TruncatedEndpoints
+public import RoundedClocks.FineSteps.MidpointBoundedness
+public import RoundedClocks.FineSteps.FineStepRegularity
 
 /-!
 # Section 3: fine steps
@@ -29,19 +34,31 @@ variable {d : ℕ}
 
 local notation "𝕄" => Matrix (Fin d) (Fin d) ℂ
 
-/-- **Example 3.2.** (i) Bit truncation is odd. (ii) For a time-dependent Hamiltonian `H` and every
+/-- **Example 3.2.** Fix an integer `k ≥ 0` and a Hermitian family `H(s)` with `s ∈ [0,1]`. Let bit
+truncation be `[x]_k = sgn(x) 2^{-k} ⌊2^k |x|⌋`, let `H^{(k)} = H^{([·]_k)}`, and let
+`σ_k = max_p max_{s∈[0,1]} #{q : H^{(k)}_{pq}(s) ≠ H_{pq}(s)}` be the largest number of entries
+that truncation changes in a row of `H(s)`. Then (i) bit truncation is odd, and (ii) for every
 `s ∈ [0,1]`, `‖H(s) - H^{(k)}(s)‖ ≤ √2 σ_k 2^{-k}`. -/
-theorem truncation_bits (k : ℕ) :
+theorem truncation_bits [NeZero d] (k : ℕ) :
     Function.Odd (bitTruncation k) ∧
       ∀ H : ℝ → 𝕄, IsTimeDepHamiltonian H → ∀ s ∈ Icc (0 : ℝ) 1,
         ‖H s - entrywise (bitTruncation k) (H s)‖ ≤ √2 * sparsity k H * ((2 : ℝ) ^ k)⁻¹ := by
-  refine ⟨?_, fun H hH s hs ↦ ?_⟩
-  · rw [Bridge.bitTruncation_eq]
-    exact (UnitaryProducts.PaperProof.ex_truncation_bits (d := d) k).1
-  · have h := (UnitaryProducts.PaperProof.ex_truncation_bits (d := d) k).2 (H s) (sparsity k H)
-      (hH s hs)
-    simp only [UnitaryProducts.Paper.truncation, Bridge.truncHerm_eq] at h
-    exact h (Bridge.rowSparse_sparsity k H hs)
+  have hodd : Function.Odd (bitTruncation k) := by
+    intro x
+    simp only [bitTruncation, Real.sign_neg, abs_neg]
+    ring
+  refine ⟨hodd, fun H hH s hs ↦ ?_⟩
+  let E := H s - entrywise (bitTruncation k) (H s)
+  have hE : E.IsHermitian := (entrywise_and_error_isHermitian _ hodd (hH s hs)).2
+  have hentry : ∀ i j, ‖E i j‖ ≤ √2 * ((2 : ℝ) ^ k)⁻¹ := by
+    intro i j
+    simpa only [E, Matrix.sub_apply, entrywise, Matrix.of_apply] using
+      norm_sub_entrywise_bitTruncation_le k (H s i j)
+  calc
+    ‖E‖ ≤ sparsity k H * (√2 * ((2 : ℝ) ^ k)⁻¹) :=
+      norm_le_row_sum_of_isHermitian hE (by positivity) fun i ↦
+        sum_norm_row_le_of_card (truncation_error_card_le k H hs) hentry i
+    _ = √2 * sparsity k H * ((2 : ℝ) ^ k)⁻¹ := by ring
 
 /-- The number of binary places `k` that Examples 3.7 and 4.5 choose exists: for every `η > 0`
 some `k` has `√2 σ_k 2^{-k} ≤ η`. -/
@@ -54,267 +71,189 @@ theorem exists_bits (H : ℝ → 𝕄) {η : ℝ} (hη : 0 < η) :
       (Finset.card_filter_le _ _).trans (by simp)
   rw [div_lt_iff₀ hη] at hk
   rw [← div_eq_mul_inv, div_le_iff₀ (by positivity)]
-  nlinarith [Real.sqrt_nonneg 2]
+  have hsqrt := Real.sqrt_nonneg 2; nlinarith
 
-/-- **Lemma 3.4.** For a regulated `H` and `ε > 0` there are checkpoints `0 = s_0 < ⋯ < s_N = 1`
-with `‖H(x) - H(y)‖ ≤ ε` whenever `s_j < x, y < s_{j+1}`. In particular, their midpoint error is at
-most `ε`. Hermiticity is not needed. -/
-theorem exists_checkpoints {H : ℝ → 𝕄} (hH : IsRegulated H 0 1) {ε : ℝ} (hε : 0 < ε) :
-    ∃ (N : ℕ) (s : ℕ → ℝ), IsCheckpoints N s ∧ (∀ j < N, s j < s (j + 1)) ∧
+/-- **Lemma 3.4.** Assuming Dieudonné (7.6.1), let `H` be a regulated time-dependent Hamiltonian,
+and let `ε > 0`. There are checkpoints `0 = s₀ < ⋯ < s_N = 1` with
+`‖H(x) - H(y)‖ ≤ ε` whenever `sⱼ < x,y < sⱼ₊₁` for some `j`. In particular, their midpoint error
+is at most `ε`. -/
+theorem exists_checkpoints (dieudonne_7_6_1 : Dieudonne_7_6_1) {H : ℝ → 𝕄}
+    [NeZero d] (hH : IsRegulatedTimeDepHamiltonian H) {ε : ℝ} (hε : 0 < ε) :
+    ∃ (N : ℕ) (s : ℕ → ℝ), IsStrictCheckpoints N s ∧
       (∀ j < N, ∀ x ∈ Ioo (s j) (s (j + 1)), ∀ y ∈ Ioo (s j) (s (j + 1)), ‖H x - H y‖ ≤ ε) ∧
-      HasMidpointError H N s ε :=
-  let ⟨N, s, hs, h⟩ := UnitaryProducts.PaperProof.exists_oscillation_partition hH hε
-  ⟨N, s, Bridge.checkpoints_of_partition hs, h⟩
+      HasMidpointError H N s ε := by
+  -- Dieudonné (7.6.1) supplies a step function within ε/2 of H.
+  obtain ⟨G, hG, happrox⟩ :=
+    dieudonne_7_6_1 d H 0 1 (ε / 2) zero_le_one hH.1 (half_pos hε)
+  obtain ⟨N, s, A, hs0, hsN, hstrict, hcell⟩ := hG
+  have hs : IsStrictCheckpoints N s :=
+    ⟨⟨fun j hj ↦ (hstrict j hj).le, hs0, hsN⟩, hstrict⟩
+  -- On each open cell, H is within ε/2 of the constant matrix A j.
+  have hA : ∀ j < N, ∀ x ∈ Ioo (s j) (s (j + 1)), ‖H x - A j‖ ≤ ε / 2 := by
+    intro j hj x hx
+    have hleft : 0 ≤ s j := by
+      have h := checkpoints_mono hs.1 (Nat.zero_le j) (Nat.le_of_lt hj)
+      simpa only [hs0] using h
+    have hright : s (j + 1) ≤ 1 := by
+      have h := checkpoints_mono hs.1 (Nat.succ_le_of_lt hj) (le_refl N)
+      simpa only [hsN] using h
+    have h := happrox x ⟨hleft.trans hx.1.le, hx.2.le.trans hright⟩
+    rw [hcell j hj x hx] at h
+    exact h.le
+  -- The triangle inequality bounds the oscillation on each open cell by ε.
+  have hpair : ∀ j < N, ∀ x ∈ Ioo (s j) (s (j + 1)),
+      ∀ y ∈ Ioo (s j) (s (j + 1)), ‖H x - H y‖ ≤ ε := by
+    intro j hj x hx y hy
+    calc
+      ‖H x - H y‖ ≤ ‖H x - A j‖ + ‖A j - H y‖ :=
+        norm_sub_le_norm_sub_add_norm_sub (H x) (A j) (H y)
+      _ = ‖H x - A j‖ + ‖H y - A j‖ := by rw [norm_sub_rev (A j) (H y)]
+      _ ≤ ε / 2 + ε / 2 := add_le_add (hA j hj x hx) (hA j hj y hy)
+      _ = ε := by ring
+  refine ⟨N, s, hs, hpair, fun j hj x hx ↦ ?_⟩
+  -- Strictness places the midpoint inside its cell, so the pairwise bound applies.
+  have hmid : (s j + s (j + 1)) / 2 ∈ Ioo (s j) (s (j + 1)) := by
+    constructor <;> linarith [hs.2 j hj]
+  exact hpair j hj x hx _ hmid
 
-/-- Checkpoints `0 = s_0 ≤ ⋯ ≤ s_N = 1` have a cell `s_j < s_{j+1}`. -/
-private theorem exists_cell {N : ℕ} {s : ℕ → ℝ} (hs : IsCheckpoints N s) :
-    ∃ j < N, s j < s (j + 1) := by
-  by_contra h
-  push_neg at h
-  have hle : ∀ j ≤ N, s j ≤ s 0 := by
+/-- **Theorem 3.6.** Assuming Dieudonné (7.6.1), Section 8.7, (10.5.4) and (10.6.3) with the remark
+(10.4.6), let
+`F : ℝ → ℝ` be odd, and let `H` be a regulated time-dependent Hamiltonian with evolution `U` over
+time `T > 0`. The midpoint product `W` of `H^{(F)}` over time `T` on any checkpoints
+`0 = s₀ ≤ ⋯ ≤ s_N = 1` satisfies
+` ‖W - U(T)‖ ≤ T max_j sup_{s_j < x < s_{j+1}}
+  ‖H(x) - H^{(F)}(s_{j+1/2})‖`.
+A repeated checkpoint contributes `1` to `W` and an empty supremum, taken to be `0`. -/
+theorem fine_steps (dieudonne_7_6_1 : Dieudonne_7_6_1)
+    (dieudonne_section_8_7 : Dieudonne_Section_8_7)
+    (dieudonne_10_5_4 : Dieudonne_10_5_4) (dieudonne_10_6_3 : Dieudonne_10_6_3)
+    [NeZero d] {F : ℝ → ℝ} (hF : Function.Odd F) {H : ℝ → 𝕄}
+    (hH : IsRegulatedTimeDepHamiltonian H)
+    {T : ℝ} (hT : 0 < T) {N : ℕ} {s : ℕ → ℝ} (hs : IsCheckpoints N s) :
+    ‖midpointProduct (fun x ↦ entrywise F (H x)) T N s - evolution H T T‖ ≤
+      T * midpointApproximationError F H N s := by
+  -- Lemma 3.4 bounds the held midpoint family.
+  have hpart := fun ε hε ↦ exists_checkpoints dieudonne_7_6_1 hH (ε := ε) hε
+  have hbounded := fine_steps_bounded_of_checkpoints hpart
+  obtain ⟨K, hKreg, hKherm, hpieces, hbound⟩ :=
+    fine_steps_held_family_of_bounded hF hH.2 hbounded hT hs
+  let A : ℕ → 𝕄 := fun j ↦ T • entrywise F (H ((s j + s (j + 1)) / 2))
+  have hA : ∀ j < N, (A j).IsHermitian := by
     intro j hj
-    induction j with
-    | zero => exact le_rfl
-    | succ j ih => exact (h j (by omega)).trans (ih (by omega))
-  have h1 := hle N le_rfl
-  rw [hs.2.1, hs.2.2] at h1
-  norm_num at h1
+    have hm := checkpoint_midpoint_mem hs hj
+    have hsample := (entrywise_and_error_isHermitian F hF (hH.2 _ hm)).1
+    rw [Matrix.IsHermitian, Matrix.conjTranspose_smul, star_trivial, hsample.eq]
+  obtain ⟨V, hV, hVend⟩ := piecewise_product hs.1 hA hpieces
+  have hV' : Generates K V 0 1 := by simpa only [hs.2.1, hs.2.2] using hV
+  have hVend' : V 1 = midpointProduct (fun x ↦ entrywise F (H x)) T N s := by
+    rw [← hs.2.2, hVend]
+    simp only [midpointProduct, A]
+    congr 1
+    apply List.map_congr_left
+    intro j _
+    rw [smul_comm (-I * (s (j + 1) - s j : ℝ)) T]
+    rw [← smul_assoc]
+    congr 1
+    apply congrArg (fun z : ℂ ↦ z • entrywise F (H ((s j + s (j + 1)) / 2)))
+    apply Complex.ext <;> simp
+  -- Reparameterize the true evolution to `[0,1]`, and apply Duhamel (2.3) once.
+  let G : ℝ → 𝕄 := fun x ↦ T • H x
+  have hGreg : IsRegulated G 0 1 := regulated_const_smul hH.1
+  have hphysicalReg : IsRegulated (fun t ↦ H (t / T)) 0 T := regulated_div_time hT hH.1
+  have hphysicalHerm : IsHermitianFamily (fun t ↦ H (t / T)) 0 T := by
+    intro t ht
+    exact hH.2 (t / T) ⟨div_nonneg ht.1 hT.le, (div_le_one hT).2 ht.2⟩
+  have hphysical : Generates (fun t ↦ H (t / T)) (evolution H T) 0 T := by
+    simpa only [evolution] using
+      generates_evolutionOf dieudonne_10_5_4 dieudonne_10_6_3
+        hT.le hphysicalReg hphysicalHerm
+  have htrue : Generates G (fun x ↦ evolution H T (T * x)) 0 1 := by
+    simpa only [G] using generates_reparameterized hT hphysical
+  have hGherm : IsHermitianFamily G 0 1 := by
+    intro x hx
+    change (T • H x).IsHermitian
+    rw [Matrix.IsHermitian, Matrix.conjTranspose_smul, star_trivial, (hH.2 x hx).eq]
+  have hD := duhamel dieudonne_7_6_1 dieudonne_section_8_7 zero_le_one
+    hGreg hGherm hKreg hKherm htrue hV'
+  -- Apply Lemma 3.4 to the normalized and held families for the Duhamel integral.
+  have hGint := fine_steps_integrable_of_checkpoints
+    (fun ε hε ↦ exists_checkpoints dieudonne_7_6_1 ⟨hGreg, hGherm⟩ (ε := ε) hε)
+  have hKint := fine_steps_integrable_of_checkpoints
+    (fun ε hε ↦ exists_checkpoints dieudonne_7_6_1 ⟨hKreg, hKherm⟩ (ε := ε) hε)
+  have hdiff : IntervalIntegrable (fun x ↦ ‖G x - K x‖)
+      MeasureTheory.volume 0 1 :=
+    (hGint.sub hKint).norm
+  calc
+    _ ≤ ∫ x in (0 : ℝ)..1, ‖G x - K x‖ := by
+      simpa only [hVend', mul_one] using hD
+    _ ≤ ∫ _x in (0 : ℝ)..1, T * midpointApproximationError F H N s :=
+      intervalIntegral.integral_mono_on zero_le_one hdiff intervalIntegrable_const hbound
+    _ = T * midpointApproximationError F H N s := by simp
 
-/-- **Theorem 3.6.** Let `F` be odd, let `H` be a regulated time-dependent Hamiltonian with
-evolution `U` over time `T > 0`, and let `W` be the midpoint product of `H^{(F)}` over time `T` on
-checkpoints `0 = s_0 ≤ ⋯ ≤ s_N = 1`. If `‖H(s) - H^{(F)}(s_{j+1/2})‖ ≤ M` whenever
-`s_j < s < s_{j+1}`, then `‖W - U(T)‖ ≤ T M`. The least such `M` is the paper's
-`max_j sup_{s_j < s < s_{j+1}} ‖H(s) - H^{(F)}(s_{j+1/2})‖`. -/
-theorem fine_steps {F : ℝ → ℝ} (hF : Function.Odd F) {H : ℝ → 𝕄} (hreg : IsRegulated H 0 1)
-    (hH : IsTimeDepHamiltonian H) {T : ℝ} (hT : 0 < T) {N : ℕ} {s : ℕ → ℝ}
-    (hs : IsCheckpoints N s) {M : ℝ}
-    (hM : ∀ j < N, ∀ x ∈ Ioo (s j) (s (j + 1)),
-      ‖H x - entrywise F (H ((s j + s (j + 1)) / 2))‖ ≤ M) :
-    ‖midpointProduct (fun x ↦ entrywise F (H x)) T N s - evolution H T T‖ ≤ T * M := by
-  have hM0 : 0 ≤ M := by
-    obtain ⟨j, hj, hlt⟩ := exists_cell hs
-    exact (norm_nonneg _).trans (hM j hj ((s j + s (j + 1)) / 2) ⟨by linarith, by linarith⟩)
-  have hs' := Bridge.checkpoints_partition hs
-  rw [← Bridge.midpointProduct_freeze, Bridge.midpointProduct_eq]
-  refine (UnitaryProducts.PaperProof.thm_fine_steps_sup hT hreg hH F hF N _ hs').trans ?_
-  refine mul_le_mul_of_nonneg_left
-    (UnitaryProducts.PaperProof.maxCellError_le hs' _ hM0 fun j hj x hx ↦ ?_) hT.le
-  simp only [Bridge.freeze_of_le s hj.le, Bridge.freeze_of_le s hj] at hx ⊢
-  exact hM j hj x hx
-
-/-- **Example 3.7.** Let `H` be a regulated time-dependent Hamiltonian, let `P` and `Q` be
-orthogonal projectors, let `C > 0` and `δ > 0`, and let `T = 2C/δ`. If the evolution `U` of `H`
-over time `T` has `‖(1 - Q) U(T) P‖ ≤ C/T`, the checkpoints have midpoint error at most
+/-- **Example 3.7.** Assuming Dieudonné (7.6.1), Section 8.7, (10.5.4) and (10.6.3) with the remark
+(10.4.6), let `H` be
+a regulated time-dependent Hamiltonian, let `P` and `Q` be orthogonal projectors, let `C > 0` and
+`δ > 0`, and let `T = 2C/δ`. If the evolution `U` of `H` over time `T` has
+`‖(1 - Q) U(T) P‖ ≤ C/T`, the checkpoints have midpoint error at most
 `δ²/(8C)`, and `√2 σ_k 2^{-k} ≤ δ²/(8C)`, then the midpoint product `W` of `H^{(k)}` over time `T`
 satisfies `‖(1 - Q) W P‖ ≤ δ`. -/
-theorem jrs_leakage {H : ℝ → 𝕄} (hreg : IsRegulated H 0 1) (hH : IsTimeDepHamiltonian H)
+theorem jrs_leakage (dieudonne_7_6_1 : Dieudonne_7_6_1)
+    (dieudonne_section_8_7 : Dieudonne_Section_8_7)
+    (dieudonne_10_5_4 : Dieudonne_10_5_4) (dieudonne_10_6_3 : Dieudonne_10_6_3)
+    [NeZero d] {H : ℝ → 𝕄} (hH : IsRegulatedTimeDepHamiltonian H)
     {P Q : 𝕄} (hP : IsOrthogonalProjector P) (hQ : IsOrthogonalProjector Q) {C δ T : ℝ}
     (hC : 0 < C) (hδ : 0 < δ) (hT : T = 2 * C / δ)
     (hU : ‖(1 - Q) * evolution H T T * P‖ ≤ C / T) {N : ℕ} {s : ℕ → ℝ}
     (hs : IsCheckpoints N s) (hmid : HasMidpointError H N s (δ ^ 2 / (8 * C))) {k : ℕ}
     (hk : √2 * sparsity k H * ((2 : ℝ) ^ k)⁻¹ ≤ δ ^ 2 / (8 * C)) :
     ‖(1 - Q) * midpointProduct (fun x ↦ entrywise (bitTruncation k) (H x)) T N s * P‖ ≤ δ := by
+  let B := δ ^ 2 / (8 * C)
+  have hB : 0 ≤ B := by positivity
+  have hpoint : ∀ j < N, ∀ x ∈ Ioo (s j) (s (j + 1)),
+      ‖H x - entrywise (bitTruncation k) (H ((s j + s (j + 1)) / 2))‖ ≤ B + B := by
+    intro j hj x hx
+    have hm := checkpoint_midpoint_mem hs hj
+    have htrunc := (truncation_bits (d := d) k).2 H hH.2 _ hm
+    calc
+      _ ≤ ‖H x - H ((s j + s (j + 1)) / 2)‖ +
+          ‖H ((s j + s (j + 1)) / 2) -
+            entrywise (bitTruncation k) (H ((s j + s (j + 1)) / 2))‖ :=
+        norm_sub_le_norm_sub_add_norm_sub _ _ _
+      _ ≤ B + B := add_le_add (hmid j hj x hx) (htrunc.trans hk)
+  have hM : midpointApproximationError (bitTruncation k) H N s ≤ B + B := by
+    refine csSup_le ⟨0, Or.inl rfl⟩ ?_
+    rintro r (rfl | ⟨j, hj, x, hx, rfl⟩)
+    · positivity
+    · exact hpoint j hj x hx
   have hT0 : 0 < T := hT ▸ div_pos (mul_pos two_pos hC) hδ
-  subst hT
-  have h := UnitaryProducts.PaperProof.cor_jrs_oscillation hreg hH P Q hP hQ hC hδ
-    (UnitaryProducts.Paper.evolution_spec hT0 hH hreg) hU N _ (Bridge.checkpoints_partition hs)
-    ((Bridge.hasMidpointError_freeze H N s _).2 hmid) k (sparsity k H)
-    (fun x hx ↦ by
-      change UnitaryProducts.RowSparse _ (H x - UnitaryProducts.truncHerm k (H x))
-      rw [Bridge.truncHerm_eq]
-      exact Bridge.rowSparse_sparsity k H hx) hk
-  have hW : midpointProduct (fun x ↦ entrywise (bitTruncation k) (H x)) (2 * C / δ) N s =
-      UnitaryProducts.Paper.midpointProductOver ((UnitaryProducts.Paper.truncation k).2.2.2 H)
-        (2 * C / δ) N (Bridge.freeze N s) := by
-    rw [← Bridge.midpointProduct_freeze, Bridge.midpointProduct_eq]
-    congr 1
-    funext x
-    exact (Bridge.truncHerm_eq k (H x)).symm
-  rw [hW]
-  exact h.2.2
+  have hW := fine_steps (d := d) dieudonne_7_6_1 dieudonne_section_8_7
+    dieudonne_10_5_4 dieudonne_10_6_3 (truncation_bits (d := d) k).1 hH hT0 hs
+  have hW' : ‖midpointProduct (fun x ↦ entrywise (bitTruncation k) (H x)) T N s -
+      evolution H T T‖ ≤ T * (B + B) :=
+    hW.trans (mul_le_mul_of_nonneg_left hM hT0.le)
+  have htransfer := transfer (d := d) hP hQ hP hQ (U := evolution H T T)
+    (W := midpointProduct (fun x ↦ entrywise (bitTruncation k) (H x)) T N s)
+    (A := 1) (B := 1) (by simp [IsUnitary]) (by simp [IsUnitary])
+    (Commute.one_left _) (Commute.one_left _)
+  simp only [one_mul, mul_one, sub_self, norm_zero, mul_zero, add_zero] at htransfer
+  have hleak : ‖(1 - Q) * midpointProduct
+      (fun x ↦ entrywise (bitTruncation k) (H x)) T N s * P‖ ≤
+      ‖(1 - Q) * evolution H T T * P‖ + T * (B + B) := by
+    linarith [le_abs_self (‖(1 - Q) * midpointProduct
+      (fun x ↦ entrywise (bitTruncation k) (H x)) T N s * P‖ -
+      ‖(1 - Q) * evolution H T T * P‖)]
+  calc
+    _ ≤ C / T + T * (B + B) := hleak.trans (add_le_add hU le_rfl)
+    _ = δ := by
+      dsimp [B]
+      rw [hT]
+      field_simp
+      ring
 
-/-- A real number is an eigenvalue of a Hermitian `A` exactly when it is some `λ_i`. -/
-private theorem ofReal_mem_spectrum {A : 𝕄} (hA : A.IsHermitian) (x : ℝ) :
-    (x : ℂ) ∈ spectrum ℂ A ↔ ∃ i, hA.eigenvalues i = x := by
-  rw [hA.spectrum_eq_image_range]
-  constructor
-  · rintro ⟨_, ⟨i, rfl⟩, h⟩
-    exact ⟨i, Complex.ofReal_injective h⟩
-  · rintro ⟨i, rfl⟩
-    exact ⟨_, ⟨i, rfl⟩, rfl⟩
-
-/-- A real number lies in `interval a b` exactly when it lies in `(a,b)`. -/
-private theorem ofReal_mem_interval {a b x : ℝ} : (x : ℂ) ∈ interval a b ↔ x ∈ Ioo a b :=
-  Complex.ofReal_injective.mem_set_image
-
-/-- The spectral projector of a Hermitian `A` for a set of real numbers is `specProj`. -/
-private theorem spectralProjector_ofReal {A : 𝕄} (hA : A.IsHermitian) (X : Set ℝ) :
-    spectralProjector A ((fun x : ℝ ↦ (x : ℂ)) '' X) = UnitaryProducts.specProj hA X := by
-  unfold spectralProjector UnitaryProducts.specProj
-  congr 1
-  rw [UnitaryProducts.PaperProof.starProjection_eigenspaces_eq_proj hA.eigenvectorBasis
-    hA.eigenvalues (fun x : ℝ ↦ (x : ℂ)) _ _ (UnitaryProducts.isDiag_eigenvectorBasis hA)]
-  congr 1
-  ext x
-  exact Complex.ofReal_injective.mem_set_image
-
-/-- `specProj` for a set of eigenvalues is the projector onto the eigenvectors it selects. -/
-private theorem specProj_eq_bandProj {A : 𝕄} (hA : A.IsHermitian) {S : Finset (Fin d)}
-    {X : Set ℝ} (h : ∀ i, i ∈ S ↔ hA.eigenvalues i ∈ X) :
-    UnitaryProducts.specProj hA X = UnitaryProducts.Paper.bandProj S A := by
-  classical
-  have hidx : UnitaryProducts.idx hA.eigenvalues X = S := by
-    ext i
-    simp [UnitaryProducts.idx, h i]
-  unfold UnitaryProducts.Paper.bandProj UnitaryProducts.specProj UnitaryProducts.proj
-  rw [dif_pos hA, hidx]
-
-/-- The rank of a matrix is the dimension of the range of its operator. -/
-private theorem rank_eq_finrank_range (P : 𝕄) :
-    P.rank = Module.finrank ℂ
-      ((Matrix.toEuclideanCLM (n := Fin d) (𝕜 := ℂ)) P).toLinearMap.range := by
-  rw [Matrix.rank_eq_finrank_range_toLin P (EuclideanSpace.basisFun (Fin d) ℂ).toBasis
-    (EuclideanSpace.basisFun (Fin d) ℂ).toBasis, ← Matrix.toEuclideanLin_eq_toLin_orthonormal,
-    ← Matrix.coe_toEuclideanCLM_eq_toEuclideanLin]
-
-/-- Remark 3.8 at one endpoint: for a band of `A` and a Hermitian `D` with `‖A - D‖` less than
-half the spectral gap `Γ`, the two spectral projectors are orthogonal projectors of equal rank,
-`‖P - P'‖ = ‖(1 - P') P‖ ≤ ‖A - D‖/(Γ - ‖A - D‖)`, the eigenvalues of `A` outside the band and of
-`D` outside `nearBand` are at distance at least `Γ` and `Γ - ‖A - D‖` from the hull `I` of the
-band, and `‖A - D‖ < Γ - ‖A - D‖`. -/
-private theorem band_endpoint {A D : 𝕄} {a b : ℝ} (hband : IsBand A a b) (hD : D.IsHermitian)
-    (hε : ‖A - D‖ < spectralGap A a b / 2) :
-    IsStarProjection (spectralProjector A (interval a b)) ∧
-    IsStarProjection (spectralProjector D (nearBand A a b ‖A - D‖)) ∧
-    (spectralProjector A (interval a b)).rank =
-      (spectralProjector D (nearBand A a b ‖A - D‖)).rank ∧
-    ‖spectralProjector A (interval a b) - spectralProjector D (nearBand A a b ‖A - D‖)‖ =
-      ‖(1 - spectralProjector D (nearBand A a b ‖A - D‖)) *
-        spectralProjector A (interval a b)‖ ∧
-    ‖(1 - spectralProjector D (nearBand A a b ‖A - D‖)) * spectralProjector A (interval a b)‖ ≤
-      ‖A - D‖ / (spectralGap A a b - ‖A - D‖) ∧
-    (∀ μ : ℝ, (μ : ℂ) ∈ spectrum ℂ A \ interval a b →
-      ∀ x ∈ Icc (sInf {y : ℝ | (y : ℂ) ∈ spectrum ℂ A ∩ interval a b})
-        (sSup {y : ℝ | (y : ℂ) ∈ spectrum ℂ A ∩ interval a b}),
-      spectralGap A a b ≤ |μ - x|) ∧
-    (∀ μ : ℝ, (μ : ℂ) ∈ spectrum ℂ D \ nearBand A a b ‖A - D‖ →
-      ∀ x ∈ Icc (sInf {y : ℝ | (y : ℂ) ∈ spectrum ℂ A ∩ interval a b})
-        (sSup {y : ℝ | (y : ℂ) ∈ spectrum ℂ A ∩ interval a b}),
-      spectralGap A a b - ‖A - D‖ ≤ |μ - x|) ∧
-    ‖A - D‖ < spectralGap A a b - ‖A - D‖ := by
-  classical
-  have hA := hband.1
-  let S : Finset (Fin d) := Finset.univ.filter fun i ↦ hA.eigenvalues i ∈ Ioo a b
-  have hmem : ∀ i, i ∈ S ↔ hA.eigenvalues i ∈ Ioo a b := by simp [S]
-  have hne : S.Nonempty := by
-    obtain ⟨_, hz, x, hx, rfl⟩ := hband.2.1
-    obtain ⟨i, rfl⟩ := (ofReal_mem_spectrum hA x).1 hz
-    exact ⟨i, (hmem i).2 hx⟩
-  have hR : Sᶜ.Nonempty := by
-    obtain ⟨z, hz, hzI⟩ := hband.2.2.1
-    rw [hA.spectrum_eq_image_range] at hz
-    obtain ⟨_, ⟨i, rfl⟩, rfl⟩ := hz
-    exact ⟨i, Finset.mem_compl.2 fun hi ↦ hzI (ofReal_mem_interval.2 ((hmem i).1 hi))⟩
-  have hhull : ∀ i, i ∈ S ↔ |hA.eigenvalues i - (S.inf' hne hA.eigenvalues +
-      S.sup' hne hA.eigenvalues) / 2| ≤
-        (S.sup' hne hA.eigenvalues - S.inf' hne hA.eigenvalues) / 2 := by
-    intro i
-    rw [abs_le]
-    constructor
-    · intro hi
-      have h1 := S.inf'_le hA.eigenvalues hi
-      have h2 := S.le_sup' hA.eigenvalues hi
-      constructor <;> linarith
-    · rintro ⟨h1, h2⟩
-      obtain ⟨i₁, hi₁, e₁⟩ := S.exists_mem_eq_inf' hne hA.eigenvalues
-      obtain ⟨i₂, hi₂, e₂⟩ := S.exists_mem_eq_sup' hne hA.eigenvalues
-      have m₁ := (hmem i₁).1 hi₁
-      have m₂ := (hmem i₂).1 hi₂
-      exact (hmem i).2 ⟨by linarith [m₁.1], by linarith [m₂.2]⟩
-  let hS : UnitaryProducts.Paper.IsBand hA S := ⟨hne, hR, _, _, hhull⟩
-  have hgap : spectralGap A a b = UnitaryProducts.Paper.bandGap hA hS := by
-    change _ = S.inf' hne fun i ↦ Sᶜ.inf' hR fun j ↦ |hA.eigenvalues i - hA.eigenvalues j|
-    apply le_antisymm
-    · obtain ⟨i, hi, ei⟩ := S.exists_mem_eq_inf' hne
-        fun i ↦ Sᶜ.inf' hR fun j ↦ |hA.eigenvalues i - hA.eigenvalues j|
-      obtain ⟨j, hj, ej⟩ := Sᶜ.exists_mem_eq_inf' hR fun j ↦ |hA.eigenvalues i - hA.eigenvalues j|
-      rw [ei, ej]
-      refine csInf_le ⟨0, ?_⟩ ⟨hA.eigenvalues i, hA.eigenvalues j,
-        ⟨(ofReal_mem_spectrum hA _).2 ⟨i, rfl⟩, ofReal_mem_interval.2 ((hmem i).1 hi)⟩,
-        ⟨(ofReal_mem_spectrum hA _).2 ⟨j, rfl⟩,
-          fun h ↦ Finset.mem_compl.1 hj ((hmem j).2 (ofReal_mem_interval.1 h))⟩, rfl⟩
-      rintro r ⟨x, y, -, -, rfl⟩
-      exact abs_nonneg _
-    · obtain ⟨i, hi⟩ := hne
-      obtain ⟨j, hj⟩ := hR
-      refine le_csInf ⟨_, hA.eigenvalues i, hA.eigenvalues j,
-        ⟨(ofReal_mem_spectrum hA _).2 ⟨i, rfl⟩, ofReal_mem_interval.2 ((hmem i).1 hi)⟩,
-        ⟨(ofReal_mem_spectrum hA _).2 ⟨j, rfl⟩,
-          fun h ↦ Finset.mem_compl.1 hj ((hmem j).2 (ofReal_mem_interval.1 h))⟩, rfl⟩ ?_
-      rintro r ⟨x, y, ⟨hx, hxI⟩, ⟨hy, hyI⟩, rfl⟩
-      obtain ⟨i, rfl⟩ := (ofReal_mem_spectrum hA x).1 hx
-      obtain ⟨j, rfl⟩ := (ofReal_mem_spectrum hA y).1 hy
-      have hi : i ∈ S := (hmem i).2 (ofReal_mem_interval.1 hxI)
-      have hj : j ∈ Sᶜ :=
-        Finset.mem_compl.2 fun h ↦ hyI (ofReal_mem_interval.2 ((hmem j).1 h))
-      exact (S.inf'_le _ hi).trans (Sᶜ.inf'_le _ hj)
-  have he : ‖A - D‖ < UnitaryProducts.Paper.bandGap hA hS / 2 := hgap ▸ hε
-  have hsep : ∀ i, i ∈ S ↔ hD.eigenvalues i ∈
-      Icc (S.inf' hne hA.eigenvalues - ‖A - D‖) (S.sup' hne hA.eigenvalues + ‖A - D‖) :=
-    (UnitaryProducts.PaperProof.truncated_endpoint_weyl_separation hA hD hS he).1
-  have hsep₂ : ∀ i, i ∉ S → ∀ x ∈ Icc (S.inf' hne hA.eigenvalues) (S.sup' hne hA.eigenvalues),
-      UnitaryProducts.Paper.bandGap hA hS ≤ |hA.eigenvalues i - x| ∧
-        UnitaryProducts.Paper.bandGap hA hS - ‖A - D‖ ≤ |hD.eigenvalues i - x| :=
-    (UnitaryProducts.PaperProof.truncated_endpoint_weyl_separation hA hD hS he).2.1
-  have hsep₃ : ‖A - D‖ < UnitaryProducts.Paper.bandGap hA hS - ‖A - D‖ :=
-    (UnitaryProducts.PaperProof.truncated_endpoint_weyl_separation hA hD hS he).2.2
-  have hRset : {x : ℝ | (x : ℂ) ∈ spectrum ℂ A ∩ interval a b} =
-      hA.eigenvalues '' (S : Set (Fin d)) := by
-    ext x
-    simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_image, Finset.mem_coe,
-      ofReal_mem_spectrum hA, ofReal_mem_interval]
-    constructor
-    · rintro ⟨⟨i, rfl⟩, hx⟩
-      exact ⟨i, (hmem i).2 hx, rfl⟩
-    · rintro ⟨i, hi, rfl⟩
-      exact ⟨⟨i, rfl⟩, (hmem i).1 hi⟩
-  have hnear : nearBand A a b ‖A - D‖ = (fun x : ℝ ↦ (x : ℂ)) ''
-      Icc (S.inf' hne hA.eigenvalues - ‖A - D‖) (S.sup' hne hA.eigenvalues + ‖A - D‖) := by
-    rw [Finset.inf'_eq_csInf_image, Finset.sup'_eq_csSup_image, ← hRset]
-    rfl
-  have hsA := specProj_eq_bandProj hA hmem
-  have hsD := specProj_eq_bandProj hD hsep
-  have hP : spectralProjector A (interval a b) = UnitaryProducts.Paper.bandProj S A :=
-    (spectralProjector_ofReal hA _).trans hsA
-  have hP' : spectralProjector D (nearBand A a b ‖A - D‖) = UnitaryProducts.Paper.bandProj S D := by
-    rw [hnear]
-    exact (spectralProjector_ofReal hD _).trans hsD
-  have hI : Icc (sInf {y : ℝ | (y : ℂ) ∈ spectrum ℂ A ∩ interval a b})
-      (sSup {y : ℝ | (y : ℂ) ∈ spectrum ℂ A ∩ interval a b}) =
-        Icc (S.inf' hne hA.eigenvalues) (S.sup' hne hA.eigenvalues) := by
-    rw [Finset.inf'_eq_csInf_image S hne, Finset.sup'_eq_csSup_image S hne, hRset]
-  have hout : ∀ μ : ℝ, (μ : ℂ) ∈ spectrum ℂ A \ interval a b →
-      ∀ x ∈ Icc (S.inf' hne hA.eigenvalues) (S.sup' hne hA.eigenvalues),
-        UnitaryProducts.Paper.bandGap hA hS ≤ |μ - x| := by
-    rintro μ ⟨hμ, hμI⟩ x hx
-    obtain ⟨i, rfl⟩ := (ofReal_mem_spectrum hA μ).1 hμ
-    exact (hsep₂ i (fun h ↦ hμI (ofReal_mem_interval.2 ((hmem i).1 h))) x hx).1
-  have hout' : ∀ μ : ℝ, (μ : ℂ) ∈ spectrum ℂ D \ nearBand A a b ‖A - D‖ →
-      ∀ x ∈ Icc (S.inf' hne hA.eigenvalues) (S.sup' hne hA.eigenvalues),
-        UnitaryProducts.Paper.bandGap hA hS - ‖A - D‖ ≤ |μ - x| := by
-    rintro μ ⟨hμ, hμN⟩ x hx
-    obtain ⟨i, rfl⟩ := (ofReal_mem_spectrum hD μ).1 hμ
-    rw [hnear] at hμN
-    exact (hsep₂ i (fun h ↦ hμN ⟨_, (hsep i).1 h, rfl⟩) x hx).2
-  have hn := UnitaryProducts.Prose.endpoint_projector_eq_directed_and_le hA hD hS he
-  rw [hP, hP', hgap, hI]
-  refine ⟨hsA ▸ UnitaryProducts.isStarProjection_specProj hA _,
-    hsD ▸ UnitaryProducts.isStarProjection_specProj hD _, ?_, hn.1, hn.2, hout, hout', hsep₃⟩
-  rw [rank_eq_finrank_range, rank_eq_finrank_range,
-    UnitaryProducts.PaperProof.bandProj_finrank hA S,
-    UnitaryProducts.PaperProof.bandProj_finrank hD S]
-
-/-- **Remark 3.8.** Let `H` be a family of matrices with evolution `U` over time `T > 0`.
+/-- **Remark 3.8.** Assuming Weyl's perturbation theorem (Bhatia, Corollary III.2.6), Bhatia
+Exercise VII.1.11, and the Davis--Kahan `sin Θ` theorem (Davis and Kahan 1970, in the form of
+Bhatia, Theorem VII.3.1), let `H` be a regulated
+time-dependent Hamiltonian with evolution `U` over time `T > 0`.
 For `s ∈ {0,1}`, let `P_s` be the spectral projector of a band `{λ : a_s < λ < b_s}` of `H(s)` with
 spectral gap `Γ_s`, let `ε_s = ‖H(s) - H^{(k)}(s)‖ < Γ_s/2`, and let `P'_s` be the spectral
 projector of `H^{(k)}(s)` for its eigenvalues within `ε_s` of `[min S_s, max S_s]`, where `S_s` is
@@ -324,19 +263,22 @@ the set of eigenvalues in the band. Then `P_s` and `P'_s` have equal rank,
 with `I_s = [min S_s, max S_s]`, every eigenvalue of `H(s)` outside the band is at distance at least
 `Γ_s` from `I_s`, every eigenvalue of `H^{(k)}(s)` not within `ε_s` of `I_s` is at distance at
 least `Γ_s - ε_s` from `I_s`, and `ε_s < Γ_s - ε_s`. -/
-theorem truncated_endpoints {H : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
-    (k : ℕ) {a b : ℝ → ℝ} (hband : ∀ s ∈ ({0, 1} : Set ℝ), IsBand (H s) (a s) (b s))
+theorem truncated_endpoints (bhatia_corollary_III_2_6 : Bhatia_Corollary_III_2_6)
+    (bhatia_exercise_VII_1_11 : Bhatia_Exercise_VII_1_11)
+    (bhatia_theorem_VII_3_1 : Bhatia_Theorem_VII_3_1) [NeZero d] {H : ℝ → 𝕄}
+    (hH : IsRegulatedTimeDepHamiltonian H) {T : ℝ} (hT : 0 < T) (k : ℕ)
+    {a b : ℝ → ℝ} (hband : HasEndpointBands H a b)
     (hε : ∀ s ∈ ({0, 1} : Set ℝ),
       ‖H s - entrywise (bitTruncation k) (H s)‖ < spectralGap (H s) (a s) (b s) / 2)
     (W : 𝕄) :
     let ε := fun s ↦ ‖H s - entrywise (bitTruncation k) (H s)‖
     let Γ := fun s ↦ spectralGap (H s) (a s) (b s)
-    let P := fun s ↦ spectralProjector (H s) (interval (a s) (b s))
+    let P := fun s ↦ bandProjector (H s) (a s) (b s)
     let P' := fun s ↦
       spectralProjector (entrywise (bitTruncation k) (H s)) (nearBand (H s) (a s) (b s) (ε s))
     let I := fun s ↦ Icc (sInf {x : ℝ | (x : ℂ) ∈ spectrum ℂ (H s) ∩ interval (a s) (b s)})
       (sSup {x : ℝ | (x : ℂ) ∈ spectrum ℂ (H s) ∩ interval (a s) (b s)})
-    (∀ s ∈ ({0, 1} : Set ℝ), (P s).rank = (P' s).rank ∧
+    (∀ s ∈ ({0, 1} : Set ℝ), HasEqualRank (P s) (P' s) ∧
       ‖P s - P' s‖ = ‖(1 - P' s) * P s‖ ∧ ‖(1 - P' s) * P s‖ ≤ ε s / (Γ s - ε s) ∧
       (∀ μ : ℝ, (μ : ℂ) ∈ spectrum ℂ (H s) \ interval (a s) (b s) →
         ∀ x ∈ I s, Γ s ≤ |μ - x|) ∧
@@ -345,40 +287,83 @@ theorem truncated_endpoints {H : ℝ → 𝕄} {T : ℝ} (hT : 0 < T)
       ε s < Γ s - ε s) ∧
     |‖(1 - P' 1) * W * P' 0‖ - ‖(1 - P 1) * evolution H T T * P 0‖| ≤
       ‖W - evolution H T T‖ + ε 0 / (Γ 0 - ε 0) + ε 1 / (Γ 1 - ε 1) := by
-  intro ε Γ P P' I
-  have hodd := (truncation_bits (d := d) k).1
-  have hend : ∀ s ∈ ({0, 1} : Set ℝ), IsStarProjection (P s) ∧ IsStarProjection (P' s) ∧
-      (P s).rank = (P' s).rank ∧ ‖P s - P' s‖ = ‖(1 - P' s) * P s‖ ∧
-      ‖(1 - P' s) * P s‖ ≤ ε s / (Γ s - ε s) ∧
-      (∀ μ : ℝ, (μ : ℂ) ∈ spectrum ℂ (H s) \ interval (a s) (b s) →
-        ∀ x ∈ I s, Γ s ≤ |μ - x|) ∧
-      (∀ μ : ℝ, (μ : ℂ) ∈ spectrum ℂ (entrywise (bitTruncation k) (H s)) \
-          nearBand (H s) (a s) (b s) (ε s) → ∀ x ∈ I s, Γ s - ε s ≤ |μ - x|) ∧
-      ε s < Γ s - ε s := fun s hs ↦
-    band_endpoint (hband s hs)
-      (UnitaryProducts.PaperProof.scalarEntryMap_and_error_isHermitian _ hodd (hband s hs).1).1
-      (hε s hs)
-  have h0 := hend 0 (by simp)
-  have h1 := hend 1 (by simp)
-  have hU : IsUnitary (evolution H T T) := by
-    unfold evolution evolutionOf
-    split_ifs with h
-    · exact h.choose_spec.2.2.1 T ⟨hT.le, le_rfl⟩
-    · simp only [IsUnitary, star_one, one_mul]
-  have hUn : ‖evolution H T T‖ ≤ 1 := UnitaryProducts.norm_le_one_of_star_mul_self hU
-  refine ⟨fun s hs ↦ (hend s hs).2.2, ?_⟩
-  have ht := UnitaryProducts.PaperProof.prop_transfer (A := 1) (B := 1) (W := W)
-    (U := evolution H T T) h0.1 h1.1 h0.2.1 h1.2.1 (one_mem _) (one_mem _)
-    (Commute.one_left _) (Commute.one_left _)
-  have e0 : ‖P' 0 - P 0‖ ≤ ε 0 / (Γ 0 - ε 0) := by
-    rw [norm_sub_rev]
-    exact h0.2.2.2.1.trans_le h0.2.2.2.2.1
-  have e1 : ‖P' 1 - P 1‖ ≤ ε 1 / (Γ 1 - ε 1) := by
-    rw [norm_sub_rev]
-    exact h1.2.2.2.1.trans_le h1.2.2.2.2.1
-  have hm := mul_le_of_le_one_left
-    (add_nonneg (norm_nonneg (P' 0 - P 0)) (norm_nonneg (P' 1 - P 1))) hUn
-  simp only [one_mul, mul_one] at ht
-  linarith
+  classical
+  dsimp only
+  have hpoint (s : ℝ) (hs : s ∈ ({0, 1} : Set ℝ)) := hband s hs
+  have hB (s : ℝ) (hs : s ∈ ({0, 1} : Set ℝ)) :=
+    (entrywise_and_error_isHermitian _ (truncation_bits (d := d) k).1 (hpoint s hs).1).1
+  have hend (s : ℝ) (hs : s ∈ ({0, 1} : Set ℝ)) :
+      HasEqualRank (bandProjector (H s) (a s) (b s))
+        (spectralProjector (entrywise (bitTruncation k) (H s))
+          (nearBand (H s) (a s) (b s) ‖H s - entrywise (bitTruncation k) (H s)‖)) ∧
+      ‖bandProjector (H s) (a s) (b s) -
+        spectralProjector (entrywise (bitTruncation k) (H s))
+          (nearBand (H s) (a s) (b s) ‖H s - entrywise (bitTruncation k) (H s)‖)‖ =
+        ‖(1 - spectralProjector (entrywise (bitTruncation k) (H s))
+          (nearBand (H s) (a s) (b s) ‖H s - entrywise (bitTruncation k) (H s)‖)) *
+          bandProjector (H s) (a s) (b s)‖ ∧
+      ‖(1 - spectralProjector (entrywise (bitTruncation k) (H s))
+          (nearBand (H s) (a s) (b s) ‖H s - entrywise (bitTruncation k) (H s)‖)) *
+          bandProjector (H s) (a s) (b s)‖ ≤
+        ‖H s - entrywise (bitTruncation k) (H s)‖ /
+          (spectralGap (H s) (a s) (b s) -
+            ‖H s - entrywise (bitTruncation k) (H s)‖) := by
+    have horiginal (μ : ℝ) :=
+      truncated_endpoints_original_separation (hpoint s hs) (μ := μ)
+    have hrank := truncated_endpoints_equal_rank bhatia_corollary_III_2_6
+      (hpoint s hs) (hB s hs) (hε s hs)
+    have hsep {μ : ℝ} := truncated_endpoints_perturbed_separation
+      bhatia_corollary_III_2_6 (μ := μ)
+      (hpoint s hs) (hB s hs) (hε s hs)
+    have hres := truncated_endpoints_residual_gap (hε s hs)
+    have hδ := lt_of_le_of_lt (norm_nonneg _) hres
+    have heq := bhatia_exercise_VII_1_11 d _ _
+      (spectralProjector_isOrthogonal _ _) (spectralProjector_isOrthogonal _ _) hrank
+    refine ⟨hrank, heq, ?_⟩
+    obtain ⟨hf, hn⟩ := truncated_endpoints_band_extrema (hpoint s hs)
+    apply bhatia_theorem_VII_3_1 d (H s) (entrywise (bitTruncation k) (H s))
+      _ _ (interval (a s) (b s)) _ _ (hpoint s hs).1 (hB s hs) rfl rfl hδ
+      (sInf {x : ℝ | (x : ℂ) ∈ spectrum ℂ (H s) ∩ interval (a s) (b s)})
+      (sSup {x : ℝ | (x : ℂ) ∈ spectrum ℂ (H s) ∩ interval (a s) (b s)})
+    · intro z hz
+      obtain ⟨x, hx, rfl⟩ := hz.2
+      exact ⟨csInf_le hf.bddBelow ⟨hz.1, ⟨x, hx, rfl⟩⟩,
+        le_csSup hf.bddAbove ⟨hz.1, ⟨x, hx, rfl⟩⟩⟩
+    · intro z hz
+      have hzspec := hz.1
+      rw [(hB s hs).spectrum_eq_image_range] at hzspec
+      obtain ⟨_, ⟨i, rfl⟩, rfl⟩ := hzspec
+      exact truncated_endpoints_outside_strip
+        (csInf_le hf.bddBelow (hn.csSup_mem hf)) hδ (hsep hz)
+  constructor
+  · intro s hs
+    exact ⟨(hend s hs).1, (hend s hs).2.1, (hend s hs).2.2,
+      (fun μ hμ => truncated_endpoints_original_separation (hpoint s hs) hμ),
+      (fun μ hμ => truncated_endpoints_perturbed_separation bhatia_corollary_III_2_6
+        (hpoint s hs) (hB s hs) (hε s hs) hμ),
+      truncated_endpoints_residual_gap (hε s hs)⟩
+  · have htransfer := transfer (d := d)
+      (P := bandProjector (H 0) (a 0) (b 0))
+      (Q := bandProjector (H 1) (a 1) (b 1))
+      (P' := spectralProjector (entrywise (bitTruncation k) (H 0))
+        (nearBand (H 0) (a 0) (b 0) ‖H 0 - entrywise (bitTruncation k) (H 0)‖))
+      (Q' := spectralProjector (entrywise (bitTruncation k) (H 1))
+        (nearBand (H 1) (a 1) (b 1) ‖H 1 - entrywise (bitTruncation k) (H 1)‖))
+      (U := evolution H T T) (W := W) (A := 1) (B := 1)
+      (spectralProjector_isOrthogonal _ _) (spectralProjector_isOrthogonal _ _)
+      (spectralProjector_isOrthogonal _ _) (spectralProjector_isOrthogonal _ _)
+      (by simp [IsUnitary]) (by simp [IsUnitary])
+      (Commute.one_left _) (Commute.one_left _)
+    rw [truncated_endpoints_evolution_norm H hT.le] at htransfer
+    simp only [one_mul, mul_one] at htransfer
+    have hzero := hend 0 (by simp)
+    have hone := hend 1 (by simp)
+    rw [← hzero.2.1] at hzero
+    rw [← hone.2.1] at hone
+    have hbound0 := hzero.2.2
+    rw [norm_sub_rev] at hbound0
+    have hbound1 := hone.2.2
+    rw [norm_sub_rev] at hbound1
+    linarith
 
 end RoundedClocks

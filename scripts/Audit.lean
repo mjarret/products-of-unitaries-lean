@@ -31,13 +31,19 @@ open Lean Elab Command in
     `RoundedClocks.theorem_A,
     `RoundedClocks.theorem_B,
     `RoundedClocks.IsRegulated,
+    `RoundedClocks.generates_exists, `RoundedClocks.generates_evolutionOf,
+    `RoundedClocks.generates_unique,
     `RoundedClocks.comparison,
+    `RoundedClocks.duhamel,
+    `RoundedClocks.piecewise_product,
+    `RoundedClocks.roundedEvolution_end,
     `RoundedClocks.stepProduct,
     `RoundedClocks.transfer,
     `RoundedClocks.IsBand,
     `RoundedClocks.entrywise,
     `RoundedClocks.truncation_bits,
     `RoundedClocks.HasMidpointError,
+    `RoundedClocks.exists_bits,
     `RoundedClocks.exists_checkpoints,
     `RoundedClocks.midpointProduct,
     `RoundedClocks.fine_steps,
@@ -72,7 +78,7 @@ open Lean Elab Command in
   for (name, _) in env.constants.toList do
     if let some idx := env.getModuleIdxFor? name then
       let m := env.header.moduleNames[idx.toNat]!
-      if (`RoundedClocks).isPrefixOf m || (`UnitaryProducts).isPrefixOf m then
+      if (`RoundedClocks).isPrefixOf m then
         let (_, next) := ((CollectAxioms.collect name).run env).run state
         state := next
         count := count + 1

@@ -1,7 +1,9 @@
 # Rounded clocks
 
-Lean proofs of every numbered statement of Michael Jarret's *Rounded clocks and finite precision: a
-transfer principle between continuous and discrete quantum dynamics*, and of its Theorems A and B.
+Lean 4 proofs of the results of Michael Jarret's *Rounded clocks and finite precision: a transfer
+principle between continuous and discrete quantum dynamics*: every numbered theorem, lemma,
+proposition, example, remark, and fact, the displayed equations (2.3)–(2.5), and Theorems A and B
+of the introduction.
 
 The paper compares finite products of unitary matrices with continuous Schrödinger evolutions. It
 proves fine-step error bounds for midpoint products with truncated entries, a unit-step comparison
@@ -9,26 +11,37 @@ for Hamiltonians with Lipschitz derivative, the corresponding comparison for pro
 unitaries through a Hermitian logarithm, and transfer bounds for leakage between spectral
 subspaces. All matrix norms are operator norms.
 
-Continuous adiabatic theorems are not formalized. Where the paper assumes a continuous leakage
-bound such as `‖(1 - Q) U(T) P‖ ≤ C / T`, the Lean statement takes it as a hypothesis.
+## Layout
 
-## Reading the statements
+The library follows the paper. Each part of the paper has one file holding its statements and
+proofs, and a folder of the same name holding the supporting lemmas of those proofs.
 
-Start with the [statement index](THEOREMS.md). It lists each numbered statement of the paper, and
-Theorems A and B, with the Lean declaration that states it.
+| File | Paper |
+| --- | --- |
+| [RoundedClocks/Definitions.lean](RoundedClocks/Definitions.lean) | the objects and notation the statements use |
+| [RoundedClocks/Citations.lean](RoundedClocks/Citations.lean) | the results the paper cites from the literature |
+| [RoundedClocks/Introduction.lean](RoundedClocks/Introduction.lean) | Theorems A and B |
+| [RoundedClocks/Preliminaries.lean](RoundedClocks/Preliminaries.lean) | Section 2 |
+| [RoundedClocks/FineSteps.lean](RoundedClocks/FineSteps.lean) | Section 3 |
+| [RoundedClocks/UnitSteps.lean](RoundedClocks/UnitSteps.lean) | Section 4 |
+| [RoundedClocks/Examples.lean](RoundedClocks/Examples.lean) | Section 5 |
+| [RoundedClocks/Appendix.lean](RoundedClocks/Appendix.lean) | Appendices A and B |
 
-The statements are in `RoundedClocks/`, one file per part of the paper, and use only the terms
-defined in [RoundedClocks/Definitions.lean](RoundedClocks/Definitions.lean). Those definitions
-follow the paper's wording and notation: `H` is a time-dependent Hamiltonian, `evolution H T` is its
-evolution over time `T`, `roundedEvolution H T` is the evolution of `H(⌊t+1/2⌋/T)`, `stepProduct H T`
-is the `T`-step product, `∂H` is the derivative of `H` on `[0,1]`, `‖f‖∞` is the supremum of `‖f‖`
-on `[0,1]`, `A†` is the conjugate transpose, and `𝒩`, `c₀`, `c₁`, `c₂`, `κ`, `ℰ`, and `ℰtilde` are
-the multiplier and constants of the paper. Each statement's docstring gives the paper's statement in
-words.
+The [statement index](THEOREMS.md) lists each result of the paper with the declaration that states
+it. Each statement's docstring gives the paper's statement in words. The proofs take the paper's
+steps in the paper's order.
 
-The proofs are in `UnitaryProducts/`. The file
-[RoundedClocks/Bridge.lean](RoundedClocks/Bridge.lean) identifies each definition of the paper with
-the form the proofs use.
+## Cited results
+
+The paper cites Dieudonné's *Foundations of Modern Analysis*, Bhatia's *Matrix Analysis*, and the
+NIST Digital Library of Mathematical Functions. Each cited result is a proposition in
+[RoundedClocks/Citations.lean](RoundedClocks/Citations.lean), with the source's statement quoted
+verbatim in its docstring and specialized to finite-dimensional complex matrices where that is all
+the paper uses. A statement whose proof uses a cited result takes that proposition as an explicit
+hypothesis, and its docstring begins "Assuming …". No cited result is an axiom.
+
+Continuous adiabatic theorems are not formalized. Where the paper assumes a continuous leakage bound
+such as `‖(1 - Q) U(T) P‖ ≤ C / T`, the Lean statement takes it as a hypothesis.
 
 ## Build
 
@@ -39,16 +52,14 @@ lake exe cache get
 lake build
 ```
 
-The toolchain and Mathlib dependency are pinned to version 4.28.0. The dependency manifest records
-exact revisions. The build enables Mathlib's standard linter set.
+The toolchain and Mathlib are pinned to version 4.28.0; the manifest records exact revisions.
 
 ## Checking the build
 
-After `lake build`, three scripts print what the build establishes:
+After `lake build`, two scripts print what the build establishes:
 
 ```sh
 lake env lean scripts/Audit.lean       # the axioms of every declaration
-lake env lean scripts/Lint.lean        # the Batteries and Mathlib environment linters
 lake env lean scripts/HeadTypes.lean   # the full statement of every indexed declaration
 ```
 
@@ -56,5 +67,5 @@ Every declaration depends only on `propext`, `Classical.choice`, and `Quot.sound
 
 ## License and citation
 
-The code is released under the [Apache License 2.0](LICENSE).
-Citation metadata is provided in [CITATION.cff](CITATION.cff).
+The code is released under the [Apache License 2.0](LICENSE). Citation metadata is in
+[CITATION.cff](CITATION.cff).
